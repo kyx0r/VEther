@@ -6,8 +6,7 @@ OBJS=$(SRCS:.cpp=.o)
 CC = g++
 LIBNAME = VEther
 LIBPATH = ../lib
-CXXFLAGS = -O3 -m64 -s -Wall -fPIC -DPIC -I ../include -I ../glfw/include -Wextra -masm=intel -mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe 
-
+CXXFLAGS = -fPIC -DPIC -I ../include -I ../glfw/include $(SHARED_FLAGS)
 all: $(LIBPATH)/lib$(LIBNAME).a
 
 clean:

@@ -18,7 +18,7 @@ PROGS = $(patsubst ./src/%.cpp, ./build/%.o,$(SRCS))
 
 # -w suppresses all warnings 
 # -Wl,-subsystem,windows gets rid of the console window 
-COMPILER_FLAGS = -fpermissive -m64 -s -Wall
+#COMPILER_FLAGS = -fpermissive -m64 -s -Wall
 
 LIBRARY_PATHS = -L ./lib
 
@@ -36,31 +36,33 @@ VETHER = -lVEther -lglfw
 #OBJ_NAME specifies the name of our exectuable 
 OBJ_NAME = VEther.exe 
 
-FUNC_CALL_PARAMS_FLAGS = -mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
+SHARED_FLAGS = -O3 -m64 -s -Wall -Wextra
+export
+#-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 
 #Monolithic compile.
 all : 
-	$(CC) -O0 -static $(OBJS) $(HEADS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(FUNC_CALL_PARAMS_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) -O0 -static $(OBJS) $(HEADS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
 	
 allwin : 
-	$(CC) -O0 -static $(OBJS) $(HEADS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(FUNC_CALL_PARAMS_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)	
+	$(CC) -O0 -static $(OBJS) $(HEADS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)	
 
 all_individual : $(PROGS)
 ./build/%.o: ./src/%.cpp
-	$(CC) -c -static $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(FUNC_CALL_PARAMS_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $@ $<
+	$(CC) -c -static $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $@ $<
 	
 VEther: 
-	$(MAKE) all -C ./src
 	$(MAKE) all -C ./glfw
+	$(MAKE) all -C ./src
 	
 #Building a static lib out of src files. Benefits - faster compile time. Makes project modular.
 #all_slwin <- use this for compilation on windows OS.
 all_slwin: VEther
-	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(FUNC_CALL_PARAMS_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
+	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
 
 #all_sl <- any other system.	
 all_sl: VEther
-	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(FUNC_CALL_PARAMS_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)	
+	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)	
 	
 clean_f:
 	find . -type f -name '*.orig' -delete

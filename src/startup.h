@@ -3,13 +3,13 @@
 #include <limits>
 #include <sstream>
 #include <vector>
-#include <tchar.h>
 #include <string>
 
 #if defined _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_EXPOSE_NATIVE_WGL
 #define GLFW_EXPOSE_NATIVE_WIN32
+#include <tchar.h>
 #endif
 
 #define VK_NO_PROTOTYPES
@@ -54,9 +54,15 @@ bool CheckPhysicalDeviceExtensions();
 bool CheckPhysicalDevices();
 bool CheckQueueProperties(VkQueueFlags desired_capabilities,  uint32_t &queue_family_index);
 bool IsExtensionSupported(const char* extension);
-bool SetQueue(QueueInfo *array, uint32_t family, float *_Priorities, int index);
 bool CreateVulkanInstance(uint32_t count, const char** exts); 
 bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_count, const char** exts);
+
+inline bool SetQueue(QueueInfo *array, uint32_t family, float *_Priorities, int index)
+{
+	array[index].FamilyIndex = family;
+	array[index].Priorities = _Priorities;
+	return true;
+}
 
 //--------------------
 

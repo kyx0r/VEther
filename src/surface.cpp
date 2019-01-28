@@ -1,16 +1,10 @@
 #include "surface.h"
 
-VkSurfaceKHR presentation_surface;
-VkPresentModeKHR *present_modes;
-VkPresentModeKHR target_surface_mode;
-VkSurfaceCapabilitiesKHR surface_capabilities;
+VkSurfaceKHR presentation_surface; // <- exported to other files.
+VkPresentModeKHR target_surface_mode; // <- exported to other files.
+VkSurfaceCapabilitiesKHR surface_capabilities; // <- exported to other files.
 
-uint32_t number_of_images;
-VkExtent2D size_of_images;
-VkImageUsageFlags image_usage;
-VkFormat image_format;
-VkColorSpaceKHR image_color_space;
-VkSurfaceTransformFlagBitsKHR  surface_transform;
+//VkPresentModeKHR *present_modes = nullptr;
 
 bool CreatePresentationSurface(WindowParameters &window_parameters)
 {
@@ -129,114 +123,4 @@ bool CheckPresentationSurfaceCapabilities()
 		return false;
 	}
 	return true;
-}
-
-bool SelectNumberOfSwapchainImages()
-{
-    number_of_images = surface_capabilities.minImageCount + 1;
-    if(surface_capabilities.maxImageCount > 0 && number_of_images > surface_capabilities.maxImageCount) 
-	{
-		number_of_images = surface_capabilities.maxImageCount;
-    }
-    return true;	
-}
-
-bool ComputeSizeOfSwapchainImages(uint32_t x, uint32_t y) 
-{
-    if( 0xFFFFFFFF == surface_capabilities.currentExtent.width ) 
-	{
-      size_of_images = { x, y };
-
-      if( size_of_images.width < surface_capabilities.minImageExtent.width ) 
-	  {
-        size_of_images.width = surface_capabilities.minImageExtent.width;
-      } else if( size_of_images.width > surface_capabilities.maxImageExtent.width ) 
-	  {
-        size_of_images.width = surface_capabilities.maxImageExtent.width;
-      }
-
-      if( size_of_images.height < surface_capabilities.minImageExtent.height ) 
-	  {
-        size_of_images.height = surface_capabilities.minImageExtent.height;
-      } else if( size_of_images.height > surface_capabilities.maxImageExtent.height ) 
-	  {
-        size_of_images.height = surface_capabilities.maxImageExtent.height;
-      }
-    } else 
-	{
-      size_of_images = surface_capabilities.currentExtent;
-    }
-    return true;
-}
-
-bool SelectDesiredUsageScenariosOfSwapchainImages(VkImageUsageFlags desired_usages) 
-{
-    image_usage = desired_usages & surface_capabilities.supportedUsageFlags;
-    return desired_usages == image_usage;
-}
-
-bool SelectTransformationOfSwapchainImages(VkSurfaceTransformFlagBitsKHR desired_transform)
-{
-    if( surface_capabilities.supportedTransforms & desired_transform ) {
-      surface_transform = desired_transform;
-    } else {
-      surface_transform = surface_capabilities.currentTransform;
-    }
-    return true;
-}
-
-bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format) 
-{
-    // Enumerate supported formats
-    uint32_t formats_count = 0;
-    VkResult result = VK_SUCCESS;
-
-    result = vkGetPhysicalDeviceSurfaceFormatsKHR( target_device, presentation_surface, &formats_count, nullptr );
-    if(result != VK_SUCCESS || formats_count == 0 ) 
-	{
-      std::cout << "Could not get the number of supported surface formats." << std::endl;
-      return false;
-    }
-
-    VkSurfaceFormatKHR surface_formats [formats_count];
-    result = vkGetPhysicalDeviceSurfaceFormatsKHR( target_device, presentation_surface, &formats_count, &surface_formats[0] );
-    if(result != VK_SUCCESS || formats_count == 0)
-	{
-      std::cout << "Could not enumerate supported surface formats." << std::endl;
-      return false;
-    }
-
-    // Select surface format
-    if(formats_count == 1 && surface_formats[0].format == VK_FORMAT_UNDEFINED) 
-	{
-      image_format = desired_surface_format.format;
-      image_color_space = desired_surface_format.colorSpace;
-      return true;
-    }
-
-    for(uint32_t i = 0; i<formats_count; i++) 
-	{
-      if(desired_surface_format.format == surface_formats[i].format && desired_surface_format.colorSpace == surface_formats[i].colorSpace)
-	  {
-        image_format = desired_surface_format.format;
-        image_color_space = desired_surface_format.colorSpace;
-        return true;
-      }
-    }
-
-    for(uint32_t i = 0; i<formats_count; i++) 
-	{
-      if( (desired_surface_format.format == surface_formats[i].format) ) 
-	  {
-        image_format = desired_surface_format.format;
-        image_color_space = surface_formats[i].colorSpace;
-        std::cout << "Desired combination of format and colorspace is not supported. Selecting other colorspace." << std::endl;
-        return true;
-      }
-    }
-	
-    image_format = surface_formats[0].format;
-    image_color_space = surface_formats[0].colorSpace;
-    std::cout << "Desired format is not supported. Selecting available format - colorspace combination." << std::endl;
-    return true;
 }

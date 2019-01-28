@@ -1,25 +1,25 @@
 #include "startup.h"
 
-uint32_t extensions_count = 0;
-uint32_t device_extensions_count = 0;
-uint32_t device_count = 0;
-uint32_t desired_count = 0; 
-uint32_t queue_families_count = 0;
-const char** desired_extensions = nullptr;
+static uint32_t extensions_count = 0;
+static uint32_t device_extensions_count = 0;
+static uint32_t device_count = 0;
+static uint32_t desired_count = 0; 
+uint32_t queue_families_count = 0; // <- exported to other files.
+static const char** desired_extensions = nullptr;
 
-VkExtensionProperties* available_extensions = nullptr;
-VkPhysicalDevice *available_devices = nullptr;
-VkQueueFamilyProperties *queue_families = nullptr;
-VkDeviceQueueCreateInfo *queue_create_infos = nullptr;
+static VkExtensionProperties* available_extensions = nullptr;
+static VkPhysicalDevice *available_devices = nullptr;
+//VkQueueFamilyProperties *queue_families = nullptr;
+//VkDeviceQueueCreateInfo *queue_create_infos = nullptr;
 
-VkInstance instance;
-VkPhysicalDevice target_device;
-VkDevice logical_device;
-VkPhysicalDeviceFeatures device_features;
-VkPhysicalDeviceProperties device_properties;
+VkInstance instance;            // <- exported to other files.
+VkPhysicalDevice target_device; // <- exported to other files.
+VkDevice logical_device;        // <- exported to other files.
+static VkPhysicalDeviceFeatures device_features;
+static VkPhysicalDeviceProperties device_properties;
 
-VkInstanceCreateInfo instance_create_info;
-VkApplicationInfo app_info = 
+static VkInstanceCreateInfo instance_create_info;
+static VkApplicationInfo app_info = 
 {
 	VK_STRUCTURE_TYPE_APPLICATION_INFO,
 	nullptr,
@@ -31,9 +31,9 @@ VkApplicationInfo app_info =
 };
 
 #if defined _WIN32
-HMODULE vulkan_lib;
+static HMODULE vulkan_lib;
 #elif defined __linux
-void* vulkan_lib
+static void* vulkan_lib;
 #endif
 
 //---------------------------------------------------------------------
@@ -342,13 +342,6 @@ bool CheckQueueProperties(VkQueueFlags desired_capabilities,  uint32_t &queue_fa
 	return false;
 }
 
-bool SetQueue(QueueInfo *array, uint32_t family, float *_Priorities, int index)
-{
-	array[index].FamilyIndex = family;
-	array[index].Priorities = _Priorities;
-	return true;
-}
-
 bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_count, const char** exts)
 {
 	desired_count = ext_count;
@@ -403,7 +396,8 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
       return false;
     }
 	
-	//delete available_extensions;
+	delete available_extensions;
+	available_extensions = nullptr;
 	
 	return true;
 }

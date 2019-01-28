@@ -1,6 +1,8 @@
 #include "src/startup.h"
 #include "src/window.h"
 #include "src/surface.h"
+#include "src/swapchain.h"
+#include "src/control.h"
 
 #define number_of_queues 2 // <- change this if more queues needed
 
@@ -42,16 +44,13 @@ int main(int argc, char *lpCmdLine[])
 		!CheckPhysicalDeviceExtensions()||
 		!CheckQueueProperties(VK_QUEUE_GRAPHICS_BIT, graphics_queue_family_index )||
 		!CheckQueueProperties(VK_QUEUE_COMPUTE_BIT, compute_queue_family_index)||
+		//! SURFACE INIT
 		!CreatePresentationSurface(windowParams)||
 		!CheckSurfaceQueueSupport(graphics_queue_family_index)||
 		!CheckSurfaceQueueSupport(compute_queue_family_index)||
 		!CheckSelectPresentationModesSupport(VK_PRESENT_MODE_MAILBOX_KHR)||
 		!CheckPresentationSurfaceCapabilities()||
-		!SelectNumberOfSwapchainImages()||
-		!ComputeSizeOfSwapchainImages(640, 480)||
-		!SelectDesiredUsageScenariosOfSwapchainImages(desired_usages)|| 
-		!SelectTransformationOfSwapchainImages(desired_transform)||
-		!SelectFormatOfSwapchainImages({VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR})||
+		//~ SURFACE INIT
 		!SetQueue(QueueInfos, graphics_queue_family_index, priority, 0)||
 		!SetQueue(QueueInfos, compute_queue_family_index, priority, 1)||
 		!CreateLogicalDevice(QueueInfos, number_of_queues, 1, device_extensions)||
@@ -65,6 +64,35 @@ int main(int argc, char *lpCmdLine[])
 	vkGetDeviceQueue(logical_device, compute_queue_family_index, 0, &ComputeQueue);
 	
 	std::cout << "Vulkan Initialized Successfully!" << std::endl;
+	
+	if(
+		!SelectNumberOfSwapchainImages()||
+		!ComputeSizeOfSwapchainImages(640, 480)||
+		!SelectDesiredUsageScenariosOfSwapchainImages(desired_usages)|| 
+		!SelectTransformationOfSwapchainImages(desired_transform)||
+		!SelectFormatOfSwapchainImages({VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR})||	
+		!CreateSwapchain(swapchain, old_swapchain)||
+		!GetHandlesOfSwapchainImages(swapchain)
+		)
+	{
+		debug_pause();
+		exit(1);		
+	}
+	
+	std::cout << "Swapchain Created!" << std::endl;
+	
+	if(
+		!CreateSemaphore(AcquiredSemaphore)||
+		!CreateSemaphore(ReadySemaphore)||
+		!CreateCommandPool(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, graphics_queue_family_index)||
+		!AllocateCommandBuffers(VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1)
+		)
+	{
+		debug_pause();
+		exit(1);		
+	}	
+	
+	std::cout << "Initial Control Buffer Created!" << std::endl;
 	
 	mainLoop();
 	

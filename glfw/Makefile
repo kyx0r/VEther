@@ -35,7 +35,7 @@ CC = gcc
 
 LIBNAME = glfw
 LIBPATH = ../lib
-CFLAGS = -O3 -Wall -m64 $(LIBFLAGS) -I.. -I ./deps -I ../include
+CFLAGS = $(LIBFLAGS) $(SHARED_FLAGS) -I.. -I ./deps -I ../include
 
 all: $(LIBPATH)/lib$(LIBNAME).a
 
