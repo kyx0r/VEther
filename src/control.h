@@ -11,6 +11,22 @@ bool BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCom
 bool EndCommandBufferRecordingOperation();
 bool ResetCommandBuffer(bool release_resources);
 
+inline void SetImageMemoryBarrier(VkPipelineStageFlags generating_stages, VkPipelineStageFlags consuming_stages, VkImageMemoryBarrier &image_memory_barrier)
+{	
+    vkCmdPipelineBarrier(command_buffer, generating_stages, consuming_stages, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
+}
+
+inline bool SubmitCommandBuffersToQueue(VkQueue queue, VkFence fence, VkSubmitInfo &submit_info)
+{
+    VkResult result = vkQueueSubmit(queue, 1, &submit_info, fence);
+    if(result != VK_SUCCESS) 
+	{
+      std::cout << "Error occurred during command buffer submission." << std::endl;
+      return false;
+    }
+	return true;
+}
+
 inline bool WaitForAllSubmittedCommandsToBeFinished()
 {
     VkResult result = vkDeviceWaitIdle(logical_device);

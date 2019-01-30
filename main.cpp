@@ -24,8 +24,6 @@ int main(int argc, char *lpCmdLine[])
 	static const char *device_extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME}; 
 	uint32_t graphics_queue_family_index; // <- this is queue 1
 	uint32_t compute_queue_family_index; // <- this is queue 2
-	VkQueue GraphicsQueue;
-	VkQueue ComputeQueue;
 	struct QueueInfo QueueInfos[number_of_queues];
 	WindowParameters windowParams;
 	float priority[] = {1.0f};
