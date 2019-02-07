@@ -1,10 +1,20 @@
 #include "swapchain.h"
 
-VkImage *handle_array_of_swapchain_images = nullptr; // <- exported to other files.
+/* {
+GVAR: logical_device -> startup.cpp	
+GVAR: target_device -> startup.cpp	
+GVAR: surface_capabilities -> surface.cpp	
+GVAR: presentation_surface -> surface.cpp	
+} */
+
+//{
+VkImage *handle_array_of_swapchain_images = nullptr;
+VkFormat image_format;
+//}
+
 static uint32_t number_of_images;
 static VkExtent2D size_of_images;
 static VkImageUsageFlags image_usage;
-static VkFormat image_format;
 static VkColorSpaceKHR image_color_space;
 static VkSurfaceTransformFlagBitsKHR  surface_transform;
 
@@ -16,6 +26,28 @@ bool SelectNumberOfSwapchainImages()
 		number_of_images = surface_capabilities.maxImageCount;
     }
     return true;	
+}
+
+bool SetSizeOfSwapchainImages(uint32_t x, uint32_t y) 
+{
+    size_of_images = { x, y };
+
+    if( x < surface_capabilities.minImageExtent.width ) 
+	{
+        size_of_images.width = surface_capabilities.minImageExtent.width;
+    } else if( x > surface_capabilities.maxImageExtent.width ) 
+	{
+      size_of_images.width = surface_capabilities.maxImageExtent.width;
+    }
+
+    if( y < surface_capabilities.minImageExtent.height ) 
+	{
+      size_of_images.height = surface_capabilities.minImageExtent.height;
+    } else if( y > surface_capabilities.maxImageExtent.height ) 
+	{
+      size_of_images.height = surface_capabilities.maxImageExtent.height;
+    }	
+	return true;
 }
 
 bool ComputeSizeOfSwapchainImages(uint32_t x, uint32_t y) 
@@ -169,6 +201,10 @@ bool GetHandlesOfSwapchainImages(VkSwapchainKHR &swapchain)
       return false;
     }
 	
+	if(handle_array_of_swapchain_images != nullptr)
+	{
+		delete handle_array_of_swapchain_images;
+	}
     handle_array_of_swapchain_images = new VkImage [images_count];
 	
     result = vkGetSwapchainImagesKHR( logical_device, swapchain, &images_count, &handle_array_of_swapchain_images[0]);
@@ -197,7 +233,11 @@ bool AcquireSwapchainImage(VkSwapchainKHR swapchain, VkSemaphore semaphore, VkFe
     }
 }
 
-bool InitSwapchain()
+void DestroySwapchain(VkSwapchainKHR &swapchain)
 {
-	return true;
+	if(swapchain)
+	{
+		vkDestroySwapchainKHR(logical_device, swapchain, nullptr);
+		swapchain = VK_NULL_HANDLE;
+	}
 }

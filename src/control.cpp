@@ -1,8 +1,15 @@
 #include "control.h"
 
+/* {
+GVAR: logical_device -> startup.cpp	
+} */
+
+//{
+VkCommandBuffer command_buffer;
+//}
+
 static VkCommandPool command_pool;
 static VkCommandBuffer *command_buffers = nullptr;
-VkCommandBuffer command_buffer;
 
 bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_family) 
 {
@@ -12,14 +19,27 @@ bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_famil
       parameters,                                   // VkCommandPoolCreateFlags     flags
       queue_family                                  // uint32_t                     queueFamilyIndex
     };
-
-    VkResult result = vkCreateCommandPool( logical_device, &command_pool_create_info, nullptr, &command_pool);
+	
+    VkResult result = vkCreateCommandPool(logical_device, &command_pool_create_info, nullptr, &command_pool);
     if(result != VK_SUCCESS) 
 	{
       std::cout << "Could not create command pool." << std::endl;
       return false;
     }
     return true;
+}
+
+bool ResetCommandPool(bool release_resources)
+{
+	//VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT -> let the driver handle the pool automatically. 
+	//VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT -> this flag is not required at pool creation if you use this function. 
+	VkResult result = vkResetCommandPool(logical_device, command_pool, release_resources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0);
+    if(result != VK_SUCCESS)
+	{
+		std::cout << "Error occurred during command pool reset." << std::endl;
+		return false;
+    }	
+	return true;
 }
 
 bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count) 
@@ -32,6 +52,10 @@ bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count)
       count                                             // uint32_t                 commandBufferCount
     };
 	
+	if(command_buffers != nullptr)
+	{
+		delete command_buffers;
+	}
 	command_buffers = new VkCommandBuffer[count];
 
     VkResult result = vkAllocateCommandBuffers(logical_device, &command_buffer_allocate_info, &command_buffers[0]);
@@ -92,6 +116,7 @@ bool EndCommandBufferRecordingOperation()
 
 bool ResetCommandBuffer(bool release_resources) 
 {
+	//VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT allows to have access to every buffer in command_buffers.
     VkResult result = vkResetCommandBuffer(command_buffer, release_resources ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0);
     if(result != VK_SUCCESS) 
 	{

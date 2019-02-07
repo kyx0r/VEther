@@ -36,7 +36,7 @@ VETHER = -lVEther -lglfw
 #OBJ_NAME specifies the name of our exectuable 
 OBJ_NAME = VEther.exe 
 
-SHARED_FLAGS = -O3 -m64 -s -Wall -Wextra
+SHARED_FLAGS = -O3 -m64 -s -Wall -Wextra -Wno-unused-parameter -Wno-cast-function-type
 export
 #-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 

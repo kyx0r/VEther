@@ -6,6 +6,18 @@
 
 #define number_of_queues 2 // <- change this if more queues needed
 
+/* {
+GVAR: window_width -> window.cpp
+GVAR: window_height -> window.cpp
+GVAR: swapchain -> window.cpp
+GVAR: old_swapchain -> window.cpp
+GVAR: AcquiredSemaphore -> window.cpp
+GVAR: ReadySemaphore -> window.cpp
+GVAR: compute_queue_family_index -> window.cpp
+GVAR: graphics_queue_family_index -> window.cpp
+GVAR: instance -> startup.cpp
+} */
+
 int main(int argc, char *lpCmdLine[])
 {
 	static const char *extensions[] = 
@@ -22,13 +34,11 @@ int main(int argc, char *lpCmdLine[])
 	#endif
 	};
 	static const char *device_extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME}; 
-	uint32_t graphics_queue_family_index; // <- this is queue 1
-	uint32_t compute_queue_family_index; // <- this is queue 2
 	struct QueueInfo QueueInfos[number_of_queues];
 	WindowParameters windowParams;
 	float priority[] = {1.0f};
-	VkImageUsageFlags desired_usages = 1;
-	VkSurfaceTransformFlagBitsKHR desired_transform;
+	static VkImageUsageFlags desired_usages = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |  VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+	static VkSurfaceTransformFlagBitsKHR desired_transform;
 	
 	initWindow();
 	
@@ -63,9 +73,13 @@ int main(int argc, char *lpCmdLine[])
 	
 	std::cout << "Vulkan Initialized Successfully!" << std::endl;
 	
+#ifdef DEBUG
+	VkDebugReportCallbackEXT debugCallback = registerDebugCallback();
+#endif
+	
 	if(
 		!SelectNumberOfSwapchainImages()||
-		!ComputeSizeOfSwapchainImages(640, 480)||
+		!ComputeSizeOfSwapchainImages(window_width, window_height)||
 		!SelectDesiredUsageScenariosOfSwapchainImages(desired_usages)|| 
 		!SelectTransformationOfSwapchainImages(desired_transform)||
 		!SelectFormatOfSwapchainImages({VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR})||	
@@ -93,6 +107,13 @@ int main(int argc, char *lpCmdLine[])
 	std::cout << "Initial Control Buffer Created!" << std::endl;
 	
 	mainLoop();
+	
+#ifdef DEBUG
+	if(debugCallback != 0)
+	{
+		vkDestroyDebugReportCallbackEXT(instance, debugCallback, 0);
+	}
+#endif	
 	
 	ReleaseVulkanLoaderLibrary();
 	

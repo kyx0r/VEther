@@ -1,34 +1,33 @@
 #include "startup.h"
 
+/* {
+GVAR: PFN_* -> vulkan_decl.h
+} */
+
+//{
+VkInstance instance;           
+VkPhysicalDevice target_device; 
+VkDevice logical_device; 
+uint32_t queue_families_count = 0; 
+//}
+
 static uint32_t extensions_count = 0;
 static uint32_t device_extensions_count = 0;
 static uint32_t device_count = 0;
 static uint32_t desired_count = 0; 
-uint32_t queue_families_count = 0; // <- exported to other files.
 static const char** desired_extensions = nullptr;
-
 static VkExtensionProperties* available_extensions = nullptr;
-static VkPhysicalDevice *available_devices = nullptr;
-//VkQueueFamilyProperties *queue_families = nullptr;
-//VkDeviceQueueCreateInfo *queue_create_infos = nullptr;
-
-VkInstance instance;            // <- exported to other files.
-VkPhysicalDevice target_device; // <- exported to other files.
-VkDevice logical_device;        // <- exported to other files.
+static VkPhysicalDevice *available_devices = nullptr;       
 static VkPhysicalDeviceFeatures device_features;
 static VkPhysicalDeviceProperties device_properties;
 
-static VkInstanceCreateInfo instance_create_info;
-static VkApplicationInfo app_info = 
+#ifdef DEBUG
+static int d_layers_count = 1;
+const char* debugLayers[] =
 {
-	VK_STRUCTURE_TYPE_APPLICATION_INFO,
-	nullptr,
-	"Vether",
-	VK_MAKE_VERSION(1,0,0),
-	"Vether",
-	VK_MAKE_VERSION(1,0,0),
-	VK_MAKE_VERSION(1,0,0)
+	"VK_LAYER_LUNARG_standard_validation"
 };
+#endif
 
 #if defined _WIN32
 static HMODULE vulkan_lib;
@@ -102,6 +101,98 @@ const char* GetVulkanResultString(VkResult result)
     }
 }
 
+#ifdef DEBUG
+
+static VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData)
+{
+	// This silences warnings like "For optimal performance image layout should be VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL instead of GENERAL."
+	// We'll assume other performance warnings are also not useful.
+	if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
+		return VK_FALSE;
+
+	const char* type =
+		(flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+		? "ERROR"
+		: (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+			? "WARNING"
+			: "INFO";
+
+	char message[4096];
+	snprintf(message, ARRAYSIZE(message), "%s: %s\n", type, pMessage);
+
+	printf("%s", message);
+
+#ifdef _WIN32
+	OutputDebugStringA(message);
+#endif
+
+	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+		assert(!"Validation error encountered!");
+
+	return VK_FALSE;
+}
+
+static bool CheckValidationLayerSupport()
+{
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    VkLayerProperties availableLayers[layerCount];
+    vkEnumerateInstanceLayerProperties(&layerCount, &availableLayers[0]);
+
+    for(int i = 0; i<d_layers_count; i++)
+	{
+        bool layerFound = false;
+        for (uint32_t z = 0; z<layerCount; z++)
+		{
+            if (strcmp(debugLayers[i], (char*) &availableLayers[z]) == 0)
+			{
+                layerFound = true;
+                break;
+            }
+        }
+        if (!layerFound)
+		{
+            return false;
+        }
+    }
+	return true;
+}
+
+VkDebugReportCallbackEXT registerDebugCallback()
+{
+	if(!CheckValidationLayerSupport())
+	{
+		std::cout<<"Debug Layers are not found! \n";
+		return 0;
+	}
+	
+	#define DEBUG_VULKAN_FUNCTION( name ) \
+	name = reinterpret_cast<PFN_##name> (vkGetInstanceProcAddr( instance, #name)); \
+	if(name == nullptr) \
+	{ \
+		std::cout<<"Could not load DEBUG Vulkan function: "<< #name <<std::endl; \
+		return 0; \
+	}else \
+		std::cout<<"Loaded DEBUG Vulkan function: "<< #name <<std::endl; \
+	
+	#include "vulkan_functions_list.inl"	
+	
+	VkDebugReportCallbackCreateInfoEXT createInfo = {};
+	createInfo.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT | 
+	VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | 
+	VK_DEBUG_REPORT_ERROR_BIT_EXT |
+	VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+	createInfo.pfnCallback = debugReportCallback;
+
+	VkDebugReportCallbackEXT callback = 0;
+	VK_CHECK(vkCreateDebugReportCallbackEXT(instance, &createInfo, 0, &callback));
+
+	return callback;
+}
+
+#endif
+
 bool LoadVulkan()
 {
 	#if defined _WIN32
@@ -120,7 +211,7 @@ bool LoadVulkan()
 	}
 			
 	#define EXPORTED_VULKAN_FUNCTION( name ) \
-	name = (PFN_##name) LoadFunction(vulkan_lib, #name); \
+	name = reinterpret_cast<PFN_##name> (LoadFunction(vulkan_lib, #name)); \
 	if(name == nullptr) \
 	{ \
 		std::cout<<"Could not load exported Vulkan function: "<< #name <<std::endl; \
@@ -136,7 +227,7 @@ bool LoadVulkan()
 bool LoadVulkanGlobalFuncs()
 {
 	#define GLOBAL_LEVEL_VULKAN_FUNCTION( name ) \
-	name = (PFN_##name)vkGetInstanceProcAddr( nullptr, #name); \
+	name = reinterpret_cast<PFN_##name> (vkGetInstanceProcAddr( nullptr, #name)); \
 	if(name == nullptr) \
 	{ \
 		std::cout<<"Could not load exported Vulkan function: "<< #name <<std::endl; \
@@ -233,7 +324,18 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		}
 	}
 	
-	instance_create_info = 
+	VkApplicationInfo app_info = 
+	{
+		VK_STRUCTURE_TYPE_APPLICATION_INFO,
+		nullptr,
+		"Vether",
+		VK_MAKE_VERSION(1,0,0),
+		"Vether",
+		VK_MAKE_VERSION(1,0,0),
+		VK_MAKE_VERSION(1,0,0)
+	};
+	
+	VkInstanceCreateInfo instance_create_info =
 	{
 		VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 		nullptr,
@@ -244,6 +346,12 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		count,
 		&desired_extensions[0]
 	};
+	
+#ifdef DEBUG
+	instance_create_info.enabledLayerCount = d_layers_count;
+    instance_create_info.ppEnabledLayerNames = debugLayers;
+#endif
+	
 	VkResult result = VK_SUCCESS;
 	result = vkCreateInstance(&instance_create_info, nullptr, &instance);
 	if(result != VK_SUCCESS)

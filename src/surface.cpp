@@ -1,10 +1,15 @@
 #include "surface.h"
 
-VkSurfaceKHR presentation_surface; // <- exported to other files.
-VkPresentModeKHR target_surface_mode; // <- exported to other files.
-VkSurfaceCapabilitiesKHR surface_capabilities; // <- exported to other files.
+/* {
+GVAR: target_device -> startup.cpp
+GVAR: instance -> startup.cpp
+} */
 
-//VkPresentModeKHR *present_modes = nullptr;
+//{
+VkSurfaceKHR presentation_surface; 
+VkPresentModeKHR target_surface_mode; 
+VkSurfaceCapabilitiesKHR surface_capabilities; 
+//}
 
 bool CreatePresentationSurface(WindowParameters &window_parameters)
 {
@@ -123,4 +128,10 @@ bool CheckPresentationSurfaceCapabilities()
 		return false;
 	}
 	return true;
+}
+
+void DestroyPresentationSurface()
+{
+	vkDestroySurfaceKHR(instance, presentation_surface, nullptr);
+	presentation_surface = VK_NULL_HANDLE;
 }

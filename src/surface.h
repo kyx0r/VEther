@@ -22,6 +22,7 @@ struct WindowParameters
 //------------------------------
 
 bool CreatePresentationSurface(WindowParameters &window_parameters);
+void DestroyPresentationSurface();
 bool CheckSurfaceQueueSupport(uint32_t &queue_family_index);
 bool CheckSelectPresentationModesSupport(VkPresentModeKHR desired_mode);
 bool CheckPresentationSurfaceCapabilities();

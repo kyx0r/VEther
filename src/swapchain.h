@@ -2,10 +2,14 @@
 #include "surface.h"
 
 extern VkImage *handle_array_of_swapchain_images;
+extern VkFormat image_format;
+
 
 //-----------------------------------
 
 bool SelectNumberOfSwapchainImages();
+
+bool SetSizeOfSwapchainImages(uint32_t x, uint32_t y);
 
 bool ComputeSizeOfSwapchainImages(uint32_t x, uint32_t y);
 
@@ -18,6 +22,8 @@ bool SelectTransformationOfSwapchainImages(VkSurfaceTransformFlagBitsKHR desired
 bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format);
 
 bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain);
+
+void DestroySwapchain(VkSwapchainKHR &swapchain);
 
 bool GetHandlesOfSwapchainImages(VkSwapchainKHR &swapchain);
 

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <assert.h>
 
 #if defined _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -25,6 +26,16 @@
 #include "vulkan_decl.h"
 
 #define DEBUG
+
+#define VK_CHECK(call) \
+	do { \
+		VkResult result_ = call; \
+		assert(result_ == VK_SUCCESS); \
+	} while (0)
+
+#ifndef ARRAYSIZE
+#define ARRAYSIZE(array) (sizeof(array) / sizeof((array)[0]))
+#endif
 
 //--------------------
 
@@ -56,6 +67,7 @@ bool CheckQueueProperties(VkQueueFlags desired_capabilities,  uint32_t &queue_fa
 bool IsExtensionSupported(const char* extension);
 bool CreateVulkanInstance(uint32_t count, const char** exts); 
 bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_count, const char** exts);
+VkDebugReportCallbackEXT registerDebugCallback();
 
 inline bool SetQueue(QueueInfo *array, uint32_t family, float *_Priorities, int index)
 {

@@ -6,6 +6,16 @@ EXPORTED_VULKAN_FUNCTION( vkGetInstanceProcAddr )
 
 #undef EXPORTED_VULKAN_FUNCTION
 
+#ifndef DEBUG_VULKAN_FUNCTION
+#define DEBUG_VULKAN_FUNCTION( function )
+#endif
+
+DEBUG_VULKAN_FUNCTION( vkCreateDebugUtilsMessengerEXT )
+DEBUG_VULKAN_FUNCTION( vkCreateDebugReportCallbackEXT )
+DEBUG_VULKAN_FUNCTION( vkDestroyDebugReportCallbackEXT )
+
+#undef DEBUG_VULKAN_FUNCTION
+
 //
 
 #ifndef GLOBAL_LEVEL_VULKAN_FUNCTION

@@ -11,6 +11,12 @@ extern PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties
 extern PFN_vkCreateInstance vkCreateInstance;
 //
 
+//DEBUG_VULKAN_FUNCTION
+extern PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
+extern PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT;
+extern PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT;
+//
+
 //INSTANCE_LEVEL_VULKAN_FUNCTIONS
 extern PFN_vkEnumeratePhysicalDevices vkEnumeratePhysicalDevices;
 extern PFN_vkGetPhysicalDeviceProperties vkGetPhysicalDeviceProperties;
