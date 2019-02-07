@@ -38,10 +38,10 @@
 //
 typedef struct _GLFWjoystickNS
 {
-    IOHIDDeviceRef      device;
-    CFMutableArrayRef   axes;
-    CFMutableArrayRef   buttons;
-    CFMutableArrayRef   hats;
+	IOHIDDeviceRef      device;
+	CFMutableArrayRef   axes;
+	CFMutableArrayRef   buttons;
+	CFMutableArrayRef   hats;
 } _GLFWjoystickNS;
 
 

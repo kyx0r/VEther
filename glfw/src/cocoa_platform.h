@@ -38,10 +38,10 @@ typedef VkFlags VkMacOSSurfaceCreateFlagsMVK;
 
 typedef struct VkMacOSSurfaceCreateInfoMVK
 {
-    VkStructureType                 sType;
-    const void*                     pNext;
-    VkMacOSSurfaceCreateFlagsMVK    flags;
-    const void*                     pView;
+	VkStructureType                 sType;
+	const void*                     pNext;
+	VkMacOSSurfaceCreateFlagsMVK    flags;
+	const void*                     pView;
 } VkMacOSSurfaceCreateInfoMVK;
 
 typedef VkResult (APIENTRY *PFN_vkCreateMacOSSurfaceMVK)(VkInstance,const VkMacOSSurfaceCreateInfoMVK*,const VkAllocationCallbacks*,VkSurfaceKHR*);
@@ -79,22 +79,22 @@ typedef UInt8 (*PFN_LMGetKbdType)(void);
 //
 typedef struct _GLFWwindowNS
 {
-    id              object;
-    id              delegate;
-    id              view;
-    id              layer;
+	id              object;
+	id              delegate;
+	id              view;
+	id              layer;
 
-    GLFWbool        maximized;
+	GLFWbool        maximized;
 
-    // Cached window properties to filter out duplicate events
-    int             width, height;
-    int             fbWidth, fbHeight;
-    float           xscale, yscale;
+	// Cached window properties to filter out duplicate events
+	int             width, height;
+	int             fbWidth, fbHeight;
+	float           xscale, yscale;
 
-    // The total sum of the distances the cursor has been warped
-    // since the last cursor motion event was processed
-    // This is kept to counteract Cocoa doing the same internally
-    double          cursorWarpDeltaX, cursorWarpDeltaY;
+	// The total sum of the distances the cursor has been warped
+	// since the last cursor motion event was processed
+	// This is kept to counteract Cocoa doing the same internally
+	double          cursorWarpDeltaX, cursorWarpDeltaY;
 
 } _GLFWwindowNS;
 
@@ -102,35 +102,36 @@ typedef struct _GLFWwindowNS
 //
 typedef struct _GLFWlibraryNS
 {
-    CGEventSourceRef    eventSource;
-    id                  delegate;
-    id                  autoreleasePool;
-    GLFWbool            finishedLaunching;
-    GLFWbool            cursorHidden;
-    TISInputSourceRef   inputSource;
-    IOHIDManagerRef     hidManager;
-    id                  unicodeData;
-    id                  helper;
-    id                  keyUpMonitor;
-    id                  nibObjects;
+	CGEventSourceRef    eventSource;
+	id                  delegate;
+	id                  autoreleasePool;
+	GLFWbool            finishedLaunching;
+	GLFWbool            cursorHidden;
+	TISInputSourceRef   inputSource;
+	IOHIDManagerRef     hidManager;
+	id                  unicodeData;
+	id                  helper;
+	id                  keyUpMonitor;
+	id                  nibObjects;
 
-    char                keyName[64];
-    short int           keycodes[256];
-    short int           scancodes[GLFW_KEY_LAST + 1];
-    char*               clipboardString;
-    CGPoint             cascadePoint;
-    // Where to place the cursor when re-enabled
-    double              restoreCursorPosX, restoreCursorPosY;
-    // The window whose disabled cursor mode is active
-    _GLFWwindow*        disabledCursorWindow;
+	char                keyName[64];
+	short int           keycodes[256];
+	short int           scancodes[GLFW_KEY_LAST + 1];
+	char*               clipboardString;
+	CGPoint             cascadePoint;
+	// Where to place the cursor when re-enabled
+	double              restoreCursorPosX, restoreCursorPosY;
+	// The window whose disabled cursor mode is active
+	_GLFWwindow*        disabledCursorWindow;
 
-    struct {
-        CFBundleRef     bundle;
-        PFN_TISCopyCurrentKeyboardLayoutInputSource CopyCurrentKeyboardLayoutInputSource;
-        PFN_TISGetInputSourceProperty GetInputSourceProperty;
-        PFN_LMGetKbdType GetKbdType;
-        CFStringRef     kPropertyUnicodeKeyLayoutData;
-    } tis;
+	struct
+	{
+		CFBundleRef     bundle;
+		PFN_TISCopyCurrentKeyboardLayoutInputSource CopyCurrentKeyboardLayoutInputSource;
+		PFN_TISGetInputSourceProperty GetInputSourceProperty;
+		PFN_LMGetKbdType GetKbdType;
+		CFStringRef     kPropertyUnicodeKeyLayoutData;
+	} tis;
 
 } _GLFWlibraryNS;
 
@@ -138,10 +139,10 @@ typedef struct _GLFWlibraryNS
 //
 typedef struct _GLFWmonitorNS
 {
-    CGDirectDisplayID   displayID;
-    CGDisplayModeRef    previousMode;
-    uint32_t            unitNumber;
-    id                  screen;
+	CGDirectDisplayID   displayID;
+	CGDisplayModeRef    previousMode;
+	uint32_t            unitNumber;
+	id                  screen;
 
 } _GLFWmonitorNS;
 
@@ -149,7 +150,7 @@ typedef struct _GLFWmonitorNS
 //
 typedef struct _GLFWcursorNS
 {
-    id              object;
+	id              object;
 
 } _GLFWcursorNS;
 
@@ -157,7 +158,7 @@ typedef struct _GLFWcursorNS
 //
 typedef struct _GLFWtimerNS
 {
-    uint64_t        frequency;
+	uint64_t        frequency;
 
 } _GLFWtimerNS;
 

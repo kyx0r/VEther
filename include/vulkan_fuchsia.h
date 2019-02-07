@@ -33,11 +33,12 @@ extern "C" {
 
 typedef VkFlags VkImagePipeSurfaceCreateFlagsFUCHSIA;
 
-typedef struct VkImagePipeSurfaceCreateInfoFUCHSIA {
-    VkStructureType                         sType;
-    const void*                             pNext;
-    VkImagePipeSurfaceCreateFlagsFUCHSIA    flags;
-    zx_handle_t                             imagePipeHandle;
+typedef struct VkImagePipeSurfaceCreateInfoFUCHSIA
+{
+	VkStructureType                         sType;
+	const void*                             pNext;
+	VkImagePipeSurfaceCreateFlagsFUCHSIA    flags;
+	zx_handle_t                             imagePipeHandle;
 } VkImagePipeSurfaceCreateInfoFUCHSIA;
 
 

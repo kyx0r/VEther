@@ -1,6 +1,7 @@
 #include "vulkan_functions.h"
 
-namespace VEther {
+namespace VEther
+{
 
 #define EXPORTED_VULKAN_FUNCTION( name ) PFN_##name name;
 #define GLOBAL_LEVEL_VULKAN_FUNCTION( name ) PFN_##name name;

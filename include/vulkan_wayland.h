@@ -33,12 +33,13 @@ extern "C" {
 
 typedef VkFlags VkWaylandSurfaceCreateFlagsKHR;
 
-typedef struct VkWaylandSurfaceCreateInfoKHR {
-    VkStructureType                   sType;
-    const void*                       pNext;
-    VkWaylandSurfaceCreateFlagsKHR    flags;
-    struct wl_display*                display;
-    struct wl_surface*                surface;
+typedef struct VkWaylandSurfaceCreateInfoKHR
+{
+	VkStructureType                   sType;
+	const void*                       pNext;
+	VkWaylandSurfaceCreateFlagsKHR    flags;
+	struct wl_display*                display;
+	struct wl_surface*                surface;
 } VkWaylandSurfaceCreateInfoKHR;
 
 

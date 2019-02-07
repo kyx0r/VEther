@@ -16,8 +16,8 @@
 #define VK_NO_PROTOTYPES
 
 //#define GLFW_INCLUDE_VULKAN //<- this define will enable similar functionality but in glfw library
-// it might have some features with easier setup, but not sure if they are needed, 
-//since im implementing parts of this library in my own code already. 
+// it might have some features with easier setup, but not sure if they are needed,
+//since im implementing parts of this library in my own code already.
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h> //<- this header allows me to access the low level window handles. 
 #include <vulkan.h>
@@ -65,7 +65,7 @@ bool CheckPhysicalDeviceExtensions();
 bool CheckPhysicalDevices();
 bool CheckQueueProperties(VkQueueFlags desired_capabilities,  uint32_t &queue_family_index);
 bool IsExtensionSupported(const char* extension);
-bool CreateVulkanInstance(uint32_t count, const char** exts); 
+bool CreateVulkanInstance(uint32_t count, const char** exts);
 bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_count, const char** exts);
 VkDebugReportCallbackEXT registerDebugCallback();
 

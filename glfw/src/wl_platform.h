@@ -35,11 +35,11 @@ typedef VkFlags VkWaylandSurfaceCreateFlagsKHR;
 
 typedef struct VkWaylandSurfaceCreateInfoKHR
 {
-    VkStructureType                 sType;
-    const void*                     pNext;
-    VkWaylandSurfaceCreateFlagsKHR  flags;
-    struct wl_display*              display;
-    struct wl_surface*              surface;
+	VkStructureType                 sType;
+	const void*                     pNext;
+	VkWaylandSurfaceCreateFlagsKHR  flags;
+	struct wl_display*              display;
+	struct wl_surface*              surface;
 } VkWaylandSurfaceCreateInfoKHR;
 
 typedef VkResult (APIENTRY *PFN_vkCreateWaylandSurfaceKHR)(VkInstance,const VkWaylandSurfaceCreateInfoKHR*,const VkAllocationCallbacks*,VkSurfaceKHR*);
@@ -78,17 +78,19 @@ typedef VkBool32 (APIENTRY *PFN_vkGetPhysicalDeviceWaylandPresentationSupportKHR
 #define _GLFW_PLATFORM_CONTEXT_STATE
 #define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE
 
-struct wl_cursor_image {
-    uint32_t width;
-    uint32_t height;
-    uint32_t hotspot_x;
-    uint32_t hotspot_y;
-    uint32_t delay;
+struct wl_cursor_image
+{
+	uint32_t width;
+	uint32_t height;
+	uint32_t hotspot_x;
+	uint32_t hotspot_y;
+	uint32_t delay;
 };
-struct wl_cursor {
-    unsigned int image_count;
-    struct wl_cursor_image** images;
-    char* name;
+struct wl_cursor
+{
+	unsigned int image_count;
+	struct wl_cursor_image** images;
+	char* name;
 };
 typedef struct wl_cursor_theme* (* PFN_wl_cursor_theme_load)(const char*, int, struct wl_shm*);
 typedef void (* PFN_wl_cursor_theme_destroy)(struct wl_cursor_theme*);
@@ -153,19 +155,19 @@ typedef xkb_keysym_t (* PFN_xkb_compose_state_get_one_sym)(struct xkb_compose_st
 
 typedef enum _GLFWdecorationSideWayland
 {
-    mainWindow,
-    topDecoration,
-    leftDecoration,
-    rightDecoration,
-    bottomDecoration,
+	mainWindow,
+	topDecoration,
+	leftDecoration,
+	rightDecoration,
+	bottomDecoration,
 
 } _GLFWdecorationSideWayland;
 
 typedef struct _GLFWdecorationWayland
 {
-    struct wl_surface*          surface;
-    struct wl_subsurface*       subsurface;
-    struct wp_viewport*         viewport;
+	struct wl_surface*          surface;
+	struct wl_subsurface*       subsurface;
+	struct wp_viewport*         viewport;
 
 } _GLFWdecorationWayland;
 
@@ -173,50 +175,53 @@ typedef struct _GLFWdecorationWayland
 //
 typedef struct _GLFWwindowWayland
 {
-    int                         width, height;
-    GLFWbool                    visible;
-    GLFWbool                    maximized;
-    GLFWbool                    hovered;
-    GLFWbool                    transparent;
-    struct wl_surface*          surface;
-    struct wl_egl_window*       native;
-    struct wl_shell_surface*    shellSurface;
-    struct wl_callback*         callback;
+	int                         width, height;
+	GLFWbool                    visible;
+	GLFWbool                    maximized;
+	GLFWbool                    hovered;
+	GLFWbool                    transparent;
+	struct wl_surface*          surface;
+	struct wl_egl_window*       native;
+	struct wl_shell_surface*    shellSurface;
+	struct wl_callback*         callback;
 
-    struct {
-        struct xdg_surface*     surface;
-        struct xdg_toplevel*    toplevel;
-        struct zxdg_toplevel_decoration_v1* decoration;
-    } xdg;
+	struct
+	{
+		struct xdg_surface*     surface;
+		struct xdg_toplevel*    toplevel;
+		struct zxdg_toplevel_decoration_v1* decoration;
+	} xdg;
 
-    _GLFWcursor*                currentCursor;
-    double                      cursorPosX, cursorPosY;
+	_GLFWcursor*                currentCursor;
+	double                      cursorPosX, cursorPosY;
 
-    char*                       title;
+	char*                       title;
 
-    // We need to track the monitors the window spans on to calculate the
-    // optimal scaling factor.
-    int                         scale;
-    _GLFWmonitor**              monitors;
-    int                         monitorsCount;
-    int                         monitorsSize;
+	// We need to track the monitors the window spans on to calculate the
+	// optimal scaling factor.
+	int                         scale;
+	_GLFWmonitor**              monitors;
+	int                         monitorsCount;
+	int                         monitorsSize;
 
-    struct {
-        struct zwp_relative_pointer_v1*    relativePointer;
-        struct zwp_locked_pointer_v1*      lockedPointer;
-    } pointerLock;
+	struct
+	{
+		struct zwp_relative_pointer_v1*    relativePointer;
+		struct zwp_locked_pointer_v1*      lockedPointer;
+	} pointerLock;
 
-    struct zwp_idle_inhibitor_v1*          idleInhibitor;
+	struct zwp_idle_inhibitor_v1*          idleInhibitor;
 
-    // This is a hack to prevent auto-iconification on creation.
-    GLFWbool                    justCreated;
+	// This is a hack to prevent auto-iconification on creation.
+	GLFWbool                    justCreated;
 
-    struct {
-        GLFWbool                           serverSide;
-        struct wl_buffer*                  buffer;
-        _GLFWdecorationWayland             top, left, right, bottom;
-        int                                focus;
-    } decorations;
+	struct
+	{
+		GLFWbool                           serverSide;
+		struct wl_buffer*                  buffer;
+		_GLFWdecorationWayland             top, left, right, bottom;
+		int                                focus;
+	} decorations;
 
 } _GLFWwindowWayland;
 
@@ -224,107 +229,110 @@ typedef struct _GLFWwindowWayland
 //
 typedef struct _GLFWlibraryWayland
 {
-    struct wl_display*          display;
-    struct wl_registry*         registry;
-    struct wl_compositor*       compositor;
-    struct wl_subcompositor*    subcompositor;
-    struct wl_shell*            shell;
-    struct wl_shm*              shm;
-    struct wl_seat*             seat;
-    struct wl_pointer*          pointer;
-    struct wl_keyboard*         keyboard;
-    struct wl_data_device_manager*          dataDeviceManager;
-    struct wl_data_device*      dataDevice;
-    struct wl_data_offer*       dataOffer;
-    struct wl_data_source*      dataSource;
-    struct xdg_wm_base*         wmBase;
-    struct zxdg_decoration_manager_v1*      decorationManager;
-    struct wp_viewporter*       viewporter;
-    struct zwp_relative_pointer_manager_v1* relativePointerManager;
-    struct zwp_pointer_constraints_v1*      pointerConstraints;
-    struct zwp_idle_inhibit_manager_v1*     idleInhibitManager;
+	struct wl_display*          display;
+	struct wl_registry*         registry;
+	struct wl_compositor*       compositor;
+	struct wl_subcompositor*    subcompositor;
+	struct wl_shell*            shell;
+	struct wl_shm*              shm;
+	struct wl_seat*             seat;
+	struct wl_pointer*          pointer;
+	struct wl_keyboard*         keyboard;
+	struct wl_data_device_manager*          dataDeviceManager;
+	struct wl_data_device*      dataDevice;
+	struct wl_data_offer*       dataOffer;
+	struct wl_data_source*      dataSource;
+	struct xdg_wm_base*         wmBase;
+	struct zxdg_decoration_manager_v1*      decorationManager;
+	struct wp_viewporter*       viewporter;
+	struct zwp_relative_pointer_manager_v1* relativePointerManager;
+	struct zwp_pointer_constraints_v1*      pointerConstraints;
+	struct zwp_idle_inhibit_manager_v1*     idleInhibitManager;
 
-    int                         compositorVersion;
-    int                         seatVersion;
+	int                         compositorVersion;
+	int                         seatVersion;
 
-    struct wl_cursor_theme*     cursorTheme;
-    struct wl_cursor_theme*     cursorThemeHiDPI;
-    struct wl_surface*          cursorSurface;
-    int                         cursorTimerfd;
-    uint32_t                    serial;
+	struct wl_cursor_theme*     cursorTheme;
+	struct wl_cursor_theme*     cursorThemeHiDPI;
+	struct wl_surface*          cursorSurface;
+	int                         cursorTimerfd;
+	uint32_t                    serial;
 
-    int32_t                     keyboardRepeatRate;
-    int32_t                     keyboardRepeatDelay;
-    int                         keyboardLastKey;
-    int                         keyboardLastScancode;
-    char*                       clipboardString;
-    size_t                      clipboardSize;
-    char*                       clipboardSendString;
-    size_t                      clipboardSendSize;
-    int                         timerfd;
-    short int                   keycodes[256];
-    short int                   scancodes[GLFW_KEY_LAST + 1];
+	int32_t                     keyboardRepeatRate;
+	int32_t                     keyboardRepeatDelay;
+	int                         keyboardLastKey;
+	int                         keyboardLastScancode;
+	char*                       clipboardString;
+	size_t                      clipboardSize;
+	char*                       clipboardSendString;
+	size_t                      clipboardSendSize;
+	int                         timerfd;
+	short int                   keycodes[256];
+	short int                   scancodes[GLFW_KEY_LAST + 1];
 
-    struct {
-        void*                   handle;
-        struct xkb_context*     context;
-        struct xkb_keymap*      keymap;
-        struct xkb_state*       state;
-
-#ifdef HAVE_XKBCOMMON_COMPOSE_H
-        struct xkb_compose_state* composeState;
-#endif
-
-        xkb_mod_mask_t          controlMask;
-        xkb_mod_mask_t          altMask;
-        xkb_mod_mask_t          shiftMask;
-        xkb_mod_mask_t          superMask;
-        xkb_mod_mask_t          capsLockMask;
-        xkb_mod_mask_t          numLockMask;
-        unsigned int            modifiers;
-
-        PFN_xkb_context_new context_new;
-        PFN_xkb_context_unref context_unref;
-        PFN_xkb_keymap_new_from_string keymap_new_from_string;
-        PFN_xkb_keymap_unref keymap_unref;
-        PFN_xkb_keymap_mod_get_index keymap_mod_get_index;
-        PFN_xkb_keymap_key_repeats keymap_key_repeats;
-        PFN_xkb_state_new state_new;
-        PFN_xkb_state_unref state_unref;
-        PFN_xkb_state_key_get_syms state_key_get_syms;
-        PFN_xkb_state_update_mask state_update_mask;
-        PFN_xkb_state_serialize_mods state_serialize_mods;
+	struct
+	{
+		void*                   handle;
+		struct xkb_context*     context;
+		struct xkb_keymap*      keymap;
+		struct xkb_state*       state;
 
 #ifdef HAVE_XKBCOMMON_COMPOSE_H
-        PFN_xkb_compose_table_new_from_locale compose_table_new_from_locale;
-        PFN_xkb_compose_table_unref compose_table_unref;
-        PFN_xkb_compose_state_new compose_state_new;
-        PFN_xkb_compose_state_unref compose_state_unref;
-        PFN_xkb_compose_state_feed compose_state_feed;
-        PFN_xkb_compose_state_get_status compose_state_get_status;
-        PFN_xkb_compose_state_get_one_sym compose_state_get_one_sym;
+		struct xkb_compose_state* composeState;
 #endif
-    } xkb;
 
-    _GLFWwindow*                pointerFocus;
-    _GLFWwindow*                keyboardFocus;
+		xkb_mod_mask_t          controlMask;
+		xkb_mod_mask_t          altMask;
+		xkb_mod_mask_t          shiftMask;
+		xkb_mod_mask_t          superMask;
+		xkb_mod_mask_t          capsLockMask;
+		xkb_mod_mask_t          numLockMask;
+		unsigned int            modifiers;
 
-    struct {
-        void*                   handle;
+		PFN_xkb_context_new context_new;
+		PFN_xkb_context_unref context_unref;
+		PFN_xkb_keymap_new_from_string keymap_new_from_string;
+		PFN_xkb_keymap_unref keymap_unref;
+		PFN_xkb_keymap_mod_get_index keymap_mod_get_index;
+		PFN_xkb_keymap_key_repeats keymap_key_repeats;
+		PFN_xkb_state_new state_new;
+		PFN_xkb_state_unref state_unref;
+		PFN_xkb_state_key_get_syms state_key_get_syms;
+		PFN_xkb_state_update_mask state_update_mask;
+		PFN_xkb_state_serialize_mods state_serialize_mods;
 
-        PFN_wl_cursor_theme_load theme_load;
-        PFN_wl_cursor_theme_destroy theme_destroy;
-        PFN_wl_cursor_theme_get_cursor theme_get_cursor;
-        PFN_wl_cursor_image_get_buffer image_get_buffer;
-    } cursor;
+#ifdef HAVE_XKBCOMMON_COMPOSE_H
+		PFN_xkb_compose_table_new_from_locale compose_table_new_from_locale;
+		PFN_xkb_compose_table_unref compose_table_unref;
+		PFN_xkb_compose_state_new compose_state_new;
+		PFN_xkb_compose_state_unref compose_state_unref;
+		PFN_xkb_compose_state_feed compose_state_feed;
+		PFN_xkb_compose_state_get_status compose_state_get_status;
+		PFN_xkb_compose_state_get_one_sym compose_state_get_one_sym;
+#endif
+	} xkb;
 
-    struct {
-        void*                   handle;
+	_GLFWwindow*                pointerFocus;
+	_GLFWwindow*                keyboardFocus;
 
-        PFN_wl_egl_window_create window_create;
-        PFN_wl_egl_window_destroy window_destroy;
-        PFN_wl_egl_window_resize window_resize;
-    } egl;
+	struct
+	{
+		void*                   handle;
+
+		PFN_wl_cursor_theme_load theme_load;
+		PFN_wl_cursor_theme_destroy theme_destroy;
+		PFN_wl_cursor_theme_get_cursor theme_get_cursor;
+		PFN_wl_cursor_image_get_buffer image_get_buffer;
+	} cursor;
+
+	struct
+	{
+		void*                   handle;
+
+		PFN_wl_egl_window_create window_create;
+		PFN_wl_egl_window_destroy window_destroy;
+		PFN_wl_egl_window_resize window_resize;
+	} egl;
 
 } _GLFWlibraryWayland;
 
@@ -332,13 +340,13 @@ typedef struct _GLFWlibraryWayland
 //
 typedef struct _GLFWmonitorWayland
 {
-    struct wl_output*           output;
-    int                         name;
-    int                         currentMode;
+	struct wl_output*           output;
+	int                         name;
+	int                         currentMode;
 
-    int                         x;
-    int                         y;
-    int                         scale;
+	int                         x;
+	int                         y;
+	int                         scale;
 
 } _GLFWmonitorWayland;
 
@@ -346,12 +354,12 @@ typedef struct _GLFWmonitorWayland
 //
 typedef struct _GLFWcursorWayland
 {
-    struct wl_cursor*           cursor;
-    struct wl_cursor*           cursorHiDPI;
-    struct wl_buffer*           buffer;
-    int                         width, height;
-    int                         xhot, yhot;
-    int                         currentImage;
+	struct wl_cursor*           cursor;
+	struct wl_cursor*           cursorHiDPI;
+	struct wl_buffer*           buffer;
+	int                         width, height;
+	int                         xhot, yhot;
+	int                         currentImage;
 } _GLFWcursorWayland;
 
 

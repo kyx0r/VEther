@@ -27,15 +27,15 @@
 
 // We don't need all the fancy stuff
 #ifndef NOMINMAX
- #define NOMINMAX
+#define NOMINMAX
 #endif
 
 #ifndef VC_EXTRALEAN
- #define VC_EXTRALEAN
+#define VC_EXTRALEAN
 #endif
 
 #ifndef WIN32_LEAN_AND_MEAN
- #define WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #endif
 
 // This is a workaround for the fact that glfw3.h needs to export APIENTRY (for
@@ -45,17 +45,17 @@
 
 // GLFW on Windows is Unicode only and does not work in MBCS mode
 #ifndef UNICODE
- #define UNICODE
+#define UNICODE
 #endif
 
 // GLFW requires Windows XP or later
 #if WINVER < 0x0501
- #undef WINVER
- #define WINVER 0x0501
+#undef WINVER
+#define WINVER 0x0501
 #endif
 #if _WIN32_WINNT < 0x0501
- #undef _WIN32_WINNT
- #define _WIN32_WINNT 0x0501
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501
 #endif
 
 // GLFW uses DirectInput8 interfaces
@@ -69,50 +69,50 @@
 
 // HACK: Define macros that some windows.h variants don't
 #ifndef WM_MOUSEHWHEEL
- #define WM_MOUSEHWHEEL 0x020E
+#define WM_MOUSEHWHEEL 0x020E
 #endif
 #ifndef WM_DWMCOMPOSITIONCHANGED
- #define WM_DWMCOMPOSITIONCHANGED 0x031E
+#define WM_DWMCOMPOSITIONCHANGED 0x031E
 #endif
 #ifndef WM_COPYGLOBALDATA
- #define WM_COPYGLOBALDATA 0x0049
+#define WM_COPYGLOBALDATA 0x0049
 #endif
 #ifndef WM_UNICHAR
- #define WM_UNICHAR 0x0109
+#define WM_UNICHAR 0x0109
 #endif
 #ifndef UNICODE_NOCHAR
- #define UNICODE_NOCHAR 0xFFFF
+#define UNICODE_NOCHAR 0xFFFF
 #endif
 #ifndef WM_DPICHANGED
- #define WM_DPICHANGED 0x02E0
+#define WM_DPICHANGED 0x02E0
 #endif
 #ifndef GET_XBUTTON_WPARAM
- #define GET_XBUTTON_WPARAM(w) (HIWORD(w))
+#define GET_XBUTTON_WPARAM(w) (HIWORD(w))
 #endif
 #ifndef EDS_ROTATEDMODE
- #define EDS_ROTATEDMODE 0x00000004
+#define EDS_ROTATEDMODE 0x00000004
 #endif
 #ifndef DISPLAY_DEVICE_ACTIVE
- #define DISPLAY_DEVICE_ACTIVE 0x00000001
+#define DISPLAY_DEVICE_ACTIVE 0x00000001
 #endif
 #ifndef _WIN32_WINNT_WINBLUE
- #define _WIN32_WINNT_WINBLUE 0x0602
+#define _WIN32_WINNT_WINBLUE 0x0602
 #endif
 #ifndef WM_GETDPISCALEDSIZE
- #define WM_GETDPISCALEDSIZE 0x02e4
+#define WM_GETDPISCALEDSIZE 0x02e4
 #endif
 #ifndef USER_DEFAULT_SCREEN_DPI
- #define USER_DEFAULT_SCREEN_DPI 96
+#define USER_DEFAULT_SCREEN_DPI 96
 #endif
 
 #if WINVER < 0x0601
 typedef struct
 {
-    DWORD cbSize;
-    DWORD ExtStatus;
+	DWORD cbSize;
+	DWORD ExtStatus;
 } CHANGEFILTERSTRUCT;
 #ifndef MSGFLT_ALLOW
- #define MSGFLT_ALLOW 1
+#define MSGFLT_ALLOW 1
 #endif
 #endif /*Windows 7*/
 
@@ -121,28 +121,28 @@ typedef struct
 #define DWM_BB_BLURREGION 0x00000002
 typedef struct
 {
-    DWORD dwFlags;
-    BOOL fEnable;
-    HRGN hRgnBlur;
-    BOOL fTransitionOnMaximized;
+	DWORD dwFlags;
+	BOOL fEnable;
+	HRGN hRgnBlur;
+	BOOL fTransitionOnMaximized;
 } DWM_BLURBEHIND;
 #else
- #include <dwmapi.h>
+#include <dwmapi.h>
 #endif /*Windows Vista*/
 
 #ifndef DPI_ENUMS_DECLARED
 typedef enum
 {
-    PROCESS_DPI_UNAWARE = 0,
-    PROCESS_SYSTEM_DPI_AWARE = 1,
-    PROCESS_PER_MONITOR_DPI_AWARE = 2
+	PROCESS_DPI_UNAWARE = 0,
+	PROCESS_SYSTEM_DPI_AWARE = 1,
+	PROCESS_PER_MONITOR_DPI_AWARE = 2
 } PROCESS_DPI_AWARENESS;
 typedef enum
 {
-    MDT_EFFECTIVE_DPI = 0,
-    MDT_ANGULAR_DPI = 1,
-    MDT_RAW_DPI = 2,
-    MDT_DEFAULT = MDT_EFFECTIVE_DPI
+	MDT_EFFECTIVE_DPI = 0,
+	MDT_ANGULAR_DPI = 1,
+	MDT_RAW_DPI = 2,
+	MDT_DEFAULT = MDT_EFFECTIVE_DPI
 } MONITOR_DPI_TYPE;
 #endif /*DPI_ENUMS_DECLARED*/
 
@@ -174,36 +174,36 @@ typedef enum
 
 // HACK: Define macros that some xinput.h variants don't
 #ifndef XINPUT_CAPS_WIRELESS
- #define XINPUT_CAPS_WIRELESS 0x0002
+#define XINPUT_CAPS_WIRELESS 0x0002
 #endif
 #ifndef XINPUT_DEVSUBTYPE_WHEEL
- #define XINPUT_DEVSUBTYPE_WHEEL 0x02
+#define XINPUT_DEVSUBTYPE_WHEEL 0x02
 #endif
 #ifndef XINPUT_DEVSUBTYPE_ARCADE_STICK
- #define XINPUT_DEVSUBTYPE_ARCADE_STICK 0x03
+#define XINPUT_DEVSUBTYPE_ARCADE_STICK 0x03
 #endif
 #ifndef XINPUT_DEVSUBTYPE_FLIGHT_STICK
- #define XINPUT_DEVSUBTYPE_FLIGHT_STICK 0x04
+#define XINPUT_DEVSUBTYPE_FLIGHT_STICK 0x04
 #endif
 #ifndef XINPUT_DEVSUBTYPE_DANCE_PAD
- #define XINPUT_DEVSUBTYPE_DANCE_PAD 0x05
+#define XINPUT_DEVSUBTYPE_DANCE_PAD 0x05
 #endif
 #ifndef XINPUT_DEVSUBTYPE_GUITAR
- #define XINPUT_DEVSUBTYPE_GUITAR 0x06
+#define XINPUT_DEVSUBTYPE_GUITAR 0x06
 #endif
 #ifndef XINPUT_DEVSUBTYPE_DRUM_KIT
- #define XINPUT_DEVSUBTYPE_DRUM_KIT 0x08
+#define XINPUT_DEVSUBTYPE_DRUM_KIT 0x08
 #endif
 #ifndef XINPUT_DEVSUBTYPE_ARCADE_PAD
- #define XINPUT_DEVSUBTYPE_ARCADE_PAD 0x13
+#define XINPUT_DEVSUBTYPE_ARCADE_PAD 0x13
 #endif
 #ifndef XUSER_MAX_COUNT
- #define XUSER_MAX_COUNT 4
+#define XUSER_MAX_COUNT 4
 #endif
 
 // HACK: Define macros that some dinput.h variants don't
 #ifndef DIDFT_OPTIONAL
- #define DIDFT_OPTIONAL	0x80000000
+#define DIDFT_OPTIONAL	0x80000000
 #endif
 
 // winmm.dll function pointer typedefs
@@ -256,11 +256,11 @@ typedef VkFlags VkWin32SurfaceCreateFlagsKHR;
 
 typedef struct VkWin32SurfaceCreateInfoKHR
 {
-    VkStructureType                 sType;
-    const void*                     pNext;
-    VkWin32SurfaceCreateFlagsKHR    flags;
-    HINSTANCE                       hinstance;
-    HWND                            hwnd;
+	VkStructureType                 sType;
+	const void*                     pNext;
+	VkWin32SurfaceCreateFlagsKHR    flags;
+	HINSTANCE                       hinstance;
+	HWND                            hwnd;
 } VkWin32SurfaceCreateInfoKHR;
 
 typedef VkResult (APIENTRY *PFN_vkCreateWin32SurfaceKHR)(VkInstance,const VkWin32SurfaceCreateInfoKHR*,const VkAllocationCallbacks*,VkSurfaceKHR*);
@@ -272,7 +272,7 @@ typedef VkBool32 (APIENTRY *PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR)(
 #include "osmesa_context.h"
 
 #if !defined(_GLFW_WNDCLASSNAME)
- #define _GLFW_WNDCLASSNAME L"GLFW30"
+#define _GLFW_WNDCLASSNAME L"GLFW30"
 #endif
 
 #define _glfw_dlopen(name) LoadLibraryA(name)
@@ -295,20 +295,20 @@ typedef VkBool32 (APIENTRY *PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR)(
 //
 typedef struct _GLFWwindowWin32
 {
-    HWND                handle;
-    HICON               bigIcon;
-    HICON               smallIcon;
+	HWND                handle;
+	HICON               bigIcon;
+	HICON               smallIcon;
 
-    GLFWbool            cursorTracked;
-    GLFWbool            frameAction;
-    GLFWbool            iconified;
-    GLFWbool            maximized;
-    // Whether to enable framebuffer transparency on DWM
-    GLFWbool            transparent;
-    GLFWbool            scaleToMonitor;
+	GLFWbool            cursorTracked;
+	GLFWbool            frameAction;
+	GLFWbool            iconified;
+	GLFWbool            maximized;
+	// Whether to enable framebuffer transparency on DWM
+	GLFWbool            transparent;
+	GLFWbool            scaleToMonitor;
 
-    // The last received cursor position, regardless of source
-    int                 lastCursorPosX, lastCursorPosY;
+	// The last received cursor position, regardless of source
+	int                 lastCursorPosX, lastCursorPosY;
 
 } _GLFWwindowWin32;
 
@@ -316,66 +316,73 @@ typedef struct _GLFWwindowWin32
 //
 typedef struct _GLFWlibraryWin32
 {
-    HWND                helperWindowHandle;
-    HDEVNOTIFY          deviceNotificationHandle;
-    DWORD               foregroundLockTimeout;
-    int                 acquiredMonitorCount;
-    char*               clipboardString;
-    short int           keycodes[512];
-    short int           scancodes[GLFW_KEY_LAST + 1];
-    char                keynames[GLFW_KEY_LAST + 1][5];
-    // Where to place the cursor when re-enabled
-    double              restoreCursorPosX, restoreCursorPosY;
-    // The window whose disabled cursor mode is active
-    _GLFWwindow*        disabledCursorWindow;
-    RAWINPUT*           rawInput;
-    int                 rawInputSize;
-    UINT                mouseTrailSize;
+	HWND                helperWindowHandle;
+	HDEVNOTIFY          deviceNotificationHandle;
+	DWORD               foregroundLockTimeout;
+	int                 acquiredMonitorCount;
+	char*               clipboardString;
+	short int           keycodes[512];
+	short int           scancodes[GLFW_KEY_LAST + 1];
+	char                keynames[GLFW_KEY_LAST + 1][5];
+	// Where to place the cursor when re-enabled
+	double              restoreCursorPosX, restoreCursorPosY;
+	// The window whose disabled cursor mode is active
+	_GLFWwindow*        disabledCursorWindow;
+	RAWINPUT*           rawInput;
+	int                 rawInputSize;
+	UINT                mouseTrailSize;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_timeGetTime                 GetTime;
-    } winmm;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_timeGetTime                 GetTime;
+	} winmm;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_DirectInput8Create          Create;
-        IDirectInput8W*                 api;
-    } dinput8;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_DirectInput8Create          Create;
+		IDirectInput8W*                 api;
+	} dinput8;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_XInputGetCapabilities       GetCapabilities;
-        PFN_XInputGetState              GetState;
-    } xinput;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_XInputGetCapabilities       GetCapabilities;
+		PFN_XInputGetState              GetState;
+	} xinput;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_SetProcessDPIAware          SetProcessDPIAware_;
-        PFN_ChangeWindowMessageFilterEx ChangeWindowMessageFilterEx_;
-        PFN_EnableNonClientDpiScaling   EnableNonClientDpiScaling_;
-        PFN_SetProcessDpiAwarenessContext SetProcessDpiAwarenessContext_;
-        PFN_GetDpiForWindow             GetDpiForWindow_;
-        PFN_AdjustWindowRectExForDpi    AdjustWindowRectExForDpi_;
-    } user32;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_SetProcessDPIAware          SetProcessDPIAware_;
+		PFN_ChangeWindowMessageFilterEx ChangeWindowMessageFilterEx_;
+		PFN_EnableNonClientDpiScaling   EnableNonClientDpiScaling_;
+		PFN_SetProcessDpiAwarenessContext SetProcessDpiAwarenessContext_;
+		PFN_GetDpiForWindow             GetDpiForWindow_;
+		PFN_AdjustWindowRectExForDpi    AdjustWindowRectExForDpi_;
+	} user32;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_DwmIsCompositionEnabled     IsCompositionEnabled;
-        PFN_DwmFlush                    Flush;
-        PFN_DwmEnableBlurBehindWindow   EnableBlurBehindWindow;
-    } dwmapi;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_DwmIsCompositionEnabled     IsCompositionEnabled;
+		PFN_DwmFlush                    Flush;
+		PFN_DwmEnableBlurBehindWindow   EnableBlurBehindWindow;
+	} dwmapi;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_SetProcessDpiAwareness      SetProcessDpiAwareness_;
-        PFN_GetDpiForMonitor            GetDpiForMonitor_;
-    } shcore;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_SetProcessDpiAwareness      SetProcessDpiAwareness_;
+		PFN_GetDpiForMonitor            GetDpiForMonitor_;
+	} shcore;
 
-    struct {
-        HINSTANCE                       instance;
-        PFN_RtlVerifyVersionInfo        RtlVerifyVersionInfo_;
-    } ntdll;
+	struct
+	{
+		HINSTANCE                       instance;
+		PFN_RtlVerifyVersionInfo        RtlVerifyVersionInfo_;
+	} ntdll;
 
 } _GLFWlibraryWin32;
 
@@ -383,14 +390,14 @@ typedef struct _GLFWlibraryWin32
 //
 typedef struct _GLFWmonitorWin32
 {
-    HMONITOR            handle;
-    // This size matches the static size of DISPLAY_DEVICE.DeviceName
-    WCHAR               adapterName[32];
-    WCHAR               displayName[32];
-    char                publicAdapterName[32];
-    char                publicDisplayName[32];
-    GLFWbool            modesPruned;
-    GLFWbool            modeChanged;
+	HMONITOR            handle;
+	// This size matches the static size of DISPLAY_DEVICE.DeviceName
+	WCHAR               adapterName[32];
+	WCHAR               displayName[32];
+	char                publicAdapterName[32];
+	char                publicDisplayName[32];
+	GLFWbool            modesPruned;
+	GLFWbool            modeChanged;
 
 } _GLFWmonitorWin32;
 
@@ -398,7 +405,7 @@ typedef struct _GLFWmonitorWin32
 //
 typedef struct _GLFWcursorWin32
 {
-    HCURSOR             handle;
+	HCURSOR             handle;
 
 } _GLFWcursorWin32;
 
@@ -406,8 +413,8 @@ typedef struct _GLFWcursorWin32
 //
 typedef struct _GLFWtimerWin32
 {
-    GLFWbool            hasPC;
-    uint64_t            frequency;
+	GLFWbool            hasPC;
+	uint64_t            frequency;
 
 } _GLFWtimerWin32;
 
@@ -415,8 +422,8 @@ typedef struct _GLFWtimerWin32
 //
 typedef struct _GLFWtlsWin32
 {
-    GLFWbool            allocated;
-    DWORD               index;
+	GLFWbool            allocated;
+	DWORD               index;
 
 } _GLFWtlsWin32;
 
@@ -424,8 +431,8 @@ typedef struct _GLFWtlsWin32
 //
 typedef struct _GLFWmutexWin32
 {
-    GLFWbool            allocated;
-    CRITICAL_SECTION    section;
+	GLFWbool            allocated;
+	CRITICAL_SECTION    section;
 
 } _GLFWmutexWin32;
 

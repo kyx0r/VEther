@@ -160,19 +160,21 @@
  * Defines the structure of an xbox 360 joystick.
  */
 
-typedef struct _XINPUT_GAMEPAD {
-    WORD wButtons;
-    BYTE bLeftTrigger;
-    BYTE bRightTrigger;
-    SHORT sThumbLX;
-    SHORT sThumbLY;
-    SHORT sThumbRX;
-    SHORT sThumbRY;
+typedef struct _XINPUT_GAMEPAD
+{
+	WORD wButtons;
+	BYTE bLeftTrigger;
+	BYTE bRightTrigger;
+	SHORT sThumbLX;
+	SHORT sThumbLY;
+	SHORT sThumbRX;
+	SHORT sThumbRY;
 } XINPUT_GAMEPAD, *PXINPUT_GAMEPAD;
 
-typedef struct _XINPUT_STATE {
-    DWORD dwPacketNumber;
-    XINPUT_GAMEPAD Gamepad;
+typedef struct _XINPUT_STATE
+{
+	DWORD dwPacketNumber;
+	XINPUT_GAMEPAD Gamepad;
 } XINPUT_STATE, *PXINPUT_STATE;
 
 /*
@@ -181,9 +183,10 @@ typedef struct _XINPUT_STATE {
  * joystick you will have to map these to your device.
  */
 
-typedef struct _XINPUT_VIBRATION {
-    WORD wLeftMotorSpeed;
-    WORD wRightMotorSpeed;
+typedef struct _XINPUT_VIBRATION
+{
+	WORD wLeftMotorSpeed;
+	WORD wRightMotorSpeed;
 } XINPUT_VIBRATION, *PXINPUT_VIBRATION;
 
 /*
@@ -194,30 +197,32 @@ typedef struct _XINPUT_VIBRATION {
  * guitar.
  */
 
-typedef struct _XINPUT_CAPABILITIES {
-    BYTE Type;
-    BYTE SubType;
-    WORD Flags;
-    XINPUT_GAMEPAD Gamepad;
-    XINPUT_VIBRATION Vibration;
+typedef struct _XINPUT_CAPABILITIES
+{
+	BYTE Type;
+	BYTE SubType;
+	WORD Flags;
+	XINPUT_GAMEPAD Gamepad;
+	XINPUT_VIBRATION Vibration;
 } XINPUT_CAPABILITIES, *PXINPUT_CAPABILITIES;
 
 /*
  * Defines the structure for a joystick input event which is
  * retrieved using the function XInputGetKeystroke
  */
-typedef struct _XINPUT_KEYSTROKE {
-    WORD VirtualKey;
-    WCHAR Unicode;
-    WORD Flags;
-    BYTE UserIndex;
-    BYTE HidCode;
+typedef struct _XINPUT_KEYSTROKE
+{
+	WORD VirtualKey;
+	WCHAR Unicode;
+	WORD Flags;
+	BYTE UserIndex;
+	BYTE HidCode;
 } XINPUT_KEYSTROKE, *PXINPUT_KEYSTROKE;
 
 typedef struct _XINPUT_BATTERY_INFORMATION
 {
-    BYTE BatteryType;
-    BYTE BatteryLevel;
+	BYTE BatteryType;
+	BYTE BatteryLevel;
 } XINPUT_BATTERY_INFORMATION, *PXINPUT_BATTERY_INFORMATION;
 
 #ifdef __cplusplus

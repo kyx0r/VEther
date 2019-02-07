@@ -33,12 +33,13 @@ extern "C" {
 
 typedef VkFlags VkXcbSurfaceCreateFlagsKHR;
 
-typedef struct VkXcbSurfaceCreateInfoKHR {
-    VkStructureType               sType;
-    const void*                   pNext;
-    VkXcbSurfaceCreateFlagsKHR    flags;
-    xcb_connection_t*             connection;
-    xcb_window_t                  window;
+typedef struct VkXcbSurfaceCreateInfoKHR
+{
+	VkStructureType               sType;
+	const void*                   pNext;
+	VkXcbSurfaceCreateFlagsKHR    flags;
+	xcb_connection_t*             connection;
+	xcb_window_t                  window;
 } VkXcbSurfaceCreateInfoKHR;
 
 

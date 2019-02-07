@@ -33,11 +33,12 @@ extern "C" {
 
 typedef VkFlags VkViSurfaceCreateFlagsNN;
 
-typedef struct VkViSurfaceCreateInfoNN {
-    VkStructureType             sType;
-    const void*                 pNext;
-    VkViSurfaceCreateFlagsNN    flags;
-    void*                       window;
+typedef struct VkViSurfaceCreateInfoNN
+{
+	VkStructureType             sType;
+	const void*                 pNext;
+	VkViSurfaceCreateFlagsNN    flags;
+	void*                       window;
 } VkViSurfaceCreateInfoNN;
 
 

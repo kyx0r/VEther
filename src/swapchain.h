@@ -13,12 +13,12 @@ bool SetSizeOfSwapchainImages(uint32_t x, uint32_t y);
 
 bool ComputeSizeOfSwapchainImages(uint32_t x, uint32_t y);
 
-bool SelectDesiredUsageScenariosOfSwapchainImages(VkImageUsageFlags desired_usages); 
+bool SelectDesiredUsageScenariosOfSwapchainImages(VkImageUsageFlags desired_usages);
 
-//how the image is transformed when rendering. 
+//how the image is transformed when rendering.
 bool SelectTransformationOfSwapchainImages(VkSurfaceTransformFlagBitsKHR desired_transform);
 
-//set surface format and its matching color format 
+//set surface format and its matching color format
 bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format);
 
 bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain);

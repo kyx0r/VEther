@@ -49,28 +49,28 @@ freely, subject to the following restrictions:
 
 /* Which platform are we on? */
 #if !defined(_TTHREAD_PLATFORM_DEFINED_)
-  #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
-    #define _TTHREAD_WIN32_
-  #else
-    #define _TTHREAD_POSIX_
-  #endif
-  #define _TTHREAD_PLATFORM_DEFINED_
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#define _TTHREAD_WIN32_
+#else
+#define _TTHREAD_POSIX_
+#endif
+#define _TTHREAD_PLATFORM_DEFINED_
 #endif
 
 /* Activate some POSIX functionality (e.g. clock_gettime and recursive mutexes) */
 #if defined(_TTHREAD_POSIX_)
-  #undef _FEATURES_H
-  #if !defined(_GNU_SOURCE)
-    #define _GNU_SOURCE
-  #endif
-  #if !defined(_POSIX_C_SOURCE) || ((_POSIX_C_SOURCE - 0) < 199309L)
-    #undef _POSIX_C_SOURCE
-    #define _POSIX_C_SOURCE 199309L
-  #endif
-  #if !defined(_XOPEN_SOURCE) || ((_XOPEN_SOURCE - 0) < 500)
-    #undef _XOPEN_SOURCE
-    #define _XOPEN_SOURCE 500
-  #endif
+#undef _FEATURES_H
+#if !defined(_GNU_SOURCE)
+#define _GNU_SOURCE
+#endif
+#if !defined(_POSIX_C_SOURCE) || ((_POSIX_C_SOURCE - 0) < 199309L)
+#undef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 199309L
+#endif
+#if !defined(_XOPEN_SOURCE) || ((_XOPEN_SOURCE - 0) < 500)
+#undef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
 #endif
 
 /* Generic includes */
@@ -78,18 +78,18 @@ freely, subject to the following restrictions:
 
 /* Platform specific includes */
 #if defined(_TTHREAD_POSIX_)
-  #include <sys/time.h>
-  #include <pthread.h>
+#include <sys/time.h>
+#include <pthread.h>
 #elif defined(_TTHREAD_WIN32_)
-  #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-    #define __UNDEF_LEAN_AND_MEAN
-  #endif
-  #include <windows.h>
-  #ifdef __UNDEF_LEAN_AND_MEAN
-    #undef WIN32_LEAN_AND_MEAN
-    #undef __UNDEF_LEAN_AND_MEAN
-  #endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#define __UNDEF_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#ifdef __UNDEF_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#undef __UNDEF_LEAN_AND_MEAN
+#endif
 #endif
 
 /* Workaround for missing TIME_UTC: If time.h doesn't provide TIME_UTC,
@@ -97,11 +97,11 @@ freely, subject to the following restrictions:
    the only other supported time specifier: CLOCK_REALTIME (and if that fails,
    we're probably emulating clock_gettime anyway, so anything goes). */
 #ifndef TIME_UTC
-  #ifdef CLOCK_REALTIME
-    #define TIME_UTC CLOCK_REALTIME
-  #else
-    #define TIME_UTC 0
-  #endif
+#ifdef CLOCK_REALTIME
+#define TIME_UTC CLOCK_REALTIME
+#else
+#define TIME_UTC 0
+#endif
 #endif
 
 /* Workaround for missing clock_gettime (most Windows compilers, afaik) */
@@ -109,9 +109,10 @@ freely, subject to the following restrictions:
 #define _TTHREAD_EMULATE_CLOCK_GETTIME_
 /* Emulate struct timespec */
 #if defined(_TTHREAD_WIN32_)
-struct _ttherad_timespec {
-  time_t tv_sec;
-  long   tv_nsec;
+struct _ttherad_timespec
+{
+	time_t tv_sec;
+	long   tv_nsec;
 };
 #define timespec _ttherad_timespec
 #endif
@@ -124,7 +125,7 @@ typedef int _tthread_clockid_t;
 int _tthread_clock_gettime(clockid_t clk_id, struct timespec *ts);
 #define clock_gettime _tthread_clock_gettime
 #ifndef CLOCK_REALTIME
-  #define CLOCK_REALTIME 0
+#define CLOCK_REALTIME 0
 #endif
 #endif
 
@@ -157,11 +158,11 @@ int _tthread_clock_gettime(clockid_t clk_id, struct timespec *ts);
 
 /* FIXME: Check for a PROPER value of __STDC_VERSION__ to know if we have C11 */
 #if !(defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201102L)) && !defined(_Thread_local)
- #if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__SUNPRO_CC) || defined(__IBMCPP__)
-  #define _Thread_local __thread
- #else
-  #define _Thread_local __declspec(thread)
- #endif
+#if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__SUNPRO_CC) || defined(__IBMCPP__)
+#define _Thread_local __thread
+#else
+#define _Thread_local __declspec(thread)
+#endif
 #endif
 
 /* Macros */
@@ -182,10 +183,11 @@ int _tthread_clock_gettime(clockid_t clk_id, struct timespec *ts);
 
 /* Mutex */
 #if defined(_TTHREAD_WIN32_)
-typedef struct {
-  CRITICAL_SECTION mHandle;   /* Critical section handle */
-  int mAlreadyLocked;         /* TRUE if the mutex is already locked */
-  int mRecursive;             /* TRUE if the mutex is recursive */
+typedef struct
+{
+	CRITICAL_SECTION mHandle;   /* Critical section handle */
+	int mAlreadyLocked;         /* TRUE if the mutex is already locked */
+	int mRecursive;             /* TRUE if the mutex is recursive */
 } mtx_t;
 #else
 typedef pthread_mutex_t mtx_t;
@@ -243,10 +245,11 @@ int mtx_unlock(mtx_t *mtx);
 
 /* Condition variable */
 #if defined(_TTHREAD_WIN32_)
-typedef struct {
-  HANDLE mEvents[2];                  /* Signal and broadcast event HANDLEs. */
-  unsigned int mWaitersCount;         /* Count of the number of waiters. */
-  CRITICAL_SECTION mWaitersCountLock; /* Serialize access to mWaitersCount. */
+typedef struct
+{
+	HANDLE mEvents[2];                  /* Signal and broadcast event HANDLEs. */
+	unsigned int mWaitersCount;         /* Count of the number of waiters. */
+	CRITICAL_SECTION mWaitersCountLock; /* Serialize access to mWaitersCount. */
 } cnd_t;
 #else
 typedef pthread_cond_t cnd_t;

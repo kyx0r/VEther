@@ -6,63 +6,64 @@ GVAR: instance -> startup.cpp
 } */
 
 //{
-VkSurfaceKHR presentation_surface; 
-VkPresentModeKHR target_surface_mode; 
-VkSurfaceCapabilitiesKHR surface_capabilities; 
+VkSurfaceKHR presentation_surface;
+VkPresentModeKHR target_surface_mode;
+VkSurfaceCapabilitiesKHR surface_capabilities;
 //}
 
 bool CreatePresentationSurface(WindowParameters &window_parameters)
 {
-    VkResult result;
+	VkResult result;
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 	window_parameters.HWnd = glfwGetWin32Window(window);
 	window_parameters.HInstance = GetModuleHandle(nullptr);
-    VkWin32SurfaceCreateInfoKHR surface_create_info = 
+	VkWin32SurfaceCreateInfoKHR surface_create_info =
 	{
-      VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,  // VkStructureType                 sType
-      nullptr,                                          // const void                    * pNext
-      0,                                                // VkWin32SurfaceCreateFlagsKHR    flags
-      window_parameters.HInstance,                      // HINSTANCE                       hinstance
-      window_parameters.HWnd                            // HWND                            hwnd
-    };
+		VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,  // VkStructureType                 sType
+		nullptr,                                          // const void                    * pNext
+		0,                                                // VkWin32SurfaceCreateFlagsKHR    flags
+		window_parameters.HInstance,                      // HINSTANCE                       hinstance
+		window_parameters.HWnd                            // HWND                            hwnd
+	};
 
-    result = vkCreateWin32SurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
+	result = vkCreateWin32SurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
 
 #elif defined VK_USE_PLATFORM_XLIB_KHR
 
-    VkXlibSurfaceCreateInfoKHR surface_create_info = 
+	VkXlibSurfaceCreateInfoKHR surface_create_info =
 	{
-      VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,   // VkStructureType                 sType
-      nullptr,                                          // const void                    * pNext
-      0,                                                // VkXlibSurfaceCreateFlagsKHR     flags
-      window_parameters.Dpy,                            // Display                       * dpy
-      window_parameters.Window                          // Window                          window
-    };
+		VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,   // VkStructureType                 sType
+		nullptr,                                          // const void                    * pNext
+		0,                                                // VkXlibSurfaceCreateFlagsKHR     flags
+		window_parameters.Dpy,                            // Display                       * dpy
+		window_parameters.Window                          // Window                          window
+	};
 
-    result = vkCreateXlibSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
+	result = vkCreateXlibSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
 
 #elif defined VK_USE_PLATFORM_XCB_KHR
 
-    VkXcbSurfaceCreateInfoKHR surface_create_info = 
+	VkXcbSurfaceCreateInfoKHR surface_create_info =
 	{
-      VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,    // VkStructureType                 sType
-      nullptr,                                          // const void                    * pNext
-      0,                                                // VkXcbSurfaceCreateFlagsKHR      flags
-      window_parameters.Connection,                     // xcb_connection_t              * connection
-      window_parameters.Window                          // xcb_window_t                    window
-    };
+		VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,    // VkStructureType                 sType
+		nullptr,                                          // const void                    * pNext
+		0,                                                // VkXcbSurfaceCreateFlagsKHR      flags
+		window_parameters.Connection,                     // xcb_connection_t              * connection
+		window_parameters.Window                          // xcb_window_t                    window
+	};
 
-    result = vkCreateXcbSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
+	result = vkCreateXcbSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
 
 #endif
 
-    if( (VK_SUCCESS != result) ||
-        (VK_NULL_HANDLE == presentation_surface) ) {
-      std::cout << "Could not create presentation surface." << std::endl;
-      return false;
-    }
-    return true;
+	if( (VK_SUCCESS != result) ||
+	        (VK_NULL_HANDLE == presentation_surface) )
+	{
+		std::cout << "Could not create presentation surface." << std::endl;
+		return false;
+	}
+	return true;
 }
 
 bool CheckSurfaceQueueSupport(uint32_t &queue_family_index)
@@ -97,7 +98,7 @@ bool CheckSelectPresentationModesSupport(VkPresentModeKHR desired_mode)
 	{
 		std::cout<<"Could not enumerate surface presentation modes! \n";
 		return false;
-	}	
+	}
 	for(uint32_t i = 0; i<modes_count; i++)
 	{
 		if(present_modes[i]==desired_mode)
@@ -114,7 +115,7 @@ bool CheckSelectPresentationModesSupport(VkPresentModeKHR desired_mode)
 			target_surface_mode = VK_PRESENT_MODE_FIFO_KHR;
 			return true;
 		}
-	}	
+	}
 	std::cout<<"Function "<<__func__<<" failed!"<<std::endl;
 	return false;
 }

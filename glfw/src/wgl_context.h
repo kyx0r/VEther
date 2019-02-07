@@ -111,9 +111,9 @@ typedef BOOL (WINAPI * PFN_wglShareLists)(HGLRC,HGLRC);
 //
 typedef struct _GLFWcontextWGL
 {
-    HDC       dc;
-    HGLRC     handle;
-    int       interval;
+	HDC       dc;
+	HGLRC     handle;
+	int       interval;
 
 } _GLFWcontextWGL;
 
@@ -121,32 +121,32 @@ typedef struct _GLFWcontextWGL
 //
 typedef struct _GLFWlibraryWGL
 {
-    HINSTANCE                           instance;
-    PFN_wglCreateContext                CreateContext;
-    PFN_wglDeleteContext                DeleteContext;
-    PFN_wglGetProcAddress               GetProcAddress;
-    PFN_wglGetCurrentDC                 GetCurrentDC;
-    PFN_wglGetCurrentContext            GetCurrentContext;
-    PFN_wglMakeCurrent                  MakeCurrent;
-    PFN_wglShareLists                   ShareLists;
+	HINSTANCE                           instance;
+	PFN_wglCreateContext                CreateContext;
+	PFN_wglDeleteContext                DeleteContext;
+	PFN_wglGetProcAddress               GetProcAddress;
+	PFN_wglGetCurrentDC                 GetCurrentDC;
+	PFN_wglGetCurrentContext            GetCurrentContext;
+	PFN_wglMakeCurrent                  MakeCurrent;
+	PFN_wglShareLists                   ShareLists;
 
-    PFNWGLSWAPINTERVALEXTPROC           SwapIntervalEXT;
-    PFNWGLGETPIXELFORMATATTRIBIVARBPROC GetPixelFormatAttribivARB;
-    PFNWGLGETEXTENSIONSSTRINGEXTPROC    GetExtensionsStringEXT;
-    PFNWGLGETEXTENSIONSSTRINGARBPROC    GetExtensionsStringARB;
-    PFNWGLCREATECONTEXTATTRIBSARBPROC   CreateContextAttribsARB;
-    GLFWbool                            EXT_swap_control;
-    GLFWbool                            EXT_colorspace;
-    GLFWbool                            ARB_multisample;
-    GLFWbool                            ARB_framebuffer_sRGB;
-    GLFWbool                            EXT_framebuffer_sRGB;
-    GLFWbool                            ARB_pixel_format;
-    GLFWbool                            ARB_create_context;
-    GLFWbool                            ARB_create_context_profile;
-    GLFWbool                            EXT_create_context_es2_profile;
-    GLFWbool                            ARB_create_context_robustness;
-    GLFWbool                            ARB_create_context_no_error;
-    GLFWbool                            ARB_context_flush_control;
+	PFNWGLSWAPINTERVALEXTPROC           SwapIntervalEXT;
+	PFNWGLGETPIXELFORMATATTRIBIVARBPROC GetPixelFormatAttribivARB;
+	PFNWGLGETEXTENSIONSSTRINGEXTPROC    GetExtensionsStringEXT;
+	PFNWGLGETEXTENSIONSSTRINGARBPROC    GetExtensionsStringARB;
+	PFNWGLCREATECONTEXTATTRIBSARBPROC   CreateContextAttribsARB;
+	GLFWbool                            EXT_swap_control;
+	GLFWbool                            EXT_colorspace;
+	GLFWbool                            ARB_multisample;
+	GLFWbool                            ARB_framebuffer_sRGB;
+	GLFWbool                            EXT_framebuffer_sRGB;
+	GLFWbool                            ARB_pixel_format;
+	GLFWbool                            ARB_create_context;
+	GLFWbool                            ARB_create_context_profile;
+	GLFWbool                            EXT_create_context_es2_profile;
+	GLFWbool                            ARB_create_context_robustness;
+	GLFWbool                            ARB_create_context_no_error;
+	GLFWbool                            ARB_context_flush_control;
 
 } _GLFWlibraryWGL;
 

@@ -5,19 +5,19 @@ GVAR: PFN_* -> vulkan_decl.h
 } */
 
 //{
-VkInstance instance;           
-VkPhysicalDevice target_device; 
-VkDevice logical_device; 
-uint32_t queue_families_count = 0; 
+VkInstance instance;
+VkPhysicalDevice target_device;
+VkDevice logical_device;
+uint32_t queue_families_count = 0;
 //}
 
 static uint32_t extensions_count = 0;
 static uint32_t device_extensions_count = 0;
 static uint32_t device_count = 0;
-static uint32_t desired_count = 0; 
+static uint32_t desired_count = 0;
 static const char** desired_extensions = nullptr;
 static VkExtensionProperties* available_extensions = nullptr;
-static VkPhysicalDevice *available_devices = nullptr;       
+static VkPhysicalDevice *available_devices = nullptr;
 static VkPhysicalDeviceFeatures device_features;
 static VkPhysicalDeviceProperties device_properties;
 
@@ -48,57 +48,57 @@ void debug_pause()
 
 const char* GetVulkanResultString(VkResult result)
 {
-    switch (result)
-    {
-        case VK_SUCCESS:
-            return "Success";
-        case VK_NOT_READY:
-            return "A fence or query has not yet completed";
-        case VK_TIMEOUT:
-            return "A wait operation has not completed in the specified time";
-        case VK_EVENT_SET:
-            return "An event is signaled";
-        case VK_EVENT_RESET:
-            return "An event is unsignaled";
-        case VK_INCOMPLETE:
-            return "A return array was too small for the result";
-        case VK_ERROR_OUT_OF_HOST_MEMORY:
-            return "A host memory allocation has failed";
-        case VK_ERROR_OUT_OF_DEVICE_MEMORY:
-            return "A device memory allocation has failed";
-        case VK_ERROR_INITIALIZATION_FAILED:
-            return "Initialization of an object could not be completed for implementation-specific reasons";
-        case VK_ERROR_DEVICE_LOST:
-            return "The logical or physical device has been lost";
-        case VK_ERROR_MEMORY_MAP_FAILED:
-            return "Mapping of a memory object has failed";
-        case VK_ERROR_LAYER_NOT_PRESENT:
-            return "A requested layer is not present or could not be loaded";
-        case VK_ERROR_EXTENSION_NOT_PRESENT:
-            return "A requested extension is not supported";
-        case VK_ERROR_FEATURE_NOT_PRESENT:
-            return "A requested feature is not supported";
-        case VK_ERROR_INCOMPATIBLE_DRIVER:
-            return "The requested version of Vulkan is not supported by the driver or is otherwise incompatible";
-        case VK_ERROR_TOO_MANY_OBJECTS:
-            return "Too many objects of the type have already been created";
-        case VK_ERROR_FORMAT_NOT_SUPPORTED:
-            return "A requested format is not supported on this device";
-        case VK_ERROR_SURFACE_LOST_KHR:
-            return "A surface is no longer available";
-        case VK_SUBOPTIMAL_KHR:
-            return "A swapchain no longer matches the surface properties exactly, but can still be used";
-        case VK_ERROR_OUT_OF_DATE_KHR:
-            return "A surface has changed in such a way that it is no longer compatible with the swapchain";
-        case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
-            return "The display used by a swapchain does not use the same presentable image layout";
-        case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
-            return "The requested window is already connected to a VkSurfaceKHR, or to some other non-Vulkan API";
-        case VK_ERROR_VALIDATION_FAILED_EXT:
-            return "A validation layer found an error";
-        default:
-            return "ERROR: UNKNOWN VULKAN ERROR";
-    }
+	switch (result)
+	{
+	case VK_SUCCESS:
+		return "Success";
+	case VK_NOT_READY:
+		return "A fence or query has not yet completed";
+	case VK_TIMEOUT:
+		return "A wait operation has not completed in the specified time";
+	case VK_EVENT_SET:
+		return "An event is signaled";
+	case VK_EVENT_RESET:
+		return "An event is unsignaled";
+	case VK_INCOMPLETE:
+		return "A return array was too small for the result";
+	case VK_ERROR_OUT_OF_HOST_MEMORY:
+		return "A host memory allocation has failed";
+	case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+		return "A device memory allocation has failed";
+	case VK_ERROR_INITIALIZATION_FAILED:
+		return "Initialization of an object could not be completed for implementation-specific reasons";
+	case VK_ERROR_DEVICE_LOST:
+		return "The logical or physical device has been lost";
+	case VK_ERROR_MEMORY_MAP_FAILED:
+		return "Mapping of a memory object has failed";
+	case VK_ERROR_LAYER_NOT_PRESENT:
+		return "A requested layer is not present or could not be loaded";
+	case VK_ERROR_EXTENSION_NOT_PRESENT:
+		return "A requested extension is not supported";
+	case VK_ERROR_FEATURE_NOT_PRESENT:
+		return "A requested feature is not supported";
+	case VK_ERROR_INCOMPATIBLE_DRIVER:
+		return "The requested version of Vulkan is not supported by the driver or is otherwise incompatible";
+	case VK_ERROR_TOO_MANY_OBJECTS:
+		return "Too many objects of the type have already been created";
+	case VK_ERROR_FORMAT_NOT_SUPPORTED:
+		return "A requested format is not supported on this device";
+	case VK_ERROR_SURFACE_LOST_KHR:
+		return "A surface is no longer available";
+	case VK_SUBOPTIMAL_KHR:
+		return "A swapchain no longer matches the surface properties exactly, but can still be used";
+	case VK_ERROR_OUT_OF_DATE_KHR:
+		return "A surface has changed in such a way that it is no longer compatible with the swapchain";
+	case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
+		return "The display used by a swapchain does not use the same presentable image layout";
+	case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
+		return "The requested window is already connected to a VkSurfaceKHR, or to some other non-Vulkan API";
+	case VK_ERROR_VALIDATION_FAILED_EXT:
+		return "A validation layer found an error";
+	default:
+		return "ERROR: UNKNOWN VULKAN ERROR";
+	}
 }
 
 #ifdef DEBUG
@@ -111,11 +111,11 @@ static VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT flags, VkDe
 		return VK_FALSE;
 
 	const char* type =
-		(flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
-		? "ERROR"
-		: (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
-			? "WARNING"
-			: "INFO";
+	    (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	    ? "ERROR"
+	    : (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+	    ? "WARNING"
+	    : "INFO";
 
 	char message[4096];
 	snprintf(message, ARRAYSIZE(message), "%s: %s\n", type, pMessage);
@@ -134,28 +134,28 @@ static VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT flags, VkDe
 
 static bool CheckValidationLayerSupport()
 {
-    uint32_t layerCount;
-    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+	uint32_t layerCount;
+	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
-    VkLayerProperties availableLayers[layerCount];
-    vkEnumerateInstanceLayerProperties(&layerCount, &availableLayers[0]);
+	VkLayerProperties availableLayers[layerCount];
+	vkEnumerateInstanceLayerProperties(&layerCount, &availableLayers[0]);
 
-    for(int i = 0; i<d_layers_count; i++)
+	for(int i = 0; i<d_layers_count; i++)
 	{
-        bool layerFound = false;
-        for (uint32_t z = 0; z<layerCount; z++)
+		bool layerFound = false;
+		for (uint32_t z = 0; z<layerCount; z++)
 		{
-            if (strcmp(debugLayers[i], (char*) &availableLayers[z]) == 0)
+			if (strcmp(debugLayers[i], (char*) &availableLayers[z]) == 0)
 			{
-                layerFound = true;
-                break;
-            }
-        }
-        if (!layerFound)
+				layerFound = true;
+				break;
+			}
+		}
+		if (!layerFound)
 		{
-            return false;
-        }
-    }
+			return false;
+		}
+	}
 	return true;
 }
 
@@ -166,8 +166,8 @@ VkDebugReportCallbackEXT registerDebugCallback()
 		std::cout<<"Debug Layers are not found! \n";
 		return 0;
 	}
-	
-	#define DEBUG_VULKAN_FUNCTION( name ) \
+
+#define DEBUG_VULKAN_FUNCTION( name ) \
 	name = reinterpret_cast<PFN_##name> (vkGetInstanceProcAddr( instance, #name)); \
 	if(name == nullptr) \
 	{ \
@@ -175,14 +175,14 @@ VkDebugReportCallbackEXT registerDebugCallback()
 		return 0; \
 	}else \
 		std::cout<<"Loaded DEBUG Vulkan function: "<< #name <<std::endl; \
-	
-	#include "vulkan_functions_list.inl"	
-	
+
+#include "vulkan_functions_list.inl"
+
 	VkDebugReportCallbackCreateInfoEXT createInfo = {};
-	createInfo.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT | 
-	VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | 
-	VK_DEBUG_REPORT_ERROR_BIT_EXT |
-	VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+	createInfo.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
+	                   VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+	                   VK_DEBUG_REPORT_ERROR_BIT_EXT |
+	                   VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
 	createInfo.pfnCallback = debugReportCallback;
 
 	VkDebugReportCallbackEXT callback = 0;
@@ -195,22 +195,22 @@ VkDebugReportCallbackEXT registerDebugCallback()
 
 bool LoadVulkan()
 {
-	#if defined _WIN32
-	#define libtype HMODULE
+#if defined _WIN32
+#define libtype HMODULE
 	vulkan_lib = LoadLibrary("vulkan-1.dll");
-	#define LoadFunction GetProcAddress
-	#elif defined __linux
-	#define libtype void*
+#define LoadFunction GetProcAddress
+#elif defined __linux
+#define libtype void*
 	vulkan_lib = dlopen("libvulcan.so.1", RTLD_NOW);
-	#define LoadFunction dlsym
-	#endif
+#define LoadFunction dlsym
+#endif
 	if(vulkan_lib == nullptr)
 	{
 		std::cout<<"Failed to load the Vulkan Runtime Library! \n";
 		return false;
 	}
-			
-	#define EXPORTED_VULKAN_FUNCTION( name ) \
+
+#define EXPORTED_VULKAN_FUNCTION( name ) \
 	name = reinterpret_cast<PFN_##name> (LoadFunction(vulkan_lib, #name)); \
 	if(name == nullptr) \
 	{ \
@@ -218,15 +218,15 @@ bool LoadVulkan()
 		return false; \
 	}else \
 		std::cout<<"Exported Vulkan function: "<< #name <<std::endl; \
-	
-	#include "vulkan_functions_list.inl"
-	
+
+#include "vulkan_functions_list.inl"
+
 	return true;
 }
 
 bool LoadVulkanGlobalFuncs()
 {
-	#define GLOBAL_LEVEL_VULKAN_FUNCTION( name ) \
+#define GLOBAL_LEVEL_VULKAN_FUNCTION( name ) \
 	name = reinterpret_cast<PFN_##name> (vkGetInstanceProcAddr( nullptr, #name)); \
 	if(name == nullptr) \
 	{ \
@@ -234,15 +234,15 @@ bool LoadVulkanGlobalFuncs()
 		return false; \
 	}else \
 		std::cout<<"Loaded exported Vulkan function: "<< #name <<std::endl; \
-	
-	#include "vulkan_functions_list.inl"
-	return true; 
+
+#include "vulkan_functions_list.inl"
+	return true;
 }
 
 //Instance functions take 1st parameter of type Vkdevice || VkQueue || VkCommandBuffer
 bool LoadInstanceFunctions()
 {
-	#define INSTANCE_LEVEL_VULKAN_FUNCTION( name ) \
+#define INSTANCE_LEVEL_VULKAN_FUNCTION( name ) \
 	name = (PFN_##name)vkGetInstanceProcAddr( instance, #name); \
 	if(name == nullptr) \
 	{ \
@@ -250,11 +250,11 @@ bool LoadInstanceFunctions()
 		return false; \
 	}else \
 		std::cout<<"Loaded instance-level Vulkan function: "<< #name <<std::endl; \
-	
-	#include "vulkan_functions_list.inl"
-	
-    // Load instance-level functions from enabled extensions
-	#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )        \
+
+#include "vulkan_functions_list.inl"
+
+	// Load instance-level functions from enabled extensions
+#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )        \
     for(uint32_t i = 0; i<desired_count; i++) {                      \
       if( std::string( desired_extensions[i] ) == std::string( extension ) ) {      \
         name = (PFN_##name)vkGetInstanceProcAddr( instance, #name );            \
@@ -265,10 +265,10 @@ bool LoadInstanceFunctions()
         }else                                                                       \
 		std::cout<<"Loaded function from extension: "<<#name<<std::endl; \
       }                                                                         \
-    }	
-	
-	#include "vulkan_functions_list.inl"
-	
+    }
+
+#include "vulkan_functions_list.inl"
+
 	return true;
 }
 
@@ -279,33 +279,33 @@ bool CheckInstanceExtensions()
 	if(result != VK_SUCCESS || extensions_count == 0)
 	{
 		std::cout<<"Could not get the extension count!  \n";
-		return false; 		
+		return false;
 	}
 	available_extensions = new VkExtensionProperties [extensions_count];
 	result = vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, &available_extensions[0]);
 	if(result != VK_SUCCESS || extensions_count == 0)
 	{
 		std::cout<<"Could not enumerate extensions!  \n";
-		return false; 		
-	}	
+		return false;
+	}
 	return true;
 }
 
-bool IsExtensionSupported(const char* extension) 
+bool IsExtensionSupported(const char* extension)
 {
 	for(uint32_t i = 0; i<extensions_count; i++)
 	{
-		if( strstr( (char*) &available_extensions[i], extension ) ) 
+		if( strstr( (char*) &available_extensions[i], extension ) )
 		{
 			return true;
-		}		
+		}
 	}
 	std::cout<<"Available Extensions: \n";
 	for(uint32_t i = 0; i<extensions_count; i++)
 	{
-		std::cout<<(char*) &available_extensions[i]<<std::endl; 
-	}	
-    return false;
+		std::cout<<(char*) &available_extensions[i]<<std::endl;
+	}
+	return false;
 }
 
 bool CreateVulkanInstance(uint32_t count, const char** exts)
@@ -323,8 +323,8 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 			}
 		}
 	}
-	
-	VkApplicationInfo app_info = 
+
+	VkApplicationInfo app_info =
 	{
 		VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		nullptr,
@@ -334,7 +334,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		VK_MAKE_VERSION(1,0,0),
 		VK_MAKE_VERSION(1,0,0)
 	};
-	
+
 	VkInstanceCreateInfo instance_create_info =
 	{
 		VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -346,25 +346,25 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		count,
 		&desired_extensions[0]
 	};
-	
+
 #ifdef DEBUG
 	instance_create_info.enabledLayerCount = d_layers_count;
-    instance_create_info.ppEnabledLayerNames = debugLayers;
+	instance_create_info.ppEnabledLayerNames = debugLayers;
 #endif
-	
+
 	VkResult result = VK_SUCCESS;
 	result = vkCreateInstance(&instance_create_info, nullptr, &instance);
 	if(result != VK_SUCCESS)
 	{
 		std::cout<<"Could not create Vulkan Instance!  \n";
-		return false; 		
-	}	
-	
-	//instance is created and we wont dont need to store instance extensions here anymore. 
-	//next step will be to load device extensions in this array. 
+		return false;
+	}
+
+	//instance is created and we wont dont need to store instance extensions here anymore.
+	//next step will be to load device extensions in this array.
 	delete available_extensions;
 	available_extensions = nullptr;
-	
+
 	return true;
 }
 
@@ -375,15 +375,15 @@ bool CheckPhysicalDevices()
 	if(result != VK_SUCCESS || device_count == 0)
 	{
 		std::cout<<"Could not get number of physical devices!  \n";
-		return false; 		
-	}	
+		return false;
+	}
 	available_devices = new VkPhysicalDevice [device_count];
 	result = vkEnumeratePhysicalDevices(instance, &device_count, &available_devices[0]);
 	if(result != VK_SUCCESS || device_count == 0)
 	{
 		std::cout<<"Could not enumerate physical devices!  \n";
-		return false; 		
-	}		
+		return false;
+	}
 	return true;
 }
 
@@ -396,24 +396,26 @@ bool CheckPhysicalDeviceExtensions()
 		if(result != VK_SUCCESS || device_extensions_count == 0)
 		{
 			std::cout<<"Could not get number of physical device extensions!  \n";
-			return false; 		
+			return false;
 		}
 		available_extensions = new VkExtensionProperties [device_extensions_count];
 		result = vkEnumerateDeviceExtensionProperties(available_devices[i], nullptr, &device_extensions_count, &available_extensions[0]);
 		if(result != VK_SUCCESS || device_extensions_count == 0)
 		{
 			std::cout<<"Could not enumerate device extensions!  \n";
-			return false; 		
-		}	
-		
+			return false;
+		}
+
 		vkGetPhysicalDeviceFeatures(available_devices[i], &device_features);
 		vkGetPhysicalDeviceProperties(available_devices[i], &device_properties);
-		
+
 		//can add more checks later.
-		if( !device_features.geometryShader ) 
+		if( !device_features.geometryShader )
 		{
 			continue;
-		} else {
+		}
+		else
+		{
 			device_features = {};
 			device_features.geometryShader = VK_TRUE;
 			target_device = available_devices[i];
@@ -464,7 +466,7 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 				return false;
 			}
 		}
-	}	
+	}
 	VkDeviceQueueCreateInfo queue_create_infos[number_of_queues];
 	for(int i = 0; i<number_of_queues; i++)
 	{
@@ -472,7 +474,7 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 		{
 			number_of_queues = number_of_queues - 1;
 		}
-		queue_create_infos[i] = 
+		queue_create_infos[i] =
 		{
 			VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 			nullptr,
@@ -482,50 +484,50 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 			array[i].Priorities
 		};
 	}
-	
-    VkDeviceCreateInfo device_create_info = 
+
+	VkDeviceCreateInfo device_create_info =
 	{
-      VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,               // VkStructureType                  sType
-      nullptr,                                            // const void                     * pNext
-      0,                                                  // VkDeviceCreateFlags              flags
-      (uint32_t) number_of_queues,                        // uint32_t                         queueCreateInfoCount
-      queue_create_infos,                                 // const VkDeviceQueueCreateInfo  * pQueueCreateInfos
-      0,                                                  // uint32_t                         enabledLayerCount
-      nullptr,                                            // const char * const             * ppEnabledLayerNames
-      ext_count,                                          // uint32_t                         enabledExtensionCount
-      &desired_extensions[0],                             // const char * const             * ppEnabledExtensionNames
-      &device_features                                    // const VkPhysicalDeviceFeatures * pEnabledFeatures
-    };	
-	
+		VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,               // VkStructureType                  sType
+		nullptr,                                            // const void                     * pNext
+		0,                                                  // VkDeviceCreateFlags              flags
+		(uint32_t) number_of_queues,                        // uint32_t                         queueCreateInfoCount
+		queue_create_infos,                                 // const VkDeviceQueueCreateInfo  * pQueueCreateInfos
+		0,                                                  // uint32_t                         enabledLayerCount
+		nullptr,                                            // const char * const             * ppEnabledLayerNames
+		ext_count,                                          // uint32_t                         enabledExtensionCount
+		&desired_extensions[0],                             // const char * const             * ppEnabledExtensionNames
+		&device_features                                    // const VkPhysicalDeviceFeatures * pEnabledFeatures
+	};
+
 	VkResult result = vkCreateDevice(target_device, &device_create_info, nullptr, &logical_device);
-    if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE) 
+	if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE)
 	{
-      std::cout << "Could not create logical device." << std::endl;
-      return false;
-    }
-	
+		std::cout << "Could not create logical device." << std::endl;
+		return false;
+	}
+
 	delete available_extensions;
 	available_extensions = nullptr;
-	
+
 	return true;
 }
 
 bool LoadDeviceLevelFunctions()
 {
-    // Load core Vulkan API device-level functions
-	#define DEVICE_LEVEL_VULKAN_FUNCTION( name )                                    \
+	// Load core Vulkan API device-level functions
+#define DEVICE_LEVEL_VULKAN_FUNCTION( name )                                    \
     name = (PFN_##name)vkGetDeviceProcAddr( logical_device, #name );            \
     if( name == nullptr ) {                                                     \
       std::cout << "Could not load device-level Vulkan function named: "        \
         #name << std::endl;                                                     \
       return false;                                                             \
     }else                                                                       \
-		std::cout<<"Loaded device-level function: "<<#name<<std::endl; 
-	
-	#include "vulkan_functions_list.inl"
-	
-    // Load device-level functions from enabled extensions
-	#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )          \
+		std::cout<<"Loaded device-level function: "<<#name<<std::endl;
+
+#include "vulkan_functions_list.inl"
+
+	// Load device-level functions from enabled extensions
+#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )          \
     for(uint32_t i = 0; i<desired_count; i++) {                      \
       if( std::string( desired_extensions[i] ) == std::string( extension ) ) {      \
         name = (PFN_##name)vkGetDeviceProcAddr( logical_device, #name );        \
@@ -537,24 +539,24 @@ bool LoadDeviceLevelFunctions()
 		std::cout<<"Loaded device-level function from extension: "<<#name<<std::endl;                                                                       \
       }                                                                         \
     }
-	#include "vulkan_functions_list.inl"
-    return true;	
+#include "vulkan_functions_list.inl"
+	return true;
 }
 
 void ReleaseVulkanLoaderLibrary()
 {
 	vkDestroyDevice( logical_device, nullptr );
 	vkDestroyInstance( instance, nullptr );
-    instance = VK_NULL_HANDLE;
-	logical_device = VK_NULL_HANDLE;	
-	
-	if( nullptr != vulkan_lib ) 
+	instance = VK_NULL_HANDLE;
+	logical_device = VK_NULL_HANDLE;
+
+	if( nullptr != vulkan_lib )
 	{
-		#if defined _WIN32
-		  FreeLibrary( vulkan_lib );
-		#elif defined __linux
-		  dlclose( vulkan_lib );
-		#endif
-		  vulkan_lib = nullptr;	
+#if defined _WIN32
+		FreeLibrary( vulkan_lib );
+#elif defined __linux
+		dlclose( vulkan_lib );
+#endif
+		vulkan_lib = nullptr;
 	}
 }

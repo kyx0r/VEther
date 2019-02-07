@@ -93,33 +93,33 @@ extern "C" {
 /* If we are we on Windows, we want a single define for it.
  */
 #if !defined(_WIN32) && (defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__))
- #define _WIN32
+#define _WIN32
 #endif /* _WIN32 */
 
 /* It is customary to use APIENTRY for OpenGL function pointer declarations on
  * all platforms.  Additionally, the Windows OpenGL header needs APIENTRY.
  */
 #ifndef APIENTRY
- #ifdef _WIN32
-  #define APIENTRY __stdcall
- #else
-  #define APIENTRY
- #endif
- #define GLFW_APIENTRY_DEFINED
+#ifdef _WIN32
+#define APIENTRY __stdcall
+#else
+#define APIENTRY
+#endif
+#define GLFW_APIENTRY_DEFINED
 #endif /* APIENTRY */
 
 /* Some Windows OpenGL headers need this.
  */
 #if !defined(WINGDIAPI) && defined(_WIN32)
- #define WINGDIAPI __declspec(dllimport)
- #define GLFW_WINGDIAPI_DEFINED
+#define WINGDIAPI __declspec(dllimport)
+#define GLFW_WINGDIAPI_DEFINED
 #endif /* WINGDIAPI */
 
 /* Some Windows GLU headers need this.
  */
 #if !defined(CALLBACK) && defined(_WIN32)
- #define CALLBACK __stdcall
- #define GLFW_CALLBACK_DEFINED
+#define CALLBACK __stdcall
+#define GLFW_CALLBACK_DEFINED
 #endif /* CALLBACK */
 
 /* Include because most Windows GLU headers need wchar_t and
@@ -137,107 +137,107 @@ extern "C" {
  */
 #if defined(GLFW_INCLUDE_ES1)
 
- #include <GLES/gl.h>
- #if defined(GLFW_INCLUDE_GLEXT)
-  #include <GLES/glext.h>
- #endif
+#include <GLES/gl.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <GLES/glext.h>
+#endif
 
 #elif defined(GLFW_INCLUDE_ES2)
 
- #include <GLES2/gl2.h>
- #if defined(GLFW_INCLUDE_GLEXT)
-  #include <GLES2/gl2ext.h>
- #endif
+#include <GLES2/gl2.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <GLES2/gl2ext.h>
+#endif
 
 #elif defined(GLFW_INCLUDE_ES3)
 
- #include <GLES3/gl3.h>
- #if defined(GLFW_INCLUDE_GLEXT)
-  #include <GLES2/gl2ext.h>
- #endif
+#include <GLES3/gl3.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <GLES2/gl2ext.h>
+#endif
 
 #elif defined(GLFW_INCLUDE_ES31)
 
- #include <GLES3/gl31.h>
- #if defined(GLFW_INCLUDE_GLEXT)
-  #include <GLES2/gl2ext.h>
- #endif
+#include <GLES3/gl31.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <GLES2/gl2ext.h>
+#endif
 
 #elif defined(GLFW_INCLUDE_ES32)
 
- #include <GLES3/gl32.h>
- #if defined(GLFW_INCLUDE_GLEXT)
-  #include <GLES2/gl2ext.h>
- #endif
+#include <GLES3/gl32.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <GLES2/gl2ext.h>
+#endif
 
 #elif defined(GLFW_INCLUDE_GLCOREARB)
 
- #if defined(__APPLE__)
+#if defined(__APPLE__)
 
-  #include <OpenGL/gl3.h>
-  #if defined(GLFW_INCLUDE_GLEXT)
-   #include <OpenGL/gl3ext.h>
-  #endif /*GLFW_INCLUDE_GLEXT*/
+#include <OpenGL/gl3.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <OpenGL/gl3ext.h>
+#endif /*GLFW_INCLUDE_GLEXT*/
 
- #else /*__APPLE__*/
+#else /*__APPLE__*/
 
-  #include <GL/glcorearb.h>
+#include <GL/glcorearb.h>
 
- #endif /*__APPLE__*/
+#endif /*__APPLE__*/
 
 #elif !defined(GLFW_INCLUDE_NONE)
 
- #if defined(__APPLE__)
+#if defined(__APPLE__)
 
-  #if !defined(GLFW_INCLUDE_GLEXT)
-   #define GL_GLEXT_LEGACY
-  #endif
-  #include <OpenGL/gl.h>
-  #if defined(GLFW_INCLUDE_GLU)
-   #include <OpenGL/glu.h>
-  #endif
+#if !defined(GLFW_INCLUDE_GLEXT)
+#define GL_GLEXT_LEGACY
+#endif
+#include <OpenGL/gl.h>
+#if defined(GLFW_INCLUDE_GLU)
+#include <OpenGL/glu.h>
+#endif
 
- #else /*__APPLE__*/
+#else /*__APPLE__*/
 
-  #include <GL/gl.h>
-  #if defined(GLFW_INCLUDE_GLEXT)
-   #include <GL/glext.h>
-  #endif
-  #if defined(GLFW_INCLUDE_GLU)
-   #include <GL/glu.h>
-  #endif
+#include <GL/gl.h>
+#if defined(GLFW_INCLUDE_GLEXT)
+#include <GL/glext.h>
+#endif
+#if defined(GLFW_INCLUDE_GLU)
+#include <GL/glu.h>
+#endif
 
- #endif /*__APPLE__*/
+#endif /*__APPLE__*/
 
 #endif /* OpenGL and OpenGL ES headers */
 
 #if defined(GLFW_INCLUDE_VULKAN)
-  #include <vulkan.h>
+#include <vulkan.h>
 #endif /* Vulkan header */
 
 #if defined(GLFW_DLL) && defined(_GLFW_BUILD_DLL)
- /* GLFW_DLL must be defined by applications that are linking against the DLL
-  * version of the GLFW library.  _GLFW_BUILD_DLL is defined by the GLFW
-  * configuration header when compiling the DLL version of the library.
-  */
- #error "You must not have both GLFW_DLL and _GLFW_BUILD_DLL defined"
+/* GLFW_DLL must be defined by applications that are linking against the DLL
+ * version of the GLFW library.  _GLFW_BUILD_DLL is defined by the GLFW
+ * configuration header when compiling the DLL version of the library.
+ */
+#error "You must not have both GLFW_DLL and _GLFW_BUILD_DLL defined"
 #endif
 
 /* GLFWAPI is used to declare public API functions for export
  * from the DLL / shared library / dynamic library.
  */
 #if defined(_WIN32) && defined(_GLFW_BUILD_DLL)
- /* We are building GLFW as a Win32 DLL */
- #define GLFWAPI __declspec(dllexport)
+/* We are building GLFW as a Win32 DLL */
+#define GLFWAPI __declspec(dllexport)
 #elif defined(_WIN32) && defined(GLFW_DLL)
- /* We are calling GLFW as a Win32 DLL */
- #define GLFWAPI __declspec(dllimport)
+/* We are calling GLFW as a Win32 DLL */
+#define GLFWAPI __declspec(dllimport)
 #elif defined(__GNUC__) && defined(_GLFW_BUILD_DLL)
- /* We are building GLFW as a shared / dynamic library */
- #define GLFWAPI __attribute__((visibility("default")))
+/* We are building GLFW as a shared / dynamic library */
+#define GLFWAPI __attribute__((visibility("default")))
 #else
- /* We are building or calling GLFW as a static library */
- #define GLFWAPI
+/* We are building or calling GLFW as a static library */
+#define GLFWAPI
 #endif
 
 
@@ -1524,24 +1524,24 @@ typedef void (* GLFWjoystickfun)(int,int);
  */
 typedef struct GLFWvidmode
 {
-    /*! The width, in screen coordinates, of the video mode.
-     */
-    int width;
-    /*! The height, in screen coordinates, of the video mode.
-     */
-    int height;
-    /*! The bit depth of the red channel of the video mode.
-     */
-    int redBits;
-    /*! The bit depth of the green channel of the video mode.
-     */
-    int greenBits;
-    /*! The bit depth of the blue channel of the video mode.
-     */
-    int blueBits;
-    /*! The refresh rate, in Hz, of the video mode.
-     */
-    int refreshRate;
+	/*! The width, in screen coordinates, of the video mode.
+	 */
+	int width;
+	/*! The height, in screen coordinates, of the video mode.
+	 */
+	int height;
+	/*! The bit depth of the red channel of the video mode.
+	 */
+	int redBits;
+	/*! The bit depth of the green channel of the video mode.
+	 */
+	int greenBits;
+	/*! The bit depth of the blue channel of the video mode.
+	 */
+	int blueBits;
+	/*! The refresh rate, in Hz, of the video mode.
+	 */
+	int refreshRate;
 } GLFWvidmode;
 
 /*! @brief Gamma ramp.
@@ -1558,18 +1558,18 @@ typedef struct GLFWvidmode
  */
 typedef struct GLFWgammaramp
 {
-    /*! An array of value describing the response of the red channel.
-     */
-    unsigned short* red;
-    /*! An array of value describing the response of the green channel.
-     */
-    unsigned short* green;
-    /*! An array of value describing the response of the blue channel.
-     */
-    unsigned short* blue;
-    /*! The number of elements in each array.
-     */
-    unsigned int size;
+	/*! An array of value describing the response of the red channel.
+	 */
+	unsigned short* red;
+	/*! An array of value describing the response of the green channel.
+	 */
+	unsigned short* green;
+	/*! An array of value describing the response of the blue channel.
+	 */
+	unsigned short* blue;
+	/*! The number of elements in each array.
+	 */
+	unsigned int size;
 } GLFWgammaramp;
 
 /*! @brief Image data.
@@ -1587,15 +1587,15 @@ typedef struct GLFWgammaramp
  */
 typedef struct GLFWimage
 {
-    /*! The width, in pixels, of this image.
-     */
-    int width;
-    /*! The height, in pixels, of this image.
-     */
-    int height;
-    /*! The pixel data of this image, arranged left-to-right, top-to-bottom.
-     */
-    unsigned char* pixels;
+	/*! The width, in pixels, of this image.
+	 */
+	int width;
+	/*! The height, in pixels, of this image.
+	 */
+	int height;
+	/*! The pixel data of this image, arranged left-to-right, top-to-bottom.
+	 */
+	unsigned char* pixels;
 } GLFWimage;
 
 /*! @brief Gamepad input state
@@ -1611,14 +1611,14 @@ typedef struct GLFWimage
  */
 typedef struct GLFWgamepadstate
 {
-    /*! The states of each [gamepad button](@ref gamepad_buttons), `GLFW_PRESS`
-     *  or `GLFW_RELEASE`.
-     */
-    unsigned char buttons[15];
-    /*! The states of each [gamepad axis](@ref gamepad_axes), in the range -1.0
-     *  to 1.0 inclusive.
-     */
-    float axes[6];
+	/*! The states of each [gamepad button](@ref gamepad_buttons), `GLFW_PRESS`
+	 *  or `GLFW_RELEASE`.
+	 */
+	unsigned char buttons[15];
+	/*! The states of each [gamepad axis](@ref gamepad_axes), in the range -1.0
+	 *  to 1.0 inclusive.
+	 */
+	float axes[6];
 } GLFWgamepadstate;
 
 
@@ -5517,20 +5517,20 @@ GLFWAPI VkResult glfwCreateWindowSurface(VkInstance instance, GLFWwindow* window
 /* ------------------- BEGIN SYSTEM/COMPILER SPECIFIC -------------------- */
 
 #ifdef GLFW_WINGDIAPI_DEFINED
- #undef WINGDIAPI
- #undef GLFW_WINGDIAPI_DEFINED
+#undef WINGDIAPI
+#undef GLFW_WINGDIAPI_DEFINED
 #endif
 
 #ifdef GLFW_CALLBACK_DEFINED
- #undef CALLBACK
- #undef GLFW_CALLBACK_DEFINED
+#undef CALLBACK
+#undef GLFW_CALLBACK_DEFINED
 #endif
 
 /* Some OpenGL related headers need GLAPIENTRY, but it is unconditionally
  * defined by some gl.h variants (OpenBSD) so define it after if needed.
  */
 #ifndef GLAPIENTRY
- #define GLAPIENTRY APIENTRY
+#define GLAPIENTRY APIENTRY
 #endif
 
 /* -------------------- END SYSTEM/COMPILER SPECIFIC --------------------- */

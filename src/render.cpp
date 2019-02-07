@@ -2,7 +2,7 @@
 #include "control.h"
 
 /* {
-GVAR: logical_device -> startup.cpp	
+GVAR: logical_device -> startup.cpp
 GVAR: command_buffer -> control.h
 GVAR: image_format -> swapchain.cpp
 } */
@@ -20,9 +20,9 @@ static int imageViewCount = 0;
 void CreateRenderPass(VkFormat depthFormat, bool late)
 {
 	VkRenderPass renderPass = 0;
-	
+
 	VkAttachmentDescription attachments[2] = {};
-	attachments[0].format = image_format; 
+	attachments[0].format = image_format;
 	attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
 	attachments[0].loadOp = late ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
 	attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -56,13 +56,13 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
 	createInfo.pAttachments = attachments;
 	createInfo.subpassCount = 1;
 	createInfo.pSubpasses = &subpass;
-	
+
 	VK_CHECK(vkCreateRenderPass(logical_device, &createInfo, 0, &renderPass));
-	
+
 	if(renderPassCount == ARRAYSIZE(renderPasses))
 	{
 		std::cout<<"Info: Run out of render passes. \n";
-		renderPassCount = 0; 
+		renderPassCount = 0;
 		vkDestroyRenderPass(logical_device, renderPasses[renderPassCount], nullptr);
 	}
 	renderPasses[renderPassCount] = renderPass;
@@ -77,7 +77,7 @@ void DestroyRenderPass(int render_index)
 void CreateFramebuffer(VkImageView colorView, VkImageView depthView, int render_index, uint32_t width, uint32_t height)
 {
 	VkFramebuffer framebuffer = 0;
-	
+
 	VkImageView attachments[] = { colorView, depthView };
 
 	VkFramebufferCreateInfo createInfo = {};
@@ -88,17 +88,17 @@ void CreateFramebuffer(VkImageView colorView, VkImageView depthView, int render_
 	createInfo.width = width;
 	createInfo.height = height;
 	createInfo.layers = 1;
-	
+
 	VK_CHECK(vkCreateFramebuffer(logical_device, &createInfo, 0, &framebuffer));
-	
+
 	if(framebufferCount == ARRAYSIZE(framebuffers))
 	{
 		std::cout<<"Info: Run out of frame buffers. \n";
-		framebufferCount = 0; 
+		framebufferCount = 0;
 		vkDestroyFramebuffer(logical_device, framebuffers[framebufferCount], nullptr);
 	}
 	framebuffers[framebufferCount] = framebuffer;
-	framebufferCount++;	
+	framebufferCount++;
 }
 
 void CreateImageView(VkImage image, VkFormat format, uint32_t mipLevel, uint32_t levelCount)
@@ -117,14 +117,14 @@ void CreateImageView(VkImage image, VkFormat format, uint32_t mipLevel, uint32_t
 
 	VkImageView view = 0;
 	VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &view));
-	
+
 	if(imageViewCount == ARRAYSIZE(framebuffers))
 	{
 		std::cout<<"Info: Run out of imageViews. \n";
-		imageViewCount = 0; 
+		imageViewCount = 0;
 	}
 	imageViews[imageViewCount] = view;
-	imageViewCount++;		
+	imageViewCount++;
 }
 
 void DestroyFramebuffer(int buffer_index)
@@ -136,12 +136,12 @@ void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpass
 {
 	VkRenderPassBeginInfo render_pass_begin_info = {};
 	render_pass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    render_pass_begin_info.pNext = nullptr;
+	render_pass_begin_info.pNext = nullptr;
 	render_pass_begin_info.renderPass = renderPasses[render_index];
-    render_pass_begin_info.framebuffer = framebuffers[buffer_index];
-    render_pass_begin_info.renderArea = render_area;
-    render_pass_begin_info.clearValueCount = ARRAYSIZE(clear_values);
-    render_pass_begin_info.pClearValues = clear_values;
-	
+	render_pass_begin_info.framebuffer = framebuffers[buffer_index];
+	render_pass_begin_info.renderArea = render_area;
+	render_pass_begin_info.clearValueCount = ARRAYSIZE(clear_values);
+	render_pass_begin_info.pClearValues = clear_values;
+
 	vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, subpass_contents);
 }

@@ -60,7 +60,7 @@ static inline void vec3_reflect(vec3 r, vec3 const v, vec3 const n)
 {
 	float p  = 2.f*vec3_mul_inner(v, n);
 	int i;
-	for(i=0;i<3;++i)
+	for(i=0; i<3; ++i)
 		r[i] = v[i] - p*n[i];
 }
 
@@ -76,7 +76,7 @@ static inline void vec4_reflect(vec4 r, vec4 v, vec4 n)
 {
 	float p  = 2.f*vec4_mul_inner(v, n);
 	int i;
-	for(i=0;i<4;++i)
+	for(i=0; i<4; ++i)
 		r[i] = v[i] - p*n[i];
 }
 
@@ -138,7 +138,8 @@ static inline void mat4x4_scale_aniso(mat4x4 M, mat4x4 a, float x, float y, floa
 	vec4_scale(M[0], a[0], x);
 	vec4_scale(M[1], a[1], y);
 	vec4_scale(M[2], a[2], z);
-	for(i = 0; i < 4; ++i) {
+	for(i = 0; i < 4; ++i)
+	{
 		M[3][i] = a[3][i];
 	}
 }
@@ -146,17 +147,19 @@ static inline void mat4x4_mul(mat4x4 M, mat4x4 a, mat4x4 b)
 {
 	mat4x4 temp;
 	int k, r, c;
-	for(c=0; c<4; ++c) for(r=0; r<4; ++r) {
-		temp[c][r] = 0.f;
-		for(k=0; k<4; ++k)
-			temp[c][r] += a[k][r] * b[c][k];
-	}
+	for(c=0; c<4; ++c) for(r=0; r<4; ++r)
+		{
+			temp[c][r] = 0.f;
+			for(k=0; k<4; ++k)
+				temp[c][r] += a[k][r] * b[c][k];
+		}
 	mat4x4_dup(M, temp);
 }
 static inline void mat4x4_mul_vec4(vec4 r, mat4x4 M, vec4 v)
 {
 	int i, j;
-	for(j=0; j<4; ++j) {
+	for(j=0; j<4; ++j)
+	{
 		r[j] = 0.f;
 		for(i=0; i<4; ++i)
 			r[j] += M[i][j] * v[i];
@@ -174,7 +177,8 @@ static inline void mat4x4_translate_in_place(mat4x4 M, float x, float y, float z
 	vec4 t = {x, y, z, 0};
 	vec4 r;
 	int i;
-	for (i = 0; i < 4; ++i) {
+	for (i = 0; i < 4; ++i)
+	{
 		mat4x4_row(r, M, i);
 		M[3][i] += vec4_mul_inner(r, t);
 	}
@@ -183,7 +187,7 @@ static inline void mat4x4_from_vec3_mul_outer(mat4x4 M, vec3 a, vec3 b)
 {
 	int i, j;
 	for(i=0; i<4; ++i) for(j=0; j<4; ++j)
-		M[i][j] = i<3 && j<3 ? a[i] * b[j] : 0.f;
+			M[i][j] = i<3 && j<3 ? a[i] * b[j] : 0.f;
 }
 static inline void mat4x4_rotate(mat4x4 R, mat4x4 M, float x, float y, float z, float angle)
 {
@@ -191,7 +195,8 @@ static inline void mat4x4_rotate(mat4x4 R, mat4x4 M, float x, float y, float z, 
 	float c = cosf(angle);
 	vec3 u = {x, y, z};
 
-	if(vec3_len(u) > 1e-4) {
+	if(vec3_len(u) > 1e-4)
+	{
 		mat4x4 T, C, S = {{0}};
 
 		vec3_norm(u, u);
@@ -216,7 +221,9 @@ static inline void mat4x4_rotate(mat4x4 R, mat4x4 M, float x, float y, float z, 
 
 		T[3][3] = 1.;
 		mat4x4_mul(R, M, T);
-	} else {
+	}
+	else
+	{
 		mat4x4_dup(R, M);
 	}
 }
@@ -224,7 +231,8 @@ static inline void mat4x4_rotate_X(mat4x4 Q, mat4x4 M, float angle)
 {
 	float s = sinf(angle);
 	float c = cosf(angle);
-	mat4x4 R = {
+	mat4x4 R =
+	{
 		{1.f, 0.f, 0.f, 0.f},
 		{0.f,   c,   s, 0.f},
 		{0.f,  -s,   c, 0.f},
@@ -236,7 +244,8 @@ static inline void mat4x4_rotate_Y(mat4x4 Q, mat4x4 M, float angle)
 {
 	float s = sinf(angle);
 	float c = cosf(angle);
-	mat4x4 R = {
+	mat4x4 R =
+	{
 		{   c, 0.f,   s, 0.f},
 		{ 0.f, 1.f, 0.f, 0.f},
 		{  -s, 0.f,   c, 0.f},
@@ -248,7 +257,8 @@ static inline void mat4x4_rotate_Z(mat4x4 Q, mat4x4 M, float angle)
 {
 	float s = sinf(angle);
 	float c = cosf(angle);
-	mat4x4 R = {
+	mat4x4 R =
+	{
 		{   c,   s, 0.f, 0.f},
 		{  -s,   c, 0.f, 0.f},
 		{ 0.f, 0.f, 1.f, 0.f},
@@ -472,7 +482,8 @@ static inline void quat_conj(quat r, quat q)
 		r[i] = -q[i];
 	r[3] = q[3];
 }
-static inline void quat_rotate(quat r, float angle, vec3 axis) {
+static inline void quat_rotate(quat r, float angle, vec3 axis)
+{
 	int i;
 	vec3 v;
 	vec3_scale(v, axis, sinf(angle / 2));
@@ -483,11 +494,11 @@ static inline void quat_rotate(quat r, float angle, vec3 axis) {
 #define quat_norm vec4_norm
 static inline void quat_mul_vec3(vec3 r, quat q, vec3 v)
 {
-/*
- * Method by Fabian 'ryg' Giessen (of Farbrausch)
-t = 2 * cross(q.xyz, v)
-v' = v + q.w * t + cross(q.xyz, t)
- */
+	/*
+	 * Method by Fabian 'ryg' Giessen (of Farbrausch)
+	t = 2 * cross(q.xyz, v)
+	v' = v + q.w * t + cross(q.xyz, t)
+	 */
 	vec3 t = {q[0], q[1], q[2]};
 	vec3 u = {q[0], q[1], q[2]};
 
@@ -532,8 +543,8 @@ static inline void mat4x4_from_quat(mat4x4 M, quat q)
 
 static inline void mat4x4o_mul_quat(mat4x4 R, mat4x4 M, quat q)
 {
-/*  XXX: The way this is written only works for othogonal matrices. */
-/* TODO: Take care of non-orthogonal case. */
+	/*  XXX: The way this is written only works for othogonal matrices. */
+	/* TODO: Take care of non-orthogonal case. */
 	quat_mul_vec3(R[0], q, M[0]);
 	quat_mul_vec3(R[1], q, M[1]);
 	quat_mul_vec3(R[2], q, M[2]);
@@ -549,7 +560,8 @@ static inline void quat_from_mat4x4(quat q, mat4x4 M)
 	int perm[] = { 0, 1, 2, 0, 1 };
 	int *p = perm;
 
-	for(i = 0; i<3; i++) {
+	for(i = 0; i<3; i++)
+	{
 		float m = M[i][i];
 		if( m < r )
 			continue;
@@ -559,7 +571,8 @@ static inline void quat_from_mat4x4(quat q, mat4x4 M)
 
 	r = (float) sqrt(1.f + M[p[0]][p[0]] - M[p[1]][p[1]] - M[p[2]][p[2]] );
 
-	if(r < 1e-6) {
+	if(r < 1e-6)
+	{
 		q[0] = 1.f;
 		q[1] = q[2] = q[3] = 0.f;
 		return;

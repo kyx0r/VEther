@@ -33,12 +33,13 @@ extern "C" {
 
 typedef VkFlags VkMirSurfaceCreateFlagsKHR;
 
-typedef struct VkMirSurfaceCreateInfoKHR {
-    VkStructureType               sType;
-    const void*                   pNext;
-    VkMirSurfaceCreateFlagsKHR    flags;
-    MirConnection*                connection;
-    MirSurface*                   mirSurface;
+typedef struct VkMirSurfaceCreateInfoKHR
+{
+	VkStructureType               sType;
+	const void*                   pNext;
+	VkMirSurfaceCreateFlagsKHR    flags;
+	MirConnection*                connection;
+	MirSurface*                   mirSurface;
 } VkMirSurfaceCreateInfoKHR;
 
 

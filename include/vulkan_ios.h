@@ -33,11 +33,12 @@ extern "C" {
 
 typedef VkFlags VkIOSSurfaceCreateFlagsMVK;
 
-typedef struct VkIOSSurfaceCreateInfoMVK {
-    VkStructureType               sType;
-    const void*                   pNext;
-    VkIOSSurfaceCreateFlagsMVK    flags;
-    const void*                   pView;
+typedef struct VkIOSSurfaceCreateInfoMVK
+{
+	VkStructureType               sType;
+	const void*                   pNext;
+	VkIOSSurfaceCreateFlagsMVK    flags;
+	const void*                   pView;
 } VkIOSSurfaceCreateInfoMVK;
 
 

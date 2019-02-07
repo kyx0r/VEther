@@ -60,111 +60,125 @@ typedef PFN_vkVoidFunction(VKAPI_PTR *PFN_GetPhysicalDeviceProcAddr)(VkInstance 
 
 #define ICD_LOADER_MAGIC 0x01CDC0DE
 
-typedef union {
-    uintptr_t loaderMagic;
-    void *loaderData;
+typedef union
+{
+	uintptr_t loaderMagic;
+	void *loaderData;
 } VK_LOADER_DATA;
 
-static inline void set_loader_magic_value(void *pNewObject) {
-    VK_LOADER_DATA *loader_info = (VK_LOADER_DATA *)pNewObject;
-    loader_info->loaderMagic = ICD_LOADER_MAGIC;
+static inline void set_loader_magic_value(void *pNewObject)
+{
+	VK_LOADER_DATA *loader_info = (VK_LOADER_DATA *)pNewObject;
+	loader_info->loaderMagic = ICD_LOADER_MAGIC;
 }
 
-static inline bool valid_loader_magic_value(void *pNewObject) {
-    const VK_LOADER_DATA *loader_info = (VK_LOADER_DATA *)pNewObject;
-    return (loader_info->loaderMagic & 0xffffffff) == ICD_LOADER_MAGIC;
+static inline bool valid_loader_magic_value(void *pNewObject)
+{
+	const VK_LOADER_DATA *loader_info = (VK_LOADER_DATA *)pNewObject;
+	return (loader_info->loaderMagic & 0xffffffff) == ICD_LOADER_MAGIC;
 }
 
 /*
  * Windows and Linux ICDs will treat VkSurfaceKHR as a pointer to a struct that
  * contains the platform-specific connection and surface information.
  */
-typedef enum {
-    VK_ICD_WSI_PLATFORM_MIR,
-    VK_ICD_WSI_PLATFORM_WAYLAND,
-    VK_ICD_WSI_PLATFORM_WIN32,
-    VK_ICD_WSI_PLATFORM_XCB,
-    VK_ICD_WSI_PLATFORM_XLIB,
-    VK_ICD_WSI_PLATFORM_ANDROID,
-    VK_ICD_WSI_PLATFORM_MACOS,
-    VK_ICD_WSI_PLATFORM_IOS,
-    VK_ICD_WSI_PLATFORM_DISPLAY
+typedef enum
+{
+	VK_ICD_WSI_PLATFORM_MIR,
+	VK_ICD_WSI_PLATFORM_WAYLAND,
+	VK_ICD_WSI_PLATFORM_WIN32,
+	VK_ICD_WSI_PLATFORM_XCB,
+	VK_ICD_WSI_PLATFORM_XLIB,
+	VK_ICD_WSI_PLATFORM_ANDROID,
+	VK_ICD_WSI_PLATFORM_MACOS,
+	VK_ICD_WSI_PLATFORM_IOS,
+	VK_ICD_WSI_PLATFORM_DISPLAY
 } VkIcdWsiPlatform;
 
-typedef struct {
-    VkIcdWsiPlatform platform;
+typedef struct
+{
+	VkIcdWsiPlatform platform;
 } VkIcdSurfaceBase;
 
 #ifdef VK_USE_PLATFORM_MIR_KHR
-typedef struct {
-    VkIcdSurfaceBase base;
-    MirConnection *connection;
-    MirSurface *mirSurface;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	MirConnection *connection;
+	MirSurface *mirSurface;
 } VkIcdSurfaceMir;
 #endif  // VK_USE_PLATFORM_MIR_KHR
 
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-typedef struct {
-    VkIcdSurfaceBase base;
-    struct wl_display *display;
-    struct wl_surface *surface;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	struct wl_display *display;
+	struct wl_surface *surface;
 } VkIcdSurfaceWayland;
 #endif  // VK_USE_PLATFORM_WAYLAND_KHR
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-typedef struct {
-    VkIcdSurfaceBase base;
-    HINSTANCE hinstance;
-    HWND hwnd;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	HINSTANCE hinstance;
+	HWND hwnd;
 } VkIcdSurfaceWin32;
 #endif  // VK_USE_PLATFORM_WIN32_KHR
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-typedef struct {
-    VkIcdSurfaceBase base;
-    xcb_connection_t *connection;
-    xcb_window_t window;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	xcb_connection_t *connection;
+	xcb_window_t window;
 } VkIcdSurfaceXcb;
 #endif  // VK_USE_PLATFORM_XCB_KHR
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-typedef struct {
-    VkIcdSurfaceBase base;
-    Display *dpy;
-    Window window;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	Display *dpy;
+	Window window;
 } VkIcdSurfaceXlib;
 #endif  // VK_USE_PLATFORM_XLIB_KHR
 
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
-typedef struct {
-    VkIcdSurfaceBase base;
-    struct ANativeWindow *window;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	struct ANativeWindow *window;
 } VkIcdSurfaceAndroid;
 #endif  // VK_USE_PLATFORM_ANDROID_KHR
 
 #ifdef VK_USE_PLATFORM_MACOS_MVK
-typedef struct {
-    VkIcdSurfaceBase base;
-    const void *pView;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	const void *pView;
 } VkIcdSurfaceMacOS;
 #endif  // VK_USE_PLATFORM_MACOS_MVK
 
 #ifdef VK_USE_PLATFORM_IOS_MVK
-typedef struct {
-    VkIcdSurfaceBase base;
-    const void *pView;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	const void *pView;
 } VkIcdSurfaceIOS;
 #endif  // VK_USE_PLATFORM_IOS_MVK
 
-typedef struct {
-    VkIcdSurfaceBase base;
-    VkDisplayModeKHR displayMode;
-    uint32_t planeIndex;
-    uint32_t planeStackIndex;
-    VkSurfaceTransformFlagBitsKHR transform;
-    float globalAlpha;
-    VkDisplayPlaneAlphaFlagBitsKHR alphaMode;
-    VkExtent2D imageExtent;
+typedef struct
+{
+	VkIcdSurfaceBase base;
+	VkDisplayModeKHR displayMode;
+	uint32_t planeIndex;
+	uint32_t planeStackIndex;
+	VkSurfaceTransformFlagBitsKHR transform;
+	float globalAlpha;
+	VkDisplayPlaneAlphaFlagBitsKHR alphaMode;
+	VkExtent2D imageExtent;
 } VkIcdSurfaceDisplay;
 
 #endif  // VKICD_H

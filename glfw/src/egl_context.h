@@ -26,25 +26,25 @@
 //========================================================================
 
 #if defined(_GLFW_USE_EGLPLATFORM_H)
- #include <EGL/eglplatform.h>
+#include <EGL/eglplatform.h>
 #elif defined(_GLFW_WIN32)
- #define EGLAPIENTRY __stdcall
+#define EGLAPIENTRY __stdcall
 typedef HDC EGLNativeDisplayType;
 typedef HWND EGLNativeWindowType;
 #elif defined(_GLFW_COCOA)
- #define EGLAPIENTRY
+#define EGLAPIENTRY
 typedef void* EGLNativeDisplayType;
 typedef id EGLNativeWindowType;
 #elif defined(_GLFW_X11)
- #define EGLAPIENTRY
+#define EGLAPIENTRY
 typedef Display* EGLNativeDisplayType;
 typedef Window EGLNativeWindowType;
 #elif defined(_GLFW_WAYLAND)
- #define EGLAPIENTRY
+#define EGLAPIENTRY
 typedef struct wl_display* EGLNativeDisplayType;
 typedef struct wl_egl_window* EGLNativeWindowType;
 #else
- #error "No supported EGL platform selected"
+#error "No supported EGL platform selected"
 #endif
 
 #define EGL_SUCCESS	0x3000
@@ -157,11 +157,11 @@ typedef GLFWglproc (EGLAPIENTRY * PFN_eglGetProcAddress)(const char*);
 //
 typedef struct _GLFWcontextEGL
 {
-   EGLConfig        config;
-   EGLContext       handle;
-   EGLSurface       surface;
+	EGLConfig        config;
+	EGLContext       handle;
+	EGLSurface       surface;
 
-   void*            client;
+	void*            client;
 
 } _GLFWcontextEGL;
 
@@ -169,34 +169,34 @@ typedef struct _GLFWcontextEGL
 //
 typedef struct _GLFWlibraryEGL
 {
-    EGLDisplay      display;
-    EGLint          major, minor;
-    GLFWbool        prefix;
+	EGLDisplay      display;
+	EGLint          major, minor;
+	GLFWbool        prefix;
 
-    GLFWbool        KHR_create_context;
-    GLFWbool        KHR_create_context_no_error;
-    GLFWbool        KHR_gl_colorspace;
-    GLFWbool        KHR_get_all_proc_addresses;
-    GLFWbool        KHR_context_flush_control;
+	GLFWbool        KHR_create_context;
+	GLFWbool        KHR_create_context_no_error;
+	GLFWbool        KHR_gl_colorspace;
+	GLFWbool        KHR_get_all_proc_addresses;
+	GLFWbool        KHR_context_flush_control;
 
-    void*           handle;
+	void*           handle;
 
-    PFN_eglGetConfigAttrib      GetConfigAttrib;
-    PFN_eglGetConfigs           GetConfigs;
-    PFN_eglGetDisplay           GetDisplay;
-    PFN_eglGetError             GetError;
-    PFN_eglInitialize           Initialize;
-    PFN_eglTerminate            Terminate;
-    PFN_eglBindAPI              BindAPI;
-    PFN_eglCreateContext        CreateContext;
-    PFN_eglDestroySurface       DestroySurface;
-    PFN_eglDestroyContext       DestroyContext;
-    PFN_eglCreateWindowSurface  CreateWindowSurface;
-    PFN_eglMakeCurrent          MakeCurrent;
-    PFN_eglSwapBuffers          SwapBuffers;
-    PFN_eglSwapInterval         SwapInterval;
-    PFN_eglQueryString          QueryString;
-    PFN_eglGetProcAddress       GetProcAddress;
+	PFN_eglGetConfigAttrib      GetConfigAttrib;
+	PFN_eglGetConfigs           GetConfigs;
+	PFN_eglGetDisplay           GetDisplay;
+	PFN_eglGetError             GetError;
+	PFN_eglInitialize           Initialize;
+	PFN_eglTerminate            Terminate;
+	PFN_eglBindAPI              BindAPI;
+	PFN_eglCreateContext        CreateContext;
+	PFN_eglDestroySurface       DestroySurface;
+	PFN_eglDestroyContext       DestroyContext;
+	PFN_eglCreateWindowSurface  CreateWindowSurface;
+	PFN_eglMakeCurrent          MakeCurrent;
+	PFN_eglSwapBuffers          SwapBuffers;
+	PFN_eglSwapInterval         SwapInterval;
+	PFN_eglQueryString          QueryString;
+	PFN_eglGetProcAddress       GetProcAddress;
 
 } _GLFWlibraryEGL;
 

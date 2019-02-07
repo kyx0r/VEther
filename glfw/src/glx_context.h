@@ -115,8 +115,8 @@ typedef GLXContext (*PFNGLXCREATECONTEXTATTRIBSARBPROC)(Display*,GLXFBConfig,GLX
 //
 typedef struct _GLFWcontextGLX
 {
-    GLXContext      handle;
-    GLXWindow       window;
+	GLXContext      handle;
+	GLXWindow       window;
 
 } _GLFWcontextGLX;
 
@@ -124,47 +124,47 @@ typedef struct _GLFWcontextGLX
 //
 typedef struct _GLFWlibraryGLX
 {
-    int             major, minor;
-    int             eventBase;
-    int             errorBase;
+	int             major, minor;
+	int             eventBase;
+	int             errorBase;
 
-    // dlopen handle for libGL.so.1
-    void*           handle;
+	// dlopen handle for libGL.so.1
+	void*           handle;
 
-    // GLX 1.3 functions
-    PFNGLXGETFBCONFIGSPROC              GetFBConfigs;
-    PFNGLXGETFBCONFIGATTRIBPROC         GetFBConfigAttrib;
-    PFNGLXGETCLIENTSTRINGPROC           GetClientString;
-    PFNGLXQUERYEXTENSIONPROC            QueryExtension;
-    PFNGLXQUERYVERSIONPROC              QueryVersion;
-    PFNGLXDESTROYCONTEXTPROC            DestroyContext;
-    PFNGLXMAKECURRENTPROC               MakeCurrent;
-    PFNGLXSWAPBUFFERSPROC               SwapBuffers;
-    PFNGLXQUERYEXTENSIONSSTRINGPROC     QueryExtensionsString;
-    PFNGLXCREATENEWCONTEXTPROC          CreateNewContext;
-    PFNGLXGETVISUALFROMFBCONFIGPROC     GetVisualFromFBConfig;
-    PFNGLXCREATEWINDOWPROC              CreateWindow;
-    PFNGLXDESTROYWINDOWPROC             DestroyWindow;
+	// GLX 1.3 functions
+	PFNGLXGETFBCONFIGSPROC              GetFBConfigs;
+	PFNGLXGETFBCONFIGATTRIBPROC         GetFBConfigAttrib;
+	PFNGLXGETCLIENTSTRINGPROC           GetClientString;
+	PFNGLXQUERYEXTENSIONPROC            QueryExtension;
+	PFNGLXQUERYVERSIONPROC              QueryVersion;
+	PFNGLXDESTROYCONTEXTPROC            DestroyContext;
+	PFNGLXMAKECURRENTPROC               MakeCurrent;
+	PFNGLXSWAPBUFFERSPROC               SwapBuffers;
+	PFNGLXQUERYEXTENSIONSSTRINGPROC     QueryExtensionsString;
+	PFNGLXCREATENEWCONTEXTPROC          CreateNewContext;
+	PFNGLXGETVISUALFROMFBCONFIGPROC     GetVisualFromFBConfig;
+	PFNGLXCREATEWINDOWPROC              CreateWindow;
+	PFNGLXDESTROYWINDOWPROC             DestroyWindow;
 
-    // GLX 1.4 and extension functions
-    PFNGLXGETPROCADDRESSPROC            GetProcAddress;
-    PFNGLXGETPROCADDRESSPROC            GetProcAddressARB;
-    PFNGLXSWAPINTERVALSGIPROC           SwapIntervalSGI;
-    PFNGLXSWAPINTERVALEXTPROC           SwapIntervalEXT;
-    PFNGLXSWAPINTERVALMESAPROC          SwapIntervalMESA;
-    PFNGLXCREATECONTEXTATTRIBSARBPROC   CreateContextAttribsARB;
-    GLFWbool        SGI_swap_control;
-    GLFWbool        EXT_swap_control;
-    GLFWbool        MESA_swap_control;
-    GLFWbool        ARB_multisample;
-    GLFWbool        ARB_framebuffer_sRGB;
-    GLFWbool        EXT_framebuffer_sRGB;
-    GLFWbool        ARB_create_context;
-    GLFWbool        ARB_create_context_profile;
-    GLFWbool        ARB_create_context_robustness;
-    GLFWbool        EXT_create_context_es2_profile;
-    GLFWbool        ARB_create_context_no_error;
-    GLFWbool        ARB_context_flush_control;
+	// GLX 1.4 and extension functions
+	PFNGLXGETPROCADDRESSPROC            GetProcAddress;
+	PFNGLXGETPROCADDRESSPROC            GetProcAddressARB;
+	PFNGLXSWAPINTERVALSGIPROC           SwapIntervalSGI;
+	PFNGLXSWAPINTERVALEXTPROC           SwapIntervalEXT;
+	PFNGLXSWAPINTERVALMESAPROC          SwapIntervalMESA;
+	PFNGLXCREATECONTEXTATTRIBSARBPROC   CreateContextAttribsARB;
+	GLFWbool        SGI_swap_control;
+	GLFWbool        EXT_swap_control;
+	GLFWbool        MESA_swap_control;
+	GLFWbool        ARB_multisample;
+	GLFWbool        ARB_framebuffer_sRGB;
+	GLFWbool        EXT_framebuffer_sRGB;
+	GLFWbool        ARB_create_context;
+	GLFWbool        ARB_create_context_profile;
+	GLFWbool        ARB_create_context_robustness;
+	GLFWbool        EXT_create_context_es2_profile;
+	GLFWbool        ARB_create_context_no_error;
+	GLFWbool        ARB_context_flush_control;
 
 } _GLFWlibraryGLX;
 
