@@ -31,6 +31,8 @@ LINKER_FLAGS = -static-libgcc -static-libstdc++
 WINAPI = -lmingw32 -lkernel32 -lm -ldxguid -ldxerr8 -luser32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lgdi32 -lcomdlg32 -lwinspool 
 WINAPI+= -lcomctl32 -luuid -lrpcrt4 -ladvapi32 -lwsock32 -lshlwapi -lversion -ldbghelp -lwinpthread
 
+_UNIX = -static -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
+
 VETHER = -lVEther -lglfw
  
 #OBJ_NAME specifies the name of our exectuable 
@@ -62,7 +64,7 @@ all_slwin: VEther
 
 #all_sl <- any other system.	
 all_sl: VEther
-	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)	
+	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
 	
 clean_f:
 	find . -type f -name '*.orig' -delete

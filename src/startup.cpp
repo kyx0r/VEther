@@ -32,6 +32,7 @@ const char* debugLayers[] =
 #if defined _WIN32
 static HMODULE vulkan_lib;
 #elif defined __linux
+#include <dlfcn.h>
 static void* vulkan_lib;
 #endif
 

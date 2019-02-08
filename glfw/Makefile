@@ -18,10 +18,13 @@ LIBFLAGS += -D_GLFW_WIN32
 endif
 
 #Assuming that X11 driver is present!
+#get xorg-dev package if its not present
 ifeq ($(detected_OS),Linux)
-SRCS2 = ./src/xkb_unicode.c ./src/window.c ./src/posix_time.c ./src/posix_thread.c
-SRCS2 += ./src/wgl_context.c ./src/vulkan.c ./src/x11_init.c ./src/x11_monitor.c ./src/x11_window.c
+SRCS2 = ./src/xkb_unicode.c ./src/window.c ./src/posix_time.c ./src/posix_thread.c 
+SRCS +=  ./src/glx_context.c ./src/egl_context.c ./src/linux_joystick.c
+SRCS2 += ./src/vulkan.c ./src/x11_init.c ./src/x11_monitor.c ./src/x11_window.c
 SRCS2 += ./src/osmesa_context.c ./src/monitor.c ./src/input.c ./src/init.c ./src/context.c
+LIBFLAGS += -D_GLFW_X11
 else
 #SRCS2=$(wildcard ./src/*.c)
 endif
