@@ -36,6 +36,8 @@ static HMODULE vulkan_lib;
 static void* vulkan_lib;
 #endif
 
+namespace startup
+{
 //---------------------------------------------------------------------
 
 void debug_pause()
@@ -168,22 +170,11 @@ VkDebugReportCallbackEXT registerDebugCallback()
 		return 0;
 	}
 
-#define DEBUG_VULKAN_FUNCTION( name ) \
-	name = reinterpret_cast<PFN_##name> (vkGetInstanceProcAddr( instance, #name)); \
-	if(name == nullptr) \
-	{ \
-		std::cout<<"Could not load DEBUG Vulkan function: "<< #name <<std::endl; \
-		return 0; \
-	}else \
-		std::cout<<"Loaded DEBUG Vulkan function: "<< #name <<std::endl; \
-
-#include "vulkan_functions_list.inl"
-
 	VkDebugReportCallbackCreateInfoEXT createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
 	createInfo.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
 	                   VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
-	                   VK_DEBUG_REPORT_ERROR_BIT_EXT |
-	                   VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+	                   VK_DEBUG_REPORT_ERROR_BIT_EXT;
 	createInfo.pfnCallback = debugReportCallback;
 
 	VkDebugReportCallbackEXT callback = 0;
@@ -411,18 +402,22 @@ bool CheckPhysicalDeviceExtensions()
 		vkGetPhysicalDeviceProperties(available_devices[i], &device_properties);
 
 		//can add more checks later.
-		if( !device_features.geometryShader )
+		if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		{
 			continue;
 		}
 		else
 		{
-			device_features = {};
-			device_features.geometryShader = VK_TRUE;
 			target_device = available_devices[i];
 			break;
 		}
 	}
+	if(target_device == 0)
+	{
+		std::cout<<"Could not find matching Gpu! \n";
+		return false;
+	}
+	delete available_devices;
 	return true;
 }
 
@@ -561,3 +556,5 @@ void ReleaseVulkanLoaderLibrary()
 		vulkan_lib = nullptr;
 	}
 }
+
+} //namespace startup

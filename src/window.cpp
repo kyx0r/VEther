@@ -1,17 +1,26 @@
 #include "window.h"
 #include "control.h"
 #include "render.h"
+#include "shaders.h"
 
 /* {
-GVAR:
+GVAR: framebufferCount -> render.cpp
+GVAR: imageViewCount -> render.cpp
+GVAR: imageViews -> render.cpp
+GVAR: handle_array_of_swapchain_images -> swapchain.cpp
+GVAR: number_of_swapchain_images -> swapchain.cpp
+GVAR: logical_device -> startup.cpp
+GVAR: pipeline_layout -> render.cpp
+GVAR: pipelines -> render.h
 } */
 
 //{
-GLFWwindow* window;
-VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+GLFWwindow* _window;
+VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 VkSwapchainKHR old_swapchain = VK_NULL_HANDLE;
 VkSemaphore AcquiredSemaphore;
 VkSemaphore ReadySemaphore;
+VkFence Fence_one;
 VkQueue GraphicsQueue;
 VkQueue ComputeQueue;
 int window_width = 1280;
@@ -20,25 +29,43 @@ uint32_t graphics_queue_family_index; // <- this is queue 1
 uint32_t compute_queue_family_index; // <- this is queue 2
 //}
 
-void window_size_callback(GLFWwindow* window, int width, int height)
+namespace window
 {
-	WaitForAllSubmittedCommandsToBeFinished();
-	old_swapchain = swapchain;
-	swapchain = VK_NULL_HANDLE;
+
+void window_size_callback(GLFWwindow* _window, int width, int height)
+{
+	control::WaitForAllSubmittedCommandsToBeFinished();
+
+	//handle minimization.
+	while (width == 0 || height == 0)
+	{
+		glfwGetFramebufferSize(_window, &width, &height);
+		glfwWaitEvents();
+	}
+
+	old_swapchain = _swapchain;
+	_swapchain = VK_NULL_HANDLE;
 	if(
-	    !SetSizeOfSwapchainImages(width, height)||
-	    !CreateSwapchain(swapchain, old_swapchain)||
-	    !GetHandlesOfSwapchainImages(swapchain)
+	    !swapchain::SetSizeOfSwapchainImages(width, height)||
+	    !swapchain::CreateSwapchain(_swapchain, old_swapchain)||
+	    !swapchain::GetHandlesOfSwapchainImages(_swapchain)
 	)
 	{
-		debug_pause();
+		startup::debug_pause();
 		exit(1);
 	}
 	window_height = height;
 	window_width = width;
+
+	render::DestroyImageViews();
+	render::DestroyFramebuffers();
+	imageViewCount = 0;
+	framebufferCount = 0;
+	render::CreateImageViews(number_of_swapchain_images, &handle_array_of_swapchain_images[0], image_format, 0, 1);
+	render::CreateFramebuffers(number_of_swapchain_images, &imageViews[0], &imageViews[0], 0, window_width, window_height);
 }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS)
 	{
@@ -72,19 +99,20 @@ void initWindow()
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-	window = glfwCreateWindow(window_width, window_height, "VEther", nullptr, nullptr);
-	glfwSetWindowSizeCallback(window, window_size_callback);
-	glfwSetKeyCallback(window, keyCallback);
+	_window = glfwCreateWindow(window_width, window_height, "VEther", nullptr, nullptr);
+	glfwSetWindowSizeCallback(_window, window_size_callback);
+	glfwSetKeyCallback(_window, keyCallback);
 }
 
 inline bool Draw()
 {
 	uint32_t image_index;
 	VkResult result;
-	WaitForAllSubmittedCommandsToBeFinished();
+	control::WaitForAllSubmittedCommandsToBeFinished();
+	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, std::numeric_limits<uint64_t>::max());
 	if(
-	    !AcquireSwapchainImage(swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index)||
-	    !BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr)
+	    !swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index)||
+	    !control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr)
 	)
 	{
 		return false;
@@ -92,11 +120,18 @@ inline bool Draw()
 
 	VkClearColorValue color =
 	{
-		1,
 		0,
-		1,
+		0,
+		0,
 		1
 	};
+
+	VkClearValue clearColor = {};
+	clearColor.color = color;
+
+	VkRect2D render_area = {};
+	render_area.extent.width = window_width;
+	render_area.extent.height = window_height;
 
 	VkImageSubresourceRange range =
 	{
@@ -107,28 +142,36 @@ inline bool Draw()
 		VK_REMAINING_ARRAY_LAYERS                 // uint32_t                   layerCount
 	};
 
-	/* 	if(!CreateFramebuffer(VkImageView colorView, VkImageView depthView, window_width, window_height))
-		{
-			std::cout<<"Failed to create frame buffer ! \n";
-			return false;
-		} */
-
 	//vkCmdClearColorImage(command_buffer, handle_array_of_swapchain_images[image_index], VK_IMAGE_LAYOUT_GENERAL, &color, 1, &range);
 
 	VkImageMemoryBarrier image_memory_barrier_before_draw =
 	{
 		VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
 		nullptr,                                  	// const void               * pNext
-		0,           								// VkAccessFlags              srcAccessMask
-		VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,       // VkAccessFlags              dstAccessMask
+		VK_ACCESS_MEMORY_READ_BIT,           		// VkAccessFlags              srcAccessMask
+		0,       									// VkAccessFlags              dstAccessMask
 		VK_IMAGE_LAYOUT_UNDEFINED,           		// VkImageLayout              oldLayout
 		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,   // VkImageLayout              newLayout
 		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   srcQueueFamilyIndex
-		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   dstQueueFamilyIndex
+		VK_QUEUE_FAMILY_IGNORED,                   	// uint32_t                   dstQueueFamilyIndex
 		handle_array_of_swapchain_images[image_index],   // VkImage                    image
 		range
 	};
-	SetImageMemoryBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, image_memory_barrier_before_draw);
+	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_draw);
+
+	render::StartRenderPass(render_area, &clearColor, VK_SUBPASS_CONTENTS_INLINE, 0, image_index);
+
+	VkViewport viewport = { 0, 0, float(window_width), float(window_height), 0, 1 };
+	VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
+
+	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
+	vkCmdDraw(command_buffer, 3, 1, 0, 0);
+
+	vkCmdEndRenderPass(command_buffer);
 
 	VkImageMemoryBarrier image_memory_barrier_before_present =
 	{
@@ -136,16 +179,17 @@ inline bool Draw()
 		nullptr,                                  	// const void               * pNext
 		VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,       // VkAccessFlags              srcAccessMask
 		VK_ACCESS_MEMORY_READ_BIT,       			// VkAccessFlags              dstAccessMask
-		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,           		// VkImageLayout              oldLayout
+		VK_IMAGE_LAYOUT_UNDEFINED,           		// VkImageLayout              oldLayout
 		VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,   			// VkImageLayout              newLayout
 		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   srcQueueFamilyIndex
 		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   dstQueueFamilyIndex
 		handle_array_of_swapchain_images[image_index],   // VkImage                    image
 		range
 	};
-	SetImageMemoryBarrier(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, image_memory_barrier_before_present);
+	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_present);
 
-	if(!EndCommandBufferRecordingOperation())
+	if(!control::EndCommandBufferRecordingOperation())
 	{
 		return false;
 	}
@@ -168,7 +212,8 @@ inline bool Draw()
 		&ReadySemaphore                              			// const VkSemaphore            * pSignalSemaphores
 	};
 
-	if(!SubmitCommandBuffersToQueue(ComputeQueue, VK_NULL_HANDLE, submit_info))
+	vkResetFences(logical_device, 1, &Fence_one);
+	if(!control::SubmitCommandBuffersToQueue(ComputeQueue, Fence_one, submit_info))
 	{
 		return false;
 	}
@@ -180,7 +225,7 @@ inline bool Draw()
 		1,   													// uint32_t                 waitSemaphoreCount
 		&ReadySemaphore,                          			// const VkSemaphore      * pWaitSemaphores
 		1,									             	// uint32_t                 swapchainCount
-		&swapchain,                                    		// const VkSwapchainKHR   * pSwapchains
+		&_swapchain,                                    		// const VkSwapchainKHR   * pSwapchains
 		&image_index,                                 			// const uint32_t         * pImageIndices
 		nullptr                                               // VkResult*                pResults
 	};
@@ -198,11 +243,27 @@ inline bool Draw()
 
 void mainLoop()
 {
-	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
-	CreateRenderPass(depthFormat, false);
-	CreateRenderPass(depthFormat, true);
+	double time = glfwGetTime()/1000;
 
-	while (!glfwWindowShouldClose(window))
+	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
+	render::CreateRenderPasses(1,depthFormat, false);
+
+	render::CreateImageViews(number_of_swapchain_images, &handle_array_of_swapchain_images[0], image_format, 0, 1);
+	render::CreateFramebuffers(number_of_swapchain_images, &imageViews[0], &imageViews[0], 0, window_width, window_height);
+
+	VkShaderModule triangleVS = shaders::loadShader("res/shaders/triangle.vert.spv");
+	assert(triangleVS);
+
+	VkShaderModule triangleFS = shaders::loadShader("res/shaders/triangle.frag.spv");
+	assert(triangleFS);
+
+	VkPipelineCache pipelineCache = 0;
+
+	render::CreatePipelineLayout();
+
+	render::CreateGraphicsPipelines(2, pipelineCache, 0, triangleVS, triangleFS);
+
+	while (!glfwWindowShouldClose(_window))
 	{
 		glfwPollEvents();
 		if(!Draw())
@@ -210,9 +271,25 @@ void mainLoop()
 			std::cout << "Critical Error! Abandon the ship." << std::endl;
 			break;
 		}
-
 	}
-	DestroySwapchain(swapchain);
-	DestroyPresentationSurface();
-	glfwDestroyWindow(window);
+
+	//CLEANUP -----------------------------------
+	control::WaitForAllSubmittedCommandsToBeFinished();
+	control::FreeCommandBuffers(1);
+	control::DestroyCommandPool();
+	vkDestroySemaphore(logical_device, AcquiredSemaphore, nullptr);
+	vkDestroySemaphore(logical_device, ReadySemaphore, nullptr);
+	vkDestroyFence(logical_device, Fence_one, nullptr);
+	render::DestroyImageViews();
+	render::DestroyFramebuffers();
+	vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
+	render::DestroyPipeLines();
+	vkDestroyShaderModule(logical_device, triangleVS, nullptr);
+	vkDestroyShaderModule(logical_device, triangleFS, nullptr);
+	render::DestroyRenderPasses();
+	swapchain::DestroySwapchain(_swapchain);
+	surface::DestroyPresentationSurface();
+	glfwDestroyWindow(_window);
 }
+
+} //namespace window

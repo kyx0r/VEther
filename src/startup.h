@@ -38,6 +38,11 @@
 #define ARRAYSIZE(array) (sizeof(array) / sizeof((array)[0]))
 #endif
 
+#define	CLAMP(_minval, x, _maxval)		\
+	((x) < (_minval) ? (_minval) :		\
+	 (x) > (_maxval) ? (_maxval) : (x))
+
+
 //--------------------
 
 extern VkDevice logical_device;
@@ -52,6 +57,9 @@ struct QueueInfo
 };
 
 //--------------------
+
+namespace startup
+{
 
 //-------------------- funcs
 void debug_pause();
@@ -79,4 +87,4 @@ inline bool SetQueue(QueueInfo *array, uint32_t family, float *_Priorities, int 
 
 //--------------------
 
-
+} //namespace startup

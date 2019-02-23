@@ -3,6 +3,7 @@
 /* {
 GVAR: target_device -> startup.cpp
 GVAR: instance -> startup.cpp
+GVAR: _window ->window.cpp
 } */
 
 //{
@@ -11,12 +12,15 @@ VkPresentModeKHR target_surface_mode;
 VkSurfaceCapabilitiesKHR surface_capabilities;
 //}
 
+namespace surface
+{
+
 bool CreatePresentationSurface(WindowParameters &window_parameters)
 {
 	VkResult result;
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-	window_parameters.HWnd = glfwGetWin32Window(window);
+	window_parameters.HWnd = glfwGetWin32Window(_window);
 	window_parameters.HInstance = GetModuleHandle(nullptr);
 	VkWin32SurfaceCreateInfoKHR surface_create_info =
 	{
@@ -125,7 +129,7 @@ bool CheckPresentationSurfaceCapabilities()
 	VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(target_device, presentation_surface, &surface_capabilities);
 	if(result != VK_SUCCESS)
 	{
-		std::cout<<"Could not get capabilities of the presentation surface! "<<GetVulkanResultString(result)<<std::endl;
+		std::cout<<"Could not get capabilities of the presentation surface! "<<startup::GetVulkanResultString(result)<<std::endl;
 		return false;
 	}
 	return true;
@@ -136,3 +140,5 @@ void DestroyPresentationSurface()
 	vkDestroySurfaceKHR(instance, presentation_surface, nullptr);
 	presentation_surface = VK_NULL_HANDLE;
 }
+
+} //namespace surface

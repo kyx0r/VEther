@@ -10,20 +10,23 @@ GVAR: presentation_surface -> surface.cpp
 //{
 VkImage *handle_array_of_swapchain_images = nullptr;
 VkFormat image_format;
+uint32_t number_of_swapchain_images;
 //}
 
-static uint32_t number_of_images;
 static VkExtent2D size_of_images;
 static VkImageUsageFlags image_usage;
 static VkColorSpaceKHR image_color_space;
 static VkSurfaceTransformFlagBitsKHR  surface_transform;
 
+namespace swapchain
+{
+
 bool SelectNumberOfSwapchainImages()
 {
-	number_of_images = surface_capabilities.minImageCount + 1;
-	if(surface_capabilities.maxImageCount > 0 && number_of_images > surface_capabilities.maxImageCount)
+	number_of_swapchain_images = surface_capabilities.minImageCount + 1;
+	if(surface_capabilities.maxImageCount > 0 && number_of_swapchain_images > surface_capabilities.maxImageCount)
 	{
-		number_of_images = surface_capabilities.maxImageCount;
+		number_of_swapchain_images = surface_capabilities.maxImageCount;
 	}
 	return true;
 }
@@ -158,7 +161,7 @@ bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format)
 	return true;
 }
 
-bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain)
+bool CreateSwapchain(VkSwapchainKHR &_swapchain, VkSwapchainKHR &old_swapchain)
 {
 	VkSwapchainCreateInfoKHR swapchain_create_info =
 	{
@@ -166,7 +169,7 @@ bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain)
 		nullptr,                                      // const void                     * pNext
 		0,                                            // VkSwapchainCreateFlagsKHR        flags
 		presentation_surface,                         // VkSurfaceKHR                     surface
-		number_of_images,                             // uint32_t                         minImageCount
+		number_of_swapchain_images,                   // uint32_t                         minImageCount
 		image_format,                                 // VkFormat                         imageFormat
 		image_color_space,                            // VkColorSpaceKHR                  imageColorSpace
 		size_of_images,                               // VkExtent2D                       imageExtent
@@ -182,9 +185,9 @@ bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain)
 		old_swapchain                                 // VkSwapchainKHR                   oldSwapchain
 	};
 
-	VkResult result = vkCreateSwapchainKHR( logical_device, &swapchain_create_info, nullptr, &swapchain );
+	VkResult result = vkCreateSwapchainKHR( logical_device, &swapchain_create_info, nullptr, &_swapchain );
 	if( (VK_SUCCESS != result) ||
-	        (VK_NULL_HANDLE == swapchain) )
+	        (VK_NULL_HANDLE == _swapchain) )
 	{
 		std::cout << "Could not create a swapchain." << std::endl;
 		return false;
@@ -199,12 +202,12 @@ bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain)
 	return true;
 }
 
-bool GetHandlesOfSwapchainImages(VkSwapchainKHR &swapchain)
+bool GetHandlesOfSwapchainImages(VkSwapchainKHR &_swapchain)
 {
 	uint32_t images_count = 0;
 	VkResult result = VK_SUCCESS;
 
-	result = vkGetSwapchainImagesKHR( logical_device, swapchain, &images_count, nullptr );
+	result = vkGetSwapchainImagesKHR( logical_device, _swapchain, &images_count, nullptr );
 	if(result != VK_SUCCESS || images_count == 0)
 	{
 		std::cout << "Could not get the number of swapchain images." << std::endl;
@@ -217,7 +220,7 @@ bool GetHandlesOfSwapchainImages(VkSwapchainKHR &swapchain)
 	}
 	handle_array_of_swapchain_images = new VkImage [images_count];
 
-	result = vkGetSwapchainImagesKHR( logical_device, swapchain, &images_count, &handle_array_of_swapchain_images[0]);
+	result = vkGetSwapchainImagesKHR( logical_device, _swapchain, &images_count, &handle_array_of_swapchain_images[0]);
 	if(result != VK_SUCCESS || images_count == 0)
 	{
 		std::cout << "Could not enumerate swapchain images." << std::endl;
@@ -226,28 +229,30 @@ bool GetHandlesOfSwapchainImages(VkSwapchainKHR &swapchain)
 	return true;
 }
 
-bool AcquireSwapchainImage(VkSwapchainKHR swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index)
+bool AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index)
 {
 	VkResult result;
 
 	//tell hardware to not wait more than 2 seconds.
-	result = vkAcquireNextImageKHR( logical_device, swapchain, 2000000000, semaphore, fence, &image_index );
+	result = vkAcquireNextImageKHR( logical_device, _swapchain, 2000000000, semaphore, fence, &image_index );
 	switch( result )
 	{
 	case VK_SUCCESS:
 	case VK_SUBOPTIMAL_KHR:
 		return true;
 	default:
-		std::cout << GetVulkanResultString(result) <<" in func "<<__func__<< std::endl;
+		std::cout << startup::GetVulkanResultString(result) <<" in func "<<__func__<< std::endl;
 		return false;
 	}
 }
 
-void DestroySwapchain(VkSwapchainKHR &swapchain)
+void DestroySwapchain(VkSwapchainKHR &_swapchain)
 {
-	if(swapchain)
+	if(_swapchain)
 	{
-		vkDestroySwapchainKHR(logical_device, swapchain, nullptr);
-		swapchain = VK_NULL_HANDLE;
+		vkDestroySwapchainKHR(logical_device, _swapchain, nullptr);
+		_swapchain = VK_NULL_HANDLE;
 	}
 }
+
+} // namespace swapchain

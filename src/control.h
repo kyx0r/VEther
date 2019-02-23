@@ -2,21 +2,34 @@
 #include "swapchain.h"
 
 extern VkCommandBuffer command_buffer;
+extern VkPhysicalDeviceMemoryProperties	memory_properties;
 
 //-----------------------------------
+#define DYNAMIC_VERTEX_BUFFER_SIZE_KB	2048
+#define NUM_DYNAMIC_BUFFERS 1
+
+typedef struct
+{
+	VkBuffer			buffer;
+	uint32_t			current_offset;
+	unsigned char *		data;
+} dynbuffer_t;
+
+namespace control
+{
 
 bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_family);
+void DestroyCommandPool();
 bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count);
+void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);
+bool CreateFence(VkFence &fence);
 bool BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCommandBufferInheritanceInfo *secondary_command_buffer_info);
 bool EndCommandBufferRecordingOperation();
 bool ResetCommandPool(bool release_resources);
 bool ResetCommandBuffer(bool release_resources);
-
-inline void SetImageMemoryBarrier(VkPipelineStageFlags generating_stages, VkPipelineStageFlags consuming_stages, VkImageMemoryBarrier &image_memory_barrier)
-{
-	vkCmdPipelineBarrier(command_buffer, generating_stages, consuming_stages, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
-}
+void InitDynamicVertexBuffers();
+unsigned char* VertexAllocate(int size, VkBuffer *buffer, VkDeviceSize *buffer_offset);
 
 inline bool SubmitCommandBuffersToQueue(VkQueue queue, VkFence fence, VkSubmitInfo &submit_info)
 {
@@ -39,5 +52,7 @@ inline bool WaitForAllSubmittedCommandsToBeFinished()
 	}
 	return true;
 }
+
+} //namespace control
 
 //-----------------------------------

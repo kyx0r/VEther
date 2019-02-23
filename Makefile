@@ -33,12 +33,12 @@ WINAPI+= -lcomctl32 -luuid -lrpcrt4 -ladvapi32 -lwsock32 -lshlwapi -lversion -ld
 
 _UNIX = -static -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
 
-VETHER = -lVEther -lglfw
+VETHER = -lVEther -lglfw -lglslang
  
 #OBJ_NAME specifies the name of our exectuable 
 OBJ_NAME = VEther.exe 
 
-SHARED_FLAGS = -O3 -m64 -s -Wall -Wextra -Wno-unused-parameter -Wno-cast-function-type
+SHARED_FLAGS = -Os -m64 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
 export
 #-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 
@@ -54,6 +54,7 @@ all_individual : $(PROGS)
 	$(CC) -c -static $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $@ $<
 	
 VEther: 
+	$(MAKE) all -C ./glsl_compiler
 	$(MAKE) all -C ./glfw
 	$(MAKE) all -C ./src
 	
@@ -70,6 +71,7 @@ clean_f:
 	find . -type f -name '*.orig' -delete
 	
 clean_o:
+	$(MAKE) clean -C ./glsl_compiler
 	$(MAKE) clean -C ./src
 	$(MAKE) clean -C ./glfw
 	find . -type f -name '*.o' -delete

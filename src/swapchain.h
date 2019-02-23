@@ -2,8 +2,11 @@
 #include "surface.h"
 
 extern VkImage *handle_array_of_swapchain_images;
+extern uint32_t number_of_swapchain_images;
 extern VkFormat image_format;
 
+namespace swapchain
+{
 
 //-----------------------------------
 
@@ -21,12 +24,14 @@ bool SelectTransformationOfSwapchainImages(VkSurfaceTransformFlagBitsKHR desired
 //set surface format and its matching color format
 bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format);
 
-bool CreateSwapchain(VkSwapchainKHR &swapchain, VkSwapchainKHR &old_swapchain);
+bool CreateSwapchain(VkSwapchainKHR &_swapchain, VkSwapchainKHR &old_swapchain);
 
-void DestroySwapchain(VkSwapchainKHR &swapchain);
+void DestroySwapchain(VkSwapchainKHR &_swapchain);
 
-bool GetHandlesOfSwapchainImages(VkSwapchainKHR &swapchain);
+bool GetHandlesOfSwapchainImages(VkSwapchainKHR &_swapchain);
 
-bool AcquireSwapchainImage(VkSwapchainKHR swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index);
+bool AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index);
 
 //------------------------------------
+
+} //namespace swapchain
