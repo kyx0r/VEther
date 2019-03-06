@@ -1,5 +1,6 @@
 #include "startup.h"
 #include "swapchain.h"
+#include "glm/glm.hpp"
 
 //GVAR: command_buffer -> control.cpp
 
@@ -15,6 +16,12 @@ extern uint32_t pipelineCount;
 
 extern VkPipelineLayout pipeline_layout;
 extern VkPipeline current_pipeline;
+
+struct Vertex
+{
+	glm::vec2 pos;
+	glm::vec3 color;
+};
 
 namespace render
 {

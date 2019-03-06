@@ -6,6 +6,7 @@
 GVAR: logical_device -> startup.cpp
 GVAR: command_buffer -> control.h
 GVAR: image_format -> swapchain.cpp
+GVAR: dyn_vertex_buffers -> control.cpp
 } */
 
 //{
@@ -172,6 +173,26 @@ void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int rende
 	VkPipelineVertexInputStateCreateInfo vertexInput = {};
 	vertexInput.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	createInfo.pVertexInputState = &vertexInput;
+
+	VkVertexInputBindingDescription bindingDescription = {};
+	bindingDescription.binding = 0;
+	bindingDescription.stride = sizeof(Vertex);
+	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	VkVertexInputAttributeDescription attributeDescriptions[2];
+	attributeDescriptions[0].binding = 0;
+	attributeDescriptions[0].location = 0;
+	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[0].offset = offsetof(Vertex, pos);
+	attributeDescriptions[1].binding = 0;
+	attributeDescriptions[1].location = 1;
+	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+	attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+	vertexInput.vertexBindingDescriptionCount = 1;
+	vertexInput.vertexAttributeDescriptionCount = ARRAYSIZE(attributeDescriptions);
+	vertexInput.pVertexBindingDescriptions = &bindingDescription;
+	vertexInput.pVertexAttributeDescriptions = &attributeDescriptions[0];
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

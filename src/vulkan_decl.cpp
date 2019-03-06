@@ -134,6 +134,7 @@ PFN_vkCmdSetDepthBias vkCmdSetDepthBias;
 PFN_vkCmdSetBlendConstants vkCmdSetBlendConstants;
 PFN_vkCmdExecuteCommands vkCmdExecuteCommands;
 PFN_vkCmdClearAttachments vkCmdClearAttachments;
+PFN_vkInvalidateMappedMemoryRanges vkInvalidateMappedMemoryRanges;
 //---
 
 //DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION

@@ -48,7 +48,7 @@ clean:
 
 lib$(LIBNAME).a: $(OBJS) $(OBJS2) $(OBJS3)
 	ar -cvr lib$(LIBNAME).a $(OBJS) $(OBJS2) $(OBJS3)
-	ranlib lib$(LIBNAME).a
+	gcc-ranlib lib$(LIBNAME).a
 
 .PHONY $(LIBPATH):
 	mkdir -p ../lib

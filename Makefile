@@ -5,8 +5,19 @@ else
 endif
 
 #OBJS specifies which files to compile as part of the project 
-OBJS = ./*cpp ./src/*cpp
-#HEADS = ./*.h
+OBJS = ./*cpp ./src/*o 
+ifeq ($(detected_OS),Windows)
+# GP = ./glfw/src/
+# OBJS += $(GP)xkb_unicode.o $(GP)window.o $(GP)win32_window.o $(GP)win32_time.o $(GP)win32_thread.o  
+# OBJS += $(GP)win32_monitor.o $(GP)win32_init.o  $(GP)wgl_context.o $(GP)vulkan.o $(GP)egl_context.o
+# OBJS += $(GP)osmesa_context.o $(GP)monitor.o $(GP)input.o $(GP)init.o $(GP)context.o $(GP)win32_joystick.o
+# OBJS += ./glsl_compiler/OGLCompilersDLL/*.o
+# OBJS += ./glsl_compiler/glslang/OSDependent/Windows/*.o
+# OBJS += ./glsl_compiler/glslang/MachineIndependent/*.o
+# OBJS += ./glsl_compiler/glslang/MachineIndependent/preprocessor/*.o
+# OBJS += ./glsl_compiler/StandAlone/*.o
+# OBJS += ./glsl_compiler/SPIRV/*.o
+endif
 
 #CC specifies which compiler we're using 
 CC = g++
@@ -22,7 +33,7 @@ PROGS = $(patsubst ./src/%.cpp, ./build/%.o,$(SRCS))
 
 LIBRARY_PATHS = -L ./lib
 
-INCLUDE_PATHS = -I ./include -I ./glfw/include
+INCLUDE_PATHS = -I ./include -I ./glfw/include -I .
 
 #LINKER_FLAGS specifies the libraries we're linking against 
 LINKER_FLAGS = -static-libgcc -static-libstdc++ 
@@ -38,20 +49,21 @@ VETHER = -lVEther -lglfw -lglslang
 #OBJ_NAME specifies the name of our exectuable 
 OBJ_NAME = VEther.exe 
 
+#for further optimization use -flto flag.
 SHARED_FLAGS = -Os -m64 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
-export
+export SHARED_FLAGS
 #-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 
 #Monolithic compile.
 all : 
-	$(CC) -O0 -static $(OBJS) $(HEADS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) -Os -static $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
 	
 allwin : 
-	$(CC) -O0 -static $(OBJS) $(HEADS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)	
+	$(CC) -Os -static $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)	
 
 all_individual : $(PROGS)
 ./build/%.o: ./src/%.cpp
-	$(CC) -c -static $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $@ $<
+	$(CC) -c -static $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $@ $<
 	
 VEther: 
 	$(MAKE) all -C ./glsl_compiler
@@ -61,11 +73,23 @@ VEther:
 #Building a static lib out of src files. Benefits - faster compile time. Makes project modular.
 #all_slwin <- use this for compilation on windows OS.
 all_slwin: VEther
-	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
+	$(CC) -flto -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
+	
+glsl_m32: SHARED_FLAGS = -Os -m32 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings	
+	
+glsl_m32: 
+	$(MAKE) all -C ./glsl_compiler
+	
+all_flto: SHARED_FLAGS = -flto -Os -m32 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
+
+all_flto: glsl_m32
+	$(MAKE) all -C ./glfw
+	$(MAKE) all -C ./src
+	$(CC) -flto -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
 
 #all_sl <- any other system.	
 all_sl: VEther
-	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
+	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
 	
 clean_f:
 	find . -type f -name '*.orig' -delete
@@ -75,6 +99,9 @@ clean_o:
 	$(MAKE) clean -C ./src
 	$(MAKE) clean -C ./glfw
 	find . -type f -name '*.o' -delete
+	
+c:
+	$(MAKE) clean -C ./src
 	
 .IGNORE format:
 	$(ASTYLE) --style=allman --indent=tab ./*.cpp, *.h

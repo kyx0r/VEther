@@ -1,11 +1,10 @@
-#include "startup.h"
-#include "control.h"
-#include "render.h"
+#include "glm/glm.hpp"
 
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: command_buffer -> control.cpp
 GVAR: pipeline_layout -> render.cpp
+GVAR: pipelines -> render.cpp
 } */
 
 typedef struct
@@ -18,6 +17,17 @@ typedef struct
 //This file contains drawing functions.
 namespace draw
 {
+
+inline void Draw_Triangle(size_t size, Vertex *vertices)
+{
+	VkBuffer buffer;
+	VkDeviceSize buffer_offset;
+	unsigned char* data = control::VertexAllocate(size, &buffer, &buffer_offset);
+	memcpy(data, &vertices[0], size);
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer, &buffer_offset);
+	vkCmdDraw(command_buffer, sizeof(vertices[0]), 1, 0, 0);
+}
 
 inline void Draw_FillCharacterQuad(int x, int y, char num, basicvertex_t *output)
 {
@@ -76,16 +86,17 @@ inline void Draw_Character(int x, int y, int num)
 	if (num == 32)
 		return; //don't waste verts on spaces
 
-	VkBuffer buffer;
-	VkDeviceSize buffer_offset;
-	basicvertex_t* vertices = (basicvertex_t*) control::VertexAllocate(6 * sizeof(basicvertex_t), &buffer, &buffer_offset);
+	/* 	VkBuffer buffer;
+		VkDeviceSize buffer_offset;
+		basicvertex_t* vertices = (basicvertex_t*) control::VertexAllocate(6 * sizeof(basicvertex_t), &buffer, &buffer_offset);
 
-	Draw_FillCharacterQuad(x, y, (char)num, vertices);
+		Draw_FillCharacterQuad(x, y, (char)num, vertices);
 
-	/* 	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer, &buffer_offset);
-		BindPipeline(pipeline[0]);
-		vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &char_texture->descriptor_set, 0, NULL);
-		vkCmdDraw(command_buffer, 6, 1, 0, 0); */
+		vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer, &buffer_offset); */
+	//I am jumping ahead of myself here. It looks like extensive texture loading is required before I can do this .
+	//BindPipeline(pipelines[1]);
+	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &char_texture->descriptor_set, 0, NULL);
+	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
 }
 
 } //namespace draw

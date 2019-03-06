@@ -12,7 +12,6 @@ uint32_t queue_families_count = 0;
 //}
 
 static uint32_t extensions_count = 0;
-static uint32_t device_extensions_count = 0;
 static uint32_t device_count = 0;
 static uint32_t desired_count = 0;
 static const char** desired_extensions = nullptr;
@@ -130,8 +129,11 @@ static VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT flags, VkDe
 #endif
 
 	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
-		assert(!"Validation error encountered!");
+		printf("\nValidation error encountered! \n");
 
+	if(flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+		return VK_FALSE;
+	debug_pause();
 	return VK_FALSE;
 }
 
@@ -382,6 +384,7 @@ bool CheckPhysicalDevices()
 bool CheckPhysicalDeviceExtensions()
 {
 	VkResult result = VK_SUCCESS;
+	uint32_t device_extensions_count = 0;
 	for(uint32_t i = 0; i<device_count; i++)
 	{
 		result = vkEnumerateDeviceExtensionProperties(available_devices[i], nullptr, &device_extensions_count, nullptr);
@@ -417,6 +420,7 @@ bool CheckPhysicalDeviceExtensions()
 		std::cout<<"Could not find matching Gpu! \n";
 		return false;
 	}
+	extensions_count = device_extensions_count;
 	delete available_devices;
 	return true;
 }

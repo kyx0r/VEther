@@ -6,7 +6,7 @@ OBJS=$(SRCS:.cpp=.o)
 CC = g++
 LIBNAME = VEther
 LIBPATH = ../lib
-CXXFLAGS = -fPIC -DPIC -I ../include -I ../glfw/include $(SHARED_FLAGS)
+CXXFLAGS = -fPIC -DPIC -I ../include -I ../ -I ../glfw/include $(SHARED_FLAGS)
 all: $(LIBPATH)/lib$(LIBNAME).a
 
 clean:
@@ -15,7 +15,7 @@ clean:
 
 lib$(LIBNAME).a: $(OBJS)
 	ar -cvr lib$(LIBNAME).a $(OBJS)
-	ranlib lib$(LIBNAME).a
+	gcc-ranlib lib$(LIBNAME).a
 
 $(LIBPATH):
 	mkdir -p ../lib

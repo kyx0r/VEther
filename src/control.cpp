@@ -7,13 +7,13 @@ GVAR: logical_device -> startup.cpp
 //{
 VkCommandBuffer command_buffer;
 VkPhysicalDeviceMemoryProperties memory_properties;
+dynbuffer_t dyn_vertex_buffers[NUM_DYNAMIC_BUFFERS];
+int current_dyn_buffer_index = 0;
 //}
 
 static VkCommandPool command_pool;
 static VkCommandBuffer *command_buffers = nullptr;
-static int current_dyn_buffer_index = 0;
 static VkDeviceMemory dyn_vertex_buffer_memory;
-static dynbuffer_t dyn_vertex_buffers[NUM_DYNAMIC_BUFFERS];
 
 namespace control
 {
@@ -191,12 +191,35 @@ inline int MemoryTypeFromProperties(uint32_t type_bits, VkFlags requirements_mas
 	return 0;
 }
 
+void InvalidateDynamicBuffers()
+{
+	VkMappedMemoryRange ranges[1];
+	memset(&ranges, 0, sizeof(ranges));
+	ranges[0].sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+	ranges[0].memory = dyn_vertex_buffer_memory;
+	ranges[0].size = VK_WHOLE_SIZE;
+	vkInvalidateMappedMemoryRanges(logical_device, 1, ranges);
+}
+
+void FlushDynamicBuffers()
+{
+	VkMappedMemoryRange ranges[1];
+	memset(&ranges, 0, sizeof(ranges));
+	ranges[0].sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+	ranges[0].memory = dyn_vertex_buffer_memory;
+	ranges[0].size = VK_WHOLE_SIZE;
+	vkFlushMappedMemoryRanges(logical_device, 1, ranges);
+}
+
 unsigned char* VertexAllocate(int size, VkBuffer *buffer, VkDeviceSize *buffer_offset)
 {
 	dynbuffer_t *dyn_vb = &dyn_vertex_buffers[current_dyn_buffer_index];
 
 	if ((dyn_vb->current_offset + size) > (DYNAMIC_VERTEX_BUFFER_SIZE_KB * 1024))
+	{
 		printf("Out of dynamic vertex buffer space, increase DYNAMIC_VERTEX_BUFFER_SIZE_KB \n");
+		dyn_vb->current_offset = 0;
+	}
 
 	*buffer = dyn_vb->buffer;
 	*buffer_offset = dyn_vb->current_offset;
@@ -225,13 +248,16 @@ void InitDynamicVertexBuffers()
 	{
 		dyn_vertex_buffers[i].current_offset = 0;
 
-		err = vkCreateBuffer(logical_device, &buffer_create_info, NULL, &dyn_vertex_buffers[i].buffer);
+		err = vkCreateBuffer(logical_device, &buffer_create_info, nullptr, &dyn_vertex_buffers[i].buffer);
 		if (err != VK_SUCCESS)
 			printf("vkCreateBuffer failed \n");
 	}
 
 	VkMemoryRequirements memory_requirements;
-	vkGetBufferMemoryRequirements(logical_device, dyn_vertex_buffers[0].buffer, &memory_requirements);
+	for (i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
+	{
+		vkGetBufferMemoryRequirements(logical_device, dyn_vertex_buffers[i].buffer, &memory_requirements);
+	}
 
 	const int align_mod = memory_requirements.size % memory_requirements.alignment;
 	const int aligned_size = ((memory_requirements.size % memory_requirements.alignment) == 0)
@@ -245,7 +271,7 @@ void InitDynamicVertexBuffers()
 	memory_allocate_info.memoryTypeIndex = MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
 
 	//num_vulkan_dynbuf_allocations += 1;
-	err = vkAllocateMemory(logical_device, &memory_allocate_info, NULL, &dyn_vertex_buffer_memory);
+	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &dyn_vertex_buffer_memory);
 	if (err != VK_SUCCESS)
 		printf("vkAllocateMemory failed \n");
 
@@ -263,6 +289,15 @@ void InitDynamicVertexBuffers()
 
 	for (i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 		dyn_vertex_buffers[i].data = (unsigned char *)data + (i * aligned_size);
+}
+
+void DestroyDynBuffers()
+{
+	for (int i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
+	{
+		vkDestroyBuffer(logical_device, dyn_vertex_buffers[i].buffer, nullptr);
+	}
+	vkFreeMemory(logical_device, dyn_vertex_buffer_memory, nullptr);
 }
 
 } //namespace control

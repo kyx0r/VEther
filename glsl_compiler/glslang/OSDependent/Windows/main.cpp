@@ -31,6 +31,7 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
+#ifndef _NO_DLL
 
 #include "InitializeDll.h"
 
@@ -72,3 +73,5 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 	return TRUE;
 }
+
+#endif

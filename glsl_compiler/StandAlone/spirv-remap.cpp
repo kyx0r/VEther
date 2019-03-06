@@ -311,6 +311,8 @@ namespace {
 
 } // namespace
 
+#ifndef _NO_SPIRV_REMAP
+
 int main(int argc, char** argv)
 {
     std::vector<std::string> inputFile;
@@ -341,3 +343,5 @@ int main(int argc, char** argv)
 
     // If we get here, everything went OK!  Nothing more to be done.
 }
+
+#endif

@@ -1,12 +1,14 @@
 #include "startup.h"
 #include "swapchain.h"
 
-extern VkCommandBuffer command_buffer;
-extern VkPhysicalDeviceMemoryProperties	memory_properties;
-
 //-----------------------------------
 #define DYNAMIC_VERTEX_BUFFER_SIZE_KB	2048
-#define NUM_DYNAMIC_BUFFERS 1
+#define NUM_DYNAMIC_BUFFERS 2
+
+extern VkCommandBuffer command_buffer;
+extern VkPhysicalDeviceMemoryProperties	memory_properties;
+extern int current_dyn_buffer_index;
+//-----------------------------------
 
 typedef struct
 {
@@ -14,12 +16,14 @@ typedef struct
 	uint32_t			current_offset;
 	unsigned char *		data;
 } dynbuffer_t;
+extern dynbuffer_t dyn_vertex_buffers[NUM_DYNAMIC_BUFFERS];
 
 namespace control
 {
 
 bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_family);
 void DestroyCommandPool();
+void DestroyDynBuffers();
 bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count);
 void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);
@@ -29,6 +33,8 @@ bool EndCommandBufferRecordingOperation();
 bool ResetCommandPool(bool release_resources);
 bool ResetCommandBuffer(bool release_resources);
 void InitDynamicVertexBuffers();
+void FlushDynamicBuffers();
+void InvalidateDynamicBuffers();
 unsigned char* VertexAllocate(int size, VkBuffer *buffer, VkDeviceSize *buffer_offset);
 
 inline bool SubmitCommandBuffersToQueue(VkQueue queue, VkFence fence, VkSubmitInfo &submit_info)

@@ -115,8 +115,8 @@ int main(int argc, char *lpCmdLine[])
 
 	std::cout << "Initial Control Buffer Created! \n";
 
-	//vkGetPhysicalDeviceMemoryProperties(target_device, &memory_properties);
-	//control::InitDynamicVertexBuffers();
+	vkGetPhysicalDeviceMemoryProperties(target_device, &memory_properties);
+	control::InitDynamicVertexBuffers();
 
 	window::mainLoop();
 

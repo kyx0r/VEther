@@ -2,6 +2,7 @@
 #include "control.h"
 #include "render.h"
 #include "shaders.h"
+#include "draw.h"
 
 /* {
 GVAR: framebufferCount -> render.cpp
@@ -12,6 +13,8 @@ GVAR: number_of_swapchain_images -> swapchain.cpp
 GVAR: logical_device -> startup.cpp
 GVAR: pipeline_layout -> render.cpp
 GVAR: pipelines -> render.h
+GVAR: dyn_vertex_buffers -> control.cpp
+GVAR: current_dyn_buffer_index -> control.cpp
 } */
 
 //{
@@ -118,45 +121,81 @@ inline bool Draw()
 		return false;
 	}
 
-	VkClearColorValue color =
+	VkPipelineStageFlags flags =
 	{
-		0,
-		0,
-		0,
-		1
+		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
 	};
 
-	VkClearValue clearColor = {};
-	clearColor.color = color;
+	static bool once = true;
+	static VkClearValue clearColor = {};
+	static VkClearColorValue color = {};
+	static VkImageSubresourceRange range = {};
+	static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
+	static VkImageMemoryBarrier image_memory_barrier_before_present = {};
+	static VkSubmitInfo submit_info = {};
+	static VkPresentInfoKHR present_info = {};
+	if(once)
+	{
+		color.float32[0] = 0;
+		color.float32[1] = 0;
+		color.float32[2] = 0;
+		color.float32[3] = 1;
+		clearColor.color = color;
+
+		range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		range.baseMipLevel = 0;
+		range.levelCount = VK_REMAINING_MIP_LEVELS;
+		range.baseArrayLayer = 0;
+		range.layerCount = VK_REMAINING_ARRAY_LAYERS;
+
+		image_memory_barrier_before_draw.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		image_memory_barrier_before_draw.pNext = nullptr;
+		image_memory_barrier_before_draw.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		image_memory_barrier_before_draw.dstAccessMask = 0;
+		image_memory_barrier_before_draw.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		image_memory_barrier_before_draw.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		image_memory_barrier_before_draw.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		image_memory_barrier_before_draw.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		image_memory_barrier_before_draw.subresourceRange = range;
+
+		image_memory_barrier_before_present.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		image_memory_barrier_before_present.pNext = nullptr;
+		image_memory_barrier_before_present.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		image_memory_barrier_before_present.dstAccessMask = 0;
+		image_memory_barrier_before_present.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		image_memory_barrier_before_present.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		image_memory_barrier_before_present.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		image_memory_barrier_before_present.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		image_memory_barrier_before_present.subresourceRange = range;
+
+		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submit_info.pNext = nullptr;
+		submit_info.waitSemaphoreCount = 1;
+		submit_info.pWaitSemaphores = &AcquiredSemaphore;
+		submit_info.pWaitDstStageMask = &flags;
+		submit_info.commandBufferCount = 1;
+		submit_info.pCommandBuffers = &command_buffer;
+		submit_info.signalSemaphoreCount = 1;
+		submit_info.pSignalSemaphores = &ReadySemaphore;
+
+		present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		present_info.pNext = nullptr;
+		present_info.waitSemaphoreCount = 1;
+		present_info.pWaitSemaphores = &ReadySemaphore;
+		present_info.swapchainCount = 1;
+		present_info.pSwapchains = &_swapchain;
+		present_info.pImageIndices = &image_index;
+		present_info.pResults = nullptr;
+
+		once = false;
+	}
 
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
 	render_area.extent.height = window_height;
 
-	VkImageSubresourceRange range =
-	{
-		VK_IMAGE_ASPECT_COLOR_BIT,                // VkImageAspectFlags         aspectMask
-		0,                                        // uint32_t                   baseMipLevel
-		VK_REMAINING_MIP_LEVELS,                  // uint32_t                   levelCount
-		0,                                        // uint32_t                   baseArrayLayer
-		VK_REMAINING_ARRAY_LAYERS                 // uint32_t                   layerCount
-	};
+	image_memory_barrier_before_draw.image = handle_array_of_swapchain_images[image_index];
 
-	//vkCmdClearColorImage(command_buffer, handle_array_of_swapchain_images[image_index], VK_IMAGE_LAYOUT_GENERAL, &color, 1, &range);
-
-	VkImageMemoryBarrier image_memory_barrier_before_draw =
-	{
-		VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		nullptr,                                  	// const void               * pNext
-		VK_ACCESS_MEMORY_READ_BIT,           		// VkAccessFlags              srcAccessMask
-		0,       									// VkAccessFlags              dstAccessMask
-		VK_IMAGE_LAYOUT_UNDEFINED,           		// VkImageLayout              oldLayout
-		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,   // VkImageLayout              newLayout
-		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   srcQueueFamilyIndex
-		VK_QUEUE_FAMILY_IGNORED,                   	// uint32_t                   dstQueueFamilyIndex
-		handle_array_of_swapchain_images[image_index],   // VkImage                    image
-		range
-	};
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_draw);
 
@@ -168,67 +207,76 @@ inline bool Draw()
 	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
-	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
-	vkCmdDraw(command_buffer, 3, 1, 0, 0);
+	control::InvalidateDynamicBuffers();
+
+	current_dyn_buffer_index = (current_dyn_buffer_index + 1) % NUM_DYNAMIC_BUFFERS;
+	static Vertex vertices[3] = {};
+	static float x1 = 0.5f;
+	static float y1 = -0.5f;
+	static float x2 = 0.6f;
+	static float y2 = 0.0f;
+	static float col = 0;
+	static bool colv = true;
+
+	static float arr[4][4] =
+	{
+		{x1,y1,x2,y2},
+		{x1,-y1,x2,-y2},
+		{-x1,y1,-x2,y2},
+		{-x1,-y1,-x2,-y2},
+	};
+
+	for(int i = 0; i<4; i++)
+	{
+		// x, y
+
+		//   *
+		// *   *
+
+		vertices[0].pos = {arr[i][0], arr[i][1]};
+		vertices[1].pos = {arr[i][2], arr[i][3]};
+		vertices[2].pos = {0, 0};
+		if(colv)
+		{
+			col = col + 0.01f;
+			if(col > 10)
+			{
+				colv = false;
+			}
+		}
+		else
+		{
+			col = col - 0.01f;
+			if(col <= 0.01f)
+			{
+				colv = true;
+			}
+		}
+		vertices[0].color = {col, 0.0f, 0.0f};
+		vertices[1].color = {0.0f, col, 0.0f};
+		vertices[2].color = {0.0f, 0.0f, col};
+		draw::Draw_Triangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0]);
+	}
 
 	vkCmdEndRenderPass(command_buffer);
 
-	VkImageMemoryBarrier image_memory_barrier_before_present =
-	{
-		VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		nullptr,                                  	// const void               * pNext
-		VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,       // VkAccessFlags              srcAccessMask
-		VK_ACCESS_MEMORY_READ_BIT,       			// VkAccessFlags              dstAccessMask
-		VK_IMAGE_LAYOUT_UNDEFINED,           		// VkImageLayout              oldLayout
-		VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,   			// VkImageLayout              newLayout
-		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   srcQueueFamilyIndex
-		VK_QUEUE_FAMILY_IGNORED,                    // uint32_t                   dstQueueFamilyIndex
-		handle_array_of_swapchain_images[image_index],   // VkImage                    image
-		range
-	};
+	image_memory_barrier_before_present.image = handle_array_of_swapchain_images[image_index];
+
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_present);
+
+	control::FlushDynamicBuffers();
 
 	if(!control::EndCommandBufferRecordingOperation())
 	{
 		return false;
 	}
 
-	VkPipelineStageFlags flags =
-	{
-		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
-	};
-
-	VkSubmitInfo submit_info =
-	{
-		VK_STRUCTURE_TYPE_SUBMIT_INFO,                        // VkStructureType                sType
-		nullptr,                                              // const void                   * pNext
-		1,   													// uint32_t                       waitSemaphoreCount
-		&AcquiredSemaphore,                        			// const VkSemaphore            * pWaitSemaphores
-		&flags,                   							// const VkPipelineStageFlags   * pWaitDstStageMask
-		1,        											// uint32_t                       commandBufferCount
-		&command_buffer,                               		// const VkCommandBuffer        * pCommandBuffers
-		1,      												// uint32_t                       signalSemaphoreCount
-		&ReadySemaphore                              			// const VkSemaphore            * pSignalSemaphores
-	};
-
 	vkResetFences(logical_device, 1, &Fence_one);
 	if(!control::SubmitCommandBuffersToQueue(ComputeQueue, Fence_one, submit_info))
 	{
 		return false;
 	}
-
-	VkPresentInfoKHR present_info =
-	{
-		VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,                   // VkStructureType          sType
-		nullptr,                                              // const void*              pNext
-		1,   													// uint32_t                 waitSemaphoreCount
-		&ReadySemaphore,                          			// const VkSemaphore      * pWaitSemaphores
-		1,									             	// uint32_t                 swapchainCount
-		&_swapchain,                                    		// const VkSwapchainKHR   * pSwapchains
-		&image_index,                                 			// const uint32_t         * pImageIndices
-		nullptr                                               // VkResult*                pResults
-	};
 
 	result = vkQueuePresentKHR(ComputeQueue, &present_info);
 	switch(result)
@@ -243,8 +291,6 @@ inline bool Draw()
 
 void mainLoop()
 {
-	double time = glfwGetTime()/1000;
-
 	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
 	render::CreateRenderPasses(1,depthFormat, false);
 
@@ -263,20 +309,36 @@ void mainLoop()
 
 	render::CreateGraphicsPipelines(2, pipelineCache, 0, triangleVS, triangleFS);
 
+	double time1 = 0;
+	double time2 = 0;
+	double time_diff = 0;
+
 	while (!glfwWindowShouldClose(_window))
 	{
 		glfwPollEvents();
-		if(!Draw())
+		time1 = glfwGetTime();
+		time_diff = time1 - time2;
+		if(time_diff > 0.01f)
 		{
-			std::cout << "Critical Error! Abandon the ship." << std::endl;
-			break;
+			if(!Draw())
+			{
+				std::cout << "Critical Error! Abandon the ship." << std::endl;
+				break;
+			}
 		}
+		else
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(time_diff*1000)));
+			continue;
+		}
+		time2 = glfwGetTime();
 	}
 
 	//CLEANUP -----------------------------------
 	control::WaitForAllSubmittedCommandsToBeFinished();
 	control::FreeCommandBuffers(1);
 	control::DestroyCommandPool();
+	control::DestroyDynBuffers();
 	vkDestroySemaphore(logical_device, AcquiredSemaphore, nullptr);
 	vkDestroySemaphore(logical_device, ReadySemaphore, nullptr);
 	vkDestroyFence(logical_device, Fence_one, nullptr);
