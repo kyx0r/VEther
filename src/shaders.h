@@ -5,6 +5,7 @@ namespace shaders
 {
 
 void CompileShaders();
+VkShaderModule loadShaderMem(int index);
 VkShaderModule loadShader(const char* path);
 
 } //namespace shaders

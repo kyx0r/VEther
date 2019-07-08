@@ -12,10 +12,10 @@ struct WindowParameters
 	HWND HWnd;
 #elif defined VK_USE_PLATFORM_XLIB_KHR
 	Display *Dpy;
-	Window Window;
+	Window wWindow;
 #elif defined VK_USE_PLATFORM_XCB_KHR
 	xcb_connection_t *Connection;
-	xcb_window_t *Window;
+	xcb_window_t wWindow;
 #endif
 };
 

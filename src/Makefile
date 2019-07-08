@@ -3,22 +3,22 @@ SRCS=$(wildcard *.cpp)
 
 OBJS=$(SRCS:.cpp=.o)
 
-CC = g++
+LINK_OBJS:= $(addprefix ../lib/,$(OBJS))
+
+PROGS = $(patsubst %.cpp,../lib/%.o,$(SRCS))
+
+CXX = g++
 LIBNAME = VEther
 LIBPATH = ../lib
 CXXFLAGS = -fPIC -DPIC -I ../include -I ../ -I ../glfw/include $(SHARED_FLAGS)
-all: $(LIBPATH)/lib$(LIBNAME).a
+
+all : $(PROGS) genlib
+../lib/%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<	
 
 clean:
-	rm -f $(OBJS) lib$(LIBNAME).a
-	rm -rf $(LIBPATH)/lib$(LIBNAME).a
+	rm -f $(LINK_OBJS) $(LIBPATH)/lib$(LIBNAME).a
 
-lib$(LIBNAME).a: $(OBJS)
-	ar -cvr lib$(LIBNAME).a $(OBJS)
-	gcc-ranlib lib$(LIBNAME).a
-
-$(LIBPATH):
-	mkdir -p ../lib
-
-$(LIBPATH)/lib$(LIBNAME).a: lib$(LIBNAME).a $(LIBPATH)
-	cp -d lib$(LIBNAME).a ../lib
+genlib:
+	ar -cvr $(LIBPATH)/lib$(LIBNAME).a $(LINK_OBJS)
+	gcc-ranlib $(LIBPATH)/lib$(LIBNAME).a

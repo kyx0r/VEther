@@ -5,8 +5,9 @@
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: command_buffer -> control.h
+GVAR: ubo_dsl -> control.cpp
+GVAR: tex_dsl -> control.cpp
 GVAR: image_format -> swapchain.cpp
-GVAR: dyn_vertex_buffers -> control.cpp
 } */
 
 //{
@@ -118,24 +119,52 @@ void CreateImageViews(int count, VkImage *image, VkFormat imageformat, uint32_t 
 	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	createInfo.format = imageformat;
+	createInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+	createInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+	createInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+	createInfo.components.a = VK_COMPONENT_SWIZZLE_A;
 	createInfo.subresourceRange.aspectMask = aspectMask;
 	createInfo.subresourceRange.baseMipLevel = mipLevel;
 	createInfo.subresourceRange.levelCount = levelCount;
 	createInfo.subresourceRange.layerCount = 1;
 
-	imageViewCount += count;
 	if(imageViewCount < ARRAYSIZE(imageViews))
 	{
 		for(int i = 0; i<count; i++)
 		{
 			createInfo.image = image[i];
-			VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[i]));
+			uint32_t inc = (!imageViewCount) ? imageViewCount + i : imageViewCount + i + 1;
+			VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[inc]));
 		}
+		imageViewCount += count;
 		return;
 	}
 	std::cout<<"Info: Run out of imageViews. \n";
 	imageViewCount = 0;
 	return;
+}
+
+VkImage Create2DImage(VkImageUsageFlags usage, int w, int h)
+{
+	VkImage img;
+	VkImageCreateInfo image_create_info;
+	memset(&image_create_info, 0, sizeof(image_create_info));
+	image_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	image_create_info.imageType = VK_IMAGE_TYPE_2D;
+	image_create_info.format = VK_FORMAT_R8G8B8A8_UNORM;
+	image_create_info.extent.width = w;
+	image_create_info.extent.height = h;
+	image_create_info.extent.depth = 1;
+	image_create_info.mipLevels = 1;
+	image_create_info.arrayLayers = 1;
+	image_create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+	image_create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+	image_create_info.usage = usage;
+	image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	image_create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+	VK_CHECK(vkCreateImage(logical_device, &image_create_info, nullptr, &img));
+	return img;
 }
 
 void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpassContents subpass_contents, int render_index, int buffer_index)
@@ -152,11 +181,64 @@ void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpass
 	vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, subpass_contents);
 }
 
-void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int render_index, VkShaderModule vs, VkShaderModule fs)
+void CreatePipelineLayout()
 {
-	VkGraphicsPipelineCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 
+	VkDescriptorSetLayout basic_descriptor_set_layouts[2] = {ubo_dsl, tex_dsl};
+
+	/* 	VkPushConstantRange push_constant_range;
+		memset(&push_constant_range, 0, sizeof(push_constant_range));
+		push_constant_range.offset = 0;
+		push_constant_range.size = 21 * sizeof(float);
+		push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS; */
+
+	VkPipelineLayoutCreateInfo createInfo;
+	memset(&createInfo, 0, sizeof(createInfo));
+	createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	createInfo.setLayoutCount = 2;
+	createInfo.pSetLayouts = basic_descriptor_set_layouts;
+	//createInfo.pushConstantRangeCount = 1;
+	//createInfo.pPushConstantRanges = &push_constant_range;
+
+	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, 0, &pipeline_layout));
+}
+
+VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
+{
+        zone::stack_alloc(100000, 1);
+
+	VkVertexInputBindingDescription* bindingDescription = new(stack_mem) VkVertexInputBindingDescription[0];
+	bindingDescription[0].binding = 0;
+	bindingDescription[0].stride = sizeof(Vertex_);
+	bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	VkVertexInputAttributeDescription* attributeDescriptions = new(bindingDescription+sizeof(bindingDescription)) VkVertexInputAttributeDescription[3];
+	attributeDescriptions[0].binding = 0;
+	attributeDescriptions[0].location = 0;
+	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[0].offset = offsetof(Vertex_, pos);
+	attributeDescriptions[1].binding = 0;
+	attributeDescriptions[1].location = 1;
+	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+	attributeDescriptions[1].offset = offsetof(Vertex_, color);
+	attributeDescriptions[2].binding = 0;
+	attributeDescriptions[2].location = 2;
+	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[2].offset = offsetof(Vertex_, tex_coord);
+
+	VkPipelineVertexInputStateCreateInfo* vertexInput = new(&attributeDescriptions[0] + sizeof(attributeDescriptions)) VkPipelineVertexInputStateCreateInfo[0];
+	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInput[0].vertexBindingDescriptionCount = 1;
+	vertexInput[0].vertexAttributeDescriptionCount = 3;
+	vertexInput[0].pVertexBindingDescriptions = bindingDescription;
+	vertexInput[0].pVertexAttributeDescriptions = &attributeDescriptions[0];
+
+	return vertexInput;
+}
+
+void CreateGraphicsPipelines
+(uint32_t count, VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs)
+{
 	VkPipelineShaderStageCreateInfo stages[2] = {};
 	stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -167,32 +249,12 @@ void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int rende
 	stages[1].module = fs;
 	stages[1].pName = "main";
 
+
+	VkGraphicsPipelineCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	createInfo.stageCount = ARRAYSIZE(stages);
 	createInfo.pStages = stages;
-
-	VkPipelineVertexInputStateCreateInfo vertexInput = {};
-	vertexInput.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	createInfo.pVertexInputState = &vertexInput;
-
-	VkVertexInputBindingDescription bindingDescription = {};
-	bindingDescription.binding = 0;
-	bindingDescription.stride = sizeof(Vertex);
-	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-	VkVertexInputAttributeDescription attributeDescriptions[2];
-	attributeDescriptions[0].binding = 0;
-	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-	attributeDescriptions[0].offset = offsetof(Vertex, pos);
-	attributeDescriptions[1].binding = 0;
-	attributeDescriptions[1].location = 1;
-	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-	vertexInput.vertexBindingDescriptionCount = 1;
-	vertexInput.vertexAttributeDescriptionCount = ARRAYSIZE(attributeDescriptions);
-	vertexInput.pVertexBindingDescriptions = &bindingDescription;
-	vertexInput.pVertexAttributeDescriptions = &attributeDescriptions[0];
+	createInfo.pVertexInputState = vertexInput();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -207,6 +269,12 @@ void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int rende
 
 	VkPipelineRasterizationStateCreateInfo rasterizationState = {};
 	rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
+	rasterizationState.cullMode = VK_CULL_MODE_NONE;
+	rasterizationState.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizationState.depthClampEnable = VK_FALSE;
+	rasterizationState.rasterizerDiscardEnable = VK_FALSE;
+	rasterizationState.depthBiasEnable = VK_FALSE;
 	rasterizationState.lineWidth = 1.f;
 	createInfo.pRasterizationState = &rasterizationState;
 
@@ -239,12 +307,12 @@ void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int rende
 	createInfo.layout = pipeline_layout;
 	createInfo.renderPass = renderPasses[render_index];
 
-	pipelineCount += count;
-	if(pipelineCount < ARRAYSIZE(pipelines))
+	uint32_t barrier = pipelineCount+count;
+	if(barrier < ARRAYSIZE(pipelines))
 	{
-		for(int i = 0; i<count; i++)
+		for(; pipelineCount<barrier; ++pipelineCount)
 		{
-			VK_CHECK(vkCreateGraphicsPipelines(logical_device, pipelineCache, 1, &createInfo, 0, &pipelines[i]));
+			VK_CHECK(vkCreateGraphicsPipelines(logical_device, pipelineCache, 1, &createInfo, 0, &pipelines[pipelineCount]));
 		}
 		return;
 	}
@@ -253,13 +321,5 @@ void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int rende
 	return;
 }
 
-void BindPipeline(VkPipeline pipeline)
-{
-	if(current_pipeline != pipeline)
-	{
-		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-		current_pipeline = pipeline;
-	}
-}
-
 } //namespace render
+ 

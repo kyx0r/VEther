@@ -5,7 +5,6 @@ else
 endif
 
 ifeq ($(detected_OS),Windows)
-OGLCompilersDLL=$(wildcard ./OGLCompilersDLL/*.cpp)
 OSSOURCE = $(wildcard ./glslang/OSDependent/Windows/*.cpp)
 endif
 
@@ -17,6 +16,7 @@ GLSLANG=$(wildcard ./glslang/MachineIndependent/*.cpp)
 PREPROCESSOR = $(wildcard ./glslang/MachineIndependent/preprocessor/*.cpp)
 STANDALONE=$(wildcard ./StandAlone/*.cpp)
 SPIRV = $(wildcard ./SPIRV/*.cpp)
+OGLCompilersDLL=$(wildcard ./OGLCompilersDLL/*.cpp)
 
 OBJS=$(OGLCompilersDLL:.cpp=.o)
 OBJS2=$(OSSOURCE:.cpp=.o)
@@ -25,11 +25,11 @@ OBJS4=$(PREPROCESSOR:.cpp=.o)
 OBJS5=$(STANDALONE:.cpp=.o)
 OBJS6=$(SPIRV:.cpp=.o)
 
-CC = g++
+CXX = g++
 LIBNAME = glslang
 LIBPATH = ../lib
 DEFINES =  -DENABLE_OPT=0 -DENABLE_NV_EXTENSIONS -DENABLE_AMD_EXTENSIONS -DNV_EXTENSIONS
-CXXFLAGS = $(SHARED_FLAGS) -fPIC -I.. -I ./OGLCompilersDLL $(DEFINES)
+CXXFLAGS = $(SHARED_FLAGS) -fPIC -I.. -I ./OGLCompilersDLL $(DEFINES) -I ../glfw/include -I ../include
 
 all: $(LIBPATH)/lib$(LIBNAME).a
 

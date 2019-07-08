@@ -1,7 +1,7 @@
 #include "window.h"
 #include "control.h"
-#include "render.h"
 #include "shaders.h"
+#include "textures.h"
 #include "draw.h"
 
 /* {
@@ -37,8 +37,6 @@ namespace window
 
 void window_size_callback(GLFWwindow* _window, int width, int height)
 {
-	control::WaitForAllSubmittedCommandsToBeFinished();
-
 	//handle minimization.
 	while (width == 0 || height == 0)
 	{
@@ -46,9 +44,12 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 		glfwWaitEvents();
 	}
 
+	VK_CHECK(vkDeviceWaitIdle(logical_device));
+
 	old_swapchain = _swapchain;
 	_swapchain = VK_NULL_HANDLE;
 	if(
+	    !surface::CheckPresentationSurfaceCapabilities()||
 	    !swapchain::SetSizeOfSwapchainImages(width, height)||
 	    !swapchain::CreateSwapchain(_swapchain, old_swapchain)||
 	    !swapchain::GetHandlesOfSwapchainImages(_swapchain)
@@ -57,6 +58,7 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 		startup::debug_pause();
 		exit(1);
 	}
+
 	window_height = height;
 	window_width = width;
 
@@ -95,6 +97,11 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 	}
 }
 
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+
+}
+  
 void initWindow()
 {
 	glfwInit();
@@ -105,13 +112,14 @@ void initWindow()
 	_window = glfwCreateWindow(window_width, window_height, "VEther", nullptr, nullptr);
 	glfwSetWindowSizeCallback(_window, window_size_callback);
 	glfwSetKeyCallback(_window, keyCallback);
+	glfwSetCursorPosCallback(_window, cursor_position_callback);
 }
 
 inline bool Draw()
 {
 	uint32_t image_index;
 	VkResult result;
-	control::WaitForAllSubmittedCommandsToBeFinished();
+	VK_CHECK(vkDeviceWaitIdle(logical_device));
 	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, std::numeric_limits<uint64_t>::max());
 	if(
 	    !swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index)||
@@ -210,53 +218,45 @@ inline bool Draw()
 	control::InvalidateDynamicBuffers();
 
 	current_dyn_buffer_index = (current_dyn_buffer_index + 1) % NUM_DYNAMIC_BUFFERS;
-	static Vertex vertices[3] = {};
-	static float x1 = 0.5f;
-	static float y1 = -0.5f;
-	static float x2 = 0.6f;
-	static float y2 = 0.0f;
-	static float col = 0;
-	static bool colv = true;
+	static Vertex_ vertices[4] = {};
 
-	static float arr[4][4] =
-	{
-		{x1,y1,x2,y2},
-		{x1,-y1,x2,-y2},
-		{-x1,y1,-x2,y2},
-		{-x1,-y1,-x2,-y2},
-	};
+	vertices[0].pos[0] = -0.5f;   //x
+	vertices[0].pos[1] = -0.5f;   //y
+	vertices[0].color[0] = 1.0f; //r
+	vertices[0].color[1] = 0.0f; //g
+	vertices[0].color[2] = 0.0f; //b
+	vertices[0].tex_coord[0] = 1.0f;
+	vertices[0].tex_coord[1] = 0.0f;
 
-	for(int i = 0; i<4; i++)
-	{
-		// x, y
+	vertices[1].pos[0] = 0.5f;
+	vertices[1].pos[1] = -0.5f;
+	vertices[1].color[0] = 0.0f;
+	vertices[1].color[1] = 1.0f;
+	vertices[1].color[2] = 0.0f;
+	vertices[1].tex_coord[0] = 0.0f;
+	vertices[1].tex_coord[1] = 0.0f;
 
-		//   *
-		// *   *
+	vertices[2].pos[0] = 0.5f;
+	vertices[2].pos[1] = 0.5f;
+	vertices[2].color[0] = 0.0f;
+	vertices[2].color[1] = 0.0f;
+	vertices[2].color[2] = 1.0f;
+	vertices[2].tex_coord[0] = 0.0f;
+	vertices[2].tex_coord[1] = 1.0f;
 
-		vertices[0].pos = {arr[i][0], arr[i][1]};
-		vertices[1].pos = {arr[i][2], arr[i][3]};
-		vertices[2].pos = {0, 0};
-		if(colv)
-		{
-			col = col + 0.01f;
-			if(col > 10)
-			{
-				colv = false;
-			}
-		}
-		else
-		{
-			col = col - 0.01f;
-			if(col <= 0.01f)
-			{
-				colv = true;
-			}
-		}
-		vertices[0].color = {col, 0.0f, 0.0f};
-		vertices[1].color = {0.0f, col, 0.0f};
-		vertices[2].color = {0.0f, 0.0f, col};
-		draw::Draw_Triangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0]);
-	}
+	vertices[3].pos[0] = -0.5f;
+	vertices[3].pos[1] = 0.5f;
+	vertices[3].color[0] = 1.0f;
+	vertices[3].color[1] = 1.0f;
+	vertices[3].color[2] = 1.0f;
+	vertices[3].tex_coord[0] = 1.0f;
+	vertices[3].tex_coord[1] = 1.0f;
+
+	//draw::DrawTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0]);
+
+	uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
+
+	draw::DrawIndexedTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], 6, indeces);
 
 	vkCmdEndRenderPass(command_buffer);
 
@@ -273,17 +273,17 @@ inline bool Draw()
 	}
 
 	vkResetFences(logical_device, 1, &Fence_one);
-	if(!control::SubmitCommandBuffersToQueue(ComputeQueue, Fence_one, submit_info))
-	{
-		return false;
-	}
 
-	result = vkQueuePresentKHR(ComputeQueue, &present_info);
+	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
+
+	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
 	switch(result)
 	{
 	case VK_SUCCESS:
 		return true;
 	default:
+		printf(startup::GetVulkanResultString(result));
+		printf("\n");
 		return false;
 	}
 	return true;
@@ -293,21 +293,24 @@ void mainLoop()
 {
 	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
 	render::CreateRenderPasses(1,depthFormat, false);
-
 	render::CreateImageViews(number_of_swapchain_images, &handle_array_of_swapchain_images[0], image_format, 0, 1);
 	render::CreateFramebuffers(number_of_swapchain_images, &imageViews[0], &imageViews[0], 0, window_width, window_height);
 
-	VkShaderModule triangleVS = shaders::loadShader("res/shaders/triangle.vert.spv");
+        shaders::CompileShaders();
+
+	VkShaderModule triangleVS = shaders::loadShaderMem(1);
 	assert(triangleVS);
 
-	VkShaderModule triangleFS = shaders::loadShader("res/shaders/triangle.frag.spv");
+	VkShaderModule triangleFS = shaders::loadShaderMem(0);
 	assert(triangleFS);
+
+	textures::SampleTexture();
 
 	VkPipelineCache pipelineCache = 0;
 
 	render::CreatePipelineLayout();
 
-	render::CreateGraphicsPipelines(2, pipelineCache, 0, triangleVS, triangleFS);
+	render::CreateGraphicsPipelines(1, pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 
 	double time1 = 0;
 	double time2 = 0;
@@ -335,7 +338,7 @@ void mainLoop()
 	}
 
 	//CLEANUP -----------------------------------
-	control::WaitForAllSubmittedCommandsToBeFinished();
+	VK_CHECK(vkDeviceWaitIdle(logical_device));
 	control::FreeCommandBuffers(1);
 	control::DestroyCommandPool();
 	control::DestroyDynBuffers();

@@ -1,5 +1,5 @@
 #include "swapchain.h"
-
+#include "zone.h"
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: target_device -> startup.cpp
@@ -216,9 +216,10 @@ bool GetHandlesOfSwapchainImages(VkSwapchainKHR &_swapchain)
 
 	if(handle_array_of_swapchain_images != nullptr)
 	{
-		delete handle_array_of_swapchain_images;
+	  zone::Z_Free((char*)&handle_array_of_swapchain_images[0]);
 	}
-	handle_array_of_swapchain_images = new VkImage [images_count];
+	char* mem = (char*) zone::Z_Malloc(sizeof(VkImage) * images_count);
+	handle_array_of_swapchain_images = new(mem) VkImage [images_count];
 
 	result = vkGetSwapchainImagesKHR( logical_device, _swapchain, &images_count, &handle_array_of_swapchain_images[0]);
 	if(result != VK_SUCCESS || images_count == 0)

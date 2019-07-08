@@ -39,6 +39,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include "StandAlone.h"
+
 #include "ResourceLimits.h"
 #include "Worklist.h"
 #include "DirStackFileIncluder.h"
@@ -60,6 +62,9 @@
 #include <thread>
 
 #include "../glslang/OSDependent/osinclude.h"
+
+VkShaderModule _shaders[20] = {};
+uint32_t cur_shader_index = 0;
 
 extern "C" {
     SH_IMPORT_EXPORT void ShOutputHtml();
@@ -1094,7 +1099,15 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
                         if (Options & EOptionOutputHexadecimal) {
                             glslang::OutputSpvHex(spirv, GetBinaryName((EShLanguage)stage), variableName);
                         } else {
-                            glslang::OutputSpvBin(spirv, GetBinaryName((EShLanguage)stage));
+			  	VkShaderModuleCreateInfo createInfo = {};
+				createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+				createInfo.codeSize = spirv.size() * sizeof(unsigned int);
+				createInfo.pCode = spirv.data();
+				VK_CHECK(vkCreateShaderModule(logical_device, &createInfo, 0, &_shaders[cur_shader_index]));
+				cur_shader_index++;
+
+			                                // zone::stack_alloc(spirv.size() * sizeof(unsigned int), 200);
+							// memcpy(stack_mem+(sizeof(int)*6), spirv.data(), spirv.size() * sizeof(unsigned int));
                         }
                         if (!SpvToolsDisassembler && (Options & EOptionHumanReadableSpv))
                             spv::Disassemble(std::cout, spirv);
@@ -1180,10 +1193,13 @@ void CompileAndLinkShaderFiles(glslang::TWorklist& Worklist)
 int singleMain()
 {
     glslang::TWorklist workList;
-    std::for_each(WorkItems.begin(), WorkItems.end(), [&workList](std::unique_ptr<glslang::TWorkItem>& item) {
+	
+	//proceed with only one target to avoid bug where same compilation occurs more than once.
+	workList.add(WorkItems.back().get());
+/*     std::for_each(WorkItems.begin(), WorkItems.end(), [&workList](std::unique_ptr<glslang::TWorkItem>& item) {
         assert(item);
         workList.add(item.get());
-    });
+    }); */
 
     if (Options & EOptionDumpConfig) {
         printf("%s", glslang::GetDefaultTBuiltInResourceString().c_str());
@@ -1296,7 +1312,7 @@ int C_DECL GLSL_COMPILER_ENTRY(int argc, char* argv[])
         if (iterations > 1)
             glslang::OS_DumpMemoryCounters();
     }
-
+	
     return ret;
 }
 
@@ -1401,8 +1417,8 @@ void CompileFile(const char* fileName, ShHandle compiler)
     }
 
     // move to length-based strings, rather than null-terminated strings
-    int* lengths = new int[1];
-    lengths[0] = (int)strlen(shaderString);
+   // int* lengths = new int[1];
+   // lengths[0] = (int)strlen(shaderString);
 
     EShMessages messages = EShMsgDefault;
     SetMessageOptions(messages);
@@ -1425,7 +1441,7 @@ void CompileFile(const char* fileName, ShHandle compiler)
             glslang::OS_DumpMemoryCounters();
     }
 
-    delete [] lengths;
+    //delete [] lengths;
     FreeFileData(shaderString);
 
     if (ret == 0)

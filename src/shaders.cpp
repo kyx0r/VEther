@@ -2,35 +2,32 @@
 
 /* {
 GVAR: logical_device -> startup.cpp
+GVAR: VkShaderModule _shaders[20] -> /standalone/standalone.cpp
+GVAR: uint32_t cur_shader_index -> /standalone/standalone.cpp
 } */
 
 namespace shaders
 {
 
+  //this must be called only when logical device is initialized already.   
 void CompileShaders()
 {
-	/* 	std::vector<char*> shaders;
-
-		shaders.insert(shaders.end(), {"./res/shaders/triangle.vert.glsl", "-V", "-o", "./res/shaders/triangle.vert.spv", "./res/shaders/triangle.vert.glsl"});
-
-		GLSL_COMPILER_ENTRY(shaders.size(), &shaders[0]); */
 
 	static char* shaders[][5] =
 	{
-		{"./res/shaders/triangle.vert.glsl", "-V", "-o", "./res/shaders/triangle.vert.spv", "./res/shaders/triangle.vert.glsl"},
-		{"./res/shaders/triangle.frag.glsl", "-V", "-o", "./res/shaders/triangle.frag.spv", "./res/shaders/triangle.frag.glsl"}
+		{"dummy", "./res/shaders/triangle.frag.glsl", "-V", "-o", "./res/shaders/triangle.frag.spv"},
+		{"dummy", "./res/shaders/triangle.vert.glsl", "-V", "-o", "./res/shaders/triangle.vert.spv"}
 	};
-	for(uint32_t i = 0; i<ARRAYSIZE(shaders); i++)
+	for(uint32_t i = 0; i<ARRAYSIZE(shaders); ++i)
 	{
 		GLSL_COMPILER_ENTRY(ARRAYSIZE(shaders[i]), shaders[i]);
 	}
-	//GLSL_COMPILER_ENTRY(ARRAYSIZE(shaders[2]), shaders[1]);
-
-	/* 	static char* argv2[] =
-		{"./res/shaders/triangle.frag.glsl", "-V", "-o", "./res/shaders/triangle.frag.spv", "./res/shaders/triangle.frag.glsl"}; */
-	//GLSL_COMPILER_ENTRY(ARRAYSIZE(argv), argv2);
-
 	std::cout<<"SHADERS COMPILED. \n";
+}
+
+VkShaderModule loadShaderMem(int index)
+{
+	return _shaders[index];
 }
 
 VkShaderModule loadShader(const char* path)

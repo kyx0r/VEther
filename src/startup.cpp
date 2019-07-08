@@ -1,4 +1,5 @@
 #include "startup.h"
+#include "zone.h"
 
 /* {
 GVAR: PFN_* -> vulkan_decl.h
@@ -6,8 +7,9 @@ GVAR: PFN_* -> vulkan_decl.h
 
 //{
 VkInstance instance;
-VkPhysicalDevice target_device;
+VkPhysicalDevice target_device = VK_NULL_HANDLE;
 VkDevice logical_device;
+uint32_t max2DTex_size = 0;
 uint32_t queue_families_count = 0;
 //}
 
@@ -24,7 +26,7 @@ static VkPhysicalDeviceProperties device_properties;
 static int d_layers_count = 1;
 const char* debugLayers[] =
 {
-	"VK_LAYER_LUNARG_standard_validation"
+	"VK_LAYER_KHRONOS_validation"
 };
 #endif
 
@@ -166,12 +168,6 @@ static bool CheckValidationLayerSupport()
 
 VkDebugReportCallbackEXT registerDebugCallback()
 {
-	if(!CheckValidationLayerSupport())
-	{
-		std::cout<<"Debug Layers are not found! \n";
-		return 0;
-	}
-
 	VkDebugReportCallbackCreateInfoEXT createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
 	createInfo.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
@@ -195,7 +191,7 @@ bool LoadVulkan()
 #define LoadFunction GetProcAddress
 #elif defined __linux
 #define libtype void*
-	vulkan_lib = dlopen("libvulcan.so.1", RTLD_NOW);
+	vulkan_lib = dlopen("libvulkan.so.1", RTLD_NOW);
 #define LoadFunction dlsym
 #endif
 	if(vulkan_lib == nullptr)
@@ -205,7 +201,7 @@ bool LoadVulkan()
 	}
 
 #define EXPORTED_VULKAN_FUNCTION( name ) \
-	name = reinterpret_cast<PFN_##name> (LoadFunction(vulkan_lib, #name)); \
+	name = (PFN_##name) (LoadFunction(vulkan_lib, #name)); \
 	if(name == nullptr) \
 	{ \
 		std::cout<<"Could not load exported Vulkan function: "<< #name <<std::endl; \
@@ -221,13 +217,13 @@ bool LoadVulkan()
 bool LoadVulkanGlobalFuncs()
 {
 #define GLOBAL_LEVEL_VULKAN_FUNCTION( name ) \
-	name = reinterpret_cast<PFN_##name> (vkGetInstanceProcAddr( nullptr, #name)); \
+        name = (PFN_##name) (vkGetInstanceProcAddr( nullptr, #name)); \
 	if(name == nullptr) \
 	{ \
-		std::cout<<"Could not load exported Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Could not load global Vulkan function: "<< #name <<std::endl; \
 		return false; \
 	}else \
-		std::cout<<"Loaded exported Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Loaded global Vulkan function: "<< #name <<std::endl; \
 
 #include "vulkan_functions_list.inl"
 	return true;
@@ -275,7 +271,8 @@ bool CheckInstanceExtensions()
 		std::cout<<"Could not get the extension count!  \n";
 		return false;
 	}
-	available_extensions = new VkExtensionProperties [extensions_count];
+	char* mem = (char*) zone::Z_Malloc(sizeof(VkExtensionProperties) * extensions_count);
+	available_extensions = new(mem) VkExtensionProperties [extensions_count];
 	result = vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, &available_extensions[0]);
 	if(result != VK_SUCCESS || extensions_count == 0)
 	{
@@ -315,6 +312,10 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 				std::cout<<"Extension \n"<<desired_extensions[i]<<" is not supported!"<<std::endl;
 				return false;
 			}
+			else
+			{
+			  std::cout<<"Using instance extension: " <<desired_extensions[i]<<"\n";
+			}
 		}
 	}
 
@@ -329,21 +330,23 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		VK_MAKE_VERSION(1,0,0)
 	};
 
-	VkInstanceCreateInfo instance_create_info =
-	{
-		VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-		nullptr,
-		0,
-		&app_info,
-		0,
-		nullptr,
-		count,
-		&desired_extensions[0]
-	};
+	VkInstanceCreateInfo instance_create_info;
+	memset(&instance_create_info, 0, sizeof(instance_create_info));
+	instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	instance_create_info.pApplicationInfo = &app_info;
+	instance_create_info.enabledExtensionCount = count;
+	instance_create_info.ppEnabledExtensionNames = &desired_extensions[0];
 
 #ifdef DEBUG
-	instance_create_info.enabledLayerCount = d_layers_count;
-	instance_create_info.ppEnabledLayerNames = debugLayers;
+	if(!CheckValidationLayerSupport())
+	{
+		std::cout<<"Debug Layers are not found! \n";
+	}
+	else
+	{
+	  //        instance_create_info.enabledLayerCount = d_layers_count;
+	  //      instance_create_info.ppEnabledLayerNames = debugLayers;
+	}
 #endif
 
 	VkResult result = VK_SUCCESS;
@@ -356,7 +359,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 
 	//instance is created and we wont dont need to store instance extensions here anymore.
 	//next step will be to load device extensions in this array.
-	delete available_extensions;
+	zone::Z_Free((char*)&available_extensions[0]);
 	available_extensions = nullptr;
 
 	return true;
@@ -371,7 +374,8 @@ bool CheckPhysicalDevices()
 		std::cout<<"Could not get number of physical devices!  \n";
 		return false;
 	}
-	available_devices = new VkPhysicalDevice [device_count];
+	char* mem = (char*) zone::Z_Malloc(sizeof(VkPhysicalDevice) * device_count);
+	available_devices = new(mem) VkPhysicalDevice [device_count];
 	result = vkEnumeratePhysicalDevices(instance, &device_count, &available_devices[0]);
 	if(result != VK_SUCCESS || device_count == 0)
 	{
@@ -393,8 +397,10 @@ bool CheckPhysicalDeviceExtensions()
 			std::cout<<"Could not get number of physical device extensions!  \n";
 			return false;
 		}
-		available_extensions = new VkExtensionProperties [device_extensions_count];
-		result = vkEnumerateDeviceExtensionProperties(available_devices[i], nullptr, &device_extensions_count, &available_extensions[0]);
+
+		VkExtensionProperties m[device_extensions_count];
+	        
+		result = vkEnumerateDeviceExtensionProperties(available_devices[i], nullptr, &device_extensions_count, &m[0]);
 		if(result != VK_SUCCESS || device_extensions_count == 0)
 		{
 			std::cout<<"Could not enumerate device extensions!  \n";
@@ -404,16 +410,22 @@ bool CheckPhysicalDeviceExtensions()
 		vkGetPhysicalDeviceFeatures(available_devices[i], &device_features);
 		vkGetPhysicalDeviceProperties(available_devices[i], &device_properties);
 
-		//can add more checks later.
-		if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+		if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
 		{
 			continue;
 		}
 		else
 		{
+		        char* mem = (char*) zone::Z_Malloc(sizeof(VkExtensionProperties) * device_extensions_count);
+			memcpy(mem, m, (sizeof(VkExtensionProperties) * device_extensions_count));
+		        available_extensions = new(mem) VkExtensionProperties [device_extensions_count];
+
+			device_features = {};
+		        max2DTex_size = device_properties.limits.maxImageDimension2D;
 			target_device = available_devices[i];
 			break;
-		}
+		}		
+		
 	}
 	if(target_device == 0)
 	{
@@ -421,7 +433,7 @@ bool CheckPhysicalDeviceExtensions()
 		return false;
 	}
 	extensions_count = device_extensions_count;
-	delete available_devices;
+	zone::Z_Free((char*)&available_devices[0]);
 	return true;
 }
 
@@ -467,38 +479,30 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 			}
 		}
 	}
-	VkDeviceQueueCreateInfo queue_create_infos[number_of_queues];
+	
+	VkDeviceQueueCreateInfo queue_create_infos[number_of_queues] = {};
 	for(int i = 0; i<number_of_queues; i++)
-	{
-		if(array[i].FamilyIndex == array[i+1].FamilyIndex)
-		{
-			number_of_queues = number_of_queues - 1;
-		}
+	{	  
 		queue_create_infos[i] =
 		{
 			VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 			nullptr,
 			0,
 			array[i].FamilyIndex,
-			(uint32_t) sizeof(array[i].Priorities)/sizeof(array[i].Priorities[0]),
+		        1,
 			array[i].Priorities
 		};
 	}
 
-	VkDeviceCreateInfo device_create_info =
-	{
-		VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,               // VkStructureType                  sType
-		nullptr,                                            // const void                     * pNext
-		0,                                                  // VkDeviceCreateFlags              flags
-		(uint32_t) number_of_queues,                        // uint32_t                         queueCreateInfoCount
-		queue_create_infos,                                 // const VkDeviceQueueCreateInfo  * pQueueCreateInfos
-		0,                                                  // uint32_t                         enabledLayerCount
-		nullptr,                                            // const char * const             * ppEnabledLayerNames
-		ext_count,                                          // uint32_t                         enabledExtensionCount
-		&desired_extensions[0],                             // const char * const             * ppEnabledExtensionNames
-		&device_features                                    // const VkPhysicalDeviceFeatures * pEnabledFeatures
-	};
-
+	VkDeviceCreateInfo device_create_info;
+	memset(&device_create_info, 0, sizeof(device_create_info));
+	device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	device_create_info.queueCreateInfoCount = number_of_queues;
+	device_create_info.pQueueCreateInfos = &queue_create_infos[0];
+	device_create_info.enabledExtensionCount = ext_count;
+	device_create_info.ppEnabledExtensionNames = &desired_extensions[0];
+	device_create_info.pEnabledFeatures = &device_features;
+ 
 	VkResult result = vkCreateDevice(target_device, &device_create_info, nullptr, &logical_device);
 	if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE)
 	{
@@ -506,9 +510,8 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 		return false;
 	}
 
-	delete available_extensions;
+	zone::Z_Free((char*)&available_extensions[0]);
 	available_extensions = nullptr;
-
 	return true;
 }
 
@@ -536,7 +539,7 @@ bool LoadDeviceLevelFunctions()
             #name << std::endl;                                                 \
           return false;                                                         \
         }else                                                                       \
-		std::cout<<"Loaded device-level function from extension: "<<#name<<std::endl;                                                                       \
+		std::cout<<"Loaded device-level function from extension: "<<#name<<std::endl; \
       }                                                                         \
     }
 #include "vulkan_functions_list.inl"
@@ -545,17 +548,17 @@ bool LoadDeviceLevelFunctions()
 
 void ReleaseVulkanLoaderLibrary()
 {
-	vkDestroyDevice( logical_device, nullptr );
-	vkDestroyInstance( instance, nullptr );
+	vkDestroyDevice(logical_device, nullptr);
+	vkDestroyInstance(instance, nullptr);
 	instance = VK_NULL_HANDLE;
 	logical_device = VK_NULL_HANDLE;
 
-	if( nullptr != vulkan_lib )
+	if(nullptr != vulkan_lib)
 	{
 #if defined _WIN32
-		FreeLibrary( vulkan_lib );
+		FreeLibrary(vulkan_lib);
 #elif defined __linux
-		dlclose( vulkan_lib );
+		dlclose(vulkan_lib);
 #endif
 		vulkan_lib = nullptr;
 	}

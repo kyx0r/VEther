@@ -1,6 +1,6 @@
 #include "startup.h"
 #include "swapchain.h"
-#include "glm/glm.hpp"
+#include "zone.h"
 
 //GVAR: command_buffer -> control.cpp
 
@@ -17,11 +17,19 @@ extern uint32_t pipelineCount;
 extern VkPipelineLayout pipeline_layout;
 extern VkPipeline current_pipeline;
 
-struct Vertex
+typedef struct
 {
-	glm::vec2 pos;
-	glm::vec3 color;
-};
+	float pos[2];   // = vec2
+	float color[3]; // = vec3
+	float tex_coord[2];
+} Vertex_;
+
+typedef struct
+{
+	float	model[16];
+	float	view[16];
+	float	proj[16];
+} UniformMatrix;
 
 namespace render
 {
@@ -31,19 +39,13 @@ void CreateFramebuffers(int count, VkImageView *colorView, VkImageView *depthVie
 void CreateRenderPasses(int count, VkFormat depthFormat, bool late);
 void CreateImageViews(int count, VkImage *image, VkFormat imageformat, uint32_t mipLevel, uint32_t levelCount);
 void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpassContents subpass_contents, int render_index, int buffer_index);
-void CreateGraphicsPipelines(int count, VkPipelineCache pipelineCache, int render_index, VkShaderModule vs, VkShaderModule fs);
-void BindPipeline(VkPipeline pipeline);
-//----------------------- return
+void CreateGraphicsPipelines(uint32_t count, VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs);
+void CreatePipelineLayout();
 //-----------------------
+VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe();
+VkImage Create2DImage(VkImageUsageFlags usage, int w, int h);
 
 //----------------------- inline
-
-inline void CreatePipelineLayout()
-{
-	VkPipelineLayoutCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, 0, &pipeline_layout));
-}
 
 inline void DestroyRenderPasses()
 {

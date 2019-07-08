@@ -8,12 +8,19 @@
 #include <assert.h>
 #include <chrono>
 #include <thread>
+#include <cfloat>
 
 #if defined _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_EXPOSE_NATIVE_WGL
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <tchar.h>
+#endif
+
+#if defined __linux
+#define VK_USE_PLATFORM_XCB_KHR
+#define GLFW_EXPOSE_NATIVE_X11
+#define GLFW_EXPOSE_NATIVE_GLX
 #endif
 
 #define VK_NO_PROTOTYPES
@@ -44,12 +51,18 @@
 	((x) < (_minval) ? (_minval) :		\
 	 (x) > (_maxval) ? (_maxval) : (x))
 
+#define	q_min(a, b)	(((a) < (b)) ? (a) : (b))
+#define	q_max(a, b)	(((a) > (b)) ? (a) : (b))
+
+#define DEFAULT_MEMORY (256 * 1024 * 1024)
+
 
 //--------------------
 
 extern VkDevice logical_device;
 extern VkInstance instance;
 extern VkPhysicalDevice target_device;
+extern uint32_t max2DTex_size;
 
 extern uint32_t queue_families_count;
 struct QueueInfo

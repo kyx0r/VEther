@@ -42,7 +42,7 @@ LINKER_FLAGS = -static-libgcc -static-libstdc++
 WINAPI = -lmingw32 -lkernel32 -lm -ldxguid -ldxerr8 -luser32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lgdi32 -lcomdlg32 -lwinspool 
 WINAPI+= -lcomctl32 -luuid -lrpcrt4 -ladvapi32 -lwsock32 -lshlwapi -lversion -ldbghelp -lwinpthread
 
-_UNIX = -static -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
+_UNIX = -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
 
 VETHER = -lVEther -lglfw -lglslang
  
@@ -50,7 +50,7 @@ VETHER = -lVEther -lglfw -lglslang
 OBJ_NAME = VEther.exe 
 
 #for further optimization use -flto flag.
-SHARED_FLAGS = -Os -m64 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
+SHARED_FLAGS = -O3 -g -m64 -Wall -Wextra -masm=intel -fno-align-functions -fno-exceptions -Wno-deprecated-copy -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
 export SHARED_FLAGS
 #-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 
@@ -75,12 +75,12 @@ VEther:
 all_slwin: VEther
 	$(CC) -flto -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
 	
-glsl_m32: SHARED_FLAGS = -Os -m32 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings	
+glsl_m32: SHARED_FLAGS = -Os -m32 -s -Wall -Wextra -fno-align-functions -fno-exceptions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings	
 	
 glsl_m32: 
 	$(MAKE) all -C ./glsl_compiler
 	
-all_flto: SHARED_FLAGS = -flto -Os -m32 -s -Wall -Wextra -fno-align-functions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
+all_flto: SHARED_FLAGS = -flto -O3 -m32 -s -Wall -Wextra -fno-align-functions -fno-exceptions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
 
 all_flto: glsl_m32
 	$(MAKE) all -C ./glfw
@@ -89,7 +89,10 @@ all_flto: glsl_m32
 
 #all_sl <- any other system.	
 all_sl: VEther
-	$(CC) -O3 -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
+	$(CC) -O3 main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
+	
+debug:
+	objcopy --only-keep-debug $(OBJ_NAME) main.debug
 	
 clean_f:
 	find . -type f -name '*.orig' -delete

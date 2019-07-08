@@ -3025,6 +3025,13 @@ VkResult _glfwPlatformCreateWindowSurface(VkInstance instance,
 //////                        GLFW native API                       //////
 //////////////////////////////////////////////////////////////////////////
 
+GLFWAPI xcb_connection_t* glfwGetConnection(void)
+{
+    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    xcb_connection_t* connection = XGetXCBConnection(_glfw.x11.display);
+    return connection;
+}
+
 GLFWAPI Display* glfwGetX11Display(void)
 {
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);

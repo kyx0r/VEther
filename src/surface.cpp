@@ -35,28 +35,33 @@ bool CreatePresentationSurface(WindowParameters &window_parameters)
 
 #elif defined VK_USE_PLATFORM_XLIB_KHR
 
+	window_parameters.wWindow = glfwGetX11Window(_window);
+	window_parameters.Dpy = glfwGetX11Display();
+	
 	VkXlibSurfaceCreateInfoKHR surface_create_info =
 	{
 		VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,   // VkStructureType                 sType
 		nullptr,                                          // const void                    * pNext
 		0,                                                // VkXlibSurfaceCreateFlagsKHR     flags
 		window_parameters.Dpy,                            // Display                       * dpy
-		window_parameters.Window                          // Window                          window
+		window_parameters.wWindow                          // Window                          window
 	};
-
+      
 	result = vkCreateXlibSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
 
 #elif defined VK_USE_PLATFORM_XCB_KHR
 
+	window_parameters.wWindow = glfwGetX11Window(_window);
+	window_parameters.Connection = glfwGetConnection();
+	
 	VkXcbSurfaceCreateInfoKHR surface_create_info =
 	{
 		VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,    // VkStructureType                 sType
 		nullptr,                                          // const void                    * pNext
 		0,                                                // VkXcbSurfaceCreateFlagsKHR      flags
 		window_parameters.Connection,                     // xcb_connection_t              * connection
-		window_parameters.Window                          // xcb_window_t                    window
+		window_parameters.wWindow                          // xcb_window_t                    window
 	};
-
 	result = vkCreateXcbSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
 
 #endif
