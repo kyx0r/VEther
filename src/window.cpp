@@ -99,7 +99,7 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-
+  // std::cout<<xpos<<std::endl;
 }
   
 void initWindow()
@@ -126,7 +126,8 @@ inline bool Draw()
 	    !control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr)
 	)
 	{
-		return false;
+	    glfwPollEvents();
+	    return true;
 	}
 
 	VkPipelineStageFlags flags =
@@ -281,6 +282,9 @@ inline bool Draw()
 	{
 	case VK_SUCCESS:
 		return true;
+	case VK_ERROR_OUT_OF_DATE_KHR:
+	        glfwPollEvents();
+		return true;
 	default:
 		printf(startup::GetVulkanResultString(result));
 		printf("\n");
@@ -323,11 +327,11 @@ void mainLoop()
 		time_diff = time1 - time2;
 		if(time_diff > 0.01f)
 		{
-			if(!Draw())
-			{
-				std::cout << "Critical Error! Abandon the ship." << std::endl;
-				break;
-			}
+		  	if(!Draw())
+		  	{
+		  		std::cout << "Critical Error! Abandon the ship." << std::endl;
+		  		break;
+		  	}
 		}
 		else
 		{

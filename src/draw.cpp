@@ -66,7 +66,6 @@ void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uin
 	RotationMatrix(mat->view, DEG2RAD(-rot), 0.0f, 1.0f, 0.0f);
 	
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
-	//VkDescriptorSet descriptor_sets[2] = {dset, tex_descriptor_sets[0]};
 	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &dset, 1, &uniform_offset);
 	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);

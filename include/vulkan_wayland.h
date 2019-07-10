@@ -32,13 +32,12 @@ extern "C" {
 #define VK_KHR_WAYLAND_SURFACE_SPEC_VERSION 6
 #define VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME "VK_KHR_wayland_surface"
 typedef VkFlags VkWaylandSurfaceCreateFlagsKHR;
-typedef struct VkWaylandSurfaceCreateInfoKHR
-{
-	VkStructureType                   sType;
-	const void*                       pNext;
-	VkWaylandSurfaceCreateFlagsKHR    flags;
-	struct wl_display*                display;
-	struct wl_surface*                surface;
+typedef struct VkWaylandSurfaceCreateInfoKHR {
+    VkStructureType                   sType;
+    const void*                       pNext;
+    VkWaylandSurfaceCreateFlagsKHR    flags;
+    struct wl_display*                display;
+    struct wl_surface*                surface;
 } VkWaylandSurfaceCreateInfoKHR;
 
 typedef VkResult (VKAPI_PTR *PFN_vkCreateWaylandSurfaceKHR)(VkInstance instance, const VkWaylandSurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);

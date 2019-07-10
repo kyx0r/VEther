@@ -32,12 +32,11 @@ extern "C" {
 #define VK_FUCHSIA_IMAGEPIPE_SURFACE_SPEC_VERSION 1
 #define VK_FUCHSIA_IMAGEPIPE_SURFACE_EXTENSION_NAME "VK_FUCHSIA_imagepipe_surface"
 typedef VkFlags VkImagePipeSurfaceCreateFlagsFUCHSIA;
-typedef struct VkImagePipeSurfaceCreateInfoFUCHSIA
-{
-	VkStructureType                         sType;
-	const void*                             pNext;
-	VkImagePipeSurfaceCreateFlagsFUCHSIA    flags;
-	zx_handle_t                             imagePipeHandle;
+typedef struct VkImagePipeSurfaceCreateInfoFUCHSIA {
+    VkStructureType                         sType;
+    const void*                             pNext;
+    VkImagePipeSurfaceCreateFlagsFUCHSIA    flags;
+    zx_handle_t                             imagePipeHandle;
 } VkImagePipeSurfaceCreateInfoFUCHSIA;
 
 typedef VkResult (VKAPI_PTR *PFN_vkCreateImagePipeSurfaceFUCHSIA)(VkInstance instance, const VkImagePipeSurfaceCreateInfoFUCHSIA* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);

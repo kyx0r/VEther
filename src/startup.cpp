@@ -344,7 +344,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 	}
 	else
 	{
-	  //        instance_create_info.enabledLayerCount = d_layers_count;
+	  //	        instance_create_info.enabledLayerCount = d_layers_count;
 	  //      instance_create_info.ppEnabledLayerNames = debugLayers;
 	}
 #endif
@@ -410,7 +410,7 @@ bool CheckPhysicalDeviceExtensions()
 		vkGetPhysicalDeviceFeatures(available_devices[i], &device_features);
 		vkGetPhysicalDeviceProperties(available_devices[i], &device_properties);
 
-		if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+		if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU && device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		{
 			continue;
 		}

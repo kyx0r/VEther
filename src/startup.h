@@ -18,6 +18,7 @@
 #endif
 
 #if defined __linux
+//#define VK_USE_PLATFORM_XLIB_KHR
 #define VK_USE_PLATFORM_XCB_KHR
 #define GLFW_EXPOSE_NATIVE_X11
 #define GLFW_EXPOSE_NATIVE_GLX

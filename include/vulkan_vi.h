@@ -32,12 +32,11 @@ extern "C" {
 #define VK_NN_VI_SURFACE_SPEC_VERSION     1
 #define VK_NN_VI_SURFACE_EXTENSION_NAME   "VK_NN_vi_surface"
 typedef VkFlags VkViSurfaceCreateFlagsNN;
-typedef struct VkViSurfaceCreateInfoNN
-{
-	VkStructureType             sType;
-	const void*                 pNext;
-	VkViSurfaceCreateFlagsNN    flags;
-	void*                       window;
+typedef struct VkViSurfaceCreateInfoNN {
+    VkStructureType             sType;
+    const void*                 pNext;
+    VkViSurfaceCreateFlagsNN    flags;
+    void*                       window;
 } VkViSurfaceCreateInfoNN;
 
 typedef VkResult (VKAPI_PTR *PFN_vkCreateViSurfaceNN)(VkInstance instance, const VkViSurfaceCreateInfoNN* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);

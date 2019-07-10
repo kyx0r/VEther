@@ -2381,8 +2381,8 @@ void _glfwPlatformFocusWindow(_GLFWwindow* window)
     else
     {
         XRaiseWindow(_glfw.x11.display, window->x11.handle);
-        XSetInputFocus(_glfw.x11.display, window->x11.handle,
-                       RevertToParent, CurrentTime);
+        //XSetInputFocus(_glfw.x11.display, window->x11.handle,
+        //               RevertToParent, CurrentTime);
     }
 
     XFlush(_glfw.x11.display);
