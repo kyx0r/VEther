@@ -59,6 +59,10 @@ namespace control
 bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_family);
 void DestroyCommandPool();
 void DestroyDynBuffers();
+void DestroyStagingBuffers();
+void DestroyUniformBuffers();
+void DestroyIndexBuffers();
+void DestroyVramHeaps(); 
 bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count);
 void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);

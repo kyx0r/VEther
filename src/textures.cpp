@@ -16,7 +16,7 @@ GVAR: tex_dsl -> control.cpp
 } */
 
 VkDescriptorSet	tex_descriptor_sets[2];
-
+static VkImage v_image[2];
 static int current_tex_ds_index = 0;
 static unsigned char palette[768];
 static unsigned int data[256];
@@ -92,6 +92,17 @@ void InitSamplers()
 	}
 }
 
+void TexDeinit()
+{
+  vkDestroySampler(logical_device, point_sampler, nullptr);
+  for(int i = 0; i< current_tex_ds_index; i++)
+  {
+    vkDestroyImage(logical_device, v_image[i], nullptr);
+    // vkDestroyDescriptorset(logical_device, tex_descriptor_sets[current_tex_ds_index], nullptr);
+  }
+  
+}
+
 void SetFilterModes(int tex_index, VkImageView *imgView)
 {
 	VkDescriptorImageInfo image_info;
@@ -151,10 +162,10 @@ void UploadTexture(unsigned char* image, int w, int h)
 
 	vkAllocateDescriptorSets(logical_device, &dsai, &tex_descriptor_sets[current_tex_ds_index]);
 
-	VkImage v_image = render::Create2DImage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
+	v_image[current_tex_ds_index] = render::Create2DImage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
 
 	VkMemoryRequirements memory_requirements;
-	vkGetImageMemoryRequirements(logical_device, v_image, &memory_requirements);
+	vkGetImageMemoryRequirements(logical_device, v_image[current_tex_ds_index], &memory_requirements);
 
 	int mem_type = control::MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 0);
 	
@@ -168,13 +179,13 @@ void UploadTexture(unsigned char* image, int w, int h)
 		printf("Failed to align the memory \n");
 		startup::debug_pause();
 	}
-	VK_CHECK(vkBindImageMemory(logical_device, v_image, heap->memory, aligned_offset));
+	VK_CHECK(vkBindImageMemory(logical_device, v_image[current_tex_ds_index], heap->memory, aligned_offset));
 
-	render::CreateImageViews(1, &v_image, VK_FORMAT_R8G8B8A8_UNORM, 0, 1);
+	render::CreateImageViews(1, &v_image[current_tex_ds_index], VK_FORMAT_R8G8B8A8_UNORM, 0, 1);
 	SetFilterModes(0, &imageViews[imageViewCount]);
 
 	unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
-	memcpy(staging_memory, image, (w * h * 4));
+	zone::Q_memcpy(staging_memory, image, (w * h * 4));
 
 	VkBufferImageCopy regions = {};
 	regions.bufferOffset = staging_buffers[current_staging_buffer].current_offset;
@@ -193,7 +204,7 @@ void UploadTexture(unsigned char* image, int w, int h)
 	image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	image_memory_barrier.image = v_image;
+	image_memory_barrier.image = v_image[current_tex_ds_index];
 	image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	image_memory_barrier.subresourceRange.baseMipLevel = 0;
 	image_memory_barrier.subresourceRange.levelCount = 1;
@@ -206,7 +217,7 @@ void UploadTexture(unsigned char* image, int w, int h)
 	image_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
 
-	vkCmdCopyBufferToImage(command_buffer, staging_buffers[current_staging_buffer].buffer, v_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regions);
+	vkCmdCopyBufferToImage(command_buffer, staging_buffers[current_staging_buffer].buffer, v_image[current_tex_ds_index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regions);
 
 	image_memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 	image_memory_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
@@ -249,6 +260,7 @@ void FsLoadPngTexture(const char* filename)
 
 bool SampleTexture()
 {
+        int mark = zone::Hunk_LowMark();
 	//generate some image
 	const unsigned w = 511;
 	const unsigned h = 511;
@@ -270,6 +282,8 @@ bool SampleTexture()
 	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
 	
 	UploadTexture(image, w, h);
+	zone::Hunk_FreeToLowMark(mark);
+	
 	return true;
 }
 

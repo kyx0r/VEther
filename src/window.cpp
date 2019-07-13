@@ -15,6 +15,7 @@ GVAR: pipeline_layout -> render.cpp
 GVAR: pipelines -> render.h
 GVAR: dyn_vertex_buffers -> control.cpp
 GVAR: current_dyn_buffer_index -> control.cpp
+GVAR: NUM_COMMAND_BUFFERS -> control.cpp
 } */
 
 //{
@@ -30,7 +31,14 @@ int window_width = 1280;
 int window_height = 960;
 uint32_t graphics_queue_family_index; // <- this is queue 1
 uint32_t compute_queue_family_index; // <- this is queue 2
+double y_wheel = 0;
+double xm_norm = 0;
+double ym_norm = 0;
+uint32_t xm = 0;
+uint32_t ym = 0;
 //}
+
+static bool q_exit = false;
 
 namespace window
 {
@@ -74,33 +82,40 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 {
 	if (action == GLFW_PRESS)
 	{
-		if (key == GLFW_KEY_R)
+		if (key == GLFW_KEY_Q)
 		{
-
-		}
-		if (key == GLFW_KEY_C)
-		{
-
-		}
-		if (key == GLFW_KEY_O)
-		{
-
-		}
-		if (key == GLFW_KEY_L)
-		{
-
-		}
-		if (key == GLFW_KEY_P)
-		{
-
+		  printf("Quiting cleanly \n");
+		  q_exit = true;
 		}
 	}
 }
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-  // std::cout<<xpos<<std::endl;
+  //  printf("Xpos: %.6f \n", xpos);
+  //printf("Ypos: %.6f \n", ypos);
+  xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
+  ym_norm = (ypos - ((window_height - 0.001) / 2)) / ((window_height - 0.001) / 2);
+  xm = (uint32_t)xpos;
+  ym = (uint32_t)ypos;
+  //printf("Xpos: %.6f \n", x);
+  //printf("Ypos: %.6f \n", y);
+	
 }
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	y_wheel += yoffset;
+      	//printf("Yoff: %.6f \n", y_wheel);
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+    {
+      
+    }
+}  
   
 void initWindow()
 {
@@ -113,6 +128,8 @@ void initWindow()
 	glfwSetWindowSizeCallback(_window, window_size_callback);
 	glfwSetKeyCallback(_window, keyCallback);
 	glfwSetCursorPosCallback(_window, cursor_position_callback);
+	glfwSetScrollCallback(_window, scroll_callback);
+	glfwSetMouseButtonCallback(_window, mouse_button_callback);
 }
 
 inline bool Draw()
@@ -210,7 +227,8 @@ inline bool Draw()
 
 	render::StartRenderPass(render_area, &clearColor, VK_SUBPASS_CONTENTS_INLINE, 0, image_index);
 
-	VkViewport viewport = { 0, 0, float(window_width), float(window_height), 0, 1 };
+	VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
+	//	VkViewport viewport = { (float)xm_norm, (float)ym_norm, float(window_width), float(window_height), 0, 1 };
 	VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
 
 	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
@@ -320,7 +338,7 @@ void mainLoop()
 	double time2 = 0;
 	double time_diff = 0;
 
-	while (!glfwWindowShouldClose(_window))
+	while (!glfwWindowShouldClose(_window) && !q_exit)
 	{
 		glfwPollEvents();
 		time1 = glfwGetTime();
@@ -343,9 +361,14 @@ void mainLoop()
 
 	//CLEANUP -----------------------------------
 	VK_CHECK(vkDeviceWaitIdle(logical_device));
-	control::FreeCommandBuffers(1);
+	control::FreeCommandBuffers(NUM_COMMAND_BUFFERS);
 	control::DestroyCommandPool();
 	control::DestroyDynBuffers();
+	control::DestroyStagingBuffers();
+	control::DestroyUniformBuffers();
+	control::DestroyIndexBuffers();
+	control::DestroyVramHeaps();
+	textures::TexDeinit();
 	vkDestroySemaphore(logical_device, AcquiredSemaphore, nullptr);
 	vkDestroySemaphore(logical_device, ReadySemaphore, nullptr);
 	vkDestroyFence(logical_device, Fence_one, nullptr);

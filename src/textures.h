@@ -10,5 +10,5 @@ bool SampleTexture();
  void GenerateColorPalette();
  void FsLoadPngTexture(const char* filename); 
 void InitSamplers();
-
+ void TexDeinit();
 }

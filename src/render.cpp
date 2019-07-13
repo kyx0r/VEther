@@ -186,19 +186,19 @@ void CreatePipelineLayout()
 
 	VkDescriptorSetLayout basic_descriptor_set_layouts[2] = {ubo_dsl, tex_dsl};
 
-	/* 	VkPushConstantRange push_constant_range;
-		memset(&push_constant_range, 0, sizeof(push_constant_range));
-		push_constant_range.offset = 0;
-		push_constant_range.size = 21 * sizeof(float);
-		push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS; */
+	VkPushConstantRange push_constant_range;
+	memset(&push_constant_range, 0, sizeof(push_constant_range));
+	push_constant_range.offset = 0;
+	push_constant_range.size = 21 * sizeof(float); //limit is 256 bytes
+	push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
 
 	VkPipelineLayoutCreateInfo createInfo;
 	memset(&createInfo, 0, sizeof(createInfo));
 	createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	createInfo.setLayoutCount = 2;
 	createInfo.pSetLayouts = basic_descriptor_set_layouts;
-	//createInfo.pushConstantRangeCount = 1;
-	//createInfo.pPushConstantRanges = &push_constant_range;
+	createInfo.pushConstantRangeCount = 1;
+	createInfo.pPushConstantRanges = &push_constant_range;
 
 	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, 0, &pipeline_layout));
 }

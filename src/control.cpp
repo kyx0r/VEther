@@ -350,6 +350,20 @@ vram_heap* VramHeapDigress(VkDeviceSize size, VkDeviceSize alignment, VkDeviceSi
 	return nullptr;
 }
 
+void DestroyVramHeaps()
+{
+  for(int i = 0; i < TEXTURE_MAX_HEAPS; ++i)
+  {
+      vram_heap* heap = &texmgr_heaps[i];
+      if(heap->offset == 0)
+      {
+	vkFreeMemory(logical_device, heap->memory, nullptr);
+      }
+	
+  }
+	
+}
+
 /*
 ===============
 
@@ -437,6 +451,16 @@ void IndexBuffersAllocate()
 
 	for (i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 		dyn_index_buffers[i].data = (unsigned char *)data + (i * aligned_size);
+}
+
+void DestroyIndexBuffers()
+{
+  for (int i = 0; i < NUM_STAGING_BUFFERS; ++i)
+  {
+    vkDestroyBuffer(logical_device, dyn_index_buffers[i].buffer, nullptr);
+  }
+
+  vkFreeMemory(logical_device, dyn_index_buffer_memory, nullptr);
 }
 
 /*
@@ -566,6 +590,19 @@ void UniformBuffersAllocate()
 		ubo_write.dstSet = ubo_descriptor_sets[i];
 		vkUpdateDescriptorSets(logical_device, 1, &ubo_write, 0, nullptr);
 	}
+}
+
+void DestroyUniformBuffers()
+{
+  for (int i = 0; i < NUM_STAGING_BUFFERS; ++i)
+  {
+    vkDestroyBuffer(logical_device, dyn_uniform_buffers[i].buffer, nullptr);
+  }
+	
+  vkDestroyDescriptorSetLayout(logical_device, ubo_dsl, nullptr);
+  vkDestroyDescriptorSetLayout(logical_device, tex_dsl, nullptr);
+  vkFreeMemory(logical_device, dyn_uniform_buffer_memory, nullptr);
+  vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr);
 }
 
 /*
@@ -710,6 +747,16 @@ void StagingBuffersAllocate()
 		staging_buffers[i].command_buffer = command_buffer;
 	}
 	SetCommandBuffer(0);
+}
+
+void DestroyStagingBuffers()
+{
+	for (int i = 0; i < NUM_STAGING_BUFFERS; ++i)
+	{
+		vkDestroyBuffer(logical_device, staging_buffers[i].buffer, nullptr);
+	        vkDestroyFence(logical_device, staging_buffers[i].fence, nullptr);
+	}
+	vkFreeMemory(logical_device, staging_memory, nullptr);
 }
 
 /*

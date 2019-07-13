@@ -55,7 +55,7 @@ inline void DestroyRenderPasses()
 
 inline void DestroyImageViews()
 {
-	for(uint32_t i = 0; i<imageViewCount; i++)
+	for(uint32_t i = 0; i<=imageViewCount; i++)
 		vkDestroyImageView(logical_device, imageViews[i], nullptr);
 }
 

@@ -82,7 +82,8 @@ typedef struct cache_user_s
 
 namespace zone
 {
-
+  void Q_memcpy(void *dest, const void *src, size_t count);
+  
 __attribute__((noinline)) void stack_alloc(int size, int mult);
 void stack_clear(int size);
 

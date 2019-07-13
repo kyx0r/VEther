@@ -238,6 +238,29 @@ int Q_log2(int val)
 	return answer;
 }
 
+void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f)
+{
+	float tx = -(right + left) / (right - left);
+	float ty = (top + bottom) / (top - bottom);
+	float tz = -(f + n) / (f - n);
+
+	memset(matrix, 0, 16 * sizeof(float));
+
+	// First column
+	matrix[0*4 + 0] = 2.0f / (right-left);
+
+	// Second column
+	matrix[1*4 + 1] = -2.0f / (top-bottom);
+	
+	// Third column
+	matrix[2*4 + 2] = -2.0f / (f-n);
+
+	// Fourth column
+	matrix[3*4 + 0] = tx;
+	matrix[3*4 + 1] = ty;
+	matrix[3*4 + 2] = tz;
+	matrix[3*4 + 3] = 1.0f;
+}
 
 /*
 ================
@@ -495,12 +518,10 @@ void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 	matrix[2*4 + 3] = 0.0f;
 
 	// Fourth column
-	matrix[3*4 + 0] = 0.0f;
-	matrix[3*4 + 1] = 0.0f;
-	matrix[3*4 + 2] = 0.0f;
+	matrix[3*4 + 0] = -eye[0];
+	matrix[3*4 + 1] = -eye[1];
+	matrix[3*4 + 2] = -eye[2];
 	matrix[3*4 + 3] = 1.0f;    
-
-	// TranslationMatrix(matrix, -eye[0], -eye[1], -eye[2]);
 }
 
 /*

@@ -344,8 +344,8 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 	}
 	else
 	{
-	  //	        instance_create_info.enabledLayerCount = d_layers_count;
-	  //      instance_create_info.ppEnabledLayerNames = debugLayers;
+	  	instance_create_info.enabledLayerCount = d_layers_count;
+	        instance_create_info.ppEnabledLayerNames = debugLayers;
 	}
 #endif
 

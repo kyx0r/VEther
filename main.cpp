@@ -143,5 +143,5 @@ int main(int argc, char *lpCmdLine[])
 #endif
 
 	startup::ReleaseVulkanLoaderLibrary();
-	startup::debug_pause();
+	//	startup::debug_pause();
 }
