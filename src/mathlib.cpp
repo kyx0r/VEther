@@ -238,6 +238,16 @@ int Q_log2(int val)
 	return answer;
 }
 
+void PrintMatrix(float matrix[16])
+{
+  printf("\n");
+  printf("Mat at row X %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 0, matrix[0], matrix[1], matrix[2], matrix[3]);
+  printf("Mat at row Y %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 1, matrix[4], matrix[5], matrix[6], matrix[7]);
+  printf("Mat at row Z %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 2, matrix[8], matrix[9], matrix[10], matrix[11]);
+  printf("Mat at row W %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 3, matrix[12], matrix[13], matrix[14], matrix[15]);
+
+}
+
 void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f)
 {
 	float tx = -(right + left) / (right - left);
@@ -260,6 +270,71 @@ void OrthoMatrix(float matrix[16], float left, float right, float bottom, float 
 	matrix[3*4 + 1] = ty;
 	matrix[3*4 + 2] = tz;
 	matrix[3*4 + 3] = 1.0f;
+}
+
+static void FrustumMatrix(float matrix[16], float fovx, float fovy)
+{
+	const float w = 1.0f / tanf(fovx * 0.5f);
+	const float h = 1.0f / tanf(fovy * 0.5f);
+
+	const float n = 4; //near
+
+	// - farclip now defaults to 16384.
+	//   This should be high enough to handle even the largest open areas without unwanted clipping.
+	//   The only reason you'd want to lower this number is if you see z-fighting.
+	
+	const float f = 16384; //far clip
+
+	memset(matrix, 0, 16 * sizeof(float));
+
+	// First column
+	matrix[0*4 + 0] = w;
+
+	// Second column
+	matrix[1*4 + 1] = -h;
+	
+	// Third column
+	matrix[2*4 + 2] = -f / (f - n);
+	matrix[2*4 + 3] = -1.0f;
+
+	// Fourth column
+	matrix[3*4 + 2] = -(n * f) / (f - n);
+}
+
+void SetupMatrix(float view_projection_matrix[16])
+{
+	// Projection matrix
+        float projection_matrix[16];
+	FrustumMatrix(projection_matrix, DEG2RAD(10), DEG2RAD(90));
+	//PrintMatrix(projection_matrix);
+	
+	// View matrix
+	float rotation_matrix[16];
+	float view_matrix[16];
+	// static float rot = 0.0f;
+	// rot += 0.1f;
+	// printf("%.6f \n", rot);
+	RotationMatrix(view_matrix, -M_PI / 2.0f, 1.0f, 0.0f, 0.0f);
+	RotationMatrix(rotation_matrix,  M_PI / 2.0f, 0.0f, 0.0f, 1.0f);
+	MatrixMultiply(view_matrix, rotation_matrix);
+	RotationMatrix(rotation_matrix, DEG2RAD(140), 1.0f, 0.0f, 0.0f);
+	MatrixMultiply(view_matrix, rotation_matrix);
+	RotationMatrix(rotation_matrix, DEG2RAD(140), 0.0f, 1.0f, 0.0f);
+	MatrixMultiply(view_matrix, rotation_matrix);
+	RotationMatrix(rotation_matrix, DEG2RAD(140), 0.0f, 0.0f, 1.0f);
+	MatrixMultiply(view_matrix, rotation_matrix);
+	
+	float translation_matrix[16];
+	TranslationMatrix(translation_matrix, 140.0f, 140.0f, 140.0f);
+	MatrixMultiply(view_matrix, translation_matrix);
+
+	// View projection matrix
+	memcpy(view_projection_matrix, projection_matrix, 16 * sizeof(float));
+	MatrixMultiply(view_projection_matrix, view_matrix);
+	float h[16];
+	ScaleMatrix(h, 20.f, 20.f, 20.f);
+	MatrixMultiply(view_projection_matrix, h);
+
 }
 
 /*
@@ -483,21 +558,44 @@ void RotationMatrix(float matrix[16], float angle, float x, float y, float z)
 	matrix[3*4 + 3] = 1.0f;
 }
 
+float vec4_mul_inner(vec4_t a, vec4_t b)
+{
+    float p = 0.0f;
+    int i;
+    for (i = 0; i < 4; ++i) p += b[i] * a[i];
+    return p;
+}
+
+void TranslateInPlace(float matrix[16], float x, float y, float z)
+{
+    vec4_t t = {x, y, z, 0};
+    vec4_t r;
+    int i;
+    for (i = 0; i < 4; ++i)
+    {
+      for (int k = 0; k < 4; ++k)
+      {
+	   r[k] = matrix[k*4 + i]; //get row values from matrix
+      }
+      matrix[3*4 + i] += vec4_mul_inner(r, t);
+    }
+}
+
 void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 {
     /* TODO: The negation of of can be spared by swapping the order of
      *       operands in the following cross products in the right way. */
   
     vec3_t f;
-    _VectorSubtract(f, center, eye);
+    _VectorSubtract(center, eye, f); //compute forward Z
     VectorNormalize(f);
 
     vec3_t s;
-    CrossProduct(s, f, up);
+    CrossProduct(f, up, s); //compute right X vector
     VectorNormalize(s);
 
     vec3_t t;
-    CrossProduct(t, s, f);
+    CrossProduct(s, f, t); //compute UP Y 
 
 	// First column
 	matrix[0*4 + 0] = s[0];
@@ -508,7 +606,7 @@ void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 	// Second column
 	matrix[1*4 + 0] = s[1];
 	matrix[1*4 + 1] = t[1];
-	matrix[1*4 + 2] = -f[0];
+	matrix[1*4 + 2] = -f[1];
 	matrix[1*4 + 3] = 0.0f;
 
 	// Third column
@@ -518,10 +616,14 @@ void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 	matrix[2*4 + 3] = 0.0f;
 
 	// Fourth column
-	matrix[3*4 + 0] = -eye[0];
-	matrix[3*4 + 1] = -eye[1];
-	matrix[3*4 + 2] = -eye[2];
-	matrix[3*4 + 3] = 1.0f;    
+
+	//matrix[3*4 + 0] = 0.0f;
+	//matrix[3*4 + 1] = 0.0f;
+	//matrix[3*4 + 2] = 0.0f;
+        matrix[3*4 + 0] = -_DotProduct(s, eye);
+	matrix[3*4 + 1] = -_DotProduct(t, eye);
+	matrix[3*4 + 2] = -_DotProduct(f, eye);
+	matrix[3*4 + 3] = 1.0f;
 }
 
 /*
@@ -556,7 +658,7 @@ ScaleMatrix
 */
 void ScaleMatrix(float matrix[16], float x, float y, float z)
 {
-	memset(matrix, 0, 16 * sizeof(float));
+  	memset(matrix, 0, 16 * sizeof(float));
 
 	// First column
 	matrix[0*4 + 0] = x;

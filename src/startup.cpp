@@ -204,10 +204,10 @@ bool LoadVulkan()
 	name = (PFN_##name) (LoadFunction(vulkan_lib, #name)); \
 	if(name == nullptr) \
 	{ \
-		std::cout<<"Could not load exported Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Could not load exported Vulkan function: "<< #name <<"\n"; \
 		return false; \
 	}else \
-		std::cout<<"Exported Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Exported Vulkan function: "<< #name <<"\n"; \
 
 #include "vulkan_functions_list.inl"
 
@@ -220,10 +220,10 @@ bool LoadVulkanGlobalFuncs()
         name = (PFN_##name) (vkGetInstanceProcAddr( nullptr, #name)); \
 	if(name == nullptr) \
 	{ \
-		std::cout<<"Could not load global Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Could not load global Vulkan function: "<< #name <<"\n"; \
 		return false; \
 	}else \
-		std::cout<<"Loaded global Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Loaded global Vulkan function: "<< #name <<"\n"; \
 
 #include "vulkan_functions_list.inl"
 	return true;
@@ -236,10 +236,10 @@ bool LoadInstanceFunctions()
 	name = (PFN_##name)vkGetInstanceProcAddr( instance, #name); \
 	if(name == nullptr) \
 	{ \
-		std::cout<<"Could not load instance-level Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Could not load instance-level Vulkan function: "<< #name <<"\n"; \
 		return false; \
 	}else \
-		std::cout<<"Loaded instance-level Vulkan function: "<< #name <<std::endl; \
+		std::cout<<"Loaded instance-level Vulkan function: "<< #name <<"\n"; \
 
 #include "vulkan_functions_list.inl"
 
@@ -250,10 +250,10 @@ bool LoadInstanceFunctions()
         name = (PFN_##name)vkGetInstanceProcAddr( instance, #name );            \
         if( name == nullptr ) {                                                 \
           std::cout << "Could not load instance-level Vulkan function named: "  \
-            #name << std::endl;                                                 \
+            #name << "\n";                                                 \
           return false;                                                         \
         }else                                                                       \
-		std::cout<<"Loaded function from extension: "<<#name<<std::endl; \
+	  std::cout<<"Loaded function from extension: "<<#name<<"\n";	\
       }                                                                         \
     }
 
@@ -309,7 +309,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		{
 			if(!IsExtensionSupported(desired_extensions[i]))
 			{
-				std::cout<<"Extension \n"<<desired_extensions[i]<<" is not supported!"<<std::endl;
+				std::cout<<"Extension \n"<<desired_extensions[i]<<" is not supported!"<<"\n";
 				return false;
 			}
 			else

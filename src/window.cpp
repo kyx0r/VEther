@@ -8,7 +8,6 @@
 GVAR: framebufferCount -> render.cpp
 GVAR: imageViewCount -> render.cpp
 GVAR: imageViews -> render.cpp
-GVAR: handle_array_of_swapchain_images -> swapchain.cpp
 GVAR: number_of_swapchain_images -> swapchain.cpp
 GVAR: logical_device -> startup.cpp
 GVAR: pipeline_layout -> render.cpp
@@ -31,6 +30,7 @@ int window_width = 1280;
 int window_height = 960;
 uint32_t graphics_queue_family_index; // <- this is queue 1
 uint32_t compute_queue_family_index; // <- this is queue 2
+double time1 = 0;
 double y_wheel = 0;
 double xm_norm = 0;
 double ym_norm = 0;
@@ -70,12 +70,24 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 	window_height = height;
 	window_width = width;
 
-	render::DestroyImageViews();
-	render::DestroyFramebuffers();
+        for(uint32_t i = 0; i<number_of_swapchain_images; i++)
+	{
+	    vkDestroyImageView(logical_device, imageViews[i], nullptr);
+	}	
+	uint32_t tmpc = imageViewCount;
 	imageViewCount = 0;
+        render::CreateSwapchainImageViews();
+	
+	render::DestroyFramebuffers();
 	framebufferCount = 0;
-	render::CreateImageViews(number_of_swapchain_images, &handle_array_of_swapchain_images[0], image_format, 0, 1);
-	render::CreateFramebuffers(number_of_swapchain_images, &imageViews[0], &imageViews[0], 0, window_width, window_height);
+
+	render::CreateDepthBuffer();
+	imageViewCount = tmpc;
+	
+        for(uint16_t i = 0; i<number_of_swapchain_images; i++)
+	{
+	    render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
+	}
 }
 
 void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mods)
@@ -153,7 +165,7 @@ inline bool Draw()
 	};
 
 	static bool once = true;
-	static VkClearValue clearColor = {};
+	static VkClearValue clearColor[2] = {};
 	static VkClearColorValue color = {};
 	static VkImageSubresourceRange range = {};
 	static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
@@ -166,7 +178,8 @@ inline bool Draw()
 		color.float32[1] = 0;
 		color.float32[2] = 0;
 		color.float32[3] = 1;
-		clearColor.color = color;
+		clearColor[0].color = color;
+		clearColor[1].depthStencil = {1.0f, 0};
 
 		range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		range.baseMipLevel = 0;
@@ -212,7 +225,6 @@ inline bool Draw()
 		present_info.pSwapchains = &_swapchain;
 		present_info.pImageIndices = &image_index;
 		present_info.pResults = nullptr;
-
 		once = false;
 	}
 
@@ -225,7 +237,7 @@ inline bool Draw()
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_draw);
 
-	render::StartRenderPass(render_area, &clearColor, VK_SUBPASS_CONTENTS_INLINE, 0, image_index);
+	render::StartRenderPass(render_area, &clearColor[0], VK_SUBPASS_CONTENTS_INLINE, 0, image_index);
 
 	VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
 	//	VkViewport viewport = { (float)xm_norm, (float)ym_norm, float(window_width), float(window_height), 0, 1 };
@@ -234,13 +246,22 @@ inline bool Draw()
 	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
+	float m[16];
+	IdentityMatrix(m);
+        //OrthoMatrix(m, 0, window_width, window_height, 0, -99999, 99999);
+	//SetupMatrix(m);
+	//PrintMatrix(m);
+	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), m);
+
+
 	control::InvalidateDynamicBuffers();
 
 	current_dyn_buffer_index = (current_dyn_buffer_index + 1) % NUM_DYNAMIC_BUFFERS;
-	static Vertex_ vertices[4] = {};
+	static Vertex_ vertices[8] = {};
 
 	vertices[0].pos[0] = -0.5f;   //x
 	vertices[0].pos[1] = -0.5f;   //y
+	vertices[0].pos[2] = 0.0f;   //z
 	vertices[0].color[0] = 1.0f; //r
 	vertices[0].color[1] = 0.0f; //g
 	vertices[0].color[2] = 0.0f; //b
@@ -249,6 +270,7 @@ inline bool Draw()
 
 	vertices[1].pos[0] = 0.5f;
 	vertices[1].pos[1] = -0.5f;
+	vertices[1].pos[2] = 0.0f;   
 	vertices[1].color[0] = 0.0f;
 	vertices[1].color[1] = 1.0f;
 	vertices[1].color[2] = 0.0f;
@@ -257,6 +279,7 @@ inline bool Draw()
 
 	vertices[2].pos[0] = 0.5f;
 	vertices[2].pos[1] = 0.5f;
+	vertices[2].pos[2] = 0.0f;
 	vertices[2].color[0] = 0.0f;
 	vertices[2].color[1] = 0.0f;
 	vertices[2].color[2] = 1.0f;
@@ -265,17 +288,55 @@ inline bool Draw()
 
 	vertices[3].pos[0] = -0.5f;
 	vertices[3].pos[1] = 0.5f;
+	vertices[3].pos[2] = 0.0f;
 	vertices[3].color[0] = 1.0f;
 	vertices[3].color[1] = 1.0f;
 	vertices[3].color[2] = 1.0f;
 	vertices[3].tex_coord[0] = 1.0f;
 	vertices[3].tex_coord[1] = 1.0f;
 
+	vertices[4].pos[0] = -0.5f;   //x
+	vertices[4].pos[1] = -0.5f;   //y
+	vertices[4].pos[2] = -0.5f;   //z
+	vertices[4].color[0] = 1.0f; //r
+	vertices[4].color[1] = 0.0f; //g
+	vertices[4].color[2] = 0.0f; //b
+	vertices[4].tex_coord[0] = 1.0f;
+	vertices[4].tex_coord[1] = 0.0f;
+
+	vertices[5].pos[0] = 0.5f;
+	vertices[5].pos[1] = -0.5f;
+	vertices[5].pos[2] = -0.5f;   
+	vertices[5].color[0] = 0.0f;
+	vertices[5].color[1] = 1.0f;
+	vertices[5].color[2] = 0.0f;
+	vertices[5].tex_coord[0] = 0.0f;
+	vertices[5].tex_coord[1] = 0.0f;
+
+	vertices[6].pos[0] = 0.5f;
+	vertices[6].pos[1] = 0.5f;
+	vertices[6].pos[2] = -0.5f;
+	vertices[6].color[0] = 0.0f;
+	vertices[6].color[1] = 0.0f;
+	vertices[6].color[2] = 1.0f;
+	vertices[6].tex_coord[0] = 0.0f;
+	vertices[6].tex_coord[1] = 1.0f;
+
+	vertices[7].pos[0] = -0.5f;
+	vertices[7].pos[1] = 0.5f;
+	vertices[7].pos[2] = -0.5f;
+	vertices[7].color[0] = 1.0f;
+	vertices[7].color[1] = 1.0f;
+	vertices[7].color[2] = 1.0f;
+	vertices[7].tex_coord[0] = 1.0f;
+	vertices[7].tex_coord[1] = 1.0f;
+
+	
 	//draw::DrawTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0]);
 
-	uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
+	uint16_t indeces[12] = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 };
 
-	draw::DrawIndexedTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], 6, indeces);
+	draw::DrawIndexedTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
 
 	vkCmdEndRenderPass(command_buffer);
 
@@ -314,10 +375,16 @@ inline bool Draw()
 void mainLoop()
 {
 	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
-	render::CreateRenderPasses(1,depthFormat, false);
-	render::CreateImageViews(number_of_swapchain_images, &handle_array_of_swapchain_images[0], image_format, 0, 1);
-	render::CreateFramebuffers(number_of_swapchain_images, &imageViews[0], &imageViews[0], 0, window_width, window_height);
+	render::CreateRenderPass(depthFormat, false);
+	render::CreateSwapchainImageViews();
 
+	render::CreateDepthBuffer();
+
+	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
+	{
+	    render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
+	}
+	
         shaders::CompileShaders();
 
 	VkShaderModule triangleVS = shaders::loadShaderMem(1);
@@ -332,9 +399,8 @@ void mainLoop()
 
 	render::CreatePipelineLayout();
 
-	render::CreateGraphicsPipelines(1, pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
+	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 
-	double time1 = 0;
 	double time2 = 0;
 	double time_diff = 0;
 
@@ -345,7 +411,7 @@ void mainLoop()
 		time_diff = time1 - time2;
 		if(time_diff > 0.01f)
 		{
-		  	if(!Draw())
+		        if(!Draw())
 		  	{
 		  		std::cout << "Critical Error! Abandon the ship." << std::endl;
 		  		break;

@@ -13,6 +13,7 @@ GVAR: command_buffer -> control.cpp
 GVAR: staging_buffers - > control.cpp
 GVAR: current_staging_buffer -> control.cpp
 GVAR: tex_dsl -> control.cpp
+GVAR: number_of_swapchain_images -> swapchain.cpp
 } */
 
 VkDescriptorSet	tex_descriptor_sets[2];
@@ -95,10 +96,10 @@ void InitSamplers()
 void TexDeinit()
 {
   vkDestroySampler(logical_device, point_sampler, nullptr);
-  for(int i = 0; i< current_tex_ds_index; i++)
+  for(int i = 0; i<current_tex_ds_index; i++)
   {
     vkDestroyImage(logical_device, v_image[i], nullptr);
-    // vkDestroyDescriptorset(logical_device, tex_descriptor_sets[current_tex_ds_index], nullptr);
+    //vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images+i+1], nullptr);
   }
   
 }
@@ -162,7 +163,7 @@ void UploadTexture(unsigned char* image, int w, int h)
 
 	vkAllocateDescriptorSets(logical_device, &dsai, &tex_descriptor_sets[current_tex_ds_index]);
 
-	v_image[current_tex_ds_index] = render::Create2DImage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
+	v_image[current_tex_ds_index] = render::Create2DImage(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
 
 	VkMemoryRequirements memory_requirements;
 	vkGetImageMemoryRequirements(logical_device, v_image[current_tex_ds_index], &memory_requirements);
@@ -181,8 +182,27 @@ void UploadTexture(unsigned char* image, int w, int h)
 	}
 	VK_CHECK(vkBindImageMemory(logical_device, v_image[current_tex_ds_index], heap->memory, aligned_offset));
 
-	render::CreateImageViews(1, &v_image[current_tex_ds_index], VK_FORMAT_R8G8B8A8_UNORM, 0, 1);
-	SetFilterModes(0, &imageViews[imageViewCount]);
+	//render::CreateImageViews(1, &v_image[current_tex_ds_index], VK_FORMAT_R8G8B8A8_UNORM, 0, 1);
+
+	VkImageViewCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	createInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	createInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+	createInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+	createInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+	createInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+	createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	createInfo.subresourceRange.baseMipLevel = 0;
+	createInfo.subresourceRange.levelCount = 1;
+	createInfo.subresourceRange.layerCount = 1;
+	createInfo.image = v_image[current_tex_ds_index];
+	
+	VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[imageViewCount++]));
+	
+	//imageViewCount += number_of_swapchain_images;
+	
+	SetFilterModes(0, &imageViews[imageViewCount-1]);
 
 	unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
 	zone::Q_memcpy(staging_memory, image, (w * h * 4));

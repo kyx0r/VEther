@@ -12,6 +12,7 @@ extern int window_width;
 extern int window_height;
 extern uint32_t graphics_queue_family_index;
 extern uint32_t compute_queue_family_index;
+extern double time1;
 extern double y_wheel;
 extern double xm_norm;
 extern double ym_norm;

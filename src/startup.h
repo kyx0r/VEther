@@ -44,6 +44,22 @@
 		assert(result_ == VK_SUCCESS); \
 	} while (0)
 
+#ifdef DEBUG
+#   define ASSERT(condition, message) \
+    do { \
+        if (! (condition)) \
+		{ \
+			printf("%s \n", message);\
+			printf("Assertion %s failed in, %s line: %d \n", #condition, __FILE__, __LINE__);\
+			char buf[10];					\
+			fgets(buf, 10, stdin); \
+			exit(1); \
+        } \
+    } while (false)
+#else
+#   define ASSERT(condition, message) do { } while (false)
+#endif
+
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(array) (sizeof(array) / sizeof((array)[0]))
 #endif

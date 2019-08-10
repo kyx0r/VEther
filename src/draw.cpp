@@ -8,6 +8,7 @@ GVAR: command_buffer -> control.cpp
 GVAR: pipeline_layout -> render.cpp
 GVAR: pipelines -> render.cpp
 GVAR: y_wheel = window.cpp;
+GVAR: time1 -> window.cpp
 } */
 
 namespace draw
@@ -59,17 +60,23 @@ void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uin
 
 	UniformMatrix* mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &buffer, &uniform_offset, &dset);
 
-	ScaleMatrix(mat->model, y_wheel/10, y_wheel/10, 0.0f);
-    // vec3_t eye = {0.0f, 3.0f, 5.0f};
-    // vec3_t origin = {0, 0, 0};
-    // vec3_t up = {0.0f, 1.0f, 0.0};
- 
-    // 	LookAt(mat->proj, eye, origin, up);
+	//	ScaleMatrix(mat->model, y_wheel/10, y_wheel/10, 0.0f);
+
+	float radius = 0.5f;
 	
-	TranslationMatrix(mat->proj, (float)xm_norm, (float)ym_norm, 0.0f);
+	vec3_t eye = {(float)sin(time1) * radius, 0.0f, (float)cos(time1) * radius};
+	vec3_t origin = {0.0f, 0.0f, 0.0f};
+	vec3_t up = {0.0f, 1.0f, 0.0};
+    
+        LookAt(mat->proj, eye, origin, up);
+        //PrintMatrix(mat->proj);
+	TranslationMatrix(mat->model, (float)xm_norm, (float)ym_norm, 0.0f);
+	
 	//	RotationMatrix(mat->model, DEG2RAD(0), 0.0f, 0.0f, 1.0f);
+	
       	//RotationMatrix(mat->proj, DEG2RAD(0), 1.0f, 0.0f, 0.0f);
 	RotationMatrix(mat->view, DEG2RAD(0), 0.0f, 1.0f, 0.0f);
+	//PrintMatrix(mat->view);
 	
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
 	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &dset, 1, &uniform_offset);

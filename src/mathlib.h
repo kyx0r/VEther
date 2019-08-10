@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define M_PI_DIV_180 (M_PI / 180.0) //johnfitz
 
+typedef float vec4_t[4];
 typedef float vec3_t[3];
 typedef float vec_t;
 struct mplane_s;
@@ -105,7 +106,9 @@ void VectorInverse (vec3_t v);
 void VectorScale (vec3_t in, vec_t scale, vec3_t out);
 int Q_log2(int val);
 
+void PrintMatrix(float matrix[16]);
 void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f);
+void SetupMatrix (float view_projection_matrix[16]);
 void R_ConcatRotations (float in1[3][3], float in2[3][3], float out[3][3]);
 void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4]);
 
