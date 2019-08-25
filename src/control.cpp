@@ -803,7 +803,7 @@ unsigned char* VertexBufferDigress(int size, VkBuffer *buffer, VkDeviceSize *buf
 	if ((dyn_vb->current_offset + size) > (DYNAMIC_VERTEX_BUFFER_SIZE_KB * 1024))
 	{
 		printf("Out of dynamic vertex buffer space, increase DYNAMIC_VERTEX_BUFFER_SIZE_KB \n");
-		dyn_vb->current_offset = 0;
+	        dyn_vb->current_offset = 0;
 	}
 
 	*buffer = dyn_vb->buffer;

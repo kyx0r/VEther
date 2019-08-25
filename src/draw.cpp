@@ -42,7 +42,7 @@ void DrawTriangle(size_t size, Vertex_* vertices)
 	vkCmdDraw(command_buffer, sizeof(vertices[0]), 1, 0, 0);
 }
 
-void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint16_t* index_array)
+void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array)
 {
 	//printf("goto \n");
 	VkBuffer buffer;
@@ -54,9 +54,9 @@ void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uin
 	zone::Q_memcpy(data, &vertices[0], size);
 	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer, &buffer_offset);
 
-	uint16_t* index_data = (uint16_t*) control::IndexBufferDigress(index_count * sizeof(uint16_t), &buffer, &buffer_offset);
-	zone::Q_memcpy(index_data, index_array, index_count * sizeof(uint16_t));
-	vkCmdBindIndexBuffer(command_buffer, buffer, buffer_offset, VK_INDEX_TYPE_UINT16);
+	uint32_t* index_data = (uint32_t*) control::IndexBufferDigress(index_count * sizeof(uint32_t), &buffer, &buffer_offset);
+	zone::Q_memcpy(index_data, index_array, index_count * sizeof(uint32_t));
+	vkCmdBindIndexBuffer(command_buffer, buffer, buffer_offset, VK_INDEX_TYPE_UINT32);
 
 	UniformMatrix* mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &buffer, &uniform_offset, &dset);
 

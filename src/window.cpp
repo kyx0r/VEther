@@ -3,6 +3,7 @@
 #include "shaders.h"
 #include "textures.h"
 #include "draw.h"
+#include "obj_parse.h"
 
 /* {
 GVAR: framebufferCount -> render.cpp
@@ -39,6 +40,7 @@ uint32_t ym = 0;
 //}
 
 static bool q_exit = false;
+static ParsedOBJ kitty;
 
 namespace window
 {
@@ -225,7 +227,7 @@ inline bool Draw()
 		present_info.pSwapchains = &_swapchain;
 		present_info.pImageIndices = &image_index;
 		present_info.pResults = nullptr;
-		once = false;
+		once = false;		
 	}
 
 	VkRect2D render_area = {};
@@ -256,88 +258,92 @@ inline bool Draw()
 
 	control::InvalidateDynamicBuffers();
 
-	current_dyn_buffer_index = (current_dyn_buffer_index + 1) % NUM_DYNAMIC_BUFFERS;
-	static Vertex_ vertices[8] = {};
+	//current_dyn_buffer_index = (current_dyn_buffer_index + 1) % NUM_DYNAMIC_BUFFERS;
+	// static Vertex_ vertices[8] = {};
 
-	vertices[0].pos[0] = -0.5f;   //x
-	vertices[0].pos[1] = -0.5f;   //y
-	vertices[0].pos[2] = 0.0f;   //z
-	vertices[0].color[0] = 1.0f; //r
-	vertices[0].color[1] = 0.0f; //g
-	vertices[0].color[2] = 0.0f; //b
-	vertices[0].tex_coord[0] = 1.0f;
-	vertices[0].tex_coord[1] = 0.0f;
+	// vertices[0].pos[0] = -0.5f;   //x
+	// vertices[0].pos[1] = -0.5f;   //y
+	// vertices[0].pos[2] = 0.0f;   //z
+	// vertices[0].color[0] = 1.0f; //r
+	// vertices[0].color[1] = 0.0f; //g
+	// vertices[0].color[2] = 0.0f; //b
+	// vertices[0].tex_coord[0] = 1.0f;
+	// vertices[0].tex_coord[1] = 0.0f;
 
-	vertices[1].pos[0] = 0.5f;
-	vertices[1].pos[1] = -0.5f;
-	vertices[1].pos[2] = 0.0f;   
-	vertices[1].color[0] = 0.0f;
-	vertices[1].color[1] = 1.0f;
-	vertices[1].color[2] = 0.0f;
-	vertices[1].tex_coord[0] = 0.0f;
-	vertices[1].tex_coord[1] = 0.0f;
+	// vertices[1].pos[0] = 0.5f;
+	// vertices[1].pos[1] = -0.5f;
+	// vertices[1].pos[2] = 0.0f;   
+	// vertices[1].color[0] = 0.0f;
+	// vertices[1].color[1] = 1.0f;
+	// vertices[1].color[2] = 0.0f;
+	// vertices[1].tex_coord[0] = 0.0f;
+	// vertices[1].tex_coord[1] = 0.0f;
 
-	vertices[2].pos[0] = 0.5f;
-	vertices[2].pos[1] = 0.5f;
-	vertices[2].pos[2] = 0.0f;
-	vertices[2].color[0] = 0.0f;
-	vertices[2].color[1] = 0.0f;
-	vertices[2].color[2] = 1.0f;
-	vertices[2].tex_coord[0] = 0.0f;
-	vertices[2].tex_coord[1] = 1.0f;
+	// vertices[2].pos[0] = 0.5f;
+	// vertices[2].pos[1] = 0.5f;
+	// vertices[2].pos[2] = 0.0f;
+	// vertices[2].color[0] = 0.0f;
+	// vertices[2].color[1] = 0.0f;
+	// vertices[2].color[2] = 1.0f;
+	// vertices[2].tex_coord[0] = 0.0f;
+	// vertices[2].tex_coord[1] = 1.0f;
 
-	vertices[3].pos[0] = -0.5f;
-	vertices[3].pos[1] = 0.5f;
-	vertices[3].pos[2] = 0.0f;
-	vertices[3].color[0] = 1.0f;
-	vertices[3].color[1] = 1.0f;
-	vertices[3].color[2] = 1.0f;
-	vertices[3].tex_coord[0] = 1.0f;
-	vertices[3].tex_coord[1] = 1.0f;
+	// vertices[3].pos[0] = -0.5f;
+	// vertices[3].pos[1] = 0.5f;
+	// vertices[3].pos[2] = 0.0f;
+	// vertices[3].color[0] = 1.0f;
+	// vertices[3].color[1] = 1.0f;
+	// vertices[3].color[2] = 1.0f;
+	// vertices[3].tex_coord[0] = 1.0f;
+	// vertices[3].tex_coord[1] = 1.0f;
 
-	vertices[4].pos[0] = -0.5f;   //x
-	vertices[4].pos[1] = -0.5f;   //y
-	vertices[4].pos[2] = -0.5f;   //z
-	vertices[4].color[0] = 1.0f; //r
-	vertices[4].color[1] = 0.0f; //g
-	vertices[4].color[2] = 0.0f; //b
-	vertices[4].tex_coord[0] = 1.0f;
-	vertices[4].tex_coord[1] = 0.0f;
+	// vertices[4].pos[0] = -0.5f;   //x
+	// vertices[4].pos[1] = -0.5f;   //y
+	// vertices[4].pos[2] = -0.5f;   //z
+	// vertices[4].color[0] = 1.0f; //r
+	// vertices[4].color[1] = 0.0f; //g
+	// vertices[4].color[2] = 0.0f; //b
+	// vertices[4].tex_coord[0] = 1.0f;
+	// vertices[4].tex_coord[1] = 0.0f;
 
-	vertices[5].pos[0] = 0.5f;
-	vertices[5].pos[1] = -0.5f;
-	vertices[5].pos[2] = -0.5f;   
-	vertices[5].color[0] = 0.0f;
-	vertices[5].color[1] = 1.0f;
-	vertices[5].color[2] = 0.0f;
-	vertices[5].tex_coord[0] = 0.0f;
-	vertices[5].tex_coord[1] = 0.0f;
+	// vertices[5].pos[0] = 0.5f;
+	// vertices[5].pos[1] = -0.5f;
+	// vertices[5].pos[2] = -0.5f;   
+	// vertices[5].color[0] = 0.0f;
+	// vertices[5].color[1] = 1.0f;
+	// vertices[5].color[2] = 0.0f;
+	// vertices[5].tex_coord[0] = 0.0f;
+	// vertices[5].tex_coord[1] = 0.0f;
 
-	vertices[6].pos[0] = 0.5f;
-	vertices[6].pos[1] = 0.5f;
-	vertices[6].pos[2] = -0.5f;
-	vertices[6].color[0] = 0.0f;
-	vertices[6].color[1] = 0.0f;
-	vertices[6].color[2] = 1.0f;
-	vertices[6].tex_coord[0] = 0.0f;
-	vertices[6].tex_coord[1] = 1.0f;
+	// vertices[6].pos[0] = 0.5f;
+	// vertices[6].pos[1] = 0.5f;
+	// vertices[6].pos[2] = -0.5f;
+	// vertices[6].color[0] = 0.0f;
+	// vertices[6].color[1] = 0.0f;
+	// vertices[6].color[2] = 1.0f;
+	// vertices[6].tex_coord[0] = 0.0f;
+	// vertices[6].tex_coord[1] = 1.0f;
 
-	vertices[7].pos[0] = -0.5f;
-	vertices[7].pos[1] = 0.5f;
-	vertices[7].pos[2] = -0.5f;
-	vertices[7].color[0] = 1.0f;
-	vertices[7].color[1] = 1.0f;
-	vertices[7].color[2] = 1.0f;
-	vertices[7].tex_coord[0] = 1.0f;
-	vertices[7].tex_coord[1] = 1.0f;
+	// vertices[7].pos[0] = -0.5f;
+	// vertices[7].pos[1] = 0.5f;
+	// vertices[7].pos[2] = -0.5f;
+	// vertices[7].color[0] = 1.0f;
+	// vertices[7].color[1] = 1.0f;
+	// vertices[7].color[2] = 1.0f;
+	// vertices[7].tex_coord[0] = 1.0f;
+	// vertices[7].tex_coord[1] = 1.0f;
 
+	// uint16_t indeces[12] = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 };
 	
-	//draw::DrawTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0]);
+	// draw::DrawIndexedTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
 
-	uint16_t indeces[12] = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 };
+	//	static Vertex_ vertices[10] = {};
 
-	draw::DrawIndexedTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
+	ParsedOBJSubModel p = *kitty.models->sub_models;
 
+
+	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
+	
 	vkCmdEndRenderPass(command_buffer);
 
 	image_memory_barrier_before_present.image = handle_array_of_swapchain_images[image_index];
@@ -384,7 +390,7 @@ void mainLoop()
 	{
 	    render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
 	}
-	
+
         shaders::CompileShaders();
 
 	VkShaderModule triangleVS = shaders::loadShaderMem(1);
@@ -394,7 +400,9 @@ void mainLoop()
 	assert(triangleFS);
 
 	textures::SampleTexture();
-
+	
+	kitty = LoadOBJ("./res/kitty.obj");
+	
 	VkPipelineCache pipelineCache = 0;
 
 	render::CreatePipelineLayout();
@@ -413,7 +421,7 @@ void mainLoop()
 		{
 		        if(!Draw())
 		  	{
-		  		std::cout << "Critical Error! Abandon the ship." << std::endl;
+		  		std::cout << "Critical Error! Abandon the ship.\n";
 		  		break;
 		  	}
 		}

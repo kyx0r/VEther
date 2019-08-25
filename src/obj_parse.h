@@ -7,6 +7,10 @@
 #include <string.h>
 #endif
 
+#include "zone.h"
+
+#define OBJ_PARSE_IMPLEMENTATION
+
 #define PARSED_OBJ_MODEL_FLAG_POSITION   (1<<0)
 #define PARSED_OBJ_MODEL_FLAG_UV         (1<<1)
 #define PARSED_OBJ_MODEL_FLAG_NORMAL     (1<<2)
@@ -64,19 +68,19 @@ struct OBJParseInfo
     OBJParseWarningCallback     *warning_callback;
 };
 
-typedef enum OBJParseErrorType OBJParseErrorType;
 enum OBJParseErrorType
 {
     OBJ_PARSE_ERROR_TYPE_out_of_memory,
     OBJ_PARSE_ERROR_TYPE_MAX
 };
+typedef enum OBJParseErrorType OBJParseErrorType;
 
-typedef enum OBJParseWarningType OBJParseWarningType;
 enum OBJParseWarningType
 {
     OBJ_PARSE_WARNING_TYPE_unexpected_token,
     OBJ_PARSE_WARNING_TYPE_MAX
 };
+typedef enum OBJParseWarningType OBJParseWarningType;
 
 struct OBJParseError
 {
@@ -112,7 +116,8 @@ struct OBJParserArena
 OBJParserArena
 OBJParserArenaInit(void *memory, unsigned int memory_size)
 {
-    OBJParserArena arena = {0};
+    OBJParserArena arena;
+    memset(&arena, 0, sizeof(OBJParserArena));
     arena.memory = memory;
     arena.memory_alloc_position = 0;
     arena.memory_size = arena.memory_left = memory_size;
@@ -184,7 +189,7 @@ OBJParserStringMatchCaseInsensitiveN(char *str1, char *str2, int n)
     return result;
 }
 
-typedef enum OBJTokenType OBJTokenType;
+
 enum OBJTokenType
 {
     OBJ_TOKEN_TYPE_null,
@@ -200,6 +205,7 @@ enum OBJTokenType
     OBJ_TOKEN_TYPE_material_library_signifier,
     OBJ_TOKEN_TYPE_use_material_signifier,
 };
+typedef enum OBJTokenType OBJTokenType;
 
 typedef struct OBJToken OBJToken;
 struct OBJToken
@@ -227,7 +233,8 @@ OBJTokenMatch(OBJToken token, char *string)
 OBJToken
 OBJParserGetNextTokenFromBuffer(char *buffer)
 {
-    OBJToken token = {0};
+    OBJToken token;
+    memset(&token, 0, sizeof(OBJToken));
     
     enum
     {
@@ -395,16 +402,17 @@ OBJRequireTokenType(OBJTokenizer *tokenizer, OBJTokenType type, OBJToken *token_
 float
 OBJTokenToFloat(OBJToken token)
 {
-    int float_str_write_pos = 0;
-    char float_str[64] = {0};
+    unsigned int float_str_write_pos = 0;
+    char float_str[64];
+    memset(float_str, 0, 64);
     float val = 0.f;
     
     for(int i = 0; i < token.string_length; ++i)
     {
-        if(token.string[i] == '-' || CharIsDigit(token.string[i]))
+        if(token.string[i] == '-' || OBJParserCharIsDigit(token.string[i]))
         {
             for(int j = i; j < token.string_length && token.string[j] &&
-                (token.string[j] == '-' || CharIsDigit(token.string[j]) || token.string[j] == '.'); ++j)
+                (token.string[j] == '-' || OBJParserCharIsDigit(token.string[j]) || token.string[j] == '.'); ++j)
             {
                 if(float_str_write_pos < sizeof(float_str))
                 {
@@ -427,16 +435,17 @@ OBJTokenToFloat(OBJToken token)
 int
 OBJTokenToInt(OBJToken token)
 {
-    int int_str_write_pos = 0;
-    char int_str[64] = {0};
+    unsigned int int_str_write_pos = 0;
+    char int_str[64];
+    memset(int_str, 0, 64);
     int val = 0;
     
     for(int i = 0; i < token.string_length; ++i)
     {
-        if(token.string[i] == '-' || CharIsDigit(token.string[i]))
+        if(token.string[i] == '-' || OBJParserCharIsDigit(token.string[i]))
         {
             for(int j = i; j < token.string_length && token.string[j] &&
-                (token.string[j] == '-' || CharIsDigit(token.string[j])); ++j)
+                (token.string[j] == '-' || OBJParserCharIsDigit(token.string[j])); ++j)
             {
                 if(int_str_write_pos < sizeof(int_str))
                 {
@@ -468,13 +477,17 @@ OBJParseLoadEntireFileAndNullTerminate(char *filename)
         fseek(file, 0, SEEK_END);
         unsigned int file_size = ftell(file);
         fseek(file, 0, SEEK_SET);
-        result = malloc(file_size+1);
+        result = (char*)zone::Hunk_Alloc(file_size+1);
         if(result)
         {
             fread(result, 1, file_size, file);
             result[file_size] = 0;
         }
         fclose(file);
+    }
+    else
+    {
+        printf("Failed to open file!  %s\n", filename);
     }
     return result;
 }
@@ -500,11 +513,23 @@ OBJParseDefaultCRTWarningCallback(OBJParseWarning warning)
 ParsedOBJ
 LoadOBJ(char *filename)
 {
-    OBJParseInfo info = {0};
+    int mark = zone::Hunk_LowMark();
+    cache_user_t cache;
+    cache.data = nullptr;
+    
+    OBJParseInfo info;
+    memset(&info, 0, sizeof(OBJParseInfo));
     {
         info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename);
         info.parse_memory_size = 1024*1024*128;
-        info.parse_memory = malloc(info.parse_memory_size);
+	if(zone::Cache_Alloc(&cache, info.parse_memory_size, "model"))
+	{
+	  info.parse_memory = cache.data;
+	}
+	else
+	{
+	  info.parse_memory = malloc(info.parse_memory_size);
+	}
         if(!info.parse_memory)
         {
             info.parse_memory_size = 0;
@@ -513,11 +538,13 @@ LoadOBJ(char *filename)
         info.error_callback    = OBJParseDefaultCRTErrorCallback;
         info.warning_callback  = OBJParseDefaultCRTWarningCallback;
     }
-    ParsedOBJ obj = {0};
+    ParsedOBJ obj;
+    memset(&obj, 0, sizeof(ParsedOBJ));
     if(info.obj_data)
     {
         obj = ParseOBJ(&info);
-        OBJParseFreeFileData(info.obj_data);
+        //OBJParseFreeFileData(info.obj_data);
+	zone::Hunk_FreeToLowMark(mark);
     }
     obj.parse_memory_to_free = info.parse_memory;
     return obj;
@@ -526,9 +553,11 @@ LoadOBJ(char *filename)
 void
 FreeParsedOBJ(ParsedOBJ *obj)
 {
+    cache_user_t cache;
+    cache.data = obj->parse_memory_to_free;
     if(obj->parse_memory_to_free)
     {
-        free(obj->parse_memory_to_free);
+      zone::Cache_Free(&cache, false);
     }
 }
 
@@ -540,20 +569,22 @@ ParseOBJ(OBJParseInfo *info)
     char *obj_data                  = info->obj_data;
     void *parse_memory              = info->parse_memory;
     unsigned int parse_memory_size  = info->parse_memory_size;
-    char *filename                  = info->filename ? info->filename : "";
-    OBJParseErrorCallback       *ErrorCallback      = info->error_callback;
+    char *filename                  = info->filename ? info->filename : (char*)"";
+    //OBJParseErrorCallback       *ErrorCallback      = info->error_callback;
     OBJParseWarningCallback     *WarningCallback    = info->warning_callback;
     
-    ParsedOBJ obj_ = {0};
+    ParsedOBJ obj_;
+    memset(&obj_, 0, sizeof(ParsedOBJ));
     ParsedOBJ *obj = &obj_;
     OBJParserArena arena_ = OBJParserArenaInit(parse_memory, parse_memory_size);
     OBJParserArena *arena = &arena_;
-    OBJTokenizer tokenizer_ = {0};
+    OBJTokenizer tokenizer_;
+    memset(&tokenizer_, 0, sizeof(OBJTokenizer));
     OBJTokenizer *tokenizer = &tokenizer_;
     tokenizer->at = obj_data;
     
-    unsigned int floats_per_vertex = 3 + 2 + 3;
-    unsigned int bytes_per_vertex = sizeof(float)*floats_per_vertex;
+    //unsigned int floats_per_vertex = 3 + 2 + 3;
+    //unsigned int bytes_per_vertex = sizeof(float)*floats_per_vertex;
     
     typedef struct OBJParsedSubModelListNode OBJParsedSubModelListNode;
     struct OBJParsedSubModelListNode
@@ -580,16 +611,16 @@ ParseOBJ(OBJParseInfo *info)
     OBJParsedModelListNode *first_model_list_node = 0;
     OBJParsedModelListNode **target_model_list_node = &first_model_list_node;
     
-    typedef struct OBJParsedMaterialLibraryNode OBJParsedMaterialLibraryNode;
-    struct OBJParsedMaterialLibraryNode
-    {
-        char *name;
-        OBJParsedMaterialLibraryNode *next;
-    };
+    /* typedef struct OBJParsedMaterialLibraryNode OBJParsedMaterialLibraryNode; */
+    /* struct OBJParsedMaterialLibraryNode */
+    /* { */
+    /*     char *name; */
+    /*     OBJParsedMaterialLibraryNode *next; */
+    /* }; */
     
-    unsigned int material_library_list_node_count = 0;
-    OBJParsedModelListNode *first_material_library_list_node = 0;
-    OBJParsedModelListNode **target_material_library_list_node = &first_material_library_list_node;
+    //unsigned int material_library_list_node_count = 0;
+    //OBJParsedModelListNode *first_material_library_list_node = 0;
+    //OBJParsedModelListNode **target_material_library_list_node = &first_material_library_list_node;
     
     // NOTE(rjf): OBJs store per-OBJ indices, NOT per-object or per-group indices,
     // which is kind of a pain. So, we'll store offsets here to correct for that as
@@ -598,7 +629,7 @@ ParseOBJ(OBJParseInfo *info)
     int vertex_uv_index_offset = 0;
     int vertex_normal_index_offset = 0;
     
-    ParsedOBJMaterial global_material = {0};
+    //ParsedOBJMaterial global_material = {0};
     
     // NOTE(rjf): Loop through all objects.
     for(;;)
@@ -608,8 +639,7 @@ ParseOBJ(OBJParseInfo *info)
         if(token.type == OBJ_TOKEN_TYPE_null)
         {
             break;
-        }
-        
+        }        
         else
         {
             
@@ -659,10 +689,10 @@ ParseOBJ(OBJParseInfo *info)
                 // NOTE(rjf): Allocate a new model.
                 OBJParsedModelListNode *model = 0;
                 {
-                    model = OBJParserArenaAllocate(arena, sizeof(*model));
+		    model = (OBJParsedModelListNode*) OBJParserArenaAllocate(arena, sizeof(*model));
                     if(!model)
                     {
-                        // TODO(rjf): ERROR: Out of memory.
+                        printf("ERROR: Out of memory.\n");
                         goto end_parse;
                     }
                     model->first_sub_model = 0;
@@ -813,14 +843,17 @@ ParseOBJ(OBJParseInfo *info)
                                         // NOTE(rjf): Warning: Unexpected token... skip.
                                         if(WarningCallback)
                                         {
-                                            OBJToken unexpected_token = OBJPeekToken(tokenizer);
-                                            OBJParseWarning warning = {0};
-                                            {
-                                                warning.type = OBJ_PARSE_WARNING_TYPE_unexpected_token;
-                                                warning.filename = filename;
-                                                warning.line = tokenizer->line;
-                                                warning.message = "Unexpected token.";
-                                            }
+					    OBJToken unexpected_token = OBJPeekToken(tokenizer);
+                                            OBJParseWarning warning;
+					    memset(&warning, 0, sizeof(OBJParseWarning));
+					    char buf[] = "Unexpected token.             ";			      
+					    memcpy(&buf[18], unexpected_token.string, unexpected_token.string_length);
+                                            
+                                            warning.type = OBJ_PARSE_WARNING_TYPE_unexpected_token;
+                                            warning.filename = filename;
+                                            warning.line = tokenizer->line;
+                                            warning.message = buf;
+                                            
                                             WarningCallback(warning);
                                         }
                                         OBJNextToken(tokenizer);
@@ -843,7 +876,7 @@ ParseOBJ(OBJParseInfo *info)
                             memory = OBJParserArenaAllocate(arena, needed_memory_for_initial_obj_read);
                             if(!memory)
                             {
-                                // TODO(rjf): ERROR: Out of memory.
+                                printf("ERROR: Out of memory.\n");
                                 goto end_parse;
                             }
                         }
@@ -926,9 +959,13 @@ ParseOBJ(OBJParseInfo *info)
                                         
                                         for(;;)
                                         {
-                                            OBJToken position = {0};
-                                            OBJToken uv = {0};
-                                            OBJToken normal = {0};
+                                            OBJToken position;
+                                            OBJToken uv;
+                                            OBJToken normal;
+					    memset(&position, 0, sizeof(OBJToken));
+					    memset(&uv, 0, sizeof(OBJToken));
+					    memset(&normal, 0, sizeof(OBJToken));
+					    
                                             
                                             if(OBJPeekToken(tokenizer).type == OBJ_TOKEN_TYPE_number)
                                             {
@@ -1063,15 +1100,18 @@ ParseOBJ(OBJParseInfo *info)
                                         // NOTE(rjf): Warning: Unexpected token... skip.
                                         if(WarningCallback)
                                         {
-                                            OBJToken unexpected_token = OBJPeekToken(tokenizer);
-                                            OBJParseWarning warning = {0};
-                                            {
-                                                warning.type = OBJ_PARSE_WARNING_TYPE_unexpected_token;
-                                                warning.filename = filename;
-                                                warning.line = tokenizer->line;
-                                                warning.message = "Unexpected token.";
-                                            }
-                                            WarningCallback(warning);
+					    OBJToken unexpected_token = OBJPeekToken(tokenizer);
+                                            OBJParseWarning warning;
+					    memset(&warning, 0, sizeof(OBJParseWarning));
+					    char buf[] = "Unexpected token.            ";			      
+					    memcpy(&buf[18], unexpected_token.string, unexpected_token.string_length);
+                                            
+                                            warning.type = OBJ_PARSE_WARNING_TYPE_unexpected_token;
+                                            warning.filename = filename;
+                                            warning.line = tokenizer->line;
+                                            warning.message = buf;
+                                            
+                                            WarningCallback(warning);					                                               
                                         }
                                         OBJNextToken(tokenizer);
                                     }
@@ -1105,7 +1145,7 @@ ParseOBJ(OBJParseInfo *info)
                             
                             if(!vertex_uv_and_normal_indices_buffer)
                             {
-                                // TODO(rjf): ERROR: Out of memory.
+                                printf("ERROR: Out of memory.\n");
                                 goto end_parse;
                             }
                             
@@ -1140,7 +1180,7 @@ ParseOBJ(OBJParseInfo *info)
                                             VertexUVAndNormalIndices *duplicate = (VertexUVAndNormalIndices *)OBJParserArenaAllocate(arena, sizeof(VertexUVAndNormalIndices));
                                             if(!duplicate)
                                             {
-                                                // TODO(rjf): ERROR: Out of memory.
+                                                printf("ERROR: Out of memory.\n");
                                                 goto end_parse;
                                             }
                                             duplicate->position_index  = position_index+1;
@@ -1177,10 +1217,10 @@ ParseOBJ(OBJParseInfo *info)
                         int *final_index_buffer = (int *)OBJParserArenaAllocate(arena, bytes_needed_for_final_index_buffer);
                         if(!final_vertex_buffer || !final_index_buffer)
                         {
-                            // TODO(rjf): ERROR: Out of memory.
+                            printf("ERROR: Out of memory.\n");
                             goto end_parse;
                         }
-                        
+
                         for(unsigned int i = 0; i < num_face_vertices; ++i)
                         {
                             int position_index = face_vertices[i*3 + 0] - 1;
@@ -1202,7 +1242,7 @@ ParseOBJ(OBJParseInfo *info)
                                 vertex_normals[(vertex_data->normal_index-1)*3+1],
                                 vertex_normals[(vertex_data->normal_index-1)*3+2],
                             };
-                            
+
                             final_vertex_buffer[(vertex_data->position_index-1)*8+0] = position[0];
                             final_vertex_buffer[(vertex_data->position_index-1)*8+1] = position[1];
                             final_vertex_buffer[(vertex_data->position_index-1)*8+2] = position[2];
@@ -1221,7 +1261,7 @@ ParseOBJ(OBJParseInfo *info)
                         
                         if(!sub_model)
                         {
-                            // TODO(rjf): ERROR: Out of memory.
+                            printf("ERROR: Out of memory.\n");
                             goto end_parse;
                         }
                         
@@ -1258,7 +1298,7 @@ ParseOBJ(OBJParseInfo *info)
                     model->sub_models = (ParsedOBJSubModel *)OBJParserArenaAllocate(arena, sizeof(ParsedOBJSubModel)*sub_model_list_node_count);
                     if(!model->sub_models)
                     {
-                        // TODO(rjf): ERROR: Out of memory.
+		        printf("ERROR: Out of memory.\n");
                         goto end_parse;
                     }
                     
@@ -1283,7 +1323,7 @@ ParseOBJ(OBJParseInfo *info)
     obj->models = (ParsedOBJModel *)OBJParserArenaAllocate(arena, sizeof(ParsedOBJModel)*model_list_node_count);
     if(!obj->models)
     {
-        // TODO(rjf): ERROR: Out of memory.
+        printf("ERROR: Out of memory.\n");
         goto end_parse;
     }
     obj->model_count = 0;

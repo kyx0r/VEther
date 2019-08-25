@@ -312,12 +312,12 @@ VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 	attributeDescriptions[0].offset = offsetof(Vertex_, pos);
 	attributeDescriptions[1].binding = 0;
 	attributeDescriptions[1].location = 1;
-	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[1].offset = offsetof(Vertex_, color);
+	attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[1].offset = offsetof(Vertex_, tex_coord);
 	attributeDescriptions[2].binding = 0;
 	attributeDescriptions[2].location = 2;
-	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-	attributeDescriptions[2].offset = offsetof(Vertex_, tex_coord);
+	attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+	attributeDescriptions[2].offset = offsetof(Vertex_, color);
 
 	VkPipelineVertexInputStateCreateInfo* vertexInput = new(&attributeDescriptions[0] + sizeof(attributeDescriptions)) VkPipelineVertexInputStateCreateInfo[0];
 	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

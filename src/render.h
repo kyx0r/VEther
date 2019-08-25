@@ -19,9 +19,9 @@ extern VkPipeline current_pipeline;
 
 typedef struct
 {
-	float pos[3];   // = vec2
-	float color[3]; // = vec3
-	float tex_coord[2];
+	float pos[3];   // = vec3
+        float tex_coord[2]; // = vec2
+  	float color[3]; // = vec3
 } Vertex_;
 
 typedef struct

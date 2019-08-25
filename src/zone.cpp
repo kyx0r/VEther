@@ -536,7 +536,7 @@ void *Hunk_AllocName (int size, const char *name)
 {
 	hunk_t	*h;
 
-#ifdef PARANOID
+#ifdef DEBUG
 	Hunk_Check ();
 #endif
 

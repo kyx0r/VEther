@@ -1,0 +1,1201 @@
+
+control.cpp,2326
+VkCommandBuffer command_buffer;11,154
+VkPhysicalDeviceMemoryProperties memory_properties;12,187
+VkDescriptorPool descriptor_pool;13,240
+VkDescriptorSetLayout ubo_dsl;14,275
+VkDescriptorSetLayout tex_dsl;15,307
+vram_heap texmgr_heaps[texmgr_heaps16,339
+dynbuffer_t dyn_index_buffers[dyn_index_buffers17,383
+dynbuffer_t dyn_vertex_buffers[dyn_vertex_buffers18,436
+dynbuffer_t dyn_uniform_buffers[dyn_uniform_buffers19,490
+stagingbuffer_t	staging_buffers[staging_buffers20,545
+uint8_t current_cmd_buffer_index 21,600
+int current_dyn_buffer_index 22,639
+int current_staging_buffer 23,713
+int current_vheap_index 24,746
+static VkCommandPool command_pool;27,784
+static VkCommandBuffer *command_buffers command_buffers28,820
+static VkDeviceMemory dyn_index_buffer_memory;29,872
+static VkDeviceMemory dyn_vertex_buffer_memory;30,920
+static VkDeviceMemory dyn_uniform_buffer_memory;31,969
+static VkDeviceMemory	staging_memory;32,1019
+static VkDescriptorSet	ubo_descriptor_sets[ubo_descriptor_sets33,1058
+namespace control35,1108
+bool CreateCommandPool(38,1132
+bool ResetCommandPool(57,1885
+bool AllocateCommandBuffers(70,2441
+void SetCommandBuffer(94,3452
+bool CreateSemaphore(100,3565
+bool CreateFence(118,4156
+bool BeginCommandBufferRecordingOperation(136,4704
+void CreateDescriptorPool(155,5561
+void CreateDescriptorSetLayouts(173,6356
+void BindDescriptorSet202,7351
+bool EndCommandBufferRecordingOperation(213,7954
+bool ResetCommandBuffer(224,8208
+void FreeCommandBuffers(236,8645
+void DestroyCommandPool(241,8772
+int MemoryTypeFromProperties(246,8870
+void VramHeapAllocate(284,9854
+vram_heap* VramHeapDigress(305,10553
+void DestroyVramHeaps(353,12052
+unsigned char* IndexBufferDigress(375,12362
+void IndexBuffersAllocate(399,13181
+void DestroyIndexBuffers(456,15534
+unsigned char* UniformBufferDigress(475,15972
+void UniformBuffersAllocate(500,16861
+void DestroyUniformBuffers(595,20687
+void ResetStagingBuffer(617,21381
+void SubmitStagingBuffer(640,22090
+unsigned char* StagingBufferDigress(670,23476
+void StagingBuffersAllocate(683,24040
+void DestroyStagingBuffers(752,26736
+void InvalidateDynamicBuffers(770,27239
+void FlushDynamicBuffers(780,27552
+void DestroyDynBuffers(790,27855
+unsigned char* VertexBufferDigress(799,28087
+void VertexBuffersAllocate(818,28661
+
+draw.cpp,82
+namespace draw14,278
+void DrawTriangle(17,299
+void DrawIndexedTriangle(45,1319
+
+lodepng.cpp,13317
+const char* LODEPNG_VERSION_STRING 43,1574
+static void* lodepng_malloc(64,2557
+static void* lodepng_realloc(72,2705
+static void lodepng_free(80,2883
+#define LODEPNG_MAX(96,3541
+#define LODEPNG_MIN(97,3593
+#define CERROR_BREAK(106,3945
+#define ERROR_BREAK(112,4116
+#define CERROR_RETURN_ERROR(115,4221
+#define CERROR_TRY_RETURN(121,4368
+#define CERROR_RETURN(127,4530
+typedef struct uivector143,5182
+	unsigned* data;145,5208
+	size_t size;146,5225
+	size_t allocsize;147,5276
+} uivector;148,5323
+static void uivector_cleanup(150,5336
+static unsigned uivector_reserve(158,5557
+static unsigned uivector_resize(175,5986
+static unsigned uivector_resizev(183,6197
+static void uivector_init(191,6412
+static unsigned uivector_push_back(199,6589
+typedef struct ucvector211,6927
+	unsigned char* data;213,6953
+	size_t size;214,6975
+	size_t allocsize;215,7003
+} ucvector;216,7041
+static unsigned ucvector_reserve(219,7110
+static unsigned ucvector_resize(236,7544
+static void ucvector_cleanup(245,7741
+static void ucvector_init(252,7906
+static void ucvector_init_buffer(262,8210
+static unsigned ucvector_push_back(271,8552
+static void string_cleanup(286,8978
+static char* alloc_string(293,9144
+unsigned lodepng_read32bitInt(313,9537
+static void lodepng_set32bitInt(320,9818
+static void lodepng_add32bitInt(330,10209
+static long lodepng_filesize(344,10818
+static unsigned lodepng_buffer_file(366,11271
+unsigned lodepng_load_file(380,11552
+unsigned lodepng_save_file(393,11999
+#define addBitToStream(414,12784
+static void addBitsToStream(422,13180
+static void addBitsToStreamReversed(428,13398
+#define READBIT(437,13705
+static unsigned char readBitFromStream(439,13817
+static unsigned readBitsFromStream(446,14021
+#define FIRST_LENGTH_CODE_INDEX 462,14563
+#define LAST_LENGTH_CODE_INDEX 463,14599
+#define NUM_DEFLATE_CODE_SYMBOLS 465,14704
+#define NUM_DISTANCE_SYMBOLS 467,14806
+#define NUM_CODE_LENGTH_CODES 469,14947
+static const unsigned LENGTHBASE[LENGTHBASE472,15031
+static const unsigned LENGTHEXTRA[LENGTHEXTRA478,15270
+static const unsigned DISTANCEBASE[DISTANCEBASE484,15564
+static const unsigned DISTANCEEXTRA[DISTANCEEXTRA490,15826
+static const unsigned CLCL_ORDER[CLCL_ORDER497,16178
+typedef struct HuffmanTree505,16466
+	unsigned* tree2d;507,16495
+	unsigned* tree1d;508,16514
+	unsigned* lengths;509,16533
+	unsigned maxbitlen;510,16597
+	unsigned numcodes;511,16667
+} HuffmanTree;512,16743
+static void HuffmanTree_init(525,17203
+static void HuffmanTree_cleanup(532,17314
+static unsigned HuffmanTree_make2DTree(540,17529
+static unsigned HuffmanTree_makeFromLengths2(605,19842
+static unsigned HuffmanTree_makeFromLengths(650,21149
+typedef struct BPMNode668,21849
+	int weight;670,21874
+	unsigned index;671,21928
+	struct BPMNode* tail;672,22003
+	int in_use;673,22074
+} BPMNode;674,22087
+typedef struct BPMLists677,22119
+	unsigned memsize;680,22162
+	BPMNode* memory;681,22181
+	unsigned numfree;682,22199
+	unsigned nextfree;683,22218
+	BPMNode** freelist;684,22238
+	unsigned listsize;686,22303
+	BPMNode** chains0;687,22323
+	BPMNode** chains1;688,22343
+} BPMLists;689,22363
+static BPMNode* bpmnode_create(692,22462
+static void bpmnode_sort(725,23396
+static void boundaryPM(752,24206
+unsigned lodepng_huffman_code_lengths(783,25331
+static unsigned HuffmanTree_makeFromFrequencies(873,28348
+static unsigned HuffmanTree_getCode(890,29092
+static unsigned HuffmanTree_getLength(895,29203
+static unsigned generateFixedLitLenTree(902,29463
+static unsigned generateFixedDistanceTree(921,30181
+static unsigned huffmanDecodeSymbol(941,30809
+static void getTreeInflateFixed(969,32039
+static unsigned getTreeInflateDynamic(977,32349
+static unsigned inflateHuffmanBlock(1125,38079
+static unsigned inflateNoCompression(1222,41579
+static unsigned lodepng_inflatev(1252,42515
+unsigned lodepng_inflate(1282,43510
+static unsigned inflate(1295,43888
+static const size_t MAX_SUPPORTED_DEFLATE_LENGTH 1317,44579
+static void addHuffmanSymbol(1320,44679
+static size_t searchCodeIndex(1327,45031
+static void addLengthDistance(1343,45482
+static const unsigned HASH_NUM_VALUES 1364,46427
+static const unsigned HASH_BIT_MASK 1365,46474
+typedef struct Hash1367,46587
+	int* head;1369,46609
+	unsigned short* chain;1371,46736
+	int* val;1372,46760
+	int* headz;1376,46959
+	unsigned short* chainz;1377,47008
+	unsigned short* zeros;1378,47069
+} Hash;1379,47149
+static unsigned hash_init(1381,47158
+static void hash_cleanup(1408,48269
+static unsigned getHash(1421,48480
+static unsigned countZeros(1444,49189
+static void updateHashChain(1456,49649
+static unsigned encodeLZ77(1476,50566
+static unsigned deflateNoCompression(1655,56135
+static void writeLZ77data(1697,57423
+static unsigned deflateDynamic(1726,58656
+static unsigned deflateFixed(1973,68504
+static unsigned lodepng_deflatev(2021,70056
+unsigned lodepng_deflate(2062,71362
+static unsigned deflate(2075,71738
+static unsigned update_adler32(2095,72395
+static unsigned adler32(2119,72920
+unsigned lodepng_zlib_decompress(2130,73305
+static unsigned zlib_decompress(2175,74697
+unsigned lodepng_zlib_compress(2192,75138
+static unsigned zlib_compress(2234,76586
+static unsigned zlib_decompress(2252,77053
+static unsigned zlib_compress(2260,77452
+#define DEFAULT_WINDOWSIZE 2275,78026
+void lodepng_compress_settings_init(2277,78059
+const LodePNGCompressSettings lodepng_default_compress_settings 2292,78500
+void lodepng_decompress_settings_init(2299,78684
+const LodePNGDecompressSettings lodepng_default_decompress_settings 2308,78886
+static unsigned lodepng_crc32_table[lodepng_crc32_table2327,79750
+unsigned lodepng_crc32(2364,83189
+static unsigned char readBitFromReversedStream(2382,83800
+static unsigned readBitsFromReversedStream(2389,84047
+static void setBitOfReversedStream0(2402,84364
+static void setBitOfReversedStream(2414,84756
+unsigned lodepng_chunk_length(2426,85374
+void lodepng_chunk_type(2431,85478
+unsigned char lodepng_chunk_type_equals(2438,85657
+unsigned char lodepng_chunk_ancillary(2444,85881
+unsigned char lodepng_chunk_private(2449,85983
+unsigned char lodepng_chunk_safetocopy(2454,86083
+unsigned char* lodepng_chunk_data(2459,86186
+const unsigned char* lodepng_chunk_data_const(2464,86266
+unsigned lodepng_chunk_check_crc(2469,86364
+void lodepng_chunk_generate_crc(2479,86721
+unsigned char* lodepng_chunk_next(2486,86929
+const unsigned char* lodepng_chunk_next_const(2501,87380
+unsigned char* lodepng_chunk_find(2516,87849
+const unsigned char* lodepng_chunk_find_const(2526,88101
+unsigned lodepng_chunk_append(2536,88377
+unsigned lodepng_chunk_create(2555,89061
+static unsigned checkColorValidity(2591,90329
+static unsigned getNumColorChannels(2616,91039
+static unsigned lodepng_get_bpp_lct(2634,91330
+void lodepng_color_mode_init(2642,91612
+void lodepng_color_mode_cleanup(2652,91834
+unsigned lodepng_color_mode_copy(2657,91925
+LodePNGColorMode lodepng_color_mode_make(2671,92334
+static int lodepng_color_mode_equal(2680,92564
+void lodepng_palette_clear(2700,93095
+unsigned lodepng_palette_add(2707,93243
+unsigned lodepng_get_bpp(2729,94092
+unsigned lodepng_get_channels(2734,94214
+unsigned lodepng_is_greyscale_type(2739,94325
+unsigned lodepng_is_alpha_type(2744,94469
+unsigned lodepng_is_palette_type(2749,94582
+unsigned lodepng_has_palette_alpha(2754,94690
+unsigned lodepng_can_have_alpha(2764,94876
+size_t lodepng_get_raw_size_lct(2771,95052
+size_t lodepng_get_raw_size(2778,95302
+static size_t lodepng_get_raw_size_idat(2790,95740
+static int lodepng_mulofl(2800,96186
+static int lodepng_addofl(2808,96506
+static int lodepng_pixel_overflow(2822,97067
+static void LodePNGUnknownChunks_init(2846,98120
+static void LodePNGUnknownChunks_cleanup(2853,98313
+static unsigned LodePNGUnknownChunks_copy(2859,98460
+static void LodePNGText_init(2882,99117
+static void LodePNGText_cleanup(2889,99244
+static unsigned LodePNGText_copy(2901,99503
+void lodepng_clear_text(2914,99819
+unsigned lodepng_add_text(2919,99895
+static void LodePNGIText_init(2942,100605
+static void LodePNGIText_cleanup(2951,100797
+static unsigned LodePNGIText_copy(2967,101226
+void lodepng_clear_itext(2983,101698
+unsigned lodepng_add_itext(2988,101776
+static unsigned lodepng_assign_icc(3019,103060
+unsigned lodepng_set_icc(3032,103482
+void lodepng_clear_icc(3040,103737
+void lodepng_info_init(3050,103981
+void lodepng_info_cleanup(3077,104628
+unsigned lodepng_info_copy(3090,104927
+static void addColorBits(3114,105804
+typedef struct ColorTree ColorTree;3125,106275
+struct ColorTree3133,106556
+	ColorTree* children[children3135,106575
+	int index;3136,106650
+static void color_tree_init(3139,106740
+static void color_tree_cleanup(3146,106866
+static int color_tree_get(3160,107126
+static int color_tree_has(3173,107526
+static void color_tree_add(3181,107853
+static unsigned rgba8ToPixel(3199,108425
+static void rgba16ToPixel(3273,110376
+static void getPixelColorRGBA8(3314,111625
+static void getPixelColorsRGBA8(3426,114612
+static void getPixelColorRGBA16(3560,118611
+unsigned lodepng_convert(3594,119818
+unsigned lodepng_convert_rgb(3684,122892
+void lodepng_color_profile_init(3753,124598
+static unsigned getValueRequiredBits(3777,125444
+unsigned lodepng_get_color_profile(3787,125786
+static unsigned lodepng_color_profile_add(4003,132385
+static unsigned auto_choose_color_from_profile(4028,133078
+unsigned lodepng_auto_choose_color(4100,135593
+static unsigned char paethPredictor(4119,136287
+static const unsigned ADAM7_IX[ADAM7_IX4132,136619
+static const unsigned ADAM7_IY[ADAM7_IY4133,136699
+static const unsigned ADAM7_DX[ADAM7_DX4134,136779
+static const unsigned ADAM7_DY[ADAM7_DY4135,136859
+static void Adam7_getpassvalues(4152,137712
+unsigned lodepng_inspect(4187,139299
+static unsigned unfilterScanline(4258,141672
+static unsigned unfilter(4333,143850
+static void Adam7_deinterlace(4375,145550
+static void removePaddingBits(4425,147120
+static unsigned postProcessScanlines(4455,148453
+static unsigned readChunk_PLTE(4506,150405
+static unsigned readChunk_tRNS(4530,151131
+static unsigned readChunk_bKGD(4566,152184
+static unsigned readChunk_tEXt(4604,153501
+static unsigned readChunk_zTXt(4647,154721
+static unsigned readChunk_iTXt(4696,156247
+static unsigned readChunk_tIME(4789,159279
+static unsigned readChunk_pHYs(4804,159678
+static unsigned readChunk_gAMA(4816,160082
+static unsigned readChunk_cHRM(4826,160379
+static unsigned readChunk_sRGB(4843,161334
+static unsigned readChunk_iCCP(4853,161602
+unsigned lodepng_inspect_chunk(4903,163139
+static void decodeGeneric(4983,165559
+unsigned lodepng_decode(5218,173854
+unsigned lodepng_decode_memory(5263,175473
+unsigned lodepng_decode32(5276,175920
+unsigned lodepng_decode24(5281,176105
+unsigned lodepng_decode_file(5287,176317
+unsigned lodepng_decode32_file(5302,176827
+unsigned lodepng_decode24_file(5307,176995
+void lodepng_decoder_settings_init(5313,177194
+void lodepng_state_init(5330,177711
+void lodepng_state_cleanup(5343,178092
+void lodepng_state_copy(5349,178233
+static unsigned addChunk(5370,179038
+static void writeSignature(5377,179317
+static unsigned addChunk_IHDR(5390,179653
+static unsigned addChunk_PLTE(5411,180404
+static unsigned addChunk_tRNS(5428,180808
+static unsigned addChunk_IDAT(5473,182132
+static unsigned addChunk_IEND(5488,182608
+static unsigned addChunk_tEXt(5497,182773
+static unsigned addChunk_zTXt(5513,183335
+static unsigned addChunk_iTXt(5540,184282
+static unsigned addChunk_bKGD(5581,185867
+static unsigned addChunk_tIME(5611,186988
+static unsigned addChunk_pHYs(5628,187541
+static unsigned addChunk_gAMA(5644,187905
+static unsigned addChunk_cHRM(5658,188185
+static unsigned addChunk_sRGB(5679,188804
+static unsigned addChunk_iCCP(5685,188961
+static void filterScanline(5713,189889
+static float flog2(5771,191672
+static unsigned filter(5787,191894
+static void addPaddingBits(6007,200003
+static void Adam7_interlace(6040,201240
+static unsigned preProcessScanlines(6091,202830
+static unsigned getPaletteTranslucency(6184,206000
+static unsigned addUnknownChunks(6207,206765
+static unsigned isGrayICCProfile(6219,207124
+static unsigned isRGBICCProfile(6234,207867
+unsigned lodepng_encode(6242,208153
+unsigned lodepng_encode_memory(6511,217569
+unsigned lodepng_encode32(6527,218125
+unsigned lodepng_encode24(6532,218317
+unsigned lodepng_encode_file(6538,218536
+unsigned lodepng_encode32_file(6549,218968
+unsigned lodepng_encode24_file(6554,219143
+void lodepng_encoder_settings_init(6560,219349
+const char* lodepng_error_text(6582,220021
+namespace lodepng6794,228359
+unsigned load_file(6798,228408
+unsigned save_file(6807,228773
+unsigned decompress(6815,229054
+unsigned decompress(6829,229462
+unsigned compress(6837,229760
+unsigned compress(6851,230160
+State::State(State6862,230482
+State::State(State6867,230529
+State::~State(~State6873,230629
+State& State::operator=(operator=6878,230680
+unsigned decode(6886,230811
+unsigned decode(6903,231394
+unsigned decode(6909,231669
+unsigned decode(6924,232128
+unsigned decode(6932,232390
+unsigned encode(6946,232888
+unsigned encode(6960,233307
+unsigned encode(6968,233655
+unsigned encode(6983,234037
+unsigned encode(6992,234358
+unsigned encode(7002,234701
+
+mathlib.cpp,997
+vec3_t vec3_origin 28,968
+void ProjectPointOnPlane(32,1074
+void PerpendicularVector(54,1523
+float	anglemod(91,2285
+void VectorAngles 105,2641
+void AngleVectors 117,2941
+int VectorCompare 143,3553
+void VectorMA 154,3690
+vec_t _DotProduct 162,3879
+void _VectorSubtract 167,3979
+void _VectorAdd 174,4132
+void _VectorCopy 181,4280
+void CrossProduct 188,4384
+vec_t VectorLength(195,4568
+float VectorNormalize 200,4638
+void VectorInverse 218,4869
+void VectorScale 225,4956
+int Q_log2(233,5093
+void PrintMatrix(241,5186
+void OrthoMatrix(251,5687
+static void FrustumMatrix(275,6267
+void SetupMatrix(304,6995
+void R_ConcatRotations 345,8358
+void R_ConcatTransforms 373,9399
+void FloorDivMod 412,10953
+int GreatestCommonDivisor 459,11803
+void MatrixMultiply(498,12413
+void RotationMatrix(531,12897
+float vec4_mul_inner(561,13730
+void TranslateInPlace(569,13875
+void LookAt(584,14210
+void TranslationMatrix(634,15393
+void ScaleMatrix(659,15817
+void IdentityMatrix(681,16162
+
+render.cpp,776
+VkRenderPass renderPasses[renderPasses16,362
+VkFramebuffer framebuffers[framebuffers17,399
+VkImageView imageViews[imageViews18,437
+VkPipeline pipelines[pipelines19,472
+uint32_t renderPassCount 20,504
+uint32_t framebufferCount 21,535
+uint32_t imageViewCount 22,567
+uint32_t pipelineCount 23,597
+VkPipelineLayout pipeline_layout 24,626
+VkPipeline current_pipeline 25,665
+namespace render28,706
+void CreateRenderPass(31,729
+void CreateFramebuffer(109,5785
+VkImage Create2DImage(126,6451
+void CreateDepthBuffer(150,7353
+void CreateSwapchainImageViews(226,11220
+void StartRenderPass(250,12163
+void CreatePipelineLayout(264,12854
+void Viewport(286,13682
+VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe(299,14045
+void CreateGraphicsPipeline332,15700
+
+shaders.cpp,123
+namespace shaders9,203
+void CompileShaders(13,304
+VkShaderModule loadShaderMem(28,722
+VkShaderModule loadShader(33,797
+
+startup.cpp,1853
+VkInstance instance;9,84
+VkPhysicalDevice target_device 10,105
+VkDevice logical_device;11,154
+uint32_t max2DTex_size 12,179
+uint32_t queue_families_count 13,207
+static uint32_t extensions_count 16,247
+static uint32_t device_count 17,285
+static uint32_t desired_count 18,319
+static const char** desired_extensions 19,354
+static VkExtensionProperties* available_extensions 20,404
+static VkPhysicalDevice *available_devices available_devices21,466
+static VkPhysicalDeviceFeatures device_features;22,520
+static VkPhysicalDeviceProperties device_properties;23,569
+static int d_layers_count 26,636
+const char* debugLayers[debugLayers27,667
+static HMODULE vulkan_lib;34,758
+static void* vulkan_lib;37,826
+namespace startup40,859
+void debug_pause(44,952
+const char* GetVulkanResultString(53,1138
+static VkBool32 VKAPI_CALL debugReportCallback(110,3448
+static bool CheckValidationLayerSupport(142,4489
+VkDebugReportCallbackEXT registerDebugCallback(169,5027
+bool LoadVulkan(186,5577
+#define libtype 189,5616
+#define LoadFunction 191,5683
+#define libtype 193,5741
+#define LoadFunction 195,5813
+#define EXPORTED_VULKAN_FUNCTION(203,5959
+bool LoadVulkanGlobalFuncs(217,6306
+#define GLOBAL_LEVEL_VULKAN_FUNCTION(219,6337
+bool LoadInstanceFunctions(233,6791
+#define INSTANCE_LEVEL_VULKAN_FUNCTION(235,6822
+#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION(247,7240
+bool CheckInstanceExtensions(265,8179
+bool IsExtensionSupported(285,8866
+bool CreateVulkanInstance(302,9223
+bool CheckPhysicalDevices(368,10932
+bool CheckPhysicalDeviceExtensions(388,11567
+bool CheckQueueProperties(440,13276
+bool CreateLogicalDevice(467,14171
+bool LoadDeviceLevelFunctions(518,15715
+#define DEVICE_LEVEL_VULKAN_FUNCTION(521,15797
+#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION(533,16531
+void ReleaseVulkanLoaderLibrary(549,17499
+
+surface.cpp,388
+VkSurfaceKHR presentation_surface;10,138
+VkPresentModeKHR target_surface_mode;11,174
+VkSurfaceCapabilitiesKHR surface_capabilities;12,213
+namespace surface15,268
+bool CreatePresentationSurface(18,292
+bool CheckSurfaceQueueSupport(78,2967
+bool CheckSelectPresentationModesSupport(94,3467
+bool CheckPresentationSurfaceCapabilities(132,4665
+void DestroyPresentationSurface(143,5033
+
+swapchain.cpp,806
+VkImage *handle_array_of_swapchain_images handle_array_of_swapchain_images11,221
+VkFormat image_format;12,275
+uint32_t number_of_swapchain_images;13,299
+static VkExtent2D size_of_images;16,344
+static VkImageUsageFlags image_usage;17,379
+static VkColorSpaceKHR image_color_space;18,418
+static VkSurfaceTransformFlagBitsKHR  surface_transform;19,461
+namespace swapchain21,521
+bool SelectNumberOfSwapchainImages(24,547
+bool SetSizeOfSwapchainImages(34,867
+bool ComputeSizeOfSwapchainImages(58,1518
+bool SelectDesiredUsageScenariosOfSwapchainImages(89,2408
+bool SelectTransformationOfSwapchainImages(95,2616
+bool SelectFormatOfSwapchainImages(108,2928
+bool CreateSwapchain(164,4895
+bool GetHandlesOfSwapchainImages(205,7242
+bool AcquireSwapchainImage(233,8157
+void DestroySwapchain(250,8669
+
+textures.cpp,537
+VkDescriptorSet	tex_descriptor_sets[tex_descriptor_sets19,455
+static VkImage v_image[v_image20,496
+static int current_tex_ds_index 21,524
+static unsigned char palette[palette22,562
+static unsigned int data[data23,598
+static VkSampler point_sampler 24,630
+namespace textures26,682
+static unsigned* TexMgr8to32(29,707
+void InitSamplers(42,966
+void TexDeinit(96,3237
+void SetFilterModes(107,3539
+  void GenerateColorPalette(128,4341
+void UploadTexture(155,5035
+void FsLoadPngTexture(255,9725
+bool SampleTexture(281,10491
+
+vulcan_functions.cpp,317
+namespace VEther3,33
+#define EXPORTED_VULKAN_FUNCTION(6,56
+#define GLOBAL_LEVEL_VULKAN_FUNCTION(7,115
+#define INSTANCE_LEVEL_VULKAN_FUNCTION(8,178
+#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION(9,243
+#define DEVICE_LEVEL_VULKAN_FUNCTION(10,334
+#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION(11,397
+
+vulkan_decl.cpp,6800
+PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;5,125
+PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;8,209
+PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties;9,293
+PFN_vkCreateInstance vkCreateInstance;10,369
+PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;14,443
+PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT;15,511
+PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT;16,579
+PFN_vkEnumeratePhysicalDevices vkEnumeratePhysicalDevices;20,690
+PFN_vkGetPhysicalDeviceProperties vkGetPhysicalDeviceProperties;21,750
+PFN_vkGetPhysicalDeviceFeatures vkGetPhysicalDeviceFeatures;22,816
+PFN_vkCreateDevice vkCreateDevice;23,878
+PFN_vkGetDeviceProcAddr vkGetDeviceProcAddr;24,914
+PFN_vkEnumerateDeviceExtensionProperties vkEnumerateDeviceExtensionProperties;25,960
+PFN_vkGetPhysicalDeviceQueueFamilyProperties vkGetPhysicalDeviceQueueFamilyProperties;26,1040
+PFN_vkGetPhysicalDeviceMemoryProperties vkGetPhysicalDeviceMemoryProperties;27,1128
+PFN_vkDestroyInstance vkDestroyInstance;28,1206
+PFN_vkGetPhysicalDeviceFormatProperties vkGetPhysicalDeviceFormatProperties;29,1248
+PFN_vkGetPhysicalDeviceSurfaceSupportKHR vkGetPhysicalDeviceSurfaceSupportKHR;33,1358
+PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vkGetPhysicalDeviceSurfaceCapabilitiesKHR;34,1438
+PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vkGetPhysicalDeviceSurfaceFormatsKHR;35,1528
+PFN_vkGetPhysicalDeviceSurfacePresentModesKHR vkGetPhysicalDeviceSurfacePresentModesKHR;36,1608
+PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR;37,1698
+PFN_vkCreateWin32SurfaceKHR vkCreateWin32SurfaceKHR;39,1778
+PFN_vkCreateXcbSurfaceKHR vkCreateXcbSurfaceKHR;41,1871
+PFN_vkCreateXlibSurfaceKHR vkCreateXlibSurfaceKHR;43,1961
+PFN_vkGetDeviceQueue vkGetDeviceQueue;49,2064
+PFN_vkDeviceWaitIdle vkDeviceWaitIdle;50,2104
+PFN_vkDestroyDevice vkDestroyDevice;51,2144
+PFN_vkCreateBuffer vkCreateBuffer;52,2182
+PFN_vkGetBufferMemoryRequirements vkGetBufferMemoryRequirements;53,2218
+PFN_vkAllocateMemory vkAllocateMemory;54,2284
+PFN_vkBindBufferMemory vkBindBufferMemory;55,2324
+PFN_vkCmdPipelineBarrier vkCmdPipelineBarrier;56,2368
+PFN_vkCreateImage vkCreateImage;57,2416
+PFN_vkGetImageMemoryRequirements vkGetImageMemoryRequirements;58,2450
+PFN_vkBindImageMemory vkBindImageMemory;59,2514
+PFN_vkCreateImageView vkCreateImageView;60,2556
+PFN_vkMapMemory vkMapMemory;61,2598
+PFN_vkFlushMappedMemoryRanges vkFlushMappedMemoryRanges;62,2628
+PFN_vkUnmapMemory vkUnmapMemory;63,2686
+PFN_vkCmdCopyBuffer vkCmdCopyBuffer;64,2720
+PFN_vkCmdCopyBufferToImage vkCmdCopyBufferToImage;65,2758
+PFN_vkCmdCopyImageToBuffer vkCmdCopyImageToBuffer;66,2810
+PFN_vkBeginCommandBuffer vkBeginCommandBuffer;67,2862
+PFN_vkEndCommandBuffer vkEndCommandBuffer;68,2910
+PFN_vkQueueSubmit vkQueueSubmit;69,2954
+PFN_vkDestroyImageView vkDestroyImageView;70,2988
+PFN_vkDestroyImage vkDestroyImage;71,3032
+PFN_vkDestroyBuffer vkDestroyBuffer;72,3068
+PFN_vkFreeMemory vkFreeMemory;73,3106
+PFN_vkCreateCommandPool vkCreateCommandPool;74,3138
+PFN_vkAllocateCommandBuffers vkAllocateCommandBuffers;75,3184
+PFN_vkCreateSemaphore vkCreateSemaphore;76,3240
+PFN_vkCreateFence vkCreateFence;77,3282
+PFN_vkWaitForFences vkWaitForFences;78,3316
+PFN_vkResetFences vkResetFences;79,3354
+PFN_vkDestroyFence vkDestroyFence;80,3388
+PFN_vkDestroySemaphore vkDestroySemaphore;81,3424
+PFN_vkResetCommandBuffer vkResetCommandBuffer;82,3468
+PFN_vkFreeCommandBuffers vkFreeCommandBuffers;83,3516
+PFN_vkResetCommandPool vkResetCommandPool;84,3564
+PFN_vkDestroyCommandPool vkDestroyCommandPool;85,3608
+PFN_vkCreateBufferView vkCreateBufferView;86,3656
+PFN_vkDestroyBufferView vkDestroyBufferView;87,3700
+PFN_vkQueueWaitIdle vkQueueWaitIdle;88,3746
+PFN_vkCreateSampler vkCreateSampler;89,3784
+PFN_vkCreateDescriptorSetLayout vkCreateDescriptorSetLayout;90,3822
+PFN_vkCreateDescriptorPool vkCreateDescriptorPool;91,3884
+PFN_vkAllocateDescriptorSets vkAllocateDescriptorSets;92,3936
+PFN_vkUpdateDescriptorSets vkUpdateDescriptorSets;93,3992
+PFN_vkCmdBindDescriptorSets vkCmdBindDescriptorSets;94,4044
+PFN_vkFreeDescriptorSets vkFreeDescriptorSets;95,4098
+PFN_vkResetDescriptorPool vkResetDescriptorPool;96,4146
+PFN_vkDestroyDescriptorPool vkDestroyDescriptorPool;97,4196
+PFN_vkDestroyDescriptorSetLayout vkDestroyDescriptorSetLayout;98,4250
+PFN_vkDestroySampler vkDestroySampler;99,4314
+PFN_vkCreateRenderPass vkCreateRenderPass;100,4354
+PFN_vkCreateFramebuffer vkCreateFramebuffer;101,4398
+PFN_vkDestroyFramebuffer vkDestroyFramebuffer;102,4444
+PFN_vkDestroyRenderPass vkDestroyRenderPass;103,4492
+PFN_vkCmdBeginRenderPass vkCmdBeginRenderPass;104,4538
+PFN_vkCmdNextSubpass vkCmdNextSubpass;105,4586
+PFN_vkCmdEndRenderPass vkCmdEndRenderPass;106,4626
+PFN_vkCreatePipelineCache vkCreatePipelineCache;107,4670
+PFN_vkGetPipelineCacheData vkGetPipelineCacheData;108,4720
+PFN_vkMergePipelineCaches vkMergePipelineCaches;109,4772
+PFN_vkDestroyPipelineCache vkDestroyPipelineCache;110,4822
+PFN_vkCreateGraphicsPipelines vkCreateGraphicsPipelines;111,4874
+PFN_vkCreateComputePipelines vkCreateComputePipelines;112,4932
+PFN_vkDestroyPipeline vkDestroyPipeline;113,4988
+PFN_vkDestroyEvent vkDestroyEvent;114,5030
+PFN_vkDestroyQueryPool vkDestroyQueryPool;115,5066
+PFN_vkCreateShaderModule vkCreateShaderModule;116,5110
+PFN_vkDestroyShaderModule vkDestroyShaderModule;117,5158
+PFN_vkCreatePipelineLayout vkCreatePipelineLayout;118,5208
+PFN_vkDestroyPipelineLayout vkDestroyPipelineLayout;119,5260
+PFN_vkCmdBindPipeline vkCmdBindPipeline;120,5314
+PFN_vkCmdSetViewport vkCmdSetViewport;121,5356
+PFN_vkCmdSetScissor vkCmdSetScissor;122,5396
+PFN_vkCmdBindVertexBuffers vkCmdBindVertexBuffers;123,5434
+PFN_vkCmdDraw vkCmdDraw;124,5486
+PFN_vkCmdDrawIndexed vkCmdDrawIndexed;125,5512
+PFN_vkCmdDispatch vkCmdDispatch;126,5552
+PFN_vkCmdCopyImage vkCmdCopyImage;127,5586
+PFN_vkCmdPushConstants vkCmdPushConstants;128,5622
+PFN_vkCmdClearColorImage vkCmdClearColorImage;129,5666
+PFN_vkCmdClearDepthStencilImage vkCmdClearDepthStencilImage;130,5714
+PFN_vkCmdBindIndexBuffer vkCmdBindIndexBuffer;131,5776
+PFN_vkCmdSetLineWidth vkCmdSetLineWidth;132,5824
+PFN_vkCmdSetDepthBias vkCmdSetDepthBias;133,5866
+PFN_vkCmdSetBlendConstants vkCmdSetBlendConstants;134,5908
+PFN_vkCmdExecuteCommands vkCmdExecuteCommands;135,5960
+PFN_vkCmdClearAttachments vkCmdClearAttachments;136,6008
+PFN_vkInvalidateMappedMemoryRanges vkInvalidateMappedMemoryRanges;137,6058
+PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR;141,6182
+PFN_vkGetSwapchainImagesKHR vkGetSwapchainImagesKHR;142,6230
+PFN_vkAcquireNextImageKHR vkAcquireNextImageKHR;143,6284
+PFN_vkQueuePresentKHR vkQueuePresentKHR;144,6334
+PFN_vkDestroySwapchainKHR vkDestroySwapchainKHR;145,6376
+
+window.cpp,830
+GLFWwindow* _window;22,542
+VkSwapchainKHR _swapchain 23,564
+VkSwapchainKHR old_swapchain 24,609
+VkSemaphore AcquiredSemaphore;25,657
+VkSemaphore ReadySemaphore;26,689
+VkFence Fence_one;27,718
+VkQueue GraphicsQueue;28,738
+VkQueue ComputeQueue;29,762
+int window_width 30,785
+int window_height 31,811
+uint32_t graphics_queue_family_index;32,837
+uint32_t compute_queue_family_index;33,898
+double time1 34,958
+double y_wheel 35,977
+double xm_norm 36,998
+double ym_norm 37,1019
+uint32_t xm 38,1040
+uint32_t ym 39,1058
+static bool q_exit 42,1083
+namespace window44,1114
+void window_size_callback(47,1137
+void keyCallback(94,2375
+void cursor_position_callback(106,2594
+void scroll_callback(119,3038
+void mouse_button_callback(125,3186
+void initWindow(133,3370
+inline bool Draw(148,3875
+void mainLoop(376,11940
+
+zone.cpp,2777
+unsigned char* stack_mem 21,485
+namespace zone23,524
+size_t q_strlcpy 26,545
+void Q_memset(54,1032
+void Q_memcpy(70,1363
+int Q_memcmp(85,1695
+void Q_strcpy(96,1894
+void Q_strncpy 105,2005
+int Q_strlen(115,2154
+char *Q_strrchr(Q_strrchr126,2273
+void Q_strcat(138,2437
+int Q_strcmp(144,2539
+int Q_strncmp(159,2751
+__attribute__((noinline)) void stack_alloc(190,3489
+void stack_clear(217,4062
+#define	DYNAMIC_SIZE	240,4647
+#define	ZONEID	242,4737
+#define MINFRAGMENT	243,4762
+typedef struct memblock_s245,4788
+	int	size;247,4818
+	int	tag;248,4883
+	int	id;249,4925
+	int	pad;250,4956
+	struct	memblock_s	*next,next251,4994
+	struct	memblock_s	*next, *prev;prev251,4994
+} memblock_t;252,5028
+	int		size;256,5064
+	memblock_t	blocklist;257,5120
+	memblock_t	*rover;rover258,5179
+} memzone_t;259,5200
+static memzone_t	*mainzone;mainzone264,5300
+void Z_Free 271,5399
+static void *Z_TagMalloc Z_TagMalloc313,6310
+static void Z_CheckHeap 378,7892
+void *Z_Malloc Z_Malloc401,8543
+void *Z_Realloc(Z_Realloc419,8840
+char *Z_Strdup Z_Strdup451,9636
+void Z_Print 465,9851
+#define	HUNK_SENTINAL	489,10639
+#define HUNKNAME_LEN	491,10675
+	int		sentinal;494,10719
+	int		size;495,10736
+	char	name[name496,10798
+} hunk_t;497,10825
+unsigned char	*hunk_base;hunk_base499,10838
+int		hunk_size;500,10865
+int		hunk_low_used;502,10884
+int		hunk_high_used;503,10905
+bool	hunk_tempactive;505,10929
+int		hunk_tempmark;506,10952
+void Hunk_Check 515,11074
+void *Hunk_AllocName Hunk_AllocName535,11543
+void *Hunk_Alloc Hunk_Alloc570,12189
+int	Hunk_LowMark 575,12269
+void Hunk_FreeToLowMark 580,12326
+void Hunk_FreeToHighMark 588,12541
+int	Hunk_HighMark 601,12882
+void *Hunk_HighAllocName Hunk_HighAllocName617,13112
+void *Hunk_TempAlloc Hunk_TempAlloc663,13959
+char *Hunk_Strdup Hunk_Strdup684,14267
+#define CACHENAME_LEN	700,14634
+typedef struct cache_system_s701,14660
+	int			size;703,14694
+	cache_user_t		*user;user704,14734
+	char			name[name705,14757
+	struct cache_system_s	*prev,prev706,14787
+	struct cache_system_s	*prev, *next;next706,14787
+	struct cache_system_s	*lru_prev,lru_prev707,14825
+	struct cache_system_s	*lru_prev, *lru_next;lru_next707,14825
+} cache_system_t;708,14891
+cache_system_t	cache_head;712,14973
+void Cache_Move 719,15049
+void Cache_FreeLow 750,15810
+void Cache_FreeHigh 772,16256
+void Cache_UnlinkLRU 794,16772
+void Cache_MakeLRU 805,17027
+cache_system_t *Cache_TryAlloc Cache_TryAlloc824,17466
+void Cache_Flush 905,19237
+void Cache_Print 917,19465
+void Cache_Report 933,19692
+void Cache_Init 944,19885
+void Cache_Free 959,20177
+void *Cache_Check Cache_Check984,20591
+void *Cache_Alloc Cache_Alloc1006,20881
+static void Memory_InitZone 1043,21724
+void Memory_Init 1067,22343
+
+control.h,865
+#define DYNAMIC_VERTEX_BUFFER_SIZE_KB	5,87
+#define DYNAMIC_UNIFORM_BUFFER_SIZE_KB 6,131
+#define DYNAMIC_INDEX_BUFFER_SIZE_KB 7,177
+#define MAX_UNIFORM_ALLOC	8,223
+#define NUM_DYNAMIC_BUFFERS 9,258
+#define NUM_STAGING_BUFFERS 10,289
+#define TEXTURE_MAX_HEAPS 11,320
+#define NUM_COMMAND_BUFFERS 12,349
+typedef struct vram_heap24,759
+	VkDeviceMemory	memory;26,788
+	VkDeviceSize offset;27,813
+	VkDeviceSize size;28,836
+	struct vram_heap* prev;29,857
+	struct vram_heap* next;30,883
+	bool free;31,909
+} vram_heap;32,922
+	VkBuffer			buffer;37,1008
+	uint32_t			current_offset;38,1029
+	unsigned char*		data;39,1058
+} dynbuffer_t;40,1082
+	VkBuffer			buffer;47,1302
+	VkCommandBuffer		command_buffer;48,1323
+	VkFence				fence;49,1358
+	int					current_offset;50,1378
+	bool				submitted;51,1404
+	unsigned char *		data;52,1425
+} stagingbuffer_t;53,1450
+
+lodepng.h,4811
+#define LODEPNG_H27,958
+#define LODEPNG_COMPILE_ZLIB45,1710
+#define LODEPNG_COMPILE_PNG50,1815
+#define LODEPNG_COMPILE_DECODER55,1932
+#define LODEPNG_COMPILE_ENCODER60,2053
+#define LODEPNG_COMPILE_DISK65,2199
+#define LODEPNG_COMPILE_ANCILLARY_CHUNKS70,2378
+#define LODEPNG_COMPILE_ERROR_TEXT75,2538
+#define LODEPNG_COMPILE_ALLOCATORS82,2837
+#define LODEPNG_COMPILE_CPP88,3031
+typedef enum LodePNGColorType99,3252
+	LCT_GREY 101,3286
+	LCT_RGB 102,3332
+	LCT_PALETTE 103,3365
+	LCT_GREY_ALPHA 104,3409
+	LCT_RGBA 105,3466
+} LodePNGColorType;106,3510
+typedef struct LodePNGDecompressSettings LodePNGDecompressSettings;263,11370
+struct LodePNGDecompressSettings264,11439
+	unsigned ignore_adler32;267,11558
+	const void* custom_context;280,12284
+typedef struct LodePNGCompressSettings LodePNGCompressSettings;292,12715
+struct LodePNGCompressSettings 293,12780
+	unsigned btype;296,12866
+	unsigned use_lz77;297,12981
+	unsigned windowsize;298,13070
+	unsigned minmatch;299,13189
+	unsigned nicematch;300,13297
+	unsigned lazymatching;301,13409
+	const void* custom_context;314,14115
+typedef struct LodePNGColorMode327,14640
+	LodePNGColorType colortype;330,14696
+	unsigned bitdepth;331,14804
+	unsigned char* palette;346,15498
+	size_t palettesize;347,15610
+	unsigned key_defined;360,16133
+	unsigned key_r;361,16215
+	unsigned key_g;362,16280
+	unsigned key_b;363,16337
+} LodePNGColorMode;364,16393
+typedef struct LodePNGTime406,18793
+	unsigned year;408,18824
+	unsigned month;409,18871
+	unsigned day;410,18900
+	unsigned hour;411,18929
+	unsigned minute;412,18958
+	unsigned second;413,18987
+} LodePNGTime;414,19044
+typedef struct LodePNGInfo418,19178
+	unsigned compression_method;421,19276
+	unsigned filter_method;422,19361
+	unsigned interlace_method;423,19430
+	LodePNGColorMode color;424,19519
+	unsigned background_defined;450,20772
+	unsigned background_r;451,20846
+	unsigned background_g;452,20938
+	unsigned background_b;453,21019
+	size_t text_num;472,21971
+	char** text_keys;473,22073
+	char** text_strings;474,22142
+	size_t itext_num;481,22338
+	char** itext_keys;482,22408
+	char** itext_langtags;483,22488
+	char** itext_transkeys;484,22602
+	char** itext_strings;485,22696
+	unsigned time_defined;488,22795
+	LodePNGTime time;489,22875
+	unsigned phys_defined;492,22921
+	unsigned phys_x;493,23038
+	unsigned phys_y;494,23092
+	unsigned phys_unit;495,23146
+	unsigned gama_defined;508,23746
+	unsigned gama_gamma;509,23841
+	unsigned chrm_defined;512,23981
+	unsigned chrm_white_x;513,24076
+	unsigned chrm_white_y;514,24134
+	unsigned chrm_red_x;515,24192
+	unsigned chrm_red_y;516,24242
+	unsigned chrm_green_x;517,24292
+	unsigned chrm_green_y;518,24344
+	unsigned chrm_blue_x;519,24396
+	unsigned chrm_blue_y;520,24447
+	unsigned srgb_defined;527,24737
+	unsigned srgb_intent;528,24833
+	unsigned iccp_defined;551,26428
+	char* iccp_name;552,26529
+	unsigned char* iccp_profile;558,26803
+	unsigned iccp_profile_size;559,26834
+	unsigned char* unknown_chunks_data[unknown_chunks_data581,27929
+	size_t unknown_chunks_size[unknown_chunks_size582,27970
+} LodePNGInfo;584,28110
+typedef struct LodePNGDecoderSettings625,30339
+	LodePNGDecompressSettings zlibsettings;627,30381
+	unsigned ignore_crc;630,30569
+	unsigned ignore_critical;631,30617
+	unsigned ignore_end;632,30680
+	unsigned color_convert;638,31155
+	unsigned read_text_chunks;641,31296
+	unsigned remember_unknown_chunks;643,31515
+} LodePNGDecoderSettings;645,31596
+typedef enum LodePNGFilterStrategy652,31863
+	LFS_ZERO,655,31929
+	LFS_MINSUM,657,32033
+	LFS_ENTROPY,660,32191
+	LFS_BRUTE_FORCE,665,32376
+	LFS_PREDEFINED667,32478
+} LodePNGFilterStrategy;668,32495
+typedef struct LodePNGColorProfile675,32949
+	unsigned colored;677,32988
+	unsigned key;678,33026
+	unsigned short key_r;679,33114
+	unsigned short key_g;680,33231
+	unsigned short key_b;681,33255
+	unsigned alpha;682,33279
+	unsigned numcolors;683,33365
+	unsigned char palette[palette684,33445
+	unsigned bits;685,33546
+	size_t numpixels;686,33667
+} LodePNGColorProfile;687,33687
+typedef struct LodePNGEncoderSettings704,34667
+	LodePNGCompressSettings zlibsettings;706,34709
+	unsigned auto_convert;708,34811
+	unsigned filter_palette_zero;714,35201
+	LodePNGFilterStrategy filter_strategy;717,35414
+	const unsigned char* predefined_filters;722,35819
+	unsigned force_palette;726,35993
+	unsigned add_id;729,36132
+	unsigned text_compression;731,36250
+} LodePNGEncoderSettings;733,36324
+typedef struct LodePNGState741,36615
+	LodePNGDecoderSettings decoder;744,36679
+	LodePNGEncoderSettings encoder;747,36807
+	LodePNGColorMode info_raw;749,36903
+	LodePNGInfo info_png;750,37009
+	unsigned error;751,37083
+	virtual ~LodePNGState(754,37170
+} LodePNGState;756,37207
+namespace lodepng976,47610
+class State 979,47660
+
+mathlib.h,646
+#define __MATHLIB_H25,910
+#define M_PI	32,984
+#define M_PI_DIV_180 35,1066
+typedef float vec4_t[vec4_t37,1116
+typedef float vec3_t[vec3_t38,1142
+typedef float vec_t;39,1168
+#define	nanmask	44,1240
+#define	IS_NAN(46,1339
+static inline int IS_NAN 48,1413
+		float f;52,1464
+		int i;53,1476
+#define Q_rint(60,1562
+#define DotProduct(62,1659
+#define DoublePrecisionDotProduct(63,1716
+#define VectorSubtract(64,1812
+#define VectorAdd(65,1891
+#define VectorCopy(66,1965
+#define VectorNormalizeFast(70,2162
+#define	PITCH	83,2465
+#define	YAW	85,2500
+#define	ROLL	87,2530
+#define DEG2RAD(89,2549
+#define BOX_ON_PLANE_SIDE(130,4366
+
+obj_parse.h,5781
+#define OBJ_PARSE_H_2,21
+#define PARSED_OBJ_MODEL_FLAG_POSITION 12,154
+#define PARSED_OBJ_MODEL_FLAG_UV 13,202
+#define PARSED_OBJ_MODEL_FLAG_NORMAL 14,250
+typedef struct ParsedOBJMaterial ParsedOBJMaterial;16,299
+struct ParsedOBJMaterial17,351
+    char *material_name;material_name19,378
+typedef struct ParsedOBJSubModel ParsedOBJSubModel;22,407
+struct ParsedOBJSubModel23,459
+    ParsedOBJMaterial material;25,486
+    int flags;26,518
+    unsigned int vertex_count;27,533
+    float *vertices;vertices28,564
+    unsigned int index_count;29,585
+    int *indices;indices30,615
+typedef struct ParsedOBJModel ParsedOBJModel;33,637
+struct ParsedOBJModel34,683
+    unsigned int sub_model_count;36,707
+    ParsedOBJSubModel *sub_models;sub_models37,741
+typedef struct ParsedOBJ ParsedOBJ;40,780
+struct ParsedOBJ41,816
+    unsigned int model_count;43,835
+    ParsedOBJModel *models;models44,865
+    void *parse_memory_to_free;parse_memory_to_free45,893
+    unsigned int material_library_count;46,925
+    char **material_libraries;material_libraries47,966
+typedef struct OBJParseInfo OBJParseInfo;50,1001
+typedef struct OBJParseError    OBJParseError;55,1176
+typedef struct OBJParseWarning  OBJParseWarning;56,1223
+typedef void OBJParseErrorCallback 57,1272
+typedef void OBJParseWarningCallback 58,1335
+struct OBJParseInfo59,1402
+    char *obj_data;obj_data61,1424
+    void *parse_memory;parse_memory62,1444
+    unsigned int parse_memory_size;63,1468
+    char *filename;filename64,1504
+    OBJParseErrorCallback       *error_callback;error_callback65,1524
+    OBJParseWarningCallback     *warning_callback;warning_callback66,1573
+enum OBJParseErrorType69,1628
+    OBJ_PARSE_ERROR_TYPE_out_of_memory,71,1653
+    OBJ_PARSE_ERROR_TYPE_MAX72,1693
+typedef enum OBJParseErrorType OBJParseErrorType;74,1725
+enum OBJParseWarningType76,1776
+    OBJ_PARSE_WARNING_TYPE_unexpected_token,78,1803
+    OBJ_PARSE_WARNING_TYPE_MAX79,1848
+typedef enum OBJParseWarningType OBJParseWarningType;81,1882
+struct OBJParseError83,1937
+    OBJParseErrorType type;85,1960
+    char *filename;filename86,1988
+    int line;87,2008
+    char *message;message88,2022
+struct OBJParseWarning91,2045
+    OBJParseWarningType type;93,2070
+    char *filename;filename94,2100
+    int line;95,2120
+    char *message;message96,2134
+typedef struct OBJParserArena OBJParserArena;105,2449
+struct OBJParserArena106,2495
+    void *memory;memory108,2519
+    unsigned int memory_alloc_position;109,2537
+    unsigned int memory_size;110,2577
+    unsigned int memory_left;111,2607
+OBJParserArenaInit(115,2656
+OBJParserArenaAllocate(125,2898
+OBJParserCharToLower(140,3240
+OBJParserCharIsAlpha(150,3349
+OBJParserCharIsDigit(156,3449
+OBJParserStringMatchCaseInsensitiveN(162,3521
+typedef enum OBJTokenType OBJTokenType;189,4043
+enum OBJTokenType190,4083
+    OBJ_TOKEN_TYPE_null,192,4103
+    OBJ_TOKEN_TYPE_object_signifier,193,4128
+    OBJ_TOKEN_TYPE_group_signifier,194,4165
+    OBJ_TOKEN_TYPE_shading_signifier,195,4201
+    OBJ_TOKEN_TYPE_vertex_position_signifier,196,4239
+    OBJ_TOKEN_TYPE_vertex_uv_signifier,197,4285
+    OBJ_TOKEN_TYPE_vertex_normal_signifier,198,4325
+    OBJ_TOKEN_TYPE_face_signifier,199,4369
+    OBJ_TOKEN_TYPE_number,200,4404
+    OBJ_TOKEN_TYPE_face_index_divider,201,4431
+    OBJ_TOKEN_TYPE_material_library_signifier,202,4470
+    OBJ_TOKEN_TYPE_use_material_signifier,203,4517
+typedef struct OBJToken OBJToken;206,4564
+struct OBJToken207,4598
+    OBJTokenType type;209,4616
+    char *string;string210,4639
+    int string_length;211,4657
+typedef struct OBJTokenizer OBJTokenizer;214,4684
+struct OBJTokenizer215,4726
+    char *at;at217,4748
+    char *filename;filename218,4762
+    int line;219,4782
+OBJTokenMatch(223,4804
+OBJParserGetNextTokenFromBuffer(230,5004
+        SEARCH_MODE_normal,236,5098
+        SEARCH_MODE_ignore_line,237,5126
+OBJNextToken(330,8442
+OBJSkipUntilNextLine(341,8691
+OBJPeekToken(354,8915
+OBJRequireToken(361,9049
+OBJRequireTokenType(378,9419
+#define OBJParseCStringToInt(394,9784
+#define OBJParseCStringToFloat(395,9826
+OBJTokenToFloat(398,9884
+OBJTokenToInt(430,10710
+OBJParseLoadEntireFileAndNullTerminate(464,11517
+OBJParseFreeFileData(485,11993
+OBJParseDefaultCRTErrorCallback(491,12062
+OBJParseDefaultCRTWarningCallback(497,12222
+LoadOBJ(503,12401
+FreeParsedOBJ(531,13198
+ParseOBJ(542,13364
+    typedef struct OBJParsedSubModelListNode OBJParsedSubModelListNode;562,14212
+    struct OBJParsedSubModelListNode563,14284
+        int flags;565,14327
+        unsigned int vertex_count;566,14346
+        float *vertices;vertices567,14381
+        unsigned int index_count;568,14406
+        int *indices;indices569,14440
+        ParsedOBJMaterial material;570,14462
+        OBJParsedSubModelListNode *next;next571,14498
+    typedef struct OBJParsedModelListNode OBJParsedModelListNode;574,14551
+    struct OBJParsedModelListNode575,14617
+        OBJParsedSubModelListNode *first_sub_model;first_sub_model577,14657
+        unsigned int sub_model_count;578,14709
+        ParsedOBJSubModel *sub_models;sub_models579,14747
+        OBJParsedModelListNode *next;next580,14786
+    typedef struct OBJParsedMaterialLibraryNode OBJParsedMaterialLibraryNode;587,15018
+    struct OBJParsedMaterialLibraryNode588,15096
+        char *name;name590,15142
+        OBJParsedMaterialLibraryNode *next;next591,15162
+                        typedef struct VertexUVAndNormalIndices VertexUVAndNormalIndices;1097,46440
+                        struct VertexUVAndNormalIndices1098,46530
+                            int position_index;1100,46612
+                            int uv_index;1101,46660
+                            int normal_index;1102,46702
+
+render.h,322
+	float pos[pos22,496
+	float color[color23,524
+	float tex_coord[tex_coord24,552
+} Vertex_;25,574
+	float	model[model29,607
+	float	view[view30,626
+	float	proj[proj31,644
+} UniformMatrix;32,662
+inline void DestroyImageViews(58,1781
+inline void DestroyFramebuffers(64,1930
+inline void DestroyPipeLines(70,2087
+
+startup.h,591
+#define VK_USE_PLATFORM_WIN32_KHR14,237
+#define GLFW_EXPOSE_NATIVE_WGL15,272
+#define GLFW_EXPOSE_NATIVE_WIN3216,304
+#define VK_USE_PLATFORM_XCB_KHR22,425
+#define GLFW_EXPOSE_NATIVE_X1123,458
+#define GLFW_EXPOSE_NATIVE_GLX24,490
+#define VK_NO_PROTOTYPES27,532
+#define DEBUG39,1026
+#define VK_CHECK(41,1043
+#   define ASSERT(48,1174
+#   define ASSERT(60,1491
+#define ARRAYSIZE(64,1580
+#define	CLAMP(67,1653
+#define	q_min(71,1768
+#define	q_max(72,1815
+#define DEFAULT_MEMORY 74,1864
+struct QueueInfo85,2113
+	uint32_t FamilyIndex;87,2134
+	float *Priorities;Priorities88,2158
+
+surface.h,207
+struct WindowParameters8,183
+	HINSTANCE HInstance;11,245
+	HWND HWnd;12,268
+	Display *Dpy;Dpy14,321
+	Window wWindow;15,337
+	xcb_connection_t *Connection;Connection17,394
+	xcb_window_t wWindow;18,426
+
+vulkan_functions.h,329
+#define VULKAN_FUNCTIONS2,26
+#define EXPORTED_VULKAN_FUNCTION(9,100
+#define GLOBAL_LEVEL_VULKAN_FUNCTION(10,166
+#define INSTANCE_LEVEL_VULKAN_FUNCTION(11,236
+#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION(12,308
+#define DEVICE_LEVEL_VULKAN_FUNCTION(13,406
+#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION(14,476
+
+zone.h,110
+#define __ZZONE_H9,214
+typedef struct cache_user_s78,1763
+	void	*data;data80,1795
+} cache_user_t;81,1809
+
+window.h,0
+
+vulkan_decl.h,0
+
+textures.h,0
+
+swapchain.h,0
+
+shaders.h,0
+
+draw.h,0
