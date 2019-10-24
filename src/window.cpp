@@ -150,17 +150,17 @@ inline bool Draw()
 {
 	uint32_t image_index;
 	VkResult result;
-	VK_CHECK(vkDeviceWaitIdle(logical_device));
-	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, std::numeric_limits<uint64_t>::max());
-	if(
-	    !swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index)||
-	    !control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr)
-	)
+	
+	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);	
+	vkResetFences(logical_device, 1, &Fence_one);	
+	if(!swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index))
 	{
 	    glfwPollEvents();
 	    return true;
 	}
 
+	assert(control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr));
+	
 	VkPipelineStageFlags flags =
 	{
 		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
@@ -242,7 +242,6 @@ inline bool Draw()
 	render::StartRenderPass(render_area, &clearColor[0], VK_SUBPASS_CONTENTS_INLINE, 0, image_index);
 
 	VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
-	//	VkViewport viewport = { (float)xm_norm, (float)ym_norm, float(window_width), float(window_height), 0, 1 };
 	VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
 
 	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
@@ -255,93 +254,7 @@ inline bool Draw()
 	//PrintMatrix(m);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), m);
 
-
-	control::InvalidateDynamicBuffers();
-
-	//current_dyn_buffer_index = (current_dyn_buffer_index + 1) % NUM_DYNAMIC_BUFFERS;
-	// static Vertex_ vertices[8] = {};
-
-	// vertices[0].pos[0] = -0.5f;   //x
-	// vertices[0].pos[1] = -0.5f;   //y
-	// vertices[0].pos[2] = 0.0f;   //z
-	// vertices[0].color[0] = 1.0f; //r
-	// vertices[0].color[1] = 0.0f; //g
-	// vertices[0].color[2] = 0.0f; //b
-	// vertices[0].tex_coord[0] = 1.0f;
-	// vertices[0].tex_coord[1] = 0.0f;
-
-	// vertices[1].pos[0] = 0.5f;
-	// vertices[1].pos[1] = -0.5f;
-	// vertices[1].pos[2] = 0.0f;   
-	// vertices[1].color[0] = 0.0f;
-	// vertices[1].color[1] = 1.0f;
-	// vertices[1].color[2] = 0.0f;
-	// vertices[1].tex_coord[0] = 0.0f;
-	// vertices[1].tex_coord[1] = 0.0f;
-
-	// vertices[2].pos[0] = 0.5f;
-	// vertices[2].pos[1] = 0.5f;
-	// vertices[2].pos[2] = 0.0f;
-	// vertices[2].color[0] = 0.0f;
-	// vertices[2].color[1] = 0.0f;
-	// vertices[2].color[2] = 1.0f;
-	// vertices[2].tex_coord[0] = 0.0f;
-	// vertices[2].tex_coord[1] = 1.0f;
-
-	// vertices[3].pos[0] = -0.5f;
-	// vertices[3].pos[1] = 0.5f;
-	// vertices[3].pos[2] = 0.0f;
-	// vertices[3].color[0] = 1.0f;
-	// vertices[3].color[1] = 1.0f;
-	// vertices[3].color[2] = 1.0f;
-	// vertices[3].tex_coord[0] = 1.0f;
-	// vertices[3].tex_coord[1] = 1.0f;
-
-	// vertices[4].pos[0] = -0.5f;   //x
-	// vertices[4].pos[1] = -0.5f;   //y
-	// vertices[4].pos[2] = -0.5f;   //z
-	// vertices[4].color[0] = 1.0f; //r
-	// vertices[4].color[1] = 0.0f; //g
-	// vertices[4].color[2] = 0.0f; //b
-	// vertices[4].tex_coord[0] = 1.0f;
-	// vertices[4].tex_coord[1] = 0.0f;
-
-	// vertices[5].pos[0] = 0.5f;
-	// vertices[5].pos[1] = -0.5f;
-	// vertices[5].pos[2] = -0.5f;   
-	// vertices[5].color[0] = 0.0f;
-	// vertices[5].color[1] = 1.0f;
-	// vertices[5].color[2] = 0.0f;
-	// vertices[5].tex_coord[0] = 0.0f;
-	// vertices[5].tex_coord[1] = 0.0f;
-
-	// vertices[6].pos[0] = 0.5f;
-	// vertices[6].pos[1] = 0.5f;
-	// vertices[6].pos[2] = -0.5f;
-	// vertices[6].color[0] = 0.0f;
-	// vertices[6].color[1] = 0.0f;
-	// vertices[6].color[2] = 1.0f;
-	// vertices[6].tex_coord[0] = 0.0f;
-	// vertices[6].tex_coord[1] = 1.0f;
-
-	// vertices[7].pos[0] = -0.5f;
-	// vertices[7].pos[1] = 0.5f;
-	// vertices[7].pos[2] = -0.5f;
-	// vertices[7].color[0] = 1.0f;
-	// vertices[7].color[1] = 1.0f;
-	// vertices[7].color[2] = 1.0f;
-	// vertices[7].tex_coord[0] = 1.0f;
-	// vertices[7].tex_coord[1] = 1.0f;
-
-	// uint16_t indeces[12] = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 };
-	
-	// draw::DrawIndexedTriangle(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
-
-	//	static Vertex_ vertices[10] = {};
-
 	ParsedOBJSubModel p = *kitty.models->sub_models;
-
-
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
 	
 	vkCmdEndRenderPass(command_buffer);
@@ -351,14 +264,10 @@ inline bool Draw()
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_present);
 
-	control::FlushDynamicBuffers();
-
 	if(!control::EndCommandBufferRecordingOperation())
 	{
 		return false;
 	}
-
-	vkResetFences(logical_device, 1, &Fence_one);
 
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
 

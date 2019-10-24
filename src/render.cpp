@@ -102,7 +102,6 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
         //createInfo.pDependencies = &dependency;	
 
 	VK_CHECK(vkCreateRenderPass(logical_device, &createInfo, 0, &renderPasses[renderPassCount++]));
-	//renderPassCount++;
 	return;
 }
 
@@ -119,7 +118,6 @@ void CreateFramebuffer(VkImageView *colorView, VkImageView *depthView, int rende
 	createInfo.attachmentCount = ARRAYSIZE(attachments);
 	createInfo.pAttachments = attachments;
 	VK_CHECK(vkCreateFramebuffer(logical_device, &createInfo, 0, &framebuffers[framebufferCount++]));
-	//	framebufferCount++;
 	return;
 }
 

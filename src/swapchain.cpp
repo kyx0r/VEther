@@ -26,8 +26,11 @@ bool SelectNumberOfSwapchainImages()
 	number_of_swapchain_images = surface_capabilities.minImageCount + 1;
 	if(surface_capabilities.maxImageCount > 0 && number_of_swapchain_images > surface_capabilities.maxImageCount)
 	{
-		number_of_swapchain_images = surface_capabilities.maxImageCount;
+		number_of_swapchain_images = surface_capabilities.maxImageCount;		
 	}
+	//HACK: verify this behavior. 
+	//keep one more because AcquireSwapchainImage may go out of bounds?
+	number_of_swapchain_images += 1;	
 	return true;
 }
 
@@ -241,6 +244,10 @@ bool AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkF
 	case VK_SUCCESS:
 	case VK_SUBOPTIMAL_KHR:
 		return true;
+	case VK_TIMEOUT:
+	        printf("Note: VK_TIMEOUT\n");		
+	        VK_CHECK(vkDeviceWaitIdle(logical_device));
+	        return false;
 	default:
 		std::cout << startup::GetVulkanResultString(result) <<" in func "<<__func__<< std::endl;
 		return false;
