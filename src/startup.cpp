@@ -124,7 +124,7 @@ static VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT flags, VkDe
 	char message[4096];
 	snprintf(message, ARRAYSIZE(message), "%s: %s\n", type, pMessage);
 
-	printf("%s", message);
+	fatal("%s", message);
 
 #ifdef _WIN32
 	OutputDebugStringA(message);

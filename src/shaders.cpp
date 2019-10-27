@@ -1,4 +1,5 @@
 #include "shaders.h"
+#include "flog.h"
 
 /* {
 GVAR: logical_device -> startup.cpp
@@ -25,7 +26,7 @@ void CompileShaders()
 	{
 		GLSL_COMPILER_ENTRY(ARRAYSIZE(shaders[i]), shaders[i]);
 	}
-	std::cout<<"SHADERS COMPILED. \n";
+	trace("SHADERS COMPILED. \n");
 }
 
 VkShaderModule loadShaderMem(int index)

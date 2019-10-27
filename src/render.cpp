@@ -1,6 +1,7 @@
 #include "render.h"
 #include "control.h"
 #include "window.h"
+#include "flog.h"
 
 /* {
 GVAR: logical_device -> startup.cpp
@@ -147,7 +148,7 @@ VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h)
 
 void CreateDepthBuffer()
 {
-	printf("Creating depth buffer\n");
+	trace("Creating depth buffer\n");
 
 	VkResult err;
 	static VkImage depth_buffer = VK_NULL_HANDLE;
@@ -178,11 +179,11 @@ void CreateDepthBuffer()
 
 	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &depth_buffer_memory);
 	if (err != VK_SUCCESS)
-		printf("vkAllocateMemory failed\n");
+		error("vkAllocateMemory failed\n");
 
 	err = vkBindImageMemory(logical_device, depth_buffer, depth_buffer_memory, 0);
 	if (err != VK_SUCCESS)
-		printf("vkBindImageMemory failed\n");
+		error("vkBindImageMemory failed\n");
 
 	VkImageViewCreateInfo image_view_create_info;
 	memset(&image_view_create_info, 0, sizeof(image_view_create_info));
@@ -199,7 +200,7 @@ void CreateDepthBuffer()
 
 	err = vkCreateImageView(logical_device, &image_view_create_info, nullptr, &imageViews[imageViewCount++]);
 	if (err != VK_SUCCESS)
-		printf("vkCreateImageView failed");
+		error("vkCreateImageView failed");
 
 	// VkImageMemoryBarrier image_memory_barrier;
 	// memset(&image_memory_barrier, 0, sizeof(image_memory_barrier));
