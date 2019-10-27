@@ -7,8 +7,8 @@ namespace textures
 {
 
 bool SampleTexture();
- void GenerateColorPalette();
- void FsLoadPngTexture(const char* filename); 
+void GenerateColorPalette();
+void FsLoadPngTexture(const char* filename);
 void InitSamplers();
- void TexDeinit();
+void TexDeinit();
 }

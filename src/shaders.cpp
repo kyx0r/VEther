@@ -9,14 +9,17 @@ GVAR: uint32_t cur_shader_index -> /standalone/standalone.cpp
 namespace shaders
 {
 
-  //this must be called only when logical device is initialized already.   
+//this must be called only when logical device is initialized already.
 void CompileShaders()
 {
 
 	static char* shaders[][5] =
 	{
 		{"dummy", "./res/shaders/triangle.frag.glsl", "-V", "-o", "./res/shaders/triangle.frag.spv"},
-		{"dummy", "./res/shaders/triangle.vert.glsl", "-V", "-o", "./res/shaders/triangle.vert.spv"}
+		{"dummy", "./res/shaders/triangle.vert.glsl", "-V", "-o", "./res/shaders/triangle.vert.spv"},
+		{"dummy", "./res/shaders/screen.frag.glsl", "-V", "-o", "./res/shaders/screen.frag.spv"},
+		{"dummy", "./res/shaders/screen.vert.glsl", "-V", "-o", "./res/shaders/screen.vert.spv"}
+
 	};
 	for(uint32_t i = 0; i<ARRAYSIZE(shaders); ++i)
 	{
@@ -33,18 +36,18 @@ VkShaderModule loadShaderMem(int index)
 VkShaderModule loadShader(const char* path)
 {
 	FILE* file = fopen(path, "rb");
-	assert(file);
+	ASSERT(file, path);
 
 	fseek(file, 0, SEEK_END);
 	long length = ftell(file);
-	assert(length >= 0);
+	ASSERT(length >= 0, "Empty File.");
 	fseek(file, 0, SEEK_SET);
 
 	char* buffer[length];
-	assert(buffer);
+	ASSERT(buffer,"");
 
 	size_t rc = fread(buffer, 1, length, file);
-	assert(rc == size_t(length));
+	ASSERT(rc == size_t(length), "Failed to read");
 	fclose(file);
 
 	VkShaderModuleCreateInfo createInfo = {};

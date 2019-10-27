@@ -30,7 +30,7 @@ void DestroySwapchain(VkSwapchainKHR &_swapchain);
 
 bool GetHandlesOfSwapchainImages(VkSwapchainKHR &_swapchain);
 
-bool AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index);
+uint8_t AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index);
 
 //------------------------------------
 

@@ -22,7 +22,7 @@ endif
 #CC specifies which compiler we're using 
 CC = g++
 
-ASTYLE = aStyle
+ASTYLE = astyle
 
 SRCS=$(wildcard ./src/*.cpp)
 PROGS = $(patsubst ./src/%.cpp, ./build/%.o,$(SRCS))

@@ -72,23 +72,23 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 	window_height = height;
 	window_width = width;
 
-        for(uint32_t i = 0; i<number_of_swapchain_images; i++)
+	for(uint32_t i = 0; i<number_of_swapchain_images; i++)
 	{
-	    vkDestroyImageView(logical_device, imageViews[i], nullptr);
-	}	
+		vkDestroyImageView(logical_device, imageViews[i], nullptr);
+	}
 	uint32_t tmpc = imageViewCount;
 	imageViewCount = 0;
-        render::CreateSwapchainImageViews();
-	
+	render::CreateSwapchainImageViews();
+
 	render::DestroyFramebuffers();
 	framebufferCount = 0;
 
 	render::CreateDepthBuffer();
 	imageViewCount = tmpc;
-	
-        for(uint16_t i = 0; i<number_of_swapchain_images; i++)
+
+	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
 	{
-	    render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
+		render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
 	}
 }
 
@@ -98,39 +98,39 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 	{
 		if (key == GLFW_KEY_Q)
 		{
-		  printf("Quiting cleanly \n");
-		  q_exit = true;
+			printf("Quiting cleanly \n");
+			q_exit = true;
 		}
 	}
 }
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-  //  printf("Xpos: %.6f \n", xpos);
-  //printf("Ypos: %.6f \n", ypos);
-  xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
-  ym_norm = (ypos - ((window_height - 0.001) / 2)) / ((window_height - 0.001) / 2);
-  xm = (uint32_t)xpos;
-  ym = (uint32_t)ypos;
-  //printf("Xpos: %.6f \n", x);
-  //printf("Ypos: %.6f \n", y);
-	
+	//  printf("Xpos: %.6f \n", xpos);
+	//printf("Ypos: %.6f \n", ypos);
+	xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
+	ym_norm = (ypos - ((window_height - 0.001) / 2)) / ((window_height - 0.001) / 2);
+	xm = (uint32_t)xpos;
+	ym = (uint32_t)ypos;
+	//printf("Xpos: %.6f \n", x);
+	//printf("Ypos: %.6f \n", y);
+
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	y_wheel += yoffset;
-      	//printf("Yoff: %.6f \n", y_wheel);
+	//printf("Yoff: %.6f \n", y_wheel);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-    {
-      
-    }
-}  
-  
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+
+	}
+}
+
 void initWindow()
 {
 	glfwInit();
@@ -146,21 +146,27 @@ void initWindow()
 	glfwSetMouseButtonCallback(_window, mouse_button_callback);
 }
 
-inline bool Draw()
+inline uint8_t Draw()
 {
 	uint32_t image_index;
 	VkResult result;
-	
-	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);	
-	vkResetFences(logical_device, 1, &Fence_one);	
-	if(!swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index))
+
+	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);
+	vkResetFences(logical_device, 1, &Fence_one);
+	uint8_t ret = swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index);
+
+	while(ret == 2)
 	{
-	    glfwPollEvents();
-	    return true;
+		ret = swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index);
+		glfwPollEvents();
+	}
+	if(!ret)
+	{
+		return 0;
 	}
 
 	assert(control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr));
-	
+
 	VkPipelineStageFlags flags =
 	{
 		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
@@ -227,7 +233,7 @@ inline bool Draw()
 		present_info.pSwapchains = &_swapchain;
 		present_info.pImageIndices = &image_index;
 		present_info.pResults = nullptr;
-		once = false;		
+		once = false;
 	}
 
 	VkRect2D render_area = {};
@@ -249,14 +255,14 @@ inline bool Draw()
 
 	float m[16];
 	IdentityMatrix(m);
-        //OrthoMatrix(m, 0, window_width, window_height, 0, -99999, 99999);
+	//OrthoMatrix(m, 0, window_width, window_height, 0, -99999, 99999);
 	//SetupMatrix(m);
 	//PrintMatrix(m);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), m);
 
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
-	
+
 	vkCmdEndRenderPass(command_buffer);
 
 	image_memory_barrier_before_present.image = handle_array_of_swapchain_images[image_index];
@@ -266,7 +272,7 @@ inline bool Draw()
 
 	if(!control::EndCommandBufferRecordingOperation())
 	{
-		return false;
+		return 0;
 	}
 
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
@@ -275,16 +281,16 @@ inline bool Draw()
 	switch(result)
 	{
 	case VK_SUCCESS:
-		return true;
+		return 1;
 	case VK_ERROR_OUT_OF_DATE_KHR:
-	        glfwPollEvents();
-		return true;
+		glfwPollEvents();
+		return 1;
 	default:
 		printf(startup::GetVulkanResultString(result));
 		printf("\n");
-		return false;
+		return 0;
 	}
-	return true;
+	return 1;
 }
 
 void mainLoop()
@@ -297,21 +303,25 @@ void mainLoop()
 
 	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
 	{
-	    render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
+		render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
 	}
 
-        shaders::CompileShaders();
-
-	VkShaderModule triangleVS = shaders::loadShaderMem(1);
-	assert(triangleVS);
+	shaders::CompileShaders();
 
 	VkShaderModule triangleFS = shaders::loadShaderMem(0);
-	assert(triangleFS);
+	ASSERT(triangleFS, "Failed to load triangleFS.");
+	VkShaderModule triangleVS = shaders::loadShaderMem(1);
+	ASSERT(triangleVS, "Failed to load triangleVS.");
+	VkShaderModule screenFS = shaders::loadShaderMem(2);
+	ASSERT(triangleVS, "Failed to load screenFS.");
+	VkShaderModule screenVS = shaders::loadShaderMem(3);
+	ASSERT(triangleVS, "Failed to load screenVS.");
+
 
 	textures::SampleTexture();
-	
+
 	kitty = LoadOBJ("./res/kitty.obj");
-	
+
 	VkPipelineCache pipelineCache = 0;
 
 	render::CreatePipelineLayout();
@@ -328,11 +338,11 @@ void mainLoop()
 		time_diff = time1 - time2;
 		if(time_diff > 0.01f)
 		{
-		        if(!Draw())
-		  	{
-		  		std::cout << "Critical Error! Abandon the ship.\n";
-		  		break;
-		  	}
+			if(!Draw())
+			{
+				std::cout << "Critical Error! Abandon the ship.\n";
+				break;
+			}
 		}
 		else
 		{
@@ -361,6 +371,8 @@ void mainLoop()
 	render::DestroyPipeLines();
 	vkDestroyShaderModule(logical_device, triangleVS, nullptr);
 	vkDestroyShaderModule(logical_device, triangleFS, nullptr);
+	vkDestroyShaderModule(logical_device, screenVS, nullptr);
+	vkDestroyShaderModule(logical_device, screenFS, nullptr);
 	render::DestroyRenderPasses();
 	swapchain::DestroySwapchain(_swapchain);
 	surface::DestroyPresentationSurface();

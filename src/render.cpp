@@ -50,20 +50,20 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
 	attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-	
+
 
 	VkAttachmentReference colorAttachment;
 	colorAttachment.attachment = 0;
 	colorAttachment.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	  
+
 	VkAttachmentReference depthAttachment;
 	depthAttachment.attachment = 1;
 	depthAttachment.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 	// If srcSubpass is equal to dstSubpass then the VkSubpassDependency describes a subpass self-dependency, and only constrains the pipeline barriers allowed within a subpass instance.
-        // Otherwise, when a render pass instance which includes a subpass dependency is submitted to a queue, it defines a memory dependency between the subpasses identified by srcSubpass and dstSubpass.
+	// Otherwise, when a render pass instance which includes a subpass dependency is submitted to a queue, it defines a memory dependency between the subpasses identified by srcSubpass and dstSubpass.
 
-        // If srcSubpass is equal to VK_SUBPASS_EXTERNAL, the first synchronization scope includes commands that occur earlier in submission order than the vkCmdBeginRenderPass used to begin the render pass instance.
+	// If srcSubpass is equal to VK_SUBPASS_EXTERNAL, the first synchronization scope includes commands that occur earlier in submission order than the vkCmdBeginRenderPass used to begin the render pass instance.
 	// Otherwise, the first set of commands includes all commands submitted as part of the subpass instance identified by srcSubpass and any load, store or multisample resolve operations on attachments used in srcSubpass.
 	// In either case, the first synchronization scope is limited to operations on the pipeline stages determined by the source stage mask specified by srcStageMask.
 
@@ -77,14 +77,14 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
 
 	// The availability and visibility operations defined by a subpass dependency affect the execution of image layout transitions within the render pass.
 
-        VkSubpassDependency dependency = {};
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;	
-	  
+	VkSubpassDependency dependency = {};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 	VkSubpassDescription subpass[1] = {};
 	subpass[0].flags = 0;
 	subpass[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -98,8 +98,8 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
 	createInfo.pAttachments = attachments;
 	createInfo.subpassCount = 1;
 	createInfo.pSubpasses = &subpass[0];
-        //createInfo.dependencyCount = 1;
-        //createInfo.pDependencies = &dependency;	
+	//createInfo.dependencyCount = 1;
+	//createInfo.pDependencies = &dependency;
 
 	VK_CHECK(vkCreateRenderPass(logical_device, &createInfo, 0, &renderPasses[renderPassCount++]));
 	return;
@@ -154,14 +154,14 @@ void CreateDepthBuffer()
 	static VkDeviceMemory depth_buffer_memory = VK_NULL_HANDLE;
 	if(depth_buffer)
 	{
-	    vkDestroyImage(logical_device, depth_buffer, nullptr);
-	    vkFreeMemory(logical_device, depth_buffer_memory, nullptr);
-	    vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images], nullptr);
+		vkDestroyImage(logical_device, depth_buffer, nullptr);
+		vkFreeMemory(logical_device, depth_buffer_memory, nullptr);
+		vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images], nullptr);
 	}
-	
+
 	//todo: check if this is supported before attempting.
 	depth_buffer = Create2DImage(VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, window_width, window_height);
-	
+
 	VkMemoryRequirements memory_requirements;
 	vkGetImageMemoryRequirements(logical_device, depth_buffer, &memory_requirements);
 
@@ -219,7 +219,7 @@ void CreateDepthBuffer()
 	// image_memory_barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 	// vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
 }
- 
+
 
 void CreateSwapchainImageViews()
 {
@@ -235,11 +235,11 @@ void CreateSwapchainImageViews()
 	createInfo.subresourceRange.baseMipLevel = 0;
 	createInfo.subresourceRange.levelCount = 1;
 	createInfo.subresourceRange.layerCount = 1;
-	
+
 	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
 	{
-	    createInfo.image = handle_array_of_swapchain_images[i];		      
-	    VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[imageViewCount + i]));
+		createInfo.image = handle_array_of_swapchain_images[i];
+		VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[imageViewCount + i]));
 	}
 	imageViewCount += number_of_swapchain_images;
 	return;
@@ -296,7 +296,7 @@ void Viewport(float x, float y, float width, float height, float min_depth, floa
 
 VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 {
-        zone::stack_alloc(100000, 1);
+	zone::stack_alloc(100000, 1);
 
 	VkVertexInputBindingDescription* bindingDescription = new(stack_mem) VkVertexInputBindingDescription[0];
 	bindingDescription[0].binding = 0;
@@ -319,7 +319,7 @@ VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 
 	VkPipelineVertexInputStateCreateInfo* vertexInput = new(&attributeDescriptions[0] + sizeof(attributeDescriptions)) VkPipelineVertexInputStateCreateInfo[0];
 	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInput[0].vertexBindingDescriptionCount = 1; 
+	vertexInput[0].vertexBindingDescriptionCount = 1;
 	vertexInput[0].vertexAttributeDescriptionCount = 3;
 	vertexInput[0].pVertexBindingDescriptions = bindingDescription;
 	vertexInput[0].pVertexAttributeDescriptions = &attributeDescriptions[0];
@@ -408,4 +408,4 @@ void CreateGraphicsPipeline
 }
 
 } //namespace render
- 
+

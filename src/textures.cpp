@@ -3,6 +3,7 @@
 #include "render.h"
 #include "zone.h"
 #include "lodepng.h"
+#include "flog.h"
 #include <math.h>
 
 /* {
@@ -41,7 +42,7 @@ static unsigned* TexMgr8to32(unsigned char *in, int pixels, unsigned int *usepal
 
 void InitSamplers()
 {
-	printf("Initializing samplers\n");
+	trace("Initializing samplers");
 
 	VkResult err;
 
@@ -63,7 +64,7 @@ void InitSamplers()
 
 		err = vkCreateSampler(logical_device, &sampler_create_info, nullptr, &point_sampler);
 		if (err != VK_SUCCESS)
-			printf("vkCreateSampler failed \n");
+			fatal("vkCreateSampler failed");
 
 
 		/* 		sampler_create_info.anisotropyEnable = VK_TRUE;
@@ -95,13 +96,13 @@ void InitSamplers()
 
 void TexDeinit()
 {
-  vkDestroySampler(logical_device, point_sampler, nullptr);
-  for(int i = 0; i<current_tex_ds_index; i++)
-  {
-    vkDestroyImage(logical_device, v_image[i], nullptr);
-    //vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images+i+1], nullptr);
-  }
-  
+	vkDestroySampler(logical_device, point_sampler, nullptr);
+	for(int i = 0; i<current_tex_ds_index; i++)
+	{
+		vkDestroyImage(logical_device, v_image[i], nullptr);
+		//vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images+i+1], nullptr);
+	}
+
 }
 
 void SetFilterModes(int tex_index, VkImageView *imgView)
@@ -125,35 +126,35 @@ void SetFilterModes(int tex_index, VkImageView *imgView)
 	vkUpdateDescriptorSets(logical_device, 1, &texture_write, 0, nullptr);
 }
 
-  void GenerateColorPalette()
-  {
-    unsigned char* dst = palette;
-    for(int i = 0; i < 256; i++)
-      {
-	unsigned char r = 127 * (1 + sin(5 * i * 6.28318531 / 16));
-	unsigned char g = 127 * (1 + sin(2 * i * 6.28318531 / 16));
-	unsigned char b = 127 * (1 + sin(3 * i * 6.28318531 / 16));
-	// unsigned char a = 63 * (1 + std::sin(8 * i * 6.28318531 / 16)) + 128; /*alpha channel of the palette (tRNS chunk)*/
-	*dst++ = r;
-	*dst++ = g;
-	*dst++ = b;
-	//*dst++ = a;
-      }
+void GenerateColorPalette()
+{
+	unsigned char* dst = palette;
+	for(int i = 0; i < 256; i++)
+	{
+		unsigned char r = 127 * (1 + sin(5 * i * 6.28318531 / 16));
+		unsigned char g = 127 * (1 + sin(2 * i * 6.28318531 / 16));
+		unsigned char b = 127 * (1 + sin(3 * i * 6.28318531 / 16));
+		// unsigned char a = 63 * (1 + std::sin(8 * i * 6.28318531 / 16)) + 128; /*alpha channel of the palette (tRNS chunk)*/
+		*dst++ = r;
+		*dst++ = g;
+		*dst++ = b;
+		//*dst++ = a;
+	}
 
-    dst = (unsigned char*)data;
-    unsigned char* src = palette;
-    for (int i = 0; i < 256; i++)
-      {
-	*dst++ = *src++;
-	*dst++ = *src++;
-	*dst++ = *src++;
-	*dst++ = 255;
-      }
-	
-  }
+	dst = (unsigned char*)data;
+	unsigned char* src = palette;
+	for (int i = 0; i < 256; i++)
+	{
+		*dst++ = *src++;
+		*dst++ = *src++;
+		*dst++ = *src++;
+		*dst++ = 255;
+	}
+
+}
 
 void UploadTexture(unsigned char* image, int w, int h)
-  {
+{
 	VkDescriptorSetAllocateInfo dsai;
 	memset(&dsai, 0, sizeof(dsai));
 	dsai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -169,15 +170,15 @@ void UploadTexture(unsigned char* image, int w, int h)
 	vkGetImageMemoryRequirements(logical_device, v_image[current_tex_ds_index], &memory_requirements);
 
 	int mem_type = control::MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 0);
-	
+
 	VkDeviceSize heap_size = (VkDeviceSize)1073741824;
-        control::VramHeapAllocate(heap_size, mem_type);
-	
+	control::VramHeapAllocate(heap_size, mem_type);
+
 	VkDeviceSize aligned_offset;
 	vram_heap* heap = control::VramHeapDigress(memory_requirements.size, memory_requirements.alignment, &aligned_offset);
 	if(!heap)
 	{
-		printf("Failed to align the memory \n");
+		fatal("Failed to align the memory");
 		startup::debug_pause();
 	}
 	VK_CHECK(vkBindImageMemory(logical_device, v_image[current_tex_ds_index], heap->memory, aligned_offset));
@@ -197,11 +198,11 @@ void UploadTexture(unsigned char* image, int w, int h)
 	createInfo.subresourceRange.levelCount = 1;
 	createInfo.subresourceRange.layerCount = 1;
 	createInfo.image = v_image[current_tex_ds_index];
-	
+
 	VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[imageViewCount++]));
-	
+
 	//imageViewCount += number_of_swapchain_images;
-	
+
 	SetFilterModes(0, &imageViews[imageViewCount-1]);
 
 	unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
@@ -249,38 +250,33 @@ void UploadTexture(unsigned char* image, int w, int h)
 	control::SubmitStagingBuffer();
 	current_tex_ds_index++;
 
-  }
+}
 
 
 void FsLoadPngTexture(const char* filename)
 {
-  if(!filename)
-    {
-      std::cout << "Null passed in to FsLoadTexture \n";
-      startup::debug_pause();
-    }
+	ASSERT(filename, "Null pointer passed into FsLoadPngTexture");
+	// Load file and decode image.
+	unsigned char mem[sizeof(std::vector<unsigned char>)];
+	std::vector<unsigned char>* image = new (mem) std::vector<unsigned char>;
 
-  // Load file and decode image.
-  unsigned char mem[sizeof(std::vector<unsigned char>)];
-  std::vector<unsigned char>* image = new (mem) std::vector<unsigned char>;
-	  
-  unsigned width, height;
-  unsigned error = lodepng::decode(*image, width, height, filename);
+	unsigned width, height;
+	unsigned error = lodepng::decode(*image, width, height, filename);
 
-  if(error != 0)
-    {
-      std::cout << "Error " << error << ": " << lodepng_error_text(error) << std::endl;
-      startup::debug_pause();
-    }
+	if(error != 0)
+	{
+		fatal("Error %s : %s",error,lodepng_error_text(error));
+		startup::debug_pause();
+	}
 
-  unsigned int* usepal = data;
-  unsigned char* img = (unsigned char*)TexMgr8to32(image->data(), (width * height), usepal);
-  UploadTexture(img, width, height);
+	unsigned int* usepal = data;
+	unsigned char* img = (unsigned char*)TexMgr8to32(image->data(), (width * height), usepal);
+	UploadTexture(img, width, height);
 }
 
 bool SampleTexture()
 {
-        int mark = zone::Hunk_LowMark();
+	int mark = zone::Hunk_LowMark();
 	//generate some image
 	const unsigned w = 511;
 	const unsigned h = 511;
@@ -300,10 +296,10 @@ bool SampleTexture()
 
 	unsigned int *usepal = data;
 	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
-	
+
 	UploadTexture(image, w, h);
 	zone::Hunk_FreeToLowMark(mark);
-	
+
 	return true;
 }
 

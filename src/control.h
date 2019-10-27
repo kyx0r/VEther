@@ -2,7 +2,7 @@
 #include "swapchain.h"
 
 //-----------------------------------
-#define DYNAMIC_VERTEX_BUFFER_SIZE_KB	2048
+#define DYNAMIC_VERTEX_BUFFER_SIZE_KB	4096
 #define DYNAMIC_UNIFORM_BUFFER_SIZE_KB  2048
 #define DYNAMIC_INDEX_BUFFER_SIZE_KB    2048
 #define MAX_UNIFORM_ALLOC		2048
@@ -62,7 +62,7 @@ void DestroyDynBuffers();
 void DestroyStagingBuffers();
 void DestroyUniformBuffers();
 void DestroyIndexBuffers();
-void DestroyVramHeaps(); 
+void DestroyVramHeaps();
 bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count);
 void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);

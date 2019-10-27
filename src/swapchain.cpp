@@ -1,5 +1,6 @@
 #include "swapchain.h"
 #include "zone.h"
+#include "flog.h"
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: target_device -> startup.cpp
@@ -26,11 +27,11 @@ bool SelectNumberOfSwapchainImages()
 	number_of_swapchain_images = surface_capabilities.minImageCount + 1;
 	if(surface_capabilities.maxImageCount > 0 && number_of_swapchain_images > surface_capabilities.maxImageCount)
 	{
-		number_of_swapchain_images = surface_capabilities.maxImageCount;		
+		number_of_swapchain_images = surface_capabilities.maxImageCount;
 	}
-	//HACK: verify this behavior. 
+	//HACK: verify this behavior.
 	//keep one more because AcquireSwapchainImage may go out of bounds?
-	number_of_swapchain_images += 1;	
+	number_of_swapchain_images += 1;
 	return true;
 }
 
@@ -117,7 +118,7 @@ bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format)
 	result = vkGetPhysicalDeviceSurfaceFormatsKHR( target_device, presentation_surface, &formats_count, nullptr );
 	if(result != VK_SUCCESS || formats_count == 0 )
 	{
-		std::cout << "Could not get the number of supported surface formats." << std::endl;
+		fatal( "Could not get the number of supported surface formats." );
 		return false;
 	}
 
@@ -125,7 +126,7 @@ bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format)
 	result = vkGetPhysicalDeviceSurfaceFormatsKHR( target_device, presentation_surface, &formats_count, &surface_formats[0] );
 	if(result != VK_SUCCESS || formats_count == 0)
 	{
-		std::cout << "Could not enumerate supported surface formats." << std::endl;
+		fatal( "Could not enumerate supported surface formats." );
 		return false;
 	}
 
@@ -153,14 +154,14 @@ bool SelectFormatOfSwapchainImages(VkSurfaceFormatKHR desired_surface_format)
 		{
 			image_format = desired_surface_format.format;
 			image_color_space = surface_formats[i].colorSpace;
-			std::cout << "Desired combination of format and colorspace is not supported. Selecting other colorspace." << std::endl;
+			warn( "Desired combination of format and colorspace is not supported. Selecting other colorspace." );
 			return true;
 		}
 	}
 
 	image_format = surface_formats[0].format;
 	image_color_space = surface_formats[0].colorSpace;
-	std::cout << "Desired format is not supported. Selecting available format - colorspace combination." << std::endl;
+	warn( "Desired format is not supported. Selecting available format - colorspace combination." );
 	return true;
 }
 
@@ -192,7 +193,7 @@ bool CreateSwapchain(VkSwapchainKHR &_swapchain, VkSwapchainKHR &old_swapchain)
 	if( (VK_SUCCESS != result) ||
 	        (VK_NULL_HANDLE == _swapchain) )
 	{
-		std::cout << "Could not create a swapchain." << std::endl;
+		fatal( "Could not create a swapchain." );
 		return false;
 	}
 
@@ -213,13 +214,13 @@ bool GetHandlesOfSwapchainImages(VkSwapchainKHR &_swapchain)
 	result = vkGetSwapchainImagesKHR( logical_device, _swapchain, &images_count, nullptr );
 	if(result != VK_SUCCESS || images_count == 0)
 	{
-		std::cout << "Could not get the number of swapchain images." << std::endl;
+		fatal( "Could not get the number of swapchain images." );
 		return false;
 	}
 
 	if(handle_array_of_swapchain_images != nullptr)
 	{
-	  zone::Z_Free((char*)&handle_array_of_swapchain_images[0]);
+		zone::Z_Free((char*)&handle_array_of_swapchain_images[0]);
 	}
 	char* mem = (char*) zone::Z_Malloc(sizeof(VkImage) * images_count);
 	handle_array_of_swapchain_images = new(mem) VkImage [images_count];
@@ -227,30 +228,33 @@ bool GetHandlesOfSwapchainImages(VkSwapchainKHR &_swapchain)
 	result = vkGetSwapchainImagesKHR( logical_device, _swapchain, &images_count, &handle_array_of_swapchain_images[0]);
 	if(result != VK_SUCCESS || images_count == 0)
 	{
-		std::cout << "Could not enumerate swapchain images." << std::endl;
+		fatal( "Could not enumerate swapchain images." );
 		return false;
 	}
 	return true;
 }
 
-bool AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index)
+uint8_t AcquireSwapchainImage(VkSwapchainKHR _swapchain, VkSemaphore semaphore, VkFence fence, uint32_t &image_index)
 {
 	VkResult result;
 
-	//tell hardware to not wait more than 2 seconds.
-	result = vkAcquireNextImageKHR( logical_device, _swapchain, 2000000000, semaphore, fence, &image_index );
+	//tell hardware to not wait more than 1 second.
+wait:
+	result = vkAcquireNextImageKHR( logical_device, _swapchain, 1000000000, semaphore, fence, &image_index );
 	switch( result )
 	{
 	case VK_SUCCESS:
 	case VK_SUBOPTIMAL_KHR:
-		return true;
+		return 1;
 	case VK_TIMEOUT:
-	        printf("Note: VK_TIMEOUT\n");		
-	        VK_CHECK(vkDeviceWaitIdle(logical_device));
-	        return false;
+		info("VK_TIMEOUT\n");
+		goto wait;
+	case VK_ERROR_OUT_OF_DATE_KHR:
+		info("VK_ERROR_OUT_OF_DATE_KHR\n");
+		return 2;
 	default:
-		std::cout << startup::GetVulkanResultString(result) <<" in func "<<__func__<< std::endl;
-		return false;
+		error("%s",startup::GetVulkanResultString(result));
+		return 0;
 	}
 }
 

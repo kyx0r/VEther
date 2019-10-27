@@ -5,6 +5,7 @@
 #include "src/control.h"
 #include "src/shaders.h"
 #include "src/textures.h"
+#include "src/flog.h"
 
 #define number_of_queues 1 // <- change this if more queues needed
 
@@ -43,7 +44,7 @@ int main(int argc, char *lpCmdLine[])
 		VK_EXT_DEBUG_REPORT_EXTENSION_NAME
 #endif
 	};
-		
+
 	static const char *device_extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 	struct QueueInfo QueueInfos[number_of_queues];
 	WindowParameters windowParams;
@@ -53,14 +54,18 @@ int main(int argc, char *lpCmdLine[])
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
 
+	log_set_level(4);
+	FILE* f = fopen("./log.txt","w");
+	log_set_fp(f);
+
 	window::initWindow();
-	
+
 	if (
-	     !startup::LoadVulkan() ||
-	     !startup::LoadVulkanGlobalFuncs() ||
-	     !startup::CheckInstanceExtensions() ||
-	     !startup::CreateVulkanInstance(ARRAYSIZE(extensions),extensions)||
-	     !startup::LoadInstanceFunctions())
+	    !startup::LoadVulkan() ||
+	    !startup::LoadVulkanGlobalFuncs() ||
+	    !startup::CheckInstanceExtensions() ||
+	    !startup::CreateVulkanInstance(ARRAYSIZE(extensions),extensions)||
+	    !startup::LoadInstanceFunctions())
 	{
 		startup::debug_pause();
 		exit(1);
@@ -68,8 +73,8 @@ int main(int argc, char *lpCmdLine[])
 
 #ifdef DEBUG
 	VkDebugReportCallbackEXT debugCallback = startup::registerDebugCallback();
-#endif	
-	
+#endif
+
 	if(
 	    !startup::CheckPhysicalDevices() ||
 	    !startup::CheckPhysicalDeviceExtensions()||
@@ -92,7 +97,7 @@ int main(int argc, char *lpCmdLine[])
 	vkGetDeviceQueue(logical_device, graphics_queue_family_index, 0, &GraphicsQueue);
 	//vkGetDeviceQueue(logical_device, compute_queue_family_index, 0, &ComputeQueue);
 
-	std::cout << "Vulkan Initialized Successfully! \n";
+	trace("Vulkan Initialized Successfully! \n");
 
 	if(
 	    !swapchain::SelectNumberOfSwapchainImages()||
@@ -108,7 +113,7 @@ int main(int argc, char *lpCmdLine[])
 		exit(1);
 	}
 
-	std::cout << "Swapchain Created! \n";
+	trace("Swapchain Created! \n");
 
 	if(
 	    !control::CreateSemaphore(AcquiredSemaphore)||
@@ -122,7 +127,7 @@ int main(int argc, char *lpCmdLine[])
 		exit(1);
 	}
 
-	std::cout << "Initial Control Buffer Created! \n";
+	trace("Initial Control Buffer Created! \n");
 
 	vkGetPhysicalDeviceMemoryProperties(target_device, &memory_properties);
 	control::IndexBuffersAllocate();

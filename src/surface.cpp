@@ -1,5 +1,5 @@
 #include "surface.h"
-
+#include "flog.h"
 /* {
 GVAR: target_device -> startup.cpp
 GVAR: instance -> startup.cpp
@@ -37,7 +37,7 @@ bool CreatePresentationSurface(WindowParameters &window_parameters)
 
 	window_parameters.wWindow = glfwGetX11Window(_window);
 	window_parameters.Dpy = glfwGetX11Display();
-	
+
 	VkXlibSurfaceCreateInfoKHR surface_create_info =
 	{
 		VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,   // VkStructureType                 sType
@@ -46,14 +46,14 @@ bool CreatePresentationSurface(WindowParameters &window_parameters)
 		window_parameters.Dpy,                            // Display                       * dpy
 		window_parameters.wWindow                          // Window                          window
 	};
-      
+
 	result = vkCreateXlibSurfaceKHR( instance, &surface_create_info, nullptr, &presentation_surface );
 
 #elif defined VK_USE_PLATFORM_XCB_KHR
 
 	window_parameters.wWindow = glfwGetX11Window(_window);
 	window_parameters.Connection = glfwGetConnection();
-	
+
 	VkXcbSurfaceCreateInfoKHR surface_create_info =
 	{
 		VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,    // VkStructureType                 sType
@@ -69,7 +69,7 @@ bool CreatePresentationSurface(WindowParameters &window_parameters)
 	if( (VK_SUCCESS != result) ||
 	        (VK_NULL_HANDLE == presentation_surface) )
 	{
-		std::cout << "Could not create presentation surface." << std::endl;
+		fatal("Could not create presentation surface.");
 		return false;
 	}
 	return true;
@@ -87,7 +87,7 @@ bool CheckSurfaceQueueSupport(uint32_t &queue_family_index)
 			return true;
 		}
 	}
-	std::cout<<"Surface queue is not supported by the device. \n";
+	fatal("Surface queue is not supported by the device.");
 	return false;
 }
 
@@ -98,14 +98,14 @@ bool CheckSelectPresentationModesSupport(VkPresentModeKHR desired_mode)
 	result = vkGetPhysicalDeviceSurfacePresentModesKHR(target_device, presentation_surface, &modes_count, nullptr);
 	if(result != VK_SUCCESS || modes_count == 0)
 	{
-		std::cout<<"Could not get number of surface presentation modes! \n";
+		fatal("Could not get number of surface presentation modes!");
 		return false;
 	}
 	VkPresentModeKHR present_modes[modes_count];
 	result = vkGetPhysicalDeviceSurfacePresentModesKHR(target_device, presentation_surface, &modes_count, &present_modes[0]);
 	if(result != VK_SUCCESS || modes_count == 0)
 	{
-		std::cout<<"Could not enumerate surface presentation modes! \n";
+		fatal("Could not enumerate surface presentation modes!");
 		return false;
 	}
 	for(uint32_t i = 0; i<modes_count; i++)
@@ -116,7 +116,7 @@ bool CheckSelectPresentationModesSupport(VkPresentModeKHR desired_mode)
 			return true;
 		}
 	}
-	std::cout<<"Note: Desired mode is not supported. Selecting default FIFO \n";
+	info("Note: Desired mode is not supported. Selecting default FIFO");
 	for(uint32_t i = 0; i<modes_count; i++)
 	{
 		if(present_modes[i]==VK_PRESENT_MODE_FIFO_KHR)
@@ -125,7 +125,7 @@ bool CheckSelectPresentationModesSupport(VkPresentModeKHR desired_mode)
 			return true;
 		}
 	}
-	std::cout<<"Function "<<__func__<<" failed!"<<std::endl;
+	error("Function failed - %s", __func__);
 	return false;
 }
 
@@ -134,7 +134,7 @@ bool CheckPresentationSurfaceCapabilities()
 	VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(target_device, presentation_surface, &surface_capabilities);
 	if(result != VK_SUCCESS)
 	{
-		std::cout<<"Could not get capabilities of the presentation surface! "<<startup::GetVulkanResultString(result)<<std::endl;
+		fatal("Could not get capabilities of the presentation surface! %s",startup::GetVulkanResultString(result));
 		return false;
 	}
 	return true;

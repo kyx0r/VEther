@@ -1,11 +1,7 @@
 #include <cstdio>
 #include <cstring>
-#include <iostream>
 #include <limits>
-#include <sstream>
-#include <vector>
 #include <string>
-#include <assert.h>
 #include <chrono>
 #include <thread>
 #include <cfloat>
@@ -38,12 +34,6 @@
 
 #define DEBUG
 
-#define VK_CHECK(call) \
-	do { \
-		VkResult result_ = call; \
-		assert(result_ == VK_SUCCESS); \
-	} while (0)
-
 #ifdef DEBUG
 #   define ASSERT(condition, message) \
     do { \
@@ -57,8 +47,11 @@
         } \
     } while (false)
 #else
-#   define ASSERT(condition, message) do { } while (false)
+#   define ASSERT(condition, message)
 #endif
+
+//when in release mode it is okay for this to give unused variable error.
+#define VK_CHECK(call) do { VkResult result = call; ASSERT(result == VK_SUCCESS,"VK_CHECK"); } while (0)
 
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(array) (sizeof(array) / sizeof((array)[0]))

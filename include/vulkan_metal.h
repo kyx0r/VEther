@@ -39,11 +39,12 @@ typedef void CAMetalLayer;
 #define VK_EXT_METAL_SURFACE_SPEC_VERSION 1
 #define VK_EXT_METAL_SURFACE_EXTENSION_NAME "VK_EXT_metal_surface"
 typedef VkFlags VkMetalSurfaceCreateFlagsEXT;
-typedef struct VkMetalSurfaceCreateInfoEXT {
-    VkStructureType                 sType;
-    const void*                     pNext;
-    VkMetalSurfaceCreateFlagsEXT    flags;
-    const CAMetalLayer*             pLayer;
+typedef struct VkMetalSurfaceCreateInfoEXT
+{
+	VkStructureType                 sType;
+	const void*                     pNext;
+	VkMetalSurfaceCreateFlagsEXT    flags;
+	const CAMetalLayer*             pLayer;
 } VkMetalSurfaceCreateInfoEXT;
 
 typedef VkResult (VKAPI_PTR *PFN_vkCreateMetalSurfaceEXT)(VkInstance instance, const VkMetalSurfaceCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);

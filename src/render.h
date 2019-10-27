@@ -20,8 +20,8 @@ extern VkPipeline current_pipeline;
 typedef struct
 {
 	float pos[3];   // = vec3
-        float tex_coord[2]; // = vec2
-  	float color[3]; // = vec3
+	float tex_coord[2]; // = vec2
+	float color[3]; // = vec3
 } Vertex_;
 
 typedef struct
@@ -41,8 +41,8 @@ void CreateSwapchainImageViews();
 void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpassContents subpass_contents, int render_index, int buffer_index);
 void CreateGraphicsPipeline(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs);
 void CreatePipelineLayout();
- void CreateDepthBuffer(); 
-void Viewport(float x, float y, float width, float height, float min_depth, float max_depth); 
+void CreateDepthBuffer();
+void Viewport(float x, float y, float width, float height, float min_depth, float max_depth);
 //-----------------------
 VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe();
 VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h);

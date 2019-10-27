@@ -100,7 +100,7 @@ typedef void* id;
 #elif defined(GLFW_EXPOSE_NATIVE_X11) || defined(GLFW_EXPOSE_NATIVE_GLX)
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
-typedef struct xcb_connection_t xcb_connection_t;  
+typedef struct xcb_connection_t xcb_connection_t;
 #elif defined(GLFW_EXPOSE_NATIVE_WAYLAND)
 #include <wayland-client.h>
 #endif
@@ -250,7 +250,7 @@ GLFWAPI id glfwGetNSGLContext(GLFWwindow* window);
 GLFWAPI Display* glfwGetX11Display(void);
 
 GLFWAPI xcb_connection_t* glfwGetConnection(void);
-  
+
 
 /*! @brief Returns the `RRCrtc` of the specified monitor.
  *

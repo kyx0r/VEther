@@ -1,9 +1,10 @@
 #include "startup.h"
 #include "zone.h"
+#include "flog.h"
 
 /* {
-GVAR: PFN_* -> vulkan_decl.h
-} */
+   GVAR: PFN_* -> vulkan_decl.h
+   } */
 
 //{
 VkInstance instance;
@@ -43,10 +44,9 @@ namespace startup
 
 void debug_pause()
 {
-	std::cout<<"Press any key to continue... \n";
-	std::cin.clear();
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	std::cin.get();
+	printf("Press any key to continue... \n");
+	char buf[10];
+	fgets(buf, 10, stdin);
 	exit(1);
 }
 
@@ -196,18 +196,18 @@ bool LoadVulkan()
 #endif
 	if(vulkan_lib == nullptr)
 	{
-		std::cout<<"Failed to load the Vulkan Runtime Library! \n";
+		fatal("Failed to load the Vulkan Runtime Library! ");
 		return false;
 	}
 
-#define EXPORTED_VULKAN_FUNCTION( name ) \
-	name = (PFN_##name) (LoadFunction(vulkan_lib, #name)); \
-	if(name == nullptr) \
-	{ \
-		std::cout<<"Could not load exported Vulkan function: "<< #name <<"\n"; \
-		return false; \
-	}else \
-		std::cout<<"Exported Vulkan function: "<< #name <<"\n"; \
+#define EXPORTED_VULKAN_FUNCTION( name )				\
+    name = (PFN_##name) (LoadFunction(vulkan_lib, #name));		\
+    if(name == nullptr)							\
+      {									\
+	warn("Could not load exported Vulkan function: %s", #name);	\
+	return false;							\
+      }else								\
+      info("Exported Vulkan function: %s" #name);			\
 
 #include "vulkan_functions_list.inl"
 
@@ -216,14 +216,14 @@ bool LoadVulkan()
 
 bool LoadVulkanGlobalFuncs()
 {
-#define GLOBAL_LEVEL_VULKAN_FUNCTION( name ) \
-        name = (PFN_##name) (vkGetInstanceProcAddr( nullptr, #name)); \
-	if(name == nullptr) \
-	{ \
-		std::cout<<"Could not load global Vulkan function: "<< #name <<"\n"; \
-		return false; \
-	}else \
-		std::cout<<"Loaded global Vulkan function: "<< #name <<"\n"; \
+#define GLOBAL_LEVEL_VULKAN_FUNCTION( name )				\
+    name = (PFN_##name) (vkGetInstanceProcAddr( nullptr, #name));	\
+    if(name == nullptr)							\
+      {									\
+	warn("Could not load global Vulkan function: %s", #name);	\
+	return false;							\
+      }else								\
+      info("Loaded global Vulkan function: %s", #name);		\
 
 #include "vulkan_functions_list.inl"
 	return true;
@@ -232,30 +232,29 @@ bool LoadVulkanGlobalFuncs()
 //Instance functions take 1st parameter of type Vkdevice || VkQueue || VkCommandBuffer
 bool LoadInstanceFunctions()
 {
-#define INSTANCE_LEVEL_VULKAN_FUNCTION( name ) \
-	name = (PFN_##name)vkGetInstanceProcAddr( instance, #name); \
-	if(name == nullptr) \
-	{ \
-		std::cout<<"Could not load instance-level Vulkan function: "<< #name <<"\n"; \
-		return false; \
-	}else \
-		std::cout<<"Loaded instance-level Vulkan function: "<< #name <<"\n"; \
+#define INSTANCE_LEVEL_VULKAN_FUNCTION( name )				\
+    name = (PFN_##name)vkGetInstanceProcAddr( instance, #name);		\
+    if(name == nullptr)							\
+      {									\
+	warn("Could not load instance-level Vulkan function: %s", #name); \
+	return false;							\
+      }else								\
+      info("Loaded instance-level Vulkan function: %s", #name);	\
 
 #include "vulkan_functions_list.inl"
 
 	// Load instance-level functions from enabled extensions
-#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )        \
-    for(uint32_t i = 0; i<desired_count; i++) {                      \
-      if( std::string( desired_extensions[i] ) == std::string( extension ) ) {      \
-        name = (PFN_##name)vkGetInstanceProcAddr( instance, #name );            \
-        if( name == nullptr ) {                                                 \
-          std::cout << "Could not load instance-level Vulkan function named: "  \
-            #name << "\n";                                                 \
-          return false;                                                         \
-        }else                                                                       \
-	  std::cout<<"Loaded function from extension: "<<#name<<"\n";	\
-      }                                                                         \
-    }
+#define INSTANCE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension ) \
+    for(uint32_t i = 0; i<desired_count; i++) {				\
+      if( std::string( desired_extensions[i] ) == std::string( extension ) ) { \
+        name = (PFN_##name)vkGetInstanceProcAddr( instance, #name );	\
+        if( name == nullptr ) {						\
+          warn("Could not load instance-level Vulkan function named: %s", #name);  \
+    return false;                                                         \
+  }else                                                                       \
+     info("Loaded function from extension: %s", #name);		\
+}                                                                         \
+}
 
 #include "vulkan_functions_list.inl"
 
@@ -268,7 +267,7 @@ bool CheckInstanceExtensions()
 	result = vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, nullptr);
 	if(result != VK_SUCCESS || extensions_count == 0)
 	{
-		std::cout<<"Could not get the extension count!  \n";
+		fatal("Could not get the extension count!");
 		return false;
 	}
 	char* mem = (char*) zone::Z_Malloc(sizeof(VkExtensionProperties) * extensions_count);
@@ -276,7 +275,7 @@ bool CheckInstanceExtensions()
 	result = vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, &available_extensions[0]);
 	if(result != VK_SUCCESS || extensions_count == 0)
 	{
-		std::cout<<"Could not enumerate extensions!  \n";
+		fatal("Could not enumerate extensions!  ");
 		return false;
 	}
 	return true;
@@ -291,10 +290,10 @@ bool IsExtensionSupported(const char* extension)
 			return true;
 		}
 	}
-	std::cout<<"Available Extensions: \n";
+	debug("Available Extensions: ");
 	for(uint32_t i = 0; i<extensions_count; i++)
 	{
-		std::cout<<(char*) &available_extensions[i]<<std::endl;
+		debug("%s", (char*)&available_extensions[i]);
 	}
 	return false;
 }
@@ -309,12 +308,12 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 		{
 			if(!IsExtensionSupported(desired_extensions[i]))
 			{
-				std::cout<<"Extension \n"<<desired_extensions[i]<<" is not supported!"<<"\n";
+				warn("Extension %s  is not supported!", desired_extensions[i]);
 				return false;
 			}
 			else
 			{
-			  std::cout<<"Using instance extension: " <<desired_extensions[i]<<"\n";
+				info("Using instance extension: %s ", desired_extensions[i]);
 			}
 		}
 	}
@@ -340,12 +339,12 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 #ifdef DEBUG
 	if(!CheckValidationLayerSupport())
 	{
-		std::cout<<"Debug Layers are not found! \n";
+		warn("Debug Layers are not found! ");
 	}
 	else
 	{
-	  	instance_create_info.enabledLayerCount = d_layers_count;
-	        instance_create_info.ppEnabledLayerNames = debugLayers;
+		instance_create_info.enabledLayerCount = d_layers_count;
+		instance_create_info.ppEnabledLayerNames = debugLayers;
 	}
 #endif
 
@@ -353,7 +352,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 	result = vkCreateInstance(&instance_create_info, nullptr, &instance);
 	if(result != VK_SUCCESS)
 	{
-		std::cout<<"Could not create Vulkan Instance!  \n";
+		fatal("Could not create Vulkan Instance!  ");
 		return false;
 	}
 
@@ -371,7 +370,7 @@ bool CheckPhysicalDevices()
 	result = vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
 	if(result != VK_SUCCESS || device_count == 0)
 	{
-		std::cout<<"Could not get number of physical devices!  \n";
+		fatal("Could not get number of physical devices!  ");
 		return false;
 	}
 	char* mem = (char*) zone::Z_Malloc(sizeof(VkPhysicalDevice) * device_count);
@@ -379,7 +378,7 @@ bool CheckPhysicalDevices()
 	result = vkEnumeratePhysicalDevices(instance, &device_count, &available_devices[0]);
 	if(result != VK_SUCCESS || device_count == 0)
 	{
-		std::cout<<"Could not enumerate physical devices!  \n";
+		fatal("Could not enumerate physical devices!  ");
 		return false;
 	}
 	return true;
@@ -394,16 +393,16 @@ bool CheckPhysicalDeviceExtensions()
 		result = vkEnumerateDeviceExtensionProperties(available_devices[i], nullptr, &device_extensions_count, nullptr);
 		if(result != VK_SUCCESS || device_extensions_count == 0)
 		{
-			std::cout<<"Could not get number of physical device extensions!  \n";
+			fatal("Could not get number of physical device extensions!  ");
 			return false;
 		}
 
 		VkExtensionProperties m[device_extensions_count];
-	        
+
 		result = vkEnumerateDeviceExtensionProperties(available_devices[i], nullptr, &device_extensions_count, &m[0]);
 		if(result != VK_SUCCESS || device_extensions_count == 0)
 		{
-			std::cout<<"Could not enumerate device extensions!  \n";
+			fatal("Could not enumerate device extensions!  ");
 			return false;
 		}
 
@@ -416,20 +415,20 @@ bool CheckPhysicalDeviceExtensions()
 		}
 		else
 		{
-		        char* mem = (char*) zone::Z_Malloc(sizeof(VkExtensionProperties) * device_extensions_count);
+			char* mem = (char*) zone::Z_Malloc(sizeof(VkExtensionProperties) * device_extensions_count);
 			memcpy(mem, m, (sizeof(VkExtensionProperties) * device_extensions_count));
-		        available_extensions = new(mem) VkExtensionProperties [device_extensions_count];
+			available_extensions = new(mem) VkExtensionProperties [device_extensions_count];
 
 			device_features = {};
-		        max2DTex_size = device_properties.limits.maxImageDimension2D;
+			max2DTex_size = device_properties.limits.maxImageDimension2D;
 			target_device = available_devices[i];
 			break;
-		}		
-		
+		}
+
 	}
 	if(target_device == 0)
 	{
-		std::cout<<"Could not find matching Gpu! \n";
+		fatal("Could not find matching Gpu! ");
 		return false;
 	}
 	extensions_count = device_extensions_count;
@@ -442,14 +441,14 @@ bool CheckQueueProperties(VkQueueFlags desired_capabilities,  uint32_t &queue_fa
 	vkGetPhysicalDeviceQueueFamilyProperties(target_device, &queue_families_count, nullptr);
 	if(queue_families_count == 0)
 	{
-		std::cout<<"Could not get number of family queues!  \n";
+		fatal("Could not get number of family queues!  ");
 		return false;
 	}
 	VkQueueFamilyProperties queue_families[queue_families_count];
 	vkGetPhysicalDeviceQueueFamilyProperties(target_device, &queue_families_count, &queue_families[0]);
 	if(queue_families_count == 0)
 	{
-		std::cout<<"Could not get properties of family queues!  \n";
+		fatal("Could not get properties of family queues!  ");
 		return false;
 	}
 	for(uint32_t i = 0; i<queue_families_count; ++i)
@@ -460,7 +459,7 @@ bool CheckQueueProperties(VkQueueFlags desired_capabilities,  uint32_t &queue_fa
 			return true;
 		}
 	}
-	std::cout<<"Some capabilities were of family queues not detected!  \n";
+	warn("Some capabilities were of family queues not detected!");
 	return false;
 }
 
@@ -474,22 +473,22 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 		{
 			if(!IsExtensionSupported(desired_extensions[i]))
 			{
-				std::cout<<"Extension \n"<<desired_extensions[i]<<" is not supported by physical device!"<<std::endl;
+				fatal("Extension %s is no supported by physical device!", desired_extensions[i]);
 				return false;
 			}
 		}
 	}
-	
+
 	VkDeviceQueueCreateInfo queue_create_infos[number_of_queues] = {};
 	for(int i = 0; i<number_of_queues; i++)
-	{	  
+	{
 		queue_create_infos[i] =
 		{
 			VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 			nullptr,
 			0,
 			array[i].FamilyIndex,
-		        1,
+			1,
 			array[i].Priorities
 		};
 	}
@@ -502,11 +501,11 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 	device_create_info.enabledExtensionCount = ext_count;
 	device_create_info.ppEnabledExtensionNames = &desired_extensions[0];
 	device_create_info.pEnabledFeatures = &device_features;
- 
+
 	VkResult result = vkCreateDevice(target_device, &device_create_info, nullptr, &logical_device);
 	if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE)
 	{
-		std::cout << "Could not create logical device." << std::endl;
+		fatal("Could not create logical device.");
 		return false;
 	}
 
@@ -518,30 +517,28 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 bool LoadDeviceLevelFunctions()
 {
 	// Load core Vulkan API device-level functions
-#define DEVICE_LEVEL_VULKAN_FUNCTION( name )                                    \
-    name = (PFN_##name)vkGetDeviceProcAddr( logical_device, #name );            \
-    if( name == nullptr ) {                                                     \
-      std::cout << "Could not load device-level Vulkan function named: "        \
-        #name << std::endl;                                                     \
-      return false;                                                             \
-    }else                                                                       \
-		std::cout<<"Loaded device-level function: "<<#name<<std::endl;
+#define DEVICE_LEVEL_VULKAN_FUNCTION( name )				\
+  name = (PFN_##name)vkGetDeviceProcAddr( logical_device, #name );	\
+  if( name == nullptr ) {						\
+	  warn("Could not load device-level Vulkan function named: %s",#name); \
+    return false;							\
+  }else									\
+    info("Loaded device-level function: %s",#name);
 
 #include "vulkan_functions_list.inl"
 
 	// Load device-level functions from enabled extensions
-#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )          \
-    for(uint32_t i = 0; i<desired_count; i++) {                      \
-      if( std::string( desired_extensions[i] ) == std::string( extension ) ) {      \
-        name = (PFN_##name)vkGetDeviceProcAddr( logical_device, #name );        \
-        if( name == nullptr ) {                                                 \
-          std::cout << "Could not load device-level Vulkan function from extension: "    \
-            #name << std::endl;                                                 \
-          return false;                                                         \
-        }else                                                                       \
-		std::cout<<"Loaded device-level function from extension: "<<#name<<std::endl; \
-      }                                                                         \
-    }
+#define DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION( name, extension )	\
+  for(uint32_t i = 0; i<desired_count; i++) {				\
+    if( std::string( desired_extensions[i] ) == std::string( extension ) ) { \
+      name = (PFN_##name)vkGetDeviceProcAddr( logical_device, #name );	\
+      if( name == nullptr ) {						\
+	      warn("Could not load device-level Vulkan function from extension: %s", #name); \
+	return false;							\
+      }else								\
+        info("Loaded device-level function from extension: %s", #name);	\
+    }									\
+  }
 #include "vulkan_functions_list.inl"
 	return true;
 }
