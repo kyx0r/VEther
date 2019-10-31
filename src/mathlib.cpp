@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "startup.h"
 #include "mathlib.h"
+#include "flog.h"
+#include "entity.h"
 
 vec3_t vec3_origin = {0,0,0};
 
@@ -272,7 +274,76 @@ void OrthoMatrix(float matrix[16], float left, float right, float bottom, float 
 	matrix[3*4 + 3] = 1.0f;
 }
 
-static void FrustumMatrix(float matrix[16], float fovx, float fovy)
+void Perspective(float matrix[16], float angle, float ratio, float near, float far)
+{
+  float tan_half_angle = tanf(angle / 2);
+
+  // First column
+  matrix[0*4 + 0] = 1.0f / (ratio * tan_half_angle);
+  matrix[0*4 + 1] = 0.0f;
+  matrix[0*4 + 2] = 0.0f;
+  matrix[0*4 + 3] = 0.0f;
+
+  // Second column
+  matrix[1*4 + 0] = 0.0f;
+  matrix[1*4 + 1] = (1.0f / tan_half_angle);
+  matrix[1*4 + 2] = 0.0f;
+  matrix[1*4 + 3] = 0.0f;
+
+  // Third column
+  matrix[2*4 + 0] = 0.0f;
+  matrix[2*4 + 1] = 0.0f;
+  matrix[2*4 + 2] = -(far + near) / (far - near);
+  matrix[2*4 + 3] = -1.0f;
+
+  // Fourth column
+  matrix[3*4 + 0] = 0.0f;
+  matrix[3*4 + 1] = 0.0f;
+  matrix[3*4 + 2] = -(2 * far * near) / (far - near);
+  matrix[3*4 + 3] = 0.0f;  
+}
+
+/*
+====================
+AdaptFovx
+Adapt a 4:3 horizontal FOV to the current screen size using the "Hor+" scaling:
+2.0 * atan(width / height * 3.0 / 4.0 * tan(fov_x / 2.0))
+====================
+*/
+float AdaptFovx (float fov_x, float width, float height)
+{
+	float	a, x;
+
+	if (fov_x < 1 || fov_x > 179)
+		 error("Bad fov: %f", fov_x);
+
+	if ((x = height / width) == 0.75)
+		return fov_x;
+	a = atan(0.75 / x * tan(fov_x / 360 * M_PI));
+	a = a * 360 / M_PI;
+	return a;
+}
+
+/*
+====================
+CalcFovy
+====================
+*/
+float CalcFovy (float fov_x, float width, float height)
+{
+	float	a, x;
+
+	if (fov_x < 1 || fov_x > 179)
+		error("Bad fov: %f", fov_x);
+
+	x = width / tan(fov_x / 360 * M_PI);
+	a = atan(height / x);
+	a = a * 360 / M_PI;
+	return a;
+}
+
+
+void FrustumMatrix(float matrix[16], float fovx, float fovy)
 {
 	const float w = 1.0f / tanf(fovx * 0.5f);
 	const float h = 1.0f / tanf(fovy * 0.5f);
@@ -305,36 +376,28 @@ void SetupMatrix(float view_projection_matrix[16])
 {
 	// Projection matrix
 	float projection_matrix[16];
-	FrustumMatrix(projection_matrix, DEG2RAD(10), DEG2RAD(90));
-	//PrintMatrix(projection_matrix);
-
+	FrustumMatrix(projection_matrix, DEG2RAD(cam.fovx), DEG2RAD(cam.fovy));
 	// View matrix
 	float rotation_matrix[16];
 	float view_matrix[16];
-	// static float rot = 0.0f;
-	// rot += 0.1f;
-	// printf("%.6f \n", rot);
+
 	RotationMatrix(view_matrix, -M_PI / 2.0f, 1.0f, 0.0f, 0.0f);
 	RotationMatrix(rotation_matrix,  M_PI / 2.0f, 0.0f, 0.0f, 1.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
-	RotationMatrix(rotation_matrix, DEG2RAD(140), 1.0f, 0.0f, 0.0f);
+	RotationMatrix(rotation_matrix, DEG2RAD(-cam.angles[2]), 1.0f, 0.0f, 0.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
-	RotationMatrix(rotation_matrix, DEG2RAD(140), 0.0f, 1.0f, 0.0f);
+	RotationMatrix(rotation_matrix, DEG2RAD(-cam.angles[0]), 0.0f, 1.0f, 0.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
-	RotationMatrix(rotation_matrix, DEG2RAD(140), 0.0f, 0.0f, 1.0f);
+	RotationMatrix(rotation_matrix, DEG2RAD(-cam.angles[1]), 0.0f, 0.0f, 1.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
 
 	float translation_matrix[16];
-	TranslationMatrix(translation_matrix, 140.0f, 140.0f, 140.0f);
+	TranslationMatrix(translation_matrix, cam.pos[0], cam.pos[1], cam.pos[2]);
 	MatrixMultiply(view_matrix, translation_matrix);
 
 	// View projection matrix
 	memcpy(view_projection_matrix, projection_matrix, 16 * sizeof(float));
 	MatrixMultiply(view_projection_matrix, view_matrix);
-	float h[16];
-	ScaleMatrix(h, 20.f, 20.f, 20.f);
-	MatrixMultiply(view_projection_matrix, h);
-
 }
 
 /*
@@ -622,7 +685,7 @@ void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 	//matrix[3*4 + 2] = 0.0f;
 	matrix[3*4 + 0] = -_DotProduct(s, eye);
 	matrix[3*4 + 1] = -_DotProduct(t, eye);
-	matrix[3*4 + 2] = -_DotProduct(f, eye);
+	matrix[3*4 + 2] = _DotProduct(f, eye);
 	matrix[3*4 + 3] = 1.0f;
 }
 

@@ -328,6 +328,15 @@ VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 	return vertexInput;
 }
 
+VkPipelineVertexInputStateCreateInfo* ScreenPipe()
+{
+	zone::stack_alloc(100000, 1);
+	VkPipelineVertexInputStateCreateInfo* vertexInput = new(stack_mem) VkPipelineVertexInputStateCreateInfo[0];
+	memset(vertexInput, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
+	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	return vertexInput;
+}
+
 void CreateGraphicsPipeline
 (VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs)
 {

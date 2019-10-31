@@ -4,6 +4,8 @@
 #include "textures.h"
 #include "draw.h"
 #include "obj_parse.h"
+#include "flog.h"
+#include "entity.h"
 
 /* {
 GVAR: framebufferCount -> render.cpp
@@ -37,9 +39,10 @@ double xm_norm = 0;
 double ym_norm = 0;
 uint32_t xm = 0;
 uint32_t ym = 0;
+double deltatime = 0;
+double frametime;
 //}
 
-static bool q_exit = false;
 static ParsedOBJ kitty;
 
 namespace window
@@ -92,18 +95,58 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 	}
 }
 
-void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mods)
-{
-	if (action == GLFW_PRESS)
-	{
-		if (key == GLFW_KEY_Q)
-		{
-			printf("Quiting cleanly \n");
-			q_exit = true;
-		}
-	}
+  void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mods)
+  {
+    if (action == GLFW_PRESS)
+      {
+	if(key == GLFW_KEY_ESCAPE)
+	  {
+	    trace("Quiting cleanly");			
+	    glfwSetWindowShouldClose(_window, true);
+	  }
+      }
+  }
+
+  void processInput()
+  {
+    float velocity = cam.speed * frametime;
+    if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
+      {
+	//camera.ProcessKeyboard(FORWARD, deltaTime);
+	cam.pos[0] += cam.front[0] * velocity;
+	cam.pos[1] += cam.front[1] * velocity;
+	cam.pos[2] += cam.front[2] * velocity; 
+      }
+    if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
+      {
+	cam.pos[0] -= cam.front[0] * velocity;
+	cam.pos[1] -= cam.front[1] * velocity;
+	cam.pos[2] -= cam.front[2] * velocity; 		     
+
+        //camera.ProcessKeyboard(BACKWARD, deltaTime);
+      }
+    if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
+      {
+	cam.pos[0] -= cam.right[0] * velocity;
+	cam.pos[1] -= cam.right[1] * velocity;
+	cam.pos[2] -= cam.right[2] * velocity; 		     
+
+        //camera.ProcessKeyboard(LEFT, deltaTime);
+      }
+    if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
+      {
+	cam.pos[0] += cam.right[0] * velocity;
+	cam.pos[1] += cam.right[1] * velocity;
+	cam.pos[2] += cam.right[2] * velocity; 		     
+
+	// camera.ProcessKeyboard(RIGHT, deltaTime);
+      }
 }
 
+float lastX = window_height / 2.0f;
+float lastY = window_width / 2.0f;
+
+  
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	//  printf("Xpos: %.6f \n", xpos);
@@ -114,13 +157,36 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	ym = (uint32_t)ypos;
 	//printf("Xpos: %.6f \n", x);
 	//printf("Ypos: %.6f \n", y);
+	
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
+	lastX = xpos;
+	lastY = ypos;
+
+	xoffset *= cam.sensitivity;
+        yoffset *= cam.sensitivity;
+
+        cam.yaw   += xoffset;
+        cam.pitch -= yoffset;
+
+        // Make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (cam.pitch > 89.0f)
+	  cam.pitch = 89.0f;
+	if (cam.pitch < -89.0f)
+	  cam.pitch = -89.0f;
+	entity::UpdateCamera();	
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	y_wheel += yoffset;
-	//printf("Yoff: %.6f \n", y_wheel);
+        if (cam.zoom >= 1.0f && cam.zoom <= 45.0f)
+            cam.zoom -= yoffset;
+        if (cam.zoom <= 1.0f)
+            cam.zoom = 1.0f;
+        if (cam.zoom >= 45.0f)
+            cam.zoom = 45.0f;
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -144,6 +210,7 @@ void initWindow()
 	glfwSetCursorPosCallback(_window, cursor_position_callback);
 	glfwSetScrollCallback(_window, scroll_callback);
 	glfwSetMouseButtonCallback(_window, mouse_button_callback);
+	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 inline uint8_t Draw()
@@ -253,13 +320,22 @@ inline uint8_t Draw()
 	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
+        processInput();
+	entity::UpdateCamera();
 	float m[16];
-	IdentityMatrix(m);
-	//OrthoMatrix(m, 0, window_width, window_height, 0, -99999, 99999);
+	float c[16];
 	//SetupMatrix(m);
-	//PrintMatrix(m);
-	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), m);
+	//IdentityMatrix(m);
+	//FrustumMatrix(m, DEG2RAD(fovx), DEG2RAD(fovy));
+	Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.	
+	entity::ViewMatrix(c);
+	//PrintMatrix(c);
+	MatrixMultiply(m, c);
+	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), &m);
 
+	//	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
+	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
+	
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
 
@@ -328,28 +404,44 @@ void mainLoop()
 
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 
-	double time2 = 0;
-	double time_diff = 0;
+	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
 
-	while (!glfwWindowShouldClose(_window) && !q_exit)
+	//fov setup.
+	entity::InitCamera();
+	
+	double time2 = 0;
+	double maxfps;
+	double realtime = 0;
+	double oldrealtime = 0;	
+
+	while (!glfwWindowShouldClose(_window))
 	{
 		glfwPollEvents();
 		time1 = glfwGetTime();
-		time_diff = time1 - time2;
-		if(time_diff > 0.01f)
+		deltatime = time1 - time2;
+		realtime += deltatime;
+		maxfps = CLAMP (10.0, 60.0, 1000.0); //60 fps
+		
+		if(realtime - oldrealtime < 1.0/maxfps)
+		  {
+		    goto c; //framerate is too high
+		  }
+		frametime = realtime - oldrealtime;
+		oldrealtime = realtime;
+	        frametime = CLAMP (0.0001, frametime, 0.1);
+	       
+		if(!Draw())
+		  {
+		    fatal("Critical Error! Abandon the ship.");
+		    break;
+		  }
+
+	c:;	        
+		if(deltatime < 0.02f)
 		{
-			if(!Draw())
-			{
-				std::cout << "Critical Error! Abandon the ship.\n";
-				break;
-			}
+		  std::this_thread::sleep_for(std::chrono::milliseconds(1));		
 		}
-		else
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds((int)(time_diff*1000)));
-			continue;
-		}
-		time2 = glfwGetTime();
+		time2 = time1;
 	}
 
 	//CLEANUP -----------------------------------

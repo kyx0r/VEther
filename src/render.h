@@ -31,6 +31,7 @@ typedef struct
 	float	proj[16];
 } UniformMatrix;
 
+
 namespace render
 {
 
@@ -45,6 +46,7 @@ void CreateDepthBuffer();
 void Viewport(float x, float y, float width, float height, float min_depth, float max_depth);
 //-----------------------
 VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe();
+ VkPipelineVertexInputStateCreateInfo* ScreenPipe(); 
 VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h);
 
 //----------------------- inline

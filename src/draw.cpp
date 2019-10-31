@@ -68,20 +68,18 @@ void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uin
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
 	//	ScaleMatrix(mat->model, y_wheel/10, y_wheel/10, 0.0f);
+	// float radius = 0.5f;
 
-	float radius = 0.5f;
+	// vec3_t eye = {(float)sin(time1) * radius, 0.0f, (float)cos(time1) * radius};
+	// vec3_t origin = {0.0f, 0.0f, 0.0f};
+	// vec3_t up = {0.0f, 1.0f, 0.0};
 
-	vec3_t eye = {(float)sin(time1) * radius, 0.0f, (float)cos(time1) * radius};
-	vec3_t origin = {0.0f, 0.0f, 0.0f};
-	vec3_t up = {0.0f, 1.0f, 0.0};
-
-	LookAt(mat->proj, eye, origin, up);
+	// LookAt(mat->model, eye, origin, up);
 	//PrintMatrix(mat->proj);
-	TranslationMatrix(mat->model, (float)xm_norm, (float)ym_norm, 0.0f);
+	//TranslationMatrix(mat->model, (float)xm_norm, (float)ym_norm, 0.0f);
 
-	//	RotationMatrix(mat->model, DEG2RAD(0), 0.0f, 0.0f, 1.0f);
-
-	//RotationMatrix(mat->proj, DEG2RAD(0), 1.0f, 0.0f, 0.0f);
+	RotationMatrix(mat->model, DEG2RAD(0), 0.0f, 0.0f, 1.0f);
+	RotationMatrix(mat->proj, DEG2RAD(0), 1.0f, 0.0f, 0.0f);
 	RotationMatrix(mat->view, DEG2RAD(0), 0.0f, 1.0f, 0.0f);
 	//PrintMatrix(mat->view);
 
