@@ -276,31 +276,31 @@ void OrthoMatrix(float matrix[16], float left, float right, float bottom, float 
 
 void Perspective(float matrix[16], float angle, float ratio, float near, float far)
 {
-  float tan_half_angle = tanf(angle / 2);
+	float tan_half_angle = tanf(angle / 2);
 
-  // First column
-  matrix[0*4 + 0] = 1.0f / (ratio * tan_half_angle);
-  matrix[0*4 + 1] = 0.0f;
-  matrix[0*4 + 2] = 0.0f;
-  matrix[0*4 + 3] = 0.0f;
+	// First column
+	matrix[0*4 + 0] = 1.0f / (ratio * tan_half_angle);
+	matrix[0*4 + 1] = 0.0f;
+	matrix[0*4 + 2] = 0.0f;
+	matrix[0*4 + 3] = 0.0f;
 
-  // Second column
-  matrix[1*4 + 0] = 0.0f;
-  matrix[1*4 + 1] = (1.0f / tan_half_angle);
-  matrix[1*4 + 2] = 0.0f;
-  matrix[1*4 + 3] = 0.0f;
+	// Second column
+	matrix[1*4 + 0] = 0.0f;
+	matrix[1*4 + 1] = (1.0f / tan_half_angle);
+	matrix[1*4 + 2] = 0.0f;
+	matrix[1*4 + 3] = 0.0f;
 
-  // Third column
-  matrix[2*4 + 0] = 0.0f;
-  matrix[2*4 + 1] = 0.0f;
-  matrix[2*4 + 2] = -(far + near) / (far - near);
-  matrix[2*4 + 3] = -1.0f;
+	// Third column
+	matrix[2*4 + 0] = 0.0f;
+	matrix[2*4 + 1] = 0.0f;
+	matrix[2*4 + 2] = -(far + near) / (far - near);
+	matrix[2*4 + 3] = -1.0f;
 
-  // Fourth column
-  matrix[3*4 + 0] = 0.0f;
-  matrix[3*4 + 1] = 0.0f;
-  matrix[3*4 + 2] = -(2 * far * near) / (far - near);
-  matrix[3*4 + 3] = 0.0f;  
+	// Fourth column
+	matrix[3*4 + 0] = 0.0f;
+	matrix[3*4 + 1] = 0.0f;
+	matrix[3*4 + 2] = -(2 * far * near) / (far - near);
+	matrix[3*4 + 3] = 0.0f;
 }
 
 /*
@@ -315,7 +315,7 @@ float AdaptFovx (float fov_x, float width, float height)
 	float	a, x;
 
 	if (fov_x < 1 || fov_x > 179)
-		 error("Bad fov: %f", fov_x);
+		error("Bad fov: %f", fov_x);
 
 	if ((x = height / width) == 0.75)
 		return fov_x;

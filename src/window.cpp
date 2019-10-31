@@ -95,58 +95,58 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 	}
 }
 
-  void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mods)
-  {
-    if (action == GLFW_PRESS)
-      {
-	if(key == GLFW_KEY_ESCAPE)
-	  {
-	    trace("Quiting cleanly");			
-	    glfwSetWindowShouldClose(_window, true);
-	  }
-      }
-  }
+void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		if(key == GLFW_KEY_ESCAPE)
+		{
+			trace("Quiting cleanly");
+			glfwSetWindowShouldClose(_window, true);
+		}
+	}
+}
 
-  void processInput()
-  {
-    float velocity = cam.speed * frametime;
-    if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
-      {
-	//camera.ProcessKeyboard(FORWARD, deltaTime);
-	cam.pos[0] += cam.front[0] * velocity;
-	cam.pos[1] += cam.front[1] * velocity;
-	cam.pos[2] += cam.front[2] * velocity; 
-      }
-    if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
-      {
-	cam.pos[0] -= cam.front[0] * velocity;
-	cam.pos[1] -= cam.front[1] * velocity;
-	cam.pos[2] -= cam.front[2] * velocity; 		     
+void processInput()
+{
+	float velocity = cam.speed * frametime;
+	if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		//camera.ProcessKeyboard(FORWARD, deltaTime);
+		cam.pos[0] += cam.front[0] * velocity;
+		cam.pos[1] += cam.front[1] * velocity;
+		cam.pos[2] += cam.front[2] * velocity;
+	}
+	if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		cam.pos[0] -= cam.front[0] * velocity;
+		cam.pos[1] -= cam.front[1] * velocity;
+		cam.pos[2] -= cam.front[2] * velocity;
 
-        //camera.ProcessKeyboard(BACKWARD, deltaTime);
-      }
-    if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
-      {
-	cam.pos[0] -= cam.right[0] * velocity;
-	cam.pos[1] -= cam.right[1] * velocity;
-	cam.pos[2] -= cam.right[2] * velocity; 		     
+		//camera.ProcessKeyboard(BACKWARD, deltaTime);
+	}
+	if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		cam.pos[0] -= cam.right[0] * velocity;
+		cam.pos[1] -= cam.right[1] * velocity;
+		cam.pos[2] -= cam.right[2] * velocity;
 
-        //camera.ProcessKeyboard(LEFT, deltaTime);
-      }
-    if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
-      {
-	cam.pos[0] += cam.right[0] * velocity;
-	cam.pos[1] += cam.right[1] * velocity;
-	cam.pos[2] += cam.right[2] * velocity; 		     
+		//camera.ProcessKeyboard(LEFT, deltaTime);
+	}
+	if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		cam.pos[0] += cam.right[0] * velocity;
+		cam.pos[1] += cam.right[1] * velocity;
+		cam.pos[2] += cam.right[2] * velocity;
 
-	// camera.ProcessKeyboard(RIGHT, deltaTime);
-      }
+		// camera.ProcessKeyboard(RIGHT, deltaTime);
+	}
 }
 
 float lastX = window_height / 2.0f;
 float lastY = window_width / 2.0f;
 
-  
+
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	//  printf("Xpos: %.6f \n", xpos);
@@ -157,7 +157,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	ym = (uint32_t)ypos;
 	//printf("Xpos: %.6f \n", x);
 	//printf("Ypos: %.6f \n", y);
-	
+
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
@@ -165,28 +165,28 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	lastY = ypos;
 
 	xoffset *= cam.sensitivity;
-        yoffset *= cam.sensitivity;
+	yoffset *= cam.sensitivity;
 
-        cam.yaw   += xoffset;
-        cam.pitch -= yoffset;
+	cam.yaw   += xoffset;
+	cam.pitch -= yoffset;
 
-        // Make sure that when pitch is out of bounds, screen doesn't get flipped
+	// Make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (cam.pitch > 89.0f)
-	  cam.pitch = 89.0f;
+		cam.pitch = 89.0f;
 	if (cam.pitch < -89.0f)
-	  cam.pitch = -89.0f;
-	entity::UpdateCamera();	
+		cam.pitch = -89.0f;
+	entity::UpdateCamera();
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	y_wheel += yoffset;
-        if (cam.zoom >= 1.0f && cam.zoom <= 45.0f)
-            cam.zoom -= yoffset;
-        if (cam.zoom <= 1.0f)
-            cam.zoom = 1.0f;
-        if (cam.zoom >= 45.0f)
-            cam.zoom = 45.0f;
+	if (cam.zoom >= 1.0f && cam.zoom <= 45.0f)
+		cam.zoom -= yoffset;
+	if (cam.zoom <= 1.0f)
+		cam.zoom = 1.0f;
+	if (cam.zoom >= 45.0f)
+		cam.zoom = 45.0f;
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -320,14 +320,14 @@ inline uint8_t Draw()
 	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
-        processInput();
+	processInput();
 	entity::UpdateCamera();
 	float m[16];
 	float c[16];
 	//SetupMatrix(m);
 	//IdentityMatrix(m);
 	//FrustumMatrix(m, DEG2RAD(fovx), DEG2RAD(fovy));
-	Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.	
+	Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
 	entity::ViewMatrix(c);
 	//PrintMatrix(c);
 	MatrixMultiply(m, c);
@@ -335,7 +335,7 @@ inline uint8_t Draw()
 
 	//	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
 	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
-	
+
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
 
@@ -408,11 +408,11 @@ void mainLoop()
 
 	//fov setup.
 	entity::InitCamera();
-	
+
 	double time2 = 0;
 	double maxfps;
 	double realtime = 0;
-	double oldrealtime = 0;	
+	double oldrealtime = 0;
 
 	while (!glfwWindowShouldClose(_window))
 	{
@@ -421,25 +421,26 @@ void mainLoop()
 		deltatime = time1 - time2;
 		realtime += deltatime;
 		maxfps = CLAMP (10.0, 60.0, 1000.0); //60 fps
-		
+
 		if(realtime - oldrealtime < 1.0/maxfps)
-		  {
-		    goto c; //framerate is too high
-		  }
+		{
+			goto c; //framerate is too high
+		}
 		frametime = realtime - oldrealtime;
 		oldrealtime = realtime;
-	        frametime = CLAMP (0.0001, frametime, 0.1);
-	       
-		if(!Draw())
-		  {
-		    fatal("Critical Error! Abandon the ship.");
-		    break;
-		  }
+		frametime = CLAMP (0.0001, frametime, 0.1);
 
-	c:;	        
+		if(!Draw())
+		{
+			fatal("Critical Error! Abandon the ship.");
+			break;
+		}
+
+c:
+		;
 		if(deltatime < 0.02f)
 		{
-		  std::this_thread::sleep_for(std::chrono::milliseconds(1));		
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 		time2 = time1;
 	}
