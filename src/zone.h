@@ -83,14 +83,16 @@ typedef struct cache_user_s
 namespace zone
 {
 void Q_memcpy(void *dest, const void *src, size_t count);
-
+ void Q_memset(void *dest, int fill, size_t count);
+ 
 __attribute__((noinline)) void stack_alloc(int size, int mult);
 void stack_clear(int size);
 
 void Memory_Init (void *buf, int size);
 
 void Z_Free (void *ptr);
-void *Z_Malloc (int size);			// returns 0 filled memory
+void *Z_TagMalloc (int size, int tag);
+void *Z_Malloc (int size); // returns 0 filled memory.
 void *Z_Realloc (void *ptr, int size);
 char *Z_Strdup (const char *s);
 

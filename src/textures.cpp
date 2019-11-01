@@ -280,7 +280,7 @@ bool SampleTexture()
 	//generate some image
 	const unsigned w = 511;
 	const unsigned h = 511;
-	unsigned char* image = reinterpret_cast<unsigned char*>(zone::Hunk_TempAlloc(w * h));
+	unsigned char* image = reinterpret_cast<unsigned char*>(zone::Hunk_Alloc(w * h));
 	for(unsigned y = 0; y < h; y++)
 		for(unsigned x = 0; x < w; x++)
 		{

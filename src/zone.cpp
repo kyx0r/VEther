@@ -9,6 +9,7 @@ Copyright (C) 2019-.... FAETHER / Etherr
 #include "zone.h"
 #include <cstddef>
 #include <csetjmp>
+#include "flog.h"
 
 /*
 ==============================================================================
@@ -19,6 +20,32 @@ Copyright (C) 2019-.... FAETHER / Etherr
 */
 
 unsigned char* stack_mem = nullptr;
+
+//This is a hook to c++ style allocations.
+//VEther will filter it's c++ libraries like glsl compiler
+//thorough this memory zone instead.
+void* operator new(size_t size)
+{
+  return zone::Z_TagMalloc(size, 1);
+}
+
+void operator delete(void* p)
+{
+  zone::Z_Free(p);
+  return;
+}
+
+void operator delete(void* p, size_t size)
+{
+  zone::Z_Free(p);
+  // Here this will keep the memory alive but does not is free.
+  // I question size parameter.
+  // "If present, the std::size_t size argument must equal the
+  // size argument passed to the allocation function that returned ptr."
+  // Concluded to ignore size alltogether. 
+  return;
+}
+
 
 namespace zone
 {
@@ -237,7 +264,7 @@ all big things are allocated on the hunk.
 ==============================================================================
 */
 
-#define	DYNAMIC_SIZE	(4 * 1024 * 1024) // ericw -- was 512KB (64-bit) / 384KB (32-bit)
+#define	DYNAMIC_SIZE	(32 * 1024 * 1024) //4mb
 
 #define	ZONEID	0x1d4a11
 #define MINFRAGMENT	64
@@ -274,14 +301,14 @@ void Z_Free (void *ptr)
 
 	if (!ptr)
 	{
-		//printf ("Z_Free: NULL pointer \n");
+		info("Z_Free: NULL pointer");
 		return;
 	}
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
-		printf ("Z_Free: freed a pointer without ZONEID \n");
+	        warn("Z_Free: freed a pointer without ZONEID");
 	if (block->tag == 0)
-		printf ("Z_Free: freed a freed pointer \n");
+		warn("Z_Free: freed a freed pointer");
 
 	block->tag = 0;		// mark as free
 
@@ -310,13 +337,13 @@ void Z_Free (void *ptr)
 }
 
 
-static void *Z_TagMalloc (int size, int tag)
+void *Z_TagMalloc (int size, int tag)
 {
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
 
 	if (!tag)
-		printf ("Z_TagMalloc: tried to use a 0 tag");
+		warn("Z_TagMalloc: tried to use a 0 tag");
 
 //
 // scan through the block list looking for the first free block
@@ -402,7 +429,8 @@ void *Z_Malloc (int size)
 {
 	void	*buf;
 
-	Z_CheckHeap ();	// DEBUG
+	//Z_CheckHeap ();
+	
 	buf = Z_TagMalloc (size, 1);
 	if (!buf)
 		printf ("Z_Malloc: failed on allocation of %i bytes",size);
@@ -541,13 +569,18 @@ void *Hunk_AllocName (int size, const char *name)
 #endif
 
 	if (size < 0)
-		printf("Hunk_Alloc: bad size: %i", size);
+	  {
+	        fatal("Hunk_Alloc: bad size: %i", size);
+		startup::debug_pause();
+	  }
 
 	size = sizeof(hunk_t) + ((size+15)&~15);
 
 	if (hunk_size - hunk_low_used - hunk_high_used < size)
-		printf("Hunk_Alloc: failed on %i bytes",size);
-
+	  {
+		fatal("Hunk_Alloc: failed on %i bytes",size);
+		startup::debug_pause();
+	  }
 	h = (hunk_t *)(hunk_base + hunk_low_used);
 	hunk_low_used += size;
 
@@ -1027,7 +1060,7 @@ void *Cache_Alloc (cache_user_t *c, int size, const char *name)
 			break;
 		}
 
-		// free the least recently used cahedat
+		// free the least recently used candedat
 		if (cache_head.lru_prev == &cache_head)
 			printf ("Cache_Alloc: out of memory"); // not enough memory at all
 
