@@ -371,7 +371,7 @@ OBJTokenToInt(OBJToken token)
 #ifndef OBJ_PARSE_NO_CRT
 
 char *
-OBJParseLoadEntireFileAndNullTerminate(char *filename)
+OBJParseLoadEntireFileAndNullTerminate(char *filename, int* size)
 {
 	char *result = 0;
 	FILE *file = fopen(filename, "rb");
@@ -379,6 +379,7 @@ OBJParseLoadEntireFileAndNullTerminate(char *filename)
 	{
 		fseek(file, 0, SEEK_END);
 		unsigned int file_size = ftell(file);
+		*size = file_size;
 		fseek(file, 0, SEEK_SET);
 		result = (char*)zone::Hunk_Alloc(file_size+1);
 		if(result)
@@ -420,13 +421,14 @@ LoadOBJ(char *filename)
 	cache_user_t cache;
 	cache.data = nullptr;
 	char ma = 0;
+	int size;
 
 	OBJParseInfo info;
 	memset(&info, 0, sizeof(OBJParseInfo));
 	ParsedOBJ obj;
 	{
-		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename);
-		info.parse_memory_size = 1024*1024*128;
+		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename, &size);
+		info.parse_memory_size = size * 3; //give it 3 time as much as of a filesize itself.
 		if(zone::Cache_Alloc(&cache, info.parse_memory_size, "model"))
 		{
 			info.parse_memory = cache.data;

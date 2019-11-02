@@ -471,7 +471,7 @@ void *Z_Realloc(void *ptr, int size)
 	if (ptr != old_ptr)
 		memmove (ptr, old_ptr, q_min(old_size, size));
 	if (old_size < size)
-		memset ((unsigned char *)ptr + old_size, 0, size - old_size);
+		Q_memset ((unsigned char *)ptr + old_size, 0, size - old_size);
 
 	return ptr;
 }
@@ -565,7 +565,7 @@ void *Hunk_AllocName (int size, const char *name)
 	hunk_t	*h;
 
 #ifdef DEBUG
-	Hunk_Check ();
+	//Hunk_Check ();
 #endif
 
 	if (size < 0)
@@ -586,7 +586,7 @@ void *Hunk_AllocName (int size, const char *name)
 
 	Cache_FreeLow(hunk_low_used);
 
-	memset (h, 0, size);
+	Q_memset (h, 0, size);
 
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
@@ -614,7 +614,7 @@ void Hunk_FreeToLowMark (int mark)
 {
 	if (mark < 0 || mark > hunk_low_used)
 		printf ("Hunk_FreeToLowMark: bad mark %i", mark);
-	memset (hunk_base + mark, 0, hunk_low_used - mark);
+	Q_memset (hunk_base + mark, 0, hunk_low_used - mark);
 	hunk_low_used = mark;
 }
 
@@ -627,7 +627,7 @@ void Hunk_FreeToHighMark (int mark)
 	}
 	if (mark < 0 || mark > hunk_high_used)
 		printf ("Hunk_FreeToHighMark: bad mark %i", mark);
-	memset (hunk_base + hunk_size - hunk_high_used, 0, hunk_high_used - mark);
+	Q_memset (hunk_base + hunk_size - hunk_high_used, 0, hunk_high_used - mark);
 	hunk_high_used = mark;
 }
 
@@ -677,7 +677,7 @@ void *Hunk_HighAllocName (int size, const char *name)
 
 	h = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
 
-	memset (h, 0, size);
+	Q_memset (h, 0, size);
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
 	q_strlcpy (h->name, name, HUNKNAME_LEN);
@@ -866,7 +866,7 @@ cache_system_t *Cache_TryAlloc (int size, bool nobottom)
 			printf ("Cache_TryAlloc: %i is greater then free hunk", size);
 
 		new_cs = (cache_system_t *) (hunk_base + hunk_low_used);
-		memset (new_cs, 0, sizeof(*new_cs));
+		Q_memset (new_cs, 0, sizeof(*new_cs));
 		new_cs->size = size;
 
 		cache_head.prev = cache_head.next = new_cs;
@@ -888,7 +888,7 @@ cache_system_t *Cache_TryAlloc (int size, bool nobottom)
 			if ( (unsigned char *)cs - (unsigned char *)new_cs >= size)
 			{
 				// found space
-				memset (new_cs, 0, sizeof(*new_cs));
+				Q_memset (new_cs, 0, sizeof(*new_cs));
 				new_cs->size = size;
 
 				new_cs->next = cs;
@@ -912,7 +912,7 @@ cache_system_t *Cache_TryAlloc (int size, bool nobottom)
 // try to allocate one at the very end
 	if ( hunk_base + hunk_size - hunk_high_used - (unsigned char *)new_cs >= size)
 	{
-		memset (new_cs, 0, sizeof(*new_cs));
+		Q_memset (new_cs, 0, sizeof(*new_cs));
 		new_cs->size = size;
 
 		new_cs->next = &cache_head;

@@ -349,8 +349,8 @@ inline uint8_t Draw()
 	MatrixMultiply(m, c);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), &m);
 
-	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdDraw(command_buffer, 6, 1, 0, 0);
+	//vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
+	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
 
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
@@ -420,7 +420,7 @@ void mainLoop()
 
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 
-	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
+	//render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
 
 	//fov setup.
 	entity::InitCamera();

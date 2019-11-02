@@ -274,7 +274,7 @@ void OrthoMatrix(float matrix[16], float left, float right, float bottom, float 
 	matrix[3*4 + 3] = 1.0f;
 }
 
-void Perspective(float matrix[16], float angle, float ratio, float near, float far)
+void Perspective(float matrix[16], float angle, float ratio, float n, float f)
 {
 	float tan_half_angle = tanf(angle / 2);
 
@@ -293,13 +293,13 @@ void Perspective(float matrix[16], float angle, float ratio, float near, float f
 	// Third column
 	matrix[2*4 + 0] = 0.0f;
 	matrix[2*4 + 1] = 0.0f;
-	matrix[2*4 + 2] = -(far + near) / (far - near);
+	matrix[2*4 + 2] = -(f + n) / (f - n);
 	matrix[2*4 + 3] = -1.0f;
 
 	// Fourth column
 	matrix[3*4 + 0] = 0.0f;
 	matrix[3*4 + 1] = 0.0f;
-	matrix[3*4 + 2] = -(2 * far * near) / (far - near);
+	matrix[3*4 + 2] = -(2 * f * n) / (f - n);
 	matrix[3*4 + 3] = 0.0f;
 }
 
