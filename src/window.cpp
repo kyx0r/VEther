@@ -104,6 +104,23 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 			trace("Quiting cleanly");
 			glfwSetWindowShouldClose(_window, true);
 		}
+		if(key == GLFW_KEY_M)
+		  {
+		    static bool state = true;
+		    if(state)
+		      {
+		        info("Mouse focused.");
+			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			state = false;
+		      }
+		    else
+		      {
+			info("Default mouse.");
+			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			state = true;
+		      }
+		  }
+
 	}
 }
 
@@ -210,7 +227,6 @@ void initWindow()
 	glfwSetCursorPosCallback(_window, cursor_position_callback);
 	glfwSetScrollCallback(_window, scroll_callback);
 	glfwSetMouseButtonCallback(_window, mouse_button_callback);
-	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 inline uint8_t Draw()
@@ -333,8 +349,8 @@ inline uint8_t Draw()
 	MatrixMultiply(m, c);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), &m);
 
-	//	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
+	vkCmdDraw(command_buffer, 6, 1, 0, 0);
 
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
