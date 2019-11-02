@@ -348,8 +348,16 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 	}
 #endif
 
+	VkAllocationCallbacks allocators;
+        allocators.pUserData = nullptr;
+	allocators.pfnAllocation = &VEtherAlloc;
+	allocators.pfnReallocation = &VEtherRealloc;
+	allocators.pfnFree = &VEtherFree;
+	allocators.pfnInternalAllocation = nullptr;
+	allocators.pfnInternalFree = nullptr;
+
 	VkResult result = VK_SUCCESS;
-	result = vkCreateInstance(&instance_create_info, nullptr, &instance);
+	result = vkCreateInstance(&instance_create_info, &allocators, &instance);
 	if(result != VK_SUCCESS)
 	{
 		fatal("Could not create Vulkan Instance!  ");
@@ -502,7 +510,15 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 	device_create_info.ppEnabledExtensionNames = &desired_extensions[0];
 	device_create_info.pEnabledFeatures = &device_features;
 
-	VkResult result = vkCreateDevice(target_device, &device_create_info, nullptr, &logical_device);
+	VkAllocationCallbacks allocators;
+        allocators.pUserData = nullptr;
+	allocators.pfnAllocation = &VEtherAlloc;
+	allocators.pfnReallocation = &VEtherRealloc;
+	allocators.pfnFree = &VEtherFree;
+	allocators.pfnInternalAllocation = nullptr;
+	allocators.pfnInternalFree = nullptr;
+
+	VkResult result = vkCreateDevice(target_device, &device_create_info, &allocators, &logical_device);
 	if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE)
 	{
 		fatal("Could not create logical device.");
@@ -545,8 +561,17 @@ bool LoadDeviceLevelFunctions()
 
 void ReleaseVulkanLoaderLibrary()
 {
-	vkDestroyDevice(logical_device, nullptr);
-	vkDestroyInstance(instance, nullptr);
+  	VkAllocationCallbacks allocators;
+        allocators.pUserData = nullptr;
+	allocators.pfnAllocation = &VEtherAlloc;
+	allocators.pfnReallocation = &VEtherRealloc;
+	allocators.pfnFree = &VEtherFree;
+	allocators.pfnInternalAllocation = nullptr;
+	allocators.pfnInternalFree = nullptr;
+	
+	vkDestroyDevice(logical_device, &allocators);	
+	vkDestroyInstance(instance, &allocators);
+	
 	instance = VK_NULL_HANDLE;
 	logical_device = VK_NULL_HANDLE;
 

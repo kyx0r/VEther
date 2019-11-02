@@ -74,11 +74,17 @@ Zone block
 
 */
 
+#include "startup.h"
+ 
 extern unsigned char* stack_mem;
 typedef struct cache_user_s
 {
 	void	*data;
 } cache_user_t;
+
+void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope);
+void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope);
+void VEtherFree(void* pusd, void* ptr);
 
 namespace zone
 {

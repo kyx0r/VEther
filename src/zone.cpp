@@ -5,7 +5,6 @@ Copyright (C) 2010-2014 QuakeSpasm developers
 Copyright (C) 2019-.... FAETHER / Etherr
 */
 
-#include "startup.h"
 #include "zone.h"
 #include <cstddef>
 #include <csetjmp>
@@ -26,7 +25,9 @@ unsigned char* stack_mem = nullptr;
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
-  return zone::Z_TagMalloc(size, 1);
+  void* p = zone::Z_TagMalloc(size, 1);
+  ASSERT(p,"operator new failed.");
+  return p;
 }
 
 void operator delete(void* p)
@@ -46,6 +47,25 @@ void operator delete(void* p, size_t size)
   return;
 }
 
+void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
+{
+  void* p = zone::Z_TagMalloc(size, 1);
+  ASSERT(p,"VEtherAlloc failed.");  
+  return p;
+}
+
+void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
+{
+  void* p = zone::Z_Realloc(porg, size);
+  ASSERT(p,"VEtherRealloc failed.");
+  return p;  
+}
+
+void VEtherFree(void* pusd, void* ptr)
+{
+  zone::Z_Free(ptr);
+  return;
+}
 
 namespace zone
 {
@@ -264,7 +284,7 @@ all big things are allocated on the hunk.
 ==============================================================================
 */
 
-#define	DYNAMIC_SIZE	(32 * 1024 * 1024) //4mb
+#define	DYNAMIC_SIZE	(64 * 1024 * 1024)
 
 #define	ZONEID	0x1d4a11
 #define MINFRAGMENT	64
@@ -342,8 +362,7 @@ void *Z_TagMalloc (int size, int tag)
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
 
-	if (!tag)
-		warn("Z_TagMalloc: tried to use a 0 tag");
+	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");
 
 //
 // scan through the block list looking for the first free block
@@ -483,7 +502,6 @@ char *Z_Strdup (const char *s)
 	memcpy (ptr, s, sz);
 	return ptr;
 }
-
 
 /*
 ========================
