@@ -6,6 +6,7 @@
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: ComputeQueue -> window.cpp
+GVAR: allocators -> startup.cpp
 } */
 
 //{
@@ -46,7 +47,7 @@ bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_famil
 		queue_family                                  // uint32_t                     queueFamilyIndex
 	};
 
-	VkResult result = vkCreateCommandPool(logical_device, &command_pool_create_info, nullptr, &command_pool);
+	VkResult result = vkCreateCommandPool(logical_device, &command_pool_create_info, &allocators, &command_pool);
 	if(result != VK_SUCCESS)
 	{
 		fatal("Could not create command pool.");
@@ -107,7 +108,7 @@ bool CreateSemaphore(VkSemaphore &semaphore)
 		0                                           // VkSemaphoreCreateFlags     flags
 	};
 
-	VkResult result = vkCreateSemaphore(logical_device, &semaphore_create_info, nullptr, &semaphore);
+	VkResult result = vkCreateSemaphore(logical_device, &semaphore_create_info, &allocators, &semaphore);
 	if(result != VK_SUCCESS)
 	{
 		fatal("Could not create a semaphore.");
@@ -125,7 +126,7 @@ bool CreateFence(VkFence &fence, VkSemaphoreCreateFlags flags)
 		flags               						// VkSemaphoreCreateFlags     flags
 	};
 
-	VkResult result = vkCreateFence(logical_device, &fenceInfo, nullptr, &fence);
+	VkResult result = vkCreateFence(logical_device, &fenceInfo, &allocators, &fence);
 	if(result != VK_SUCCESS)
 	{
 		fatal("Could not create a fence.");
@@ -168,7 +169,7 @@ void CreateDescriptorPool()
 	descriptor_pool_create_info.pPoolSizes = pool_sizes;
 	descriptor_pool_create_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
-	VK_CHECK(vkCreateDescriptorPool(logical_device, &descriptor_pool_create_info, nullptr, &descriptor_pool));
+	VK_CHECK(vkCreateDescriptorPool(logical_device, &descriptor_pool_create_info, &allocators, &descriptor_pool));
 }
 
 void CreateDescriptorSetLayouts()
@@ -195,9 +196,9 @@ void CreateDescriptorSetLayouts()
 	dslci.bindingCount = 1;
 	dslci.pBindings = &ubo;
 
-	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, nullptr, &ubo_dsl));
+	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, &allocators, &ubo_dsl));
 	dslci.pBindings = &slb;
-	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, nullptr, &tex_dsl));
+	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, &allocators, &tex_dsl));
 }
 
 void BindDescriptorSet
@@ -241,7 +242,7 @@ void FreeCommandBuffers(uint32_t count)
 
 void DestroyCommandPool()
 {
-	vkDestroyCommandPool(logical_device, command_pool, nullptr);
+	vkDestroyCommandPool(logical_device, command_pool, &allocators);
 }
 
 int MemoryTypeFromProperties(uint32_t type_bits, VkFlags requirements_mask, VkFlags preferred_mask)
@@ -292,7 +293,7 @@ void VramHeapAllocate(VkDeviceSize size, uint32_t memory_type_index)
 	memory_allocate_info.allocationSize = size;
 	memory_allocate_info.memoryTypeIndex = memory_type_index;
 
-	VkResult err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &heap->memory);
+	VkResult err = vkAllocateMemory(logical_device, &memory_allocate_info, &allocators, &heap->memory);
 	if (err != VK_SUCCESS)
 		error("vkAllocateMemory failed");
 
@@ -309,7 +310,7 @@ vram_heap* VramHeapDigress(VkDeviceSize size, VkDeviceSize alignment, VkDeviceSi
 	vram_heap* best_fit_node = nullptr;
 	VkDeviceSize best_fit_size = UINT64_MAX;
 
-	for ( ; ; current_node = current_node->next)
+	for ( ; current_node != nullptr; current_node = current_node->next)
 	{
 		if (!current_node->free)
 			continue;
@@ -358,7 +359,7 @@ void DestroyVramHeaps()
 		vram_heap* heap = &texmgr_heaps[i];
 		if(heap->offset == 0)
 		{
-			vkFreeMemory(logical_device, heap->memory, nullptr);
+			vkFreeMemory(logical_device, heap->memory, &allocators);
 		}
 
 	}
@@ -413,7 +414,7 @@ void IndexBuffersAllocate()
 	{
 		dyn_index_buffers[i].current_offset = 0;
 
-		err = vkCreateBuffer(logical_device, &buffer_create_info, nullptr, &dyn_index_buffers[i].buffer);
+		err = vkCreateBuffer(logical_device, &buffer_create_info, &allocators, &dyn_index_buffers[i].buffer);
 		if (err != VK_SUCCESS)
 			error("vkCreateBuffer failed \n");
 	}
@@ -434,7 +435,7 @@ void IndexBuffersAllocate()
 	memory_allocate_info.allocationSize = NUM_DYNAMIC_BUFFERS * aligned_size;
 	memory_allocate_info.memoryTypeIndex = MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
 
-	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &dyn_index_buffer_memory);
+	err = vkAllocateMemory(logical_device, &memory_allocate_info, &allocators, &dyn_index_buffer_memory);
 	if (err != VK_SUCCESS)
 		error("vkAllocateMemory failed");
 
@@ -456,12 +457,12 @@ void IndexBuffersAllocate()
 
 void DestroyIndexBuffers()
 {
-	for (int i = 0; i < NUM_STAGING_BUFFERS; ++i)
+	for (int i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 	{
-		vkDestroyBuffer(logical_device, dyn_index_buffers[i].buffer, nullptr);
+		vkDestroyBuffer(logical_device, dyn_index_buffers[i].buffer, &allocators);
 	}
 
-	vkFreeMemory(logical_device, dyn_index_buffer_memory, nullptr);
+	vkFreeMemory(logical_device, dyn_index_buffer_memory, &allocators);
 }
 
 /*
@@ -516,7 +517,7 @@ void UniformBuffersAllocate()
 	{
 		dyn_uniform_buffers[i].current_offset = 0;
 
-		err = vkCreateBuffer(logical_device, &buffer_create_info, nullptr, &dyn_uniform_buffers[i].buffer);
+		err = vkCreateBuffer(logical_device, &buffer_create_info, &allocators, &dyn_uniform_buffers[i].buffer);
 		if (err != VK_SUCCESS)
 			error("vkCreateBuffer failed \n");
 	}
@@ -539,7 +540,7 @@ void UniformBuffersAllocate()
 	memory_allocate_info.memoryTypeIndex = MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
 
 	//num_vulkan_dynbuf_allocations += 1;
-	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &dyn_uniform_buffer_memory);
+	err = vkAllocateMemory(logical_device, &memory_allocate_info, &allocators, &dyn_uniform_buffer_memory);
 	if (err != VK_SUCCESS)
 		error("vkAllocateMemory failed \n");
 
@@ -595,15 +596,15 @@ void UniformBuffersAllocate()
 
 void DestroyUniformBuffers()
 {
-	for (int i = 0; i < NUM_STAGING_BUFFERS; ++i)
+	for (int i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 	{
-		vkDestroyBuffer(logical_device, dyn_uniform_buffers[i].buffer, nullptr);
+		vkDestroyBuffer(logical_device, dyn_uniform_buffers[i].buffer, &allocators);
 	}
 
-	vkDestroyDescriptorSetLayout(logical_device, ubo_dsl, nullptr);
-	vkDestroyDescriptorSetLayout(logical_device, tex_dsl, nullptr);
-	vkFreeMemory(logical_device, dyn_uniform_buffer_memory, nullptr);
-	vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr);
+	vkDestroyDescriptorSetLayout(logical_device, ubo_dsl, &allocators);
+	vkDestroyDescriptorSetLayout(logical_device, tex_dsl, &allocators);
+	vkFreeMemory(logical_device, dyn_uniform_buffer_memory, &allocators);
+	vkDestroyDescriptorPool(logical_device, descriptor_pool, &allocators);
 }
 
 /*
@@ -636,6 +637,7 @@ void ResetStagingBuffer()
 	command_buffer = staging_buffer->command_buffer;
 	BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr);
 	SetCommandBuffer(0);
+	current_staging_buffer--;
 }
 
 void SubmitStagingBuffer()
@@ -665,7 +667,7 @@ void SubmitStagingBuffer()
 	vkQueueSubmit(GraphicsQueue, 1, &submit_info, staging_buffers[current_staging_buffer].fence);
 
 	staging_buffers[current_staging_buffer].submitted = true;
-	current_staging_buffer = (current_staging_buffer + 1) % NUM_STAGING_BUFFERS; //still questionable decision
+	current_staging_buffer++;
 }
 
 unsigned char* StagingBufferDigress(int size, int alignment)
@@ -701,7 +703,7 @@ void StagingBuffersAllocate()
 		staging_buffers[i].current_offset = 0;
 		staging_buffers[i].submitted = false;
 
-		err = vkCreateBuffer(logical_device, &buffer_create_info, nullptr, &staging_buffers[i].buffer);
+		err = vkCreateBuffer(logical_device, &buffer_create_info, &allocators, &staging_buffers[i].buffer);
 		if (err != VK_SUCCESS)
 			error("vkCreateBuffer failed \n");
 	}
@@ -723,7 +725,7 @@ void StagingBuffersAllocate()
 	memory_allocate_info.allocationSize = NUM_STAGING_BUFFERS * aligned_size;
 	memory_allocate_info.memoryTypeIndex = MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
 
-	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &staging_memory);
+	err = vkAllocateMemory(logical_device, &memory_allocate_info, &allocators, &staging_memory);
 	if (err != VK_SUCCESS)
 		error("vkAllocateMemory failed \n");
 
@@ -754,10 +756,10 @@ void DestroyStagingBuffers()
 {
 	for (int i = 0; i < NUM_STAGING_BUFFERS; ++i)
 	{
-		vkDestroyBuffer(logical_device, staging_buffers[i].buffer, nullptr);
-		vkDestroyFence(logical_device, staging_buffers[i].fence, nullptr);
+		vkDestroyBuffer(logical_device, staging_buffers[i].buffer, &allocators);
+		vkDestroyFence(logical_device, staging_buffers[i].fence, &allocators);
 	}
-	vkFreeMemory(logical_device, staging_memory, nullptr);
+	vkFreeMemory(logical_device, staging_memory, &allocators);
 }
 
 /*
@@ -792,9 +794,9 @@ void DestroyDynBuffers()
 {
 	for (int i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 	{
-		vkDestroyBuffer(logical_device, dyn_vertex_buffers[i].buffer, nullptr);
+		vkDestroyBuffer(logical_device, dyn_vertex_buffers[i].buffer, &allocators);
 	}
-	vkFreeMemory(logical_device, dyn_vertex_buffer_memory, nullptr);
+	vkFreeMemory(logical_device, dyn_vertex_buffer_memory, &allocators);
 }
 
 unsigned char* VertexBufferDigress(int size, VkBuffer *buffer, VkDeviceSize *buffer_offset)
@@ -834,7 +836,7 @@ void VertexBuffersAllocate()
 	{
 		dyn_vertex_buffers[i].current_offset = 0;
 
-		err = vkCreateBuffer(logical_device, &buffer_create_info, nullptr, &dyn_vertex_buffers[i].buffer);
+		err = vkCreateBuffer(logical_device, &buffer_create_info, &allocators, &dyn_vertex_buffers[i].buffer);
 		if (err != VK_SUCCESS)
 			error("vkCreateBuffer failed \n");
 	}
@@ -857,7 +859,7 @@ void VertexBuffersAllocate()
 	memory_allocate_info.memoryTypeIndex = MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
 
 	//num_vulkan_dynbuf_allocations += 1;
-	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &dyn_vertex_buffer_memory);
+	err = vkAllocateMemory(logical_device, &memory_allocate_info, &allocators, &dyn_vertex_buffer_memory);
 	if (err != VK_SUCCESS)
 		error("vkAllocateMemory failed \n");
 

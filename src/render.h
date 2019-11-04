@@ -31,7 +31,6 @@ typedef struct
 	float	proj[16];
 } UniformMatrix;
 
-
 namespace render
 {
 

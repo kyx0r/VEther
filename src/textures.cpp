@@ -171,18 +171,21 @@ void UploadTexture(unsigned char* image, int w, int h)
 
 	int mem_type = control::MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 0);
 
-	VkDeviceSize heap_size = (VkDeviceSize)1073741824;
-	control::VramHeapAllocate(heap_size, mem_type);
-
+ try_again:;
 	VkDeviceSize aligned_offset;
-	vram_heap* heap = control::VramHeapDigress(memory_requirements.size, memory_requirements.alignment, &aligned_offset);
+	vram_heap* heap = control::VramHeapDigress(memory_requirements.size, memory_requirements.alignment, &aligned_offset);	
 	if(!heap)
-	{
-		fatal("Failed to align the memory");
-		startup::debug_pause();
+	  {
+	    if(current_tex_ds_index > 0)
+	      {
+		//1st allocation - OK. Do not warn.
+	        warn("Failed to align the memory");
+	      }
+		control::VramHeapAllocate((VkDeviceSize)1073741824, mem_type);
+		goto try_again;
 	}
 	VK_CHECK(vkBindImageMemory(logical_device, v_image[current_tex_ds_index], heap->memory, aligned_offset));
-
+	
 	//render::CreateImageViews(1, &v_image[current_tex_ds_index], VK_FORMAT_R8G8B8A8_UNORM, 0, 1);
 
 	VkImageViewCreateInfo createInfo = {};
@@ -201,10 +204,10 @@ void UploadTexture(unsigned char* image, int w, int h)
 
 	VK_CHECK(vkCreateImageView(logical_device, &createInfo, 0, &imageViews[imageViewCount++]));
 
-	//imageViewCount += number_of_swapchain_images;
+	SetFilterModes(current_tex_ds_index, &imageViews[imageViewCount-1]);
 
-	SetFilterModes(0, &imageViews[imageViewCount-1]);
-
+	//	p("%d", current_staging_buffer);
+	
 	unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
 	zone::Q_memcpy(staging_memory, image, (w * h * 4));
 
@@ -297,6 +300,7 @@ bool SampleTexture()
 	unsigned int *usepal = data;
 	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
 
+	UploadTexture(image, w, h);
 	UploadTexture(image, w, h);
 	zone::Hunk_FreeToLowMark(mark);
 

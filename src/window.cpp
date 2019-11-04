@@ -13,6 +13,7 @@ GVAR: imageViewCount -> render.cpp
 GVAR: imageViews -> render.cpp
 GVAR: number_of_swapchain_images -> swapchain.cpp
 GVAR: logical_device -> startup.cpp
+GVAR: allocators -> startup.cpp
 GVAR: pipeline_layout -> render.cpp
 GVAR: pipelines -> render.h
 GVAR: dyn_vertex_buffers -> control.cpp
@@ -349,6 +350,48 @@ inline uint8_t Draw()
 	MatrixMultiply(m, c);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), &m);
 
+	static Vertex_ vertices[4] = {};
+
+	vertices[0].pos[0] = -0.5f;   //x
+	vertices[0].pos[1] = -0.5f;   //y
+	vertices[0].pos[2] = 0.0f;   //z
+	vertices[0].color[0] = 1.0f; //r
+	vertices[0].color[1] = 0.0f; //g
+	vertices[0].color[2] = 0.0f; //b
+	vertices[0].tex_coord[0] = 1.0f;
+	vertices[0].tex_coord[1] = 0.0f;
+
+	vertices[1].pos[0] = 0.5f;
+	vertices[1].pos[1] = -0.5f;
+	vertices[1].pos[2] = 0.0f;   
+	vertices[1].color[0] = 0.0f;
+	vertices[1].color[1] = 1.0f;
+	vertices[1].color[2] = 0.0f;
+	vertices[1].tex_coord[0] = 0.0f;
+	vertices[1].tex_coord[1] = 0.0f;
+
+	vertices[2].pos[0] = 0.5f;
+	vertices[2].pos[1] = 0.5f;
+	vertices[2].pos[2] = 0.0f;
+	vertices[2].color[0] = 0.0f;
+	vertices[2].color[1] = 0.0f;
+	vertices[2].color[2] = 1.0f;
+	vertices[2].tex_coord[0] = 0.0f;
+	vertices[2].tex_coord[1] = 1.0f;
+
+	vertices[3].pos[0] = -0.5f;
+	vertices[3].pos[1] = 0.5f;
+	vertices[3].pos[2] = 0.0f;
+	vertices[3].color[0] = 1.0f;
+	vertices[3].color[1] = 1.0f;
+	vertices[3].color[2] = 1.0f;
+	vertices[3].tex_coord[0] = 1.0f;
+	vertices[3].tex_coord[1] = 1.0f;
+
+	uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
+
+	draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
+	
 	//vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
 	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
 
@@ -370,6 +413,9 @@ inline uint8_t Draw()
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
 
 	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
+	
+	control::ResetStagingBuffer();
+	
 	switch(result)
 	{
 	case VK_SUCCESS:
@@ -409,7 +455,6 @@ void mainLoop()
 	VkShaderModule screenVS = shaders::loadShaderMem(3);
 	ASSERT(triangleVS, "Failed to load screenVS.");
 
-
 	textures::SampleTexture();
 
 	kitty = LoadOBJ("./res/kitty.obj");
@@ -420,7 +465,7 @@ void mainLoop()
 
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 
-	//render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
+	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
 
 	//fov setup.
 	entity::InitCamera();
@@ -471,12 +516,12 @@ c:
 	control::DestroyIndexBuffers();
 	control::DestroyVramHeaps();
 	textures::TexDeinit();
-	vkDestroySemaphore(logical_device, AcquiredSemaphore, nullptr);
-	vkDestroySemaphore(logical_device, ReadySemaphore, nullptr);
-	vkDestroyFence(logical_device, Fence_one, nullptr);
+	vkDestroySemaphore(logical_device, AcquiredSemaphore, &allocators);
+	vkDestroySemaphore(logical_device, ReadySemaphore, &allocators);
+	vkDestroyFence(logical_device, Fence_one, &allocators);
 	render::DestroyImageViews();
 	render::DestroyFramebuffers();
-	vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
+	vkDestroyPipelineLayout(logical_device, pipeline_layout, &allocators);
 	render::DestroyPipeLines();
 	vkDestroyShaderModule(logical_device, triangleVS, nullptr);
 	vkDestroyShaderModule(logical_device, triangleFS, nullptr);

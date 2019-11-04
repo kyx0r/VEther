@@ -5,6 +5,7 @@
 
 /* {
 GVAR: logical_device -> startup.cpp
+GVAR: allocators -> startup.cpp
 GVAR: command_buffer -> control.h
 GVAR: ubo_dsl -> control.cpp
 GVAR: tex_dsl -> control.cpp
@@ -279,7 +280,7 @@ void CreatePipelineLayout()
 	createInfo.pushConstantRangeCount = 1;
 	createInfo.pPushConstantRanges = &push_constant_range;
 
-	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, 0, &pipeline_layout));
+	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, &allocators, &pipeline_layout));
 }
 
 void Viewport(float x, float y, float width, float height, float min_depth, float max_depth)
@@ -331,9 +332,32 @@ VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 VkPipelineVertexInputStateCreateInfo* ScreenPipe()
 {
 	zone::stack_alloc(100000, 1);
-	VkPipelineVertexInputStateCreateInfo* vertexInput = new(stack_mem) VkPipelineVertexInputStateCreateInfo[0];
-	memset(vertexInput, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
+	VkVertexInputBindingDescription* bindingDescription = new(stack_mem) VkVertexInputBindingDescription[0];
+	bindingDescription[0].binding = 0;
+	bindingDescription[0].stride = sizeof(Vertex_);
+	bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	VkVertexInputAttributeDescription* attributeDescriptions = new(bindingDescription+sizeof(bindingDescription)) VkVertexInputAttributeDescription[3];
+	attributeDescriptions[0].binding = 0;
+	attributeDescriptions[0].location = 0;
+	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+	attributeDescriptions[0].offset = offsetof(Vertex_, pos);
+	attributeDescriptions[1].binding = 0;
+	attributeDescriptions[1].location = 1;
+	attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[1].offset = offsetof(Vertex_, tex_coord);
+	attributeDescriptions[2].binding = 0;
+	attributeDescriptions[2].location = 2;
+	attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+	attributeDescriptions[2].offset = offsetof(Vertex_, color);
+
+	VkPipelineVertexInputStateCreateInfo* vertexInput = new(&attributeDescriptions[0] + sizeof(attributeDescriptions)) VkPipelineVertexInputStateCreateInfo[0];
 	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInput[0].vertexBindingDescriptionCount = 1;
+	vertexInput[0].vertexAttributeDescriptionCount = 3;
+	vertexInput[0].pVertexBindingDescriptions = bindingDescription;
+	vertexInput[0].pVertexAttributeDescriptions = &attributeDescriptions[0];
+
 	return vertexInput;
 }
 

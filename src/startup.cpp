@@ -10,6 +10,7 @@
 VkInstance instance;
 VkPhysicalDevice target_device = VK_NULL_HANDLE;
 VkDevice logical_device;
+VkAllocationCallbacks allocators;
 uint32_t max2DTex_size = 0;
 uint32_t queue_families_count = 0;
 //}
@@ -348,7 +349,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 	}
 #endif
 
-	VkAllocationCallbacks allocators;
+	//define custom vulkan allocators
         allocators.pUserData = nullptr;
 	allocators.pfnAllocation = &VEtherAlloc;
 	allocators.pfnReallocation = &VEtherRealloc;
@@ -510,14 +511,6 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 	device_create_info.ppEnabledExtensionNames = &desired_extensions[0];
 	device_create_info.pEnabledFeatures = &device_features;
 
-	VkAllocationCallbacks allocators;
-        allocators.pUserData = nullptr;
-	allocators.pfnAllocation = &VEtherAlloc;
-	allocators.pfnReallocation = &VEtherRealloc;
-	allocators.pfnFree = &VEtherFree;
-	allocators.pfnInternalAllocation = nullptr;
-	allocators.pfnInternalFree = nullptr;
-
 	VkResult result = vkCreateDevice(target_device, &device_create_info, &allocators, &logical_device);
 	if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE)
 	{
@@ -560,15 +553,7 @@ bool LoadDeviceLevelFunctions()
 }
 
 void ReleaseVulkanLoaderLibrary()
-{
-  	VkAllocationCallbacks allocators;
-        allocators.pUserData = nullptr;
-	allocators.pfnAllocation = &VEtherAlloc;
-	allocators.pfnReallocation = &VEtherRealloc;
-	allocators.pfnFree = &VEtherFree;
-	allocators.pfnInternalAllocation = nullptr;
-	allocators.pfnInternalFree = nullptr;
-	
+{	
 	vkDestroyDevice(logical_device, &allocators);	
 	vkDestroyInstance(instance, &allocators);
 	

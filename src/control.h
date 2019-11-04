@@ -7,7 +7,7 @@
 #define DYNAMIC_INDEX_BUFFER_SIZE_KB    2048
 #define MAX_UNIFORM_ALLOC		2048
 #define NUM_DYNAMIC_BUFFERS 2
-#define NUM_STAGING_BUFFERS 2
+#define NUM_STAGING_BUFFERS 3 //in actuality there are 2 staging as command buffer 0 is primary renderer.
 #define TEXTURE_MAX_HEAPS 5
 #define NUM_COMMAND_BUFFERS 5
 

@@ -54,7 +54,7 @@ int main(int argc, char *lpCmdLine[])
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
 
-	log_set_level(4);
+	log_set_level(0);
 	FILE* f = fopen("./log.txt","w");
 	log_set_fp(f);
 

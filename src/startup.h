@@ -72,6 +72,7 @@
 extern VkDevice logical_device;
 extern VkInstance instance;
 extern VkPhysicalDevice target_device;
+extern VkAllocationCallbacks allocators;
 extern uint32_t max2DTex_size;
 
 extern uint32_t queue_families_count;
