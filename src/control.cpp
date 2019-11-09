@@ -344,6 +344,7 @@ vram_heap* VramHeapDigress(VkDeviceSize size, VkDeviceSize alignment, VkDeviceSi
 			best_fit_node->offset += aligned_size;
 
 			*aligned_offset = new_node->offset + align_padding;
+			ASSERT(current_vheap_index < TEXTURE_MAX_HEAPS, "current_vheap_index > TEXTURE_MAX_HEAPS");
 			return new_node;
 		}
 	}
@@ -619,11 +620,14 @@ They are used to map the vertex data to vram.
 void ResetStagingBuffer()
 {
 	VkResult err;
+	current_staging_buffer--;
 	stagingbuffer_t* staging_buffer = &staging_buffers[current_staging_buffer];
 
-	if (!staging_buffers->submitted)
+	if (!staging_buffer->submitted)
+	  {
+	    current_staging_buffer++; 
 		return;
-
+	  }
 	err = vkWaitForFences(logical_device, 1, &staging_buffer->fence, VK_TRUE, UINT64_MAX);
 	if (err != VK_SUCCESS)
 		error("vkWaitForFences failed \n");
@@ -636,8 +640,7 @@ void ResetStagingBuffer()
 	staging_buffer->submitted = false;
 	command_buffer = staging_buffer->command_buffer;
 	BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr);
-	SetCommandBuffer(0);
-	current_staging_buffer--;
+	SetCommandBuffer(0);	
 }
 
 void SubmitStagingBuffer()
@@ -679,7 +682,6 @@ unsigned char* StagingBufferDigress(int size, int alignment)
 	                                 : (staging_buffer->current_offset + alignment - align_mod);
 
 	unsigned char *data = staging_buffer->data + staging_buffer->current_offset;
-
 	return data;
 }
 
@@ -741,6 +743,8 @@ void StagingBuffersAllocate()
 	if (err != VK_SUCCESS)
 		error("vkMapMemory failed \n");
 
+	//now here we init from 1, because command buffer at 0 is reserved for main renderer,
+	//to avoid problems of trying to record on same command buffer twice, we keep it like that.
 	for (i = 1; i < NUM_STAGING_BUFFERS; ++i)
 	{
 		staging_buffers[i].data = (unsigned char *)data + (i * aligned_size);

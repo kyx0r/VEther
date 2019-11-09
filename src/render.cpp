@@ -298,7 +298,7 @@ void Viewport(float x, float y, float width, float height, float min_depth, floa
 
 VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 {
-	zone::stack_alloc(100000, 1);
+	zone::stack_alloc(100000);
 
 	VkVertexInputBindingDescription* bindingDescription = new(stack_mem) VkVertexInputBindingDescription[0];
 	bindingDescription[0].binding = 0;
@@ -331,7 +331,7 @@ VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 
 VkPipelineVertexInputStateCreateInfo* ScreenPipe()
 {
-	zone::stack_alloc(100000, 1);
+	zone::stack_alloc(100000);
 	VkVertexInputBindingDescription* bindingDescription = new(stack_mem) VkVertexInputBindingDescription[0];
 	bindingDescription[0].binding = 0;
 	bindingDescription[0].stride = sizeof(Vertex_);

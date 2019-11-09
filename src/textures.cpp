@@ -17,8 +17,8 @@ GVAR: tex_dsl -> control.cpp
 GVAR: number_of_swapchain_images -> swapchain.cpp
 } */
 
-VkDescriptorSet	tex_descriptor_sets[2];
-static VkImage v_image[2];
+VkDescriptorSet	tex_descriptor_sets[20];
+static VkImage v_image[20];
 static int current_tex_ds_index = 0;
 static unsigned char palette[768];
 static unsigned int data[256];
@@ -153,17 +153,65 @@ void GenerateColorPalette()
 
 }
 
+  void UpdateTexture(unsigned char* image, int w, int h, int index)
+  {
+    //SetFilterModes(index, &imageViews[imageViewCount-1]);
+    unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
+    zone::Q_memcpy(staging_memory, image, (w * h * 4));
+
+    VkBufferImageCopy regions = {};
+    regions.bufferOffset = staging_buffers[current_staging_buffer].current_offset;
+    regions.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    regions.imageSubresource.layerCount = 1;
+    regions.imageSubresource.mipLevel = 0;
+    regions.imageOffset = {0, 0, 0};
+    regions.imageExtent.width = w;
+    regions.imageExtent.height = h;
+    regions.imageExtent.depth = 1;
+
+    control::SetCommandBuffer(current_staging_buffer);
+
+    VkImageMemoryBarrier image_memory_barrier;
+    memset(&image_memory_barrier, 0, sizeof(image_memory_barrier));
+    image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    image_memory_barrier.image = v_image[index];
+    image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    image_memory_barrier.subresourceRange.baseMipLevel = 0;
+    image_memory_barrier.subresourceRange.levelCount = 1;
+    image_memory_barrier.subresourceRange.baseArrayLayer = 0;
+    image_memory_barrier.subresourceRange.layerCount = 1;
+
+    image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    image_memory_barrier.srcAccessMask = 0;
+    image_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
+
+    vkCmdCopyBufferToImage(command_buffer, staging_buffers[current_staging_buffer].buffer, v_image[index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regions);
+
+    image_memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    image_memory_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
+
+    control::SetCommandBuffer(0);
+    control::SubmitStagingBuffer();
+  }
+
 void UploadTexture(unsigned char* image, int w, int h)
-{
+{  
 	VkDescriptorSetAllocateInfo dsai;
 	memset(&dsai, 0, sizeof(dsai));
 	dsai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	dsai.descriptorPool = descriptor_pool;
 	dsai.descriptorSetCount = 1;
 	dsai.pSetLayouts = &tex_dsl;
-
+	
 	vkAllocateDescriptorSets(logical_device, &dsai, &tex_descriptor_sets[current_tex_ds_index]);
-
+	
 	v_image[current_tex_ds_index] = render::Create2DImage(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
 
 	VkMemoryRequirements memory_requirements;
@@ -301,10 +349,39 @@ bool SampleTexture()
 	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
 
 	UploadTexture(image, w, h);
-	UploadTexture(image, w, h);
 	zone::Hunk_FreeToLowMark(mark);
 
 	return true;
 }
+
+bool SampleTextureUpdate()
+{
+	int mark = zone::Hunk_LowMark();
+	//generate some image
+	const unsigned w = 511;
+	const unsigned h = 511;
+	unsigned char* image = reinterpret_cast<unsigned char*>(zone::Hunk_Alloc(w * h));
+	for(unsigned y = 0; y < h; y++)
+		for(unsigned x = 0; x < w; x++)
+		{
+			size_t byte_index = (y * w + x);
+//			printf("%d ", byte_index);
+//			bool byte_half = (y * w + x) % 2 == 1;
+
+			int color = (int)(4 * ((1 + sin(2.0 * 6.28318531 * x / (double)w))
+			                       + (1 + sin(2.0 * 6.28318531 * y / (double)h))) );
+
+			image[byte_index] |= (unsigned char)(color << (0));
+		}
+
+	unsigned int *usepal = data;
+	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
+
+        UpdateTexture(image, w, h, 0);
+	zone::Hunk_FreeToLowMark(mark);
+
+	return true;
+}
+
 
 } //namespace tex

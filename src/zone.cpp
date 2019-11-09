@@ -48,21 +48,26 @@ void operator delete(void* p, size_t size)
 }
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
-{
+{ 
+  ASSERT(align <= 8, "wrong alignment from driver!");
   void* p = zone::Z_TagMalloc(size, 1);
+  //void* p = malloc(aligned_size);
   ASSERT(p,"VEtherAlloc failed.");  
   return p;
 }
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
+  ASSERT(align <= 8, "wrong alignment from driver!");
   void* p = zone::Z_Realloc(porg, size);
+  //void* p = realloc(porg, aligned_size);
   ASSERT(p,"VEtherRealloc failed.");
   return p;  
 }
 
 void VEtherFree(void* pusd, void* ptr)
 {
+  //free(ptr);
   zone::Z_Free(ptr);
   return;
 }
@@ -234,31 +239,33 @@ Make sure to clean up the stack before or after, if needed.
 ==============================================================================
 */
 
-__attribute__((noinline)) void stack_alloc(int size, int mult)
+__attribute__((noinline)) void stack_alloc(int size)
 {
-	jmp_buf ret;
-	int val = setjmp(ret);
+ ret:;
+	static int val = 0;
 	if(val == 1)
 	{
 		//we have to give a reason for compiler
 		//to know that this is a valid return function
 		//and is not UB.
+	  val = 0;
 		return;
 	}
 	if(stack_mem != nullptr)
 	{
-		unsigned char mem[*((int*)stack_mem)+size*mult];
+		unsigned char mem[*((int*)stack_mem)+size];
 		*((int*)mem) = size;
 		*((int*)mem + sizeof(int)) = reinterpret_cast<uintptr_t>(stack_mem);
 		stack_mem = mem;
 	}
 	else
 	{
-		unsigned char mem[size*mult];
+		unsigned char mem[size];
 		*((int*)mem) = size;
 		stack_mem = mem;
 	}
-	longjmp(ret, 1);
+	val = 1;
+	goto ret;
 }
 
 void stack_clear(int size)

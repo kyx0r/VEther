@@ -91,7 +91,7 @@ namespace zone
 void Q_memcpy(void *dest, const void *src, size_t count);
  void Q_memset(void *dest, int fill, size_t count);
  
-__attribute__((noinline)) void stack_alloc(int size, int mult);
+__attribute__((noinline)) void stack_alloc(int size);
 void stack_clear(int size);
 
 void Memory_Init (void *buf, int size);

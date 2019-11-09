@@ -40,7 +40,6 @@ double xm_norm = 0;
 double ym_norm = 0;
 uint32_t xm = 0;
 uint32_t ym = 0;
-double deltatime = 0;
 double frametime;
 //}
 
@@ -412,10 +411,11 @@ inline uint8_t Draw()
 
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
 
-	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
-	
 	control::ResetStagingBuffer();
+	textures::SampleTextureUpdate();
 	
+	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
+		
 	switch(result)
 	{
 	case VK_SUCCESS:
@@ -474,7 +474,8 @@ void mainLoop()
 	double maxfps;
 	double realtime = 0;
 	double oldrealtime = 0;
-
+	double deltatime = 0;
+	
 	while (!glfwWindowShouldClose(_window))
 	{
 		glfwPollEvents();
