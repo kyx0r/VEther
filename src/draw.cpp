@@ -16,20 +16,26 @@ namespace draw
 
   void DrawQuad(size_t size, Vertex_* vertices, size_t index_count, uint16_t* index_array)
 {
-	VkBuffer buffer;
-	VkDeviceSize buffer_offset;
-	VkDescriptorSet dset;
+	static VkBuffer buffer[2];
+	static VkDeviceSize buffer_offset[2];
+	static bool once = true;
+	static unsigned char* data;
+	static uint16_t* index_data;	
+	if(once)
+	  {
+	    data = control::VertexBufferDigress(size, &buffer[0], &buffer_offset[0]);
+	    index_data = (uint16_t*) control::IndexBufferDigress(index_count * sizeof(uint16_t), &buffer[1], &buffer_offset[1]);
+	    once = false;
+	  }
 
-	unsigned char* data = control::VertexBufferDigress(size, &buffer, &buffer_offset);
-	memcpy(data, &vertices[0], size);
-	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer, &buffer_offset);
+        zone::Q_memcpy(data, &vertices[0], size);
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer[0], &buffer_offset[0]);
 
-	uint16_t* index_data = (uint16_t*) control::IndexBufferDigress(index_count * sizeof(uint16_t), &buffer, &buffer_offset);
 	zone::Q_memcpy(index_data, index_array, index_count * sizeof(uint16_t));
-	vkCmdBindIndexBuffer(command_buffer, buffer, buffer_offset, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT16);
 	
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[1], 0, nullptr);
         vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 

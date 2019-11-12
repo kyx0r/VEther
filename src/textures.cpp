@@ -40,6 +40,13 @@ static unsigned* TexMgr8to32(unsigned char *in, int pixels, unsigned int *usepal
 	return data;
 }
 
+unsigned char* Tex8to32(unsigned char* image, int l)
+{
+  unsigned int *usepal = data;
+  image = (unsigned char*)TexMgr8to32(image, l, usepal);
+  return image;
+}
+
 void InitSamplers()
 {
 	trace("Initializing samplers");
@@ -368,8 +375,8 @@ bool SampleTextureUpdate()
 //			printf("%d ", byte_index);
 //			bool byte_half = (y * w + x) % 2 == 1;
 
-			int color = (int)(4 * ((1 + sin(2.0 * 6.28318531 * x / (double)w))
-			                       + (1 + sin(2.0 * 6.28318531 * y / (double)h))) );
+			int color = (int)(4 * ((1 + sin(frametime * 6.28318531 * x / (double)w))
+			                       + (1 + sin(time1 * 6.28318531 * y / (double)h))) );
 
 			image[byte_index] |= (unsigned char)(color << (0));
 		}

@@ -27,6 +27,9 @@ VkPipelineLayout pipeline_layout = 0;
 VkPipeline current_pipeline = 0;
 //}
 
+static VkImage depth_buffer = VK_NULL_HANDLE;
+static VkDeviceMemory depth_buffer_memory = VK_NULL_HANDLE;
+
 namespace render
 {
 
@@ -146,21 +149,23 @@ VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h)
 	return img;
 }
 
-
+void DestroyDepthBuffer()
+{
+  vkDestroyImage(logical_device, depth_buffer, nullptr);
+  vkFreeMemory(logical_device, depth_buffer_memory, nullptr);      
+}
+  
 void CreateDepthBuffer()
 {
 	trace("Creating depth buffer\n");
 
 	VkResult err;
-	static VkImage depth_buffer = VK_NULL_HANDLE;
-	static VkDeviceMemory depth_buffer_memory = VK_NULL_HANDLE;
 	if(depth_buffer)
-	{
-		vkDestroyImage(logical_device, depth_buffer, nullptr);
-		vkFreeMemory(logical_device, depth_buffer_memory, nullptr);
-		vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images], nullptr);
-	}
-
+	  {
+	    DestroyDepthBuffer();
+	    vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images], nullptr);	
+	  }
+	  
 	//todo: check if this is supported before attempting.
 	depth_buffer = Create2DImage(VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, window_width, window_height);
 

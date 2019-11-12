@@ -41,6 +41,7 @@ void CreateSwapchainImageViews();
 void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpassContents subpass_contents, int render_index, int buffer_index);
 void CreateGraphicsPipeline(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs);
 void CreatePipelineLayout();
+void DestroyDepthBuffer();
 void CreateDepthBuffer();
 void Viewport(float x, float y, float width, float height, float min_depth, float max_depth);
 //-----------------------
