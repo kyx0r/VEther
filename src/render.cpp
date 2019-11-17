@@ -275,7 +275,7 @@ void CreatePipelineLayout()
 	memset(&push_constant_range, 0, sizeof(push_constant_range));
 	push_constant_range.offset = 0;
 	push_constant_range.size = 21 * sizeof(float); //limit is 256 bytes
-	push_constant_range.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+	push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	VkPipelineLayoutCreateInfo createInfo;
 	memset(&createInfo, 0, sizeof(createInfo));
@@ -339,22 +339,22 @@ VkPipelineVertexInputStateCreateInfo* ScreenPipe()
 	zone::stack_alloc(100000);
 	VkVertexInputBindingDescription* bindingDescription = new(stack_mem) VkVertexInputBindingDescription[0];
 	bindingDescription[0].binding = 0;
-	bindingDescription[0].stride = sizeof(Vertex_);
+	bindingDescription[0].stride = sizeof(Uivertex);
 	bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 	VkVertexInputAttributeDescription* attributeDescriptions = new(bindingDescription+sizeof(bindingDescription)) VkVertexInputAttributeDescription[3];
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
 	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[0].offset = offsetof(Vertex_, pos);
+	attributeDescriptions[0].offset = offsetof(Uivertex, pos);
 	attributeDescriptions[1].binding = 0;
 	attributeDescriptions[1].location = 1;
 	attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
-	attributeDescriptions[1].offset = offsetof(Vertex_, tex_coord);
+	attributeDescriptions[1].offset = offsetof(Uivertex, tex_coord);
 	attributeDescriptions[2].binding = 0;
 	attributeDescriptions[2].location = 2;
-	attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[2].offset = offsetof(Vertex_, color);
+	attributeDescriptions[2].format = VK_FORMAT_R32_UINT;
+	attributeDescriptions[2].offset = offsetof(Uivertex, color);
 
 	VkPipelineVertexInputStateCreateInfo* vertexInput = new(&attributeDescriptions[0] + sizeof(attributeDescriptions)) VkPipelineVertexInputStateCreateInfo[0];
 	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

@@ -6,8 +6,6 @@
 #include "obj_parse.h"
 #include "flog.h"
 #include "entity.h"
-#include "microui.h"
-#include "atlas.h"
 
 /* {
 GVAR: framebufferCount -> render.cpp
@@ -371,17 +369,18 @@ inline uint8_t Draw()
 	log_window(ctx);
 	mu_end(ctx);
 
+	//record ui commands.
 	mu_Command *cmd = NULL;
 	while (mu_next_command(ctx, &cmd)) {
 	  switch (cmd->type) {
 	  // case MU_COMMAND_TEXT: r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color); break;
-	  // case MU_COMMAND_RECT: r_draw_rect(cmd->rect.rect, cmd->rect.color); break;
+	  case MU_COMMAND_RECT: draw::r_draw_rect(cmd->rect.rect, cmd->rect.color); break;
 	  // case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
 	  // case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
 	  }
+	  break;
 	}
 	
-
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
 	render_area.extent.height = window_height;
@@ -410,49 +409,84 @@ inline uint8_t Draw()
 	entity::ViewMatrix(c);
 	//PrintMatrix(c);
 	MatrixMultiply(m, c);
-	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 16 * sizeof(float), &m);
+	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
+	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
+	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
+       	
+	draw::PresentUI();
+	
+ 	// static Uivertex vertices[4] = {};
 
-	static Vertex_ vertices[4] = {};
+	// vertices[0].pos[0] = -0.5f;   //x
+	// vertices[0].pos[1] = -0.5f;   //y
+	// vertices[0].pos[2] = 0.0f;   //z
+	// vertices[0].color = 0x0000000F0;
+	// vertices[0].tex_coord[0] = 1.0f;
+	// vertices[0].tex_coord[1] = 0.0f;
 
-	vertices[0].pos[0] = -0.5f;   //x
-	vertices[0].pos[1] = -0.5f;   //y
-	vertices[0].pos[2] = 0.0f;   //z
-	vertices[0].color[0] = 1.0f; //r
-	vertices[0].color[1] = 0.0f; //g
-	vertices[0].color[2] = 0.0f; //b
-	vertices[0].tex_coord[0] = 1.0f;
-	vertices[0].tex_coord[1] = 0.0f;
+	// vertices[1].pos[0] = 0.5f;
+	// vertices[1].pos[1] = -0.5f;
+	// vertices[1].pos[2] = 0.0f;   
+	// vertices[1].tex_coord[0] = 0.0f;
+	// vertices[1].tex_coord[1] = 0.0f;
 
-	vertices[1].pos[0] = 0.5f;
-	vertices[1].pos[1] = -0.5f;
-	vertices[1].pos[2] = 0.0f;   
-	vertices[1].color[0] = 0.0f;
-	vertices[1].color[1] = 1.0f;
-	vertices[1].color[2] = 0.0f;
-	vertices[1].tex_coord[0] = 0.0f;
-	vertices[1].tex_coord[1] = 0.0f;
+	// vertices[2].pos[0] = 0.5f;
+	// vertices[2].pos[1] = 0.5f;
+	// vertices[2].pos[2] = 0.0f;
+	// vertices[2].tex_coord[0] = 0.0f;
+	// vertices[2].tex_coord[1] = 1.0f;
 
-	vertices[2].pos[0] = 0.5f;
-	vertices[2].pos[1] = 0.5f;
-	vertices[2].pos[2] = 0.0f;
-	vertices[2].color[0] = 0.0f;
-	vertices[2].color[1] = 0.0f;
-	vertices[2].color[2] = 1.0f;
-	vertices[2].tex_coord[0] = 0.0f;
-	vertices[2].tex_coord[1] = 1.0f;
+	// vertices[3].pos[0] = -0.5f;
+	// vertices[3].pos[1] = 0.5f;
+	// vertices[3].pos[2] = 0.0f;
+	// vertices[3].tex_coord[0] = 1.0f;
+	// vertices[3].tex_coord[1] = 1.0f;
 
-	vertices[3].pos[0] = -0.5f;
-	vertices[3].pos[1] = 0.5f;
-	vertices[3].pos[2] = 0.0f;
-	vertices[3].color[0] = 1.0f;
-	vertices[3].color[1] = 1.0f;
-	vertices[3].color[2] = 1.0f;
-	vertices[3].tex_coord[0] = 1.0f;
-	vertices[3].tex_coord[1] = 1.0f;
+	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
 
-	uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
+	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
+  
+	// static Vertex_ vertices[4] = {};
 
-	draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
+	// vertices[0].pos[0] = -0.5f;   //x
+	// vertices[0].pos[1] = -0.5f;   //y
+	// vertices[0].pos[2] = 0.0f;   //z
+	// vertices[0].color[0] = 1.0f; //r
+	// vertices[0].color[1] = 0.0f; //g
+	// vertices[0].color[2] = 0.0f; //b
+	// vertices[0].tex_coord[0] = 1.0f;
+	// vertices[0].tex_coord[1] = 0.0f;
+
+	// vertices[1].pos[0] = 0.5f;
+	// vertices[1].pos[1] = -0.5f;
+	// vertices[1].pos[2] = 0.0f;   
+	// vertices[1].color[0] = 0.0f;
+	// vertices[1].color[1] = 1.0f;
+	// vertices[1].color[2] = 0.0f;
+	// vertices[1].tex_coord[0] = 0.0f;
+	// vertices[1].tex_coord[1] = 0.0f;
+
+	// vertices[2].pos[0] = 0.5f;
+	// vertices[2].pos[1] = 0.5f;
+	// vertices[2].pos[2] = 0.0f;
+	// vertices[2].color[0] = 0.0f;
+	// vertices[2].color[1] = 0.0f;
+	// vertices[2].color[2] = 1.0f;
+	// vertices[2].tex_coord[0] = 0.0f;
+	// vertices[2].tex_coord[1] = 1.0f;
+
+	// vertices[3].pos[0] = -0.5f;
+	// vertices[3].pos[1] = 0.5f;
+	// vertices[3].pos[2] = 0.0f;
+	// vertices[3].color[0] = 1.0f;
+	// vertices[3].color[1] = 1.0f;
+	// vertices[3].color[2] = 1.0f;
+	// vertices[3].tex_coord[0] = 1.0f;
+	// vertices[3].tex_coord[1] = 1.0f;
+
+	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
+
+	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
 	
 	//vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
 	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
@@ -492,26 +526,6 @@ inline uint8_t Draw()
 		return 0;
 	}
 	return 1;
-}
-
-
-int r_get_text_width(const char *text, int len) {
-  int res = 0;
-  for (const char *p = text; *p && len--; p++) {
-    if ((*p & 0xc0) == 0x80) { continue; }
-    int chr = mu_min((unsigned char) *p, 127);
-    res += atlas[6 + chr].w;
-  }
-  return res;
-}
-
-static int text_width(mu_Font font, const char *text, int len) {
-  if (len == -1) { len = strlen(text); }
-  return r_get_text_width(text, len);
-}
-
-static int text_height(mu_Font font) {
-  return 18;
 }
 
 void mainLoop()
@@ -556,13 +570,13 @@ void mainLoop()
 	/* init microui */
 	ctx = (mu_Context*) zone::Hunk_Alloc(sizeof(mu_Context));
 	mu_init(ctx);
-	ctx->text_width = text_width;
-	ctx->text_height = text_height;
+	ctx->text_width = draw::text_width;
+	ctx->text_height = draw::text_height;
 
 	//int mark = zone::Hunk_LowMark();
 	//unsigned char* image = (unsigned char*) zone::Hunk_Alloc(ATLAS_WIDTH * ATLAS_HEIGHT);
-        unsigned char* out = textures::Tex8to32(atlas_texture, ATLAS_WIDTH * ATLAS_HEIGHT);
-	textures::UploadTexture(out, ATLAS_WIDTH, ATLAS_HEIGHT);
+        //unsigned char* out = textures::Tex8to32(atlas_texture, ATLAS_WIDTH * ATLAS_HEIGHT);
+	//textures::UploadTexture(out, ATLAS_WIDTH, ATLAS_HEIGHT);
 	//zone::Hunk_FreeToLowMark(mark);
 	
 	double time2 = 0;

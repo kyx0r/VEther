@@ -1,7 +1,8 @@
 #include "draw.h"
 #include "control.h"
 #include "textures.h"
-
+#include "atlas.h"
+#include "flog.h"
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: command_buffer -> control.cpp
@@ -14,7 +15,7 @@ GVAR: time1 -> window.cpp
 namespace draw
 {
 
-  void DrawQuad(size_t size, Vertex_* vertices, size_t index_count, uint16_t* index_array)
+  void DrawQuad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* index_array)
 {
 	static VkBuffer buffer[2];
 	static VkDeviceSize buffer_offset[2];
@@ -35,7 +36,7 @@ namespace draw
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT16);
 	
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[1], 0, nullptr);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
         vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 
@@ -86,6 +87,135 @@ void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uin
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 
+int r_get_text_width(const char *text, int len)
+{
+  int res = 0;
+  for (const char *p = text; *p && len--; p++) {
+    if ((*p & 0xc0) == 0x80) { continue; }
+    int chr = mu_min((unsigned char) *p, 127);
+    res += atlas[6 + chr].w;
+  }
+  return res;
+}
+
+int text_width(mu_Font font, const char *text, int len)
+{
+  if (len == -1) { len = strlen(text); }
+  return r_get_text_width(text, len);
+}
+
+int text_height(mu_Font font)
+{
+  return 18;
+}
+
+static int buf_idx;
+#define BUFFER_SIZE 1000
+Uivertex vert[BUFFER_SIZE * 8];
+uint32_t index_buf[BUFFER_SIZE * 6];
+  
+static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color)
+{
+  if (buf_idx == BUFFER_SIZE) { buf_idx = 0; }
+
+  int texvert_idx = buf_idx * 4;
+  int   index_idx = buf_idx * 6;
+  buf_idx++;
+
+  vert[texvert_idx + 0].pos[0] = dst.x;
+  vert[texvert_idx + 0].pos[1] = dst.y;
+    
+  vert[texvert_idx + 1].pos[0] = dst.x + dst.w;
+  vert[texvert_idx + 1].pos[1] = dst.y;
+    
+  vert[texvert_idx + 2].pos[0] = dst.x;
+  vert[texvert_idx + 2].pos[1] = dst.y + dst.h;
+    
+  vert[texvert_idx + 3].pos[0] = dst.x + dst.w;
+  vert[texvert_idx + 3].pos[1] = dst.y + dst.h;
+  
+  // /* update texture buffer */
+  // float x = src.x / (float) ATLAS_WIDTH;
+  // float y = src.y / (float) ATLAS_HEIGHT;
+  // float w = src.w / (float) ATLAS_WIDTH;
+  // float h = src.h / (float) ATLAS_HEIGHT;
+  // tex_buf[texvert_idx + 0] = x;
+  // tex_buf[texvert_idx + 1] = y;
+  // tex_buf[texvert_idx + 2] = x + w;
+  // tex_buf[texvert_idx + 3] = y;
+  // tex_buf[texvert_idx + 4] = x;
+  // tex_buf[texvert_idx + 5] = y + h;
+  // tex_buf[texvert_idx + 6] = x + w;
+  // tex_buf[texvert_idx + 7] = y + h;
+
+  // /* update vertex buffer */
+  // vert_buf[texvert_idx + 0] = dst.x;
+  // vert_buf[texvert_idx + 1] = dst.y;
+  // vert_buf[texvert_idx + 2] = dst.x + dst.w;
+  // vert_buf[texvert_idx + 3] = dst.y;
+  // vert_buf[texvert_idx + 4] = dst.x;
+  // vert_buf[texvert_idx + 5] = dst.y + dst.h;
+  // vert_buf[texvert_idx + 6] = dst.x + dst.w;
+  // vert_buf[texvert_idx + 7] = dst.y + dst.h;
+
+  /* update color buffer */
+
+  //p("%d %d %d %d", color.r, color.g, color.b, color.a);
+
+  //p("%f", (float)color.r/255.0f);
+
+  vert[texvert_idx + 0].color = 0x323232FF;
+  vert[texvert_idx + 1].color = 0x323232FF;
+  vert[texvert_idx + 2].color = 0x323232FF;
+  vert[texvert_idx + 3].color = 0x323232FF;
+  
+  
+  // memcpy(&vert[texvert_idx + 0].color, &color, 4);
+  // memcpy(&vert[texvert_idx + 1].color, &color, 4);
+  // memcpy(&vert[texvert_idx + 2].color, &color, 4);
+  // memcpy(&vert[texvert_idx + 3].color, &color, 4);
+  
+  /* update index buffer */
+  index_buf[index_idx + 0] = texvert_idx + 0;
+  index_buf[index_idx + 1] = texvert_idx + 1;
+  index_buf[index_idx + 2] = texvert_idx + 2;
+  index_buf[index_idx + 3] = texvert_idx + 2;
+  index_buf[index_idx + 4] = texvert_idx + 3;
+  index_buf[index_idx + 5] = texvert_idx + 1;
+  
+}
+
+void PresentUI()
+{
+	static VkBuffer buffer[2];
+	static VkDeviceSize buffer_offset[2];
+	static bool once = true;
+	static unsigned char* data;
+	static uint32_t* index_data;	
+	if(once)
+	  {
+	    data = control::VertexBufferDigress(sizeof(Uivertex) * 144, &buffer[0], &buffer_offset[0]);
+	    index_data = (uint32_t*) control::IndexBufferDigress(36 * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
+	    once = false;
+	  }
+
+        zone::Q_memcpy(data, &vert[0], sizeof(Uivertex) * 4 * buf_idx);
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer[0], &buffer_offset[0]);
+
+	zone::Q_memcpy(index_data, index_buf, buf_idx * 6 * sizeof(uint32_t));
+	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
+	
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
+        vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
+	buf_idx = 0;
+}
+
+
+void r_draw_rect(mu_Rect rect, mu_Color color)
+{
+  push_quad(rect, atlas[5], color);
+}
+  
 
 
 }
