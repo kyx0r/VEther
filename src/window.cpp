@@ -45,6 +45,7 @@ mu_Context* ctx;
 //}
 
 static ParsedOBJ kitty;
+static int mu_eidx = 500;
 
 namespace window
 {
@@ -54,9 +55,10 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 	//handle minimization.
 	while (width == 0 || height == 0)
 	{
-		glfwGetFramebufferSize(_window, &width, &height);
 		glfwWaitEvents();
 	}
+
+	glfwGetFramebufferSize(_window, &width, &height);
 
 	VK_CHECK(vkDeviceWaitIdle(logical_device));
 
@@ -223,8 +225,6 @@ void initWindow()
 
 static  char logbuf[64000];
 static   int logbuf_updated = 0;
-static float bg[3] = { 90, 95, 100 };
-
 
 static void write_log(const char *text) {
   if (logbuf[0]) { strcat(logbuf, "\n"); }
@@ -275,11 +275,67 @@ static void log_window(mu_Context *ctx) {
   }
 }
 
+static int uint8_slider(mu_Context *ctx, unsigned char *value, int low, int high) {
+  static float tmp;
+  mu_push_id(ctx, &value, sizeof(value));
+  tmp = *value;
+  int res = mu_slider_ex(ctx, &tmp, low, high, 0, "%.0f", MU_OPT_ALIGNCENTER);
+  *value = tmp;
+  mu_pop_id(ctx);
+  return res;
+}
+
+static void style_window(mu_Context *ctx)
+{
+  static mu_Container window;
+
+  /* init window manually so we can set its position and size */
+  if (!window.inited) {
+    mu_init_window(ctx, &window, 0);
+    window.rect = mu_rect(350, 250, 300, 240);
+  }
+
+  static struct { const char *label; int idx; } colors[] = {
+    { "text:",         MU_COLOR_TEXT        },
+    { "border:",       MU_COLOR_BORDER      },
+    { "windowbg:",     MU_COLOR_WINDOWBG    },
+    { "titlebg:",      MU_COLOR_TITLEBG     },
+    { "titletext:",    MU_COLOR_TITLETEXT   },
+    { "panelbg:",      MU_COLOR_PANELBG     },
+    { "button:",       MU_COLOR_BUTTON      },
+    { "buttonhover:",  MU_COLOR_BUTTONHOVER },
+    { "buttonfocus:",  MU_COLOR_BUTTONFOCUS },
+    { "base:",         MU_COLOR_BASE        },
+    { "basehover:",    MU_COLOR_BASEHOVER   },
+    { "basefocus:",    MU_COLOR_BASEFOCUS   },
+    { "scrollbase:",   MU_COLOR_SCROLLBASE  },
+    { "scrollthumb:",  MU_COLOR_SCROLLTHUMB },
+    { NULL, 0 }
+  };
+
+  if (mu_begin_window(ctx, &window, "Style Editor")) {
+    int sw = mu_get_container(ctx)->body.w * 0.14;
+    int widths[] = { 80, sw, sw, sw, sw, -1 };
+    mu_layout_row(ctx, 6, widths, 0);
+    for (int i = 0; colors[i].label; i++) {
+      mu_label(ctx, colors[i].label);
+      uint8_slider(ctx, &ctx->style->colors[i].r, 0, 255);
+      uint8_slider(ctx, &ctx->style->colors[i].g, 0, 255);
+      uint8_slider(ctx, &ctx->style->colors[i].b, 0, 255);
+      uint8_slider(ctx, &ctx->style->colors[i].a, 0, 255);
+      mu_draw_rect(ctx, mu_layout_next(ctx), ctx->style->colors[i]);
+    }
+    mu_end_window(ctx);
+  }
+}
+
+
 inline uint8_t Draw()
 {
 	uint32_t image_index;
 	VkResult result;
-
+	mu_Command* cmd = nullptr;               
+	
 	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);
 	vkResetFences(logical_device, 1, &Fence_one);
 	uint8_t ret = swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index);
@@ -362,24 +418,30 @@ inline uint8_t Draw()
 		present_info.pSwapchains = &_swapchain;
 		present_info.pImageIndices = &image_index;
 		present_info.pResults = nullptr;
+
+		draw::buf_idx = mu_eidx;
+		
 		once = false;
 	}
 
 	mu_begin(ctx);
 	log_window(ctx);
+	style_window(ctx);
 	mu_end(ctx);
 
 	//record ui commands.
-	mu_Command *cmd = NULL;
-	while (mu_next_command(ctx, &cmd)) {
-	  switch (cmd->type) {
-	  // case MU_COMMAND_TEXT: r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color); break;
-	  case MU_COMMAND_RECT: draw::r_draw_rect(cmd->rect.rect, cmd->rect.color); break;
-	  // case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
-	  // case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
+	while (mu_next_command(ctx, &cmd))
+	  {	  
+	    switch (cmd->type)
+	    {
+	      case MU_COMMAND_TEXT: draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color); break;
+	      case MU_COMMAND_RECT: draw::r_draw_rect(cmd->rect.rect, cmd->rect.color); break;
+	      // case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
+	      // case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
+	    }
+	    //break;
 	  }
-	  break;
-	}
+	draw::buf_idx = mu_eidx;
 	
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
@@ -417,32 +479,35 @@ inline uint8_t Draw()
 	
  	// static Uivertex vertices[4] = {};
 
-	// vertices[0].pos[0] = -0.5f;   //x
-	// vertices[0].pos[1] = -0.5f;   //y
+	// vertices[0].pos[0] = 300;   //x
+	// vertices[0].pos[1] = 200;   //y
 	// vertices[0].pos[2] = 0.0f;   //z
-	// vertices[0].color = 0x0000000F0;
+	// vertices[0].color = 0xFFFFFFFF;
 	// vertices[0].tex_coord[0] = 1.0f;
 	// vertices[0].tex_coord[1] = 0.0f;
 
-	// vertices[1].pos[0] = 0.5f;
-	// vertices[1].pos[1] = -0.5f;
-	// vertices[1].pos[2] = 0.0f;   
+	// vertices[1].pos[0] = 400;
+	// vertices[1].pos[1] = 200;
+	// vertices[1].pos[2] = 0.0f;
+	// vertices[1].color = 0xFFFFFFFF;
 	// vertices[1].tex_coord[0] = 0.0f;
 	// vertices[1].tex_coord[1] = 0.0f;
 
-	// vertices[2].pos[0] = 0.5f;
-	// vertices[2].pos[1] = 0.5f;
+	// vertices[2].pos[0] = 300;
+	// vertices[2].pos[1] = 100;
 	// vertices[2].pos[2] = 0.0f;
+	// vertices[2].color = 0xFFFFFFFF;
 	// vertices[2].tex_coord[0] = 0.0f;
 	// vertices[2].tex_coord[1] = 1.0f;
 
-	// vertices[3].pos[0] = -0.5f;
-	// vertices[3].pos[1] = 0.5f;
+	// vertices[3].pos[0] = 400;
+	// vertices[3].pos[1] = 100;
 	// vertices[3].pos[2] = 0.0f;
+	// vertices[3].color = 0xFFFFFFFF;
 	// vertices[3].tex_coord[0] = 1.0f;
 	// vertices[3].tex_coord[1] = 1.0f;
 
-	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
+	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 1};
 
 	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
   
@@ -509,7 +574,7 @@ inline uint8_t Draw()
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
 
 	control::ResetStagingBuffer();
-	textures::SampleTextureUpdate();
+	//textures::SampleTextureUpdate();
 	
 	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
 		
@@ -552,7 +617,7 @@ void mainLoop()
 	VkShaderModule screenVS = shaders::loadShaderMem(3);
 	ASSERT(triangleVS, "Failed to load screenVS.");
 
-	textures::SampleTexture();
+	//textures::SampleTexture();
 
 	kitty = LoadOBJ("./res/kitty.obj");
 
@@ -573,11 +638,7 @@ void mainLoop()
 	ctx->text_width = draw::text_width;
 	ctx->text_height = draw::text_height;
 
-	//int mark = zone::Hunk_LowMark();
-	//unsigned char* image = (unsigned char*) zone::Hunk_Alloc(ATLAS_WIDTH * ATLAS_HEIGHT);
-        //unsigned char* out = textures::Tex8to32(atlas_texture, ATLAS_WIDTH * ATLAS_HEIGHT);
-	//textures::UploadTexture(out, ATLAS_WIDTH, ATLAS_HEIGHT);
-	//zone::Hunk_FreeToLowMark(mark);
+	draw::InitAtlasTexture();
 	
 	double time2 = 0;
 	double maxfps;

@@ -32,7 +32,7 @@ void main()
    float x = (inPosition.x - ((push_constants.window_width - 0.001) / 2)) / ((push_constants.window_width - 0.001) / 2);
    float y = (inPosition.y - ((push_constants.window_height - 0.001) / 2)) / ((push_constants.window_height - 0.001) / 2);
 
-   vec4 conv = vec4((inColor & 0xFF000000) >> 24, (inColor & 0x0000FF00) >> 8, (inColor & 0x00FF0000) >> 16, (inColor & 0x000000FF) >> 0);
+   vec4 conv = vec4((inColor & 0x000000FF) >> 0, (inColor & 0x0000FF00) >> 8, (inColor & 0x00FF0000) >> 16, (inColor & 0xFF000000) >> 24);
    conv.r = conv.r / 255.0;
    conv.g = conv.g / 255.0;
    conv.b = conv.b / 255.0;

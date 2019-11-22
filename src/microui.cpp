@@ -409,6 +409,7 @@ int mu_next_command(mu_Context *ctx, mu_Command **cmd) {
   } else {
     *cmd = (mu_Command*) ctx->command_list.items;
   }
+  //printf("%d\n", ctx->command_list.idx);
   while ((char*) *cmd != ctx->command_list.items + ctx->command_list.idx) {
     if ((*cmd)->type != MU_COMMAND_JUMP) { return 1; }
     *cmd = (mu_Command*) (*cmd)->jump.dst;

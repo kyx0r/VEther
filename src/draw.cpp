@@ -109,19 +109,20 @@ int text_height(mu_Font font)
   return 18;
 }
 
-static int buf_idx;
+int buf_idx;
 #define BUFFER_SIZE 1000
-Uivertex vert[BUFFER_SIZE * 8];
+Uivertex vert[BUFFER_SIZE * 4];
 uint32_t index_buf[BUFFER_SIZE * 6];
   
 static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color)
 {
-  if (buf_idx == BUFFER_SIZE) { buf_idx = 0; }
-
+  buf_idx--;
   int texvert_idx = buf_idx * 4;
-  int   index_idx = buf_idx * 6;
-  buf_idx++;
-
+  int   index_idx = buf_idx * 6;  
+  ASSERT(buf_idx < BUFFER_SIZE, "Out of ui memory!");
+  //  p("%d", buf_idx);
+  ASSERT(buf_idx > 0, "buf_idx < 0");
+  
   vert[texvert_idx + 0].pos[0] = dst.x;
   vert[texvert_idx + 0].pos[1] = dst.y;
     
@@ -134,46 +135,24 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color)
   vert[texvert_idx + 3].pos[0] = dst.x + dst.w;
   vert[texvert_idx + 3].pos[1] = dst.y + dst.h;
   
-  // /* update texture buffer */
-  // float x = src.x / (float) ATLAS_WIDTH;
-  // float y = src.y / (float) ATLAS_HEIGHT;
-  // float w = src.w / (float) ATLAS_WIDTH;
-  // float h = src.h / (float) ATLAS_HEIGHT;
-  // tex_buf[texvert_idx + 0] = x;
-  // tex_buf[texvert_idx + 1] = y;
-  // tex_buf[texvert_idx + 2] = x + w;
-  // tex_buf[texvert_idx + 3] = y;
-  // tex_buf[texvert_idx + 4] = x;
-  // tex_buf[texvert_idx + 5] = y + h;
-  // tex_buf[texvert_idx + 6] = x + w;
-  // tex_buf[texvert_idx + 7] = y + h;
+  /* update texture buffer */
+  float x = src.x / (float) ATLAS_WIDTH;
+  float y = src.y / (float) ATLAS_HEIGHT;
+  float w = src.w / (float) ATLAS_WIDTH;
+  float h = src.h / (float) ATLAS_HEIGHT;
+  vert[texvert_idx + 0].tex_coord[0] = x;
+  vert[texvert_idx + 0].tex_coord[1] = y;
+  vert[texvert_idx + 1].tex_coord[0] = x + w;
+  vert[texvert_idx + 1].tex_coord[1] = y;
+  vert[texvert_idx + 2].tex_coord[0] = x;
+  vert[texvert_idx + 2].tex_coord[1] = y + h;
+  vert[texvert_idx + 3].tex_coord[0] = x + w;
+  vert[texvert_idx + 3].tex_coord[1] = y + h;
 
-  // /* update vertex buffer */
-  // vert_buf[texvert_idx + 0] = dst.x;
-  // vert_buf[texvert_idx + 1] = dst.y;
-  // vert_buf[texvert_idx + 2] = dst.x + dst.w;
-  // vert_buf[texvert_idx + 3] = dst.y;
-  // vert_buf[texvert_idx + 4] = dst.x;
-  // vert_buf[texvert_idx + 5] = dst.y + dst.h;
-  // vert_buf[texvert_idx + 6] = dst.x + dst.w;
-  // vert_buf[texvert_idx + 7] = dst.y + dst.h;
-
-  /* update color buffer */
-
-  //p("%d %d %d %d", color.r, color.g, color.b, color.a);
-
-  //p("%f", (float)color.r/255.0f);
-
-  vert[texvert_idx + 0].color = 0x323232FF;
-  vert[texvert_idx + 1].color = 0x323232FF;
-  vert[texvert_idx + 2].color = 0x323232FF;
-  vert[texvert_idx + 3].color = 0x323232FF;
-  
-  
-  // memcpy(&vert[texvert_idx + 0].color, &color, 4);
-  // memcpy(&vert[texvert_idx + 1].color, &color, 4);
-  // memcpy(&vert[texvert_idx + 2].color, &color, 4);
-  // memcpy(&vert[texvert_idx + 3].color, &color, 4);
+  memcpy(&vert[texvert_idx + 0].color, &color, 4);
+  memcpy(&vert[texvert_idx + 1].color, &color, 4);
+  memcpy(&vert[texvert_idx + 2].color, &color, 4);
+  memcpy(&vert[texvert_idx + 3].color, &color, 4);
   
   /* update index buffer */
   index_buf[index_idx + 0] = texvert_idx + 0;
@@ -194,8 +173,8 @@ void PresentUI()
 	static uint32_t* index_data;	
 	if(once)
 	  {
-	    data = control::VertexBufferDigress(sizeof(Uivertex) * 144, &buffer[0], &buffer_offset[0]);
-	    index_data = (uint32_t*) control::IndexBufferDigress(36 * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
+	    data = control::VertexBufferDigress(sizeof(Uivertex) * BUFFER_SIZE * 8, &buffer[0], &buffer_offset[0]);
+	    index_data = (uint32_t*) control::IndexBufferDigress(BUFFER_SIZE * 6 * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
 	    once = false;
 	  }
 
@@ -207,9 +186,30 @@ void PresentUI()
 	
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
         vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
-	buf_idx = 0;
 }
 
+void InitAtlasTexture()
+{
+	int mark = zone::Hunk_LowMark();
+        unsigned char* out = textures::Tex8to32(atlas_texture, ATLAS_WIDTH * ATLAS_HEIGHT);
+	textures::UploadTexture(out, ATLAS_WIDTH, ATLAS_HEIGHT);
+	zone::Hunk_FreeToLowMark(mark);  
+}
+
+void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color) {
+  mu_Rect dst = { pos.x, pos.y, 0, 0 };
+  for (const char *p = text; *p; p++)
+  {
+    if ((*p & 0xc0) == 0x80) { continue; }
+    int chr = mu_min((unsigned char) *p, 127);
+    //p("%d",chr+6-32);
+    mu_Rect src = atlas[chr+6-32];
+    dst.w = src.w;
+    dst.h = src.h;
+    //    push_quad(dst, src, color);
+    dst.x += dst.w;
+  }
+}
 
 void r_draw_rect(mu_Rect rect, mu_Color color)
 {

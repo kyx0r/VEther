@@ -1,10 +1,12 @@
+#include "startup.h"
 #include "mathlib.h"
 #include "render.h"
 #include "microui.h"
 
-
 namespace draw
 {
+
+  extern int buf_idx;
 
   void DrawQuad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* index_array);
   void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array);
@@ -12,6 +14,7 @@ namespace draw
  int r_get_text_width(const char *text, int len);
  int text_width(mu_Font font, const char *text, int len); 
  int text_height(mu_Font font);
+ void InitAtlasTexture();
  void r_draw_rect(mu_Rect rect, mu_Color color);
-
+ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color);
 } //namespace draw
