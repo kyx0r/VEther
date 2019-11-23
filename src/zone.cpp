@@ -25,51 +25,51 @@ unsigned char* stack_mem = nullptr;
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
-  void* p = zone::Z_TagMalloc(size, 1);
-  ASSERT(p,"operator new failed.");
-  return p;
+	void* p = zone::Z_TagMalloc(size, 1);
+	ASSERT(p,"operator new failed.");
+	return p;
 }
 
 void operator delete(void* p)
 {
-  zone::Z_Free(p);
-  return;
+	zone::Z_Free(p);
+	return;
 }
 
 void operator delete(void* p, size_t size)
 {
-  zone::Z_Free(p);
-  // Here this will keep the memory alive but does not is free.
-  // I question size parameter.
-  // "If present, the std::size_t size argument must equal the
-  // size argument passed to the allocation function that returned ptr."
-  // Concluded to ignore size alltogether. 
-  return;
+	zone::Z_Free(p);
+	// Here this will keep the memory alive but does not is free.
+	// I question size parameter.
+	// "If present, the std::size_t size argument must equal the
+	// size argument passed to the allocation function that returned ptr."
+	// Concluded to ignore size alltogether.
+	return;
 }
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
-{ 
-  ASSERT(align <= 8, "wrong alignment from driver!");
-  void* p = zone::Z_TagMalloc(size, 1);
-  //void* p = malloc(aligned_size);
-  ASSERT(p,"VEtherAlloc failed.");  
-  return p;
+{
+	ASSERT(align <= 8, "wrong alignment from driver!");
+	void* p = zone::Z_TagMalloc(size, 1);
+	//void* p = malloc(aligned_size);
+	ASSERT(p,"VEtherAlloc failed.");
+	return p;
 }
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-  ASSERT(align <= 8, "wrong alignment from driver!");
-  void* p = zone::Z_Realloc(porg, size);
-  //void* p = realloc(porg, aligned_size);
-  ASSERT(p,"VEtherRealloc failed.");
-  return p;  
+	ASSERT(align <= 8, "wrong alignment from driver!");
+	void* p = zone::Z_Realloc(porg, size);
+	//void* p = realloc(porg, aligned_size);
+	ASSERT(p,"VEtherRealloc failed.");
+	return p;
 }
 
 void VEtherFree(void* pusd, void* ptr)
 {
-  //free(ptr);
-  zone::Z_Free(ptr);
-  return;
+	//free(ptr);
+	zone::Z_Free(ptr);
+	return;
 }
 
 namespace zone
@@ -241,14 +241,15 @@ Make sure to clean up the stack before or after, if needed.
 
 __attribute__((noinline)) void stack_alloc(int size)
 {
- ret:;
+ret:
+	;
 	static int val = 0;
 	if(val == 1)
 	{
 		//we have to give a reason for compiler
 		//to know that this is a valid return function
 		//and is not UB.
-	  val = 0;
+		val = 0;
 		return;
 	}
 	if(stack_mem != nullptr)
@@ -333,7 +334,7 @@ void Z_Free (void *ptr)
 	}
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
-	        warn("Z_Free: freed a pointer without ZONEID");
+		warn("Z_Free: freed a pointer without ZONEID");
 	if (block->tag == 0)
 		warn("Z_Free: freed a freed pointer");
 
@@ -456,7 +457,7 @@ void *Z_Malloc (int size)
 	void	*buf;
 
 	//Z_CheckHeap ();
-	
+
 	buf = Z_TagMalloc (size, 1);
 	if (!buf)
 		printf ("Z_Malloc: failed on allocation of %i bytes",size);
@@ -594,18 +595,18 @@ void *Hunk_AllocName (int size, const char *name)
 #endif
 
 	if (size < 0)
-	  {
-	        fatal("Hunk_Alloc: bad size: %i", size);
+	{
+		fatal("Hunk_Alloc: bad size: %i", size);
 		startup::debug_pause();
-	  }
+	}
 
 	size = sizeof(hunk_t) + ((size+15)&~15);
 
 	if (hunk_size - hunk_low_used - hunk_high_used < size)
-	  {
+	{
 		fatal("Hunk_Alloc: failed on %i bytes",size);
 		startup::debug_pause();
-	  }
+	}
 	h = (hunk_t *)(hunk_base + hunk_low_used);
 	hunk_low_used += size;
 

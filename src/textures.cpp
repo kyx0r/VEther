@@ -42,9 +42,9 @@ static unsigned* TexMgr8to32(unsigned char *in, int pixels, unsigned int *usepal
 
 unsigned char* Tex8to32(unsigned char* image, int l)
 {
-  unsigned int *usepal = data;
-  image = (unsigned char*)TexMgr8to32(image, l, usepal);
-  return image;
+	unsigned int *usepal = data;
+	image = (unsigned char*)TexMgr8to32(image, l, usepal);
+	return image;
 }
 
 void InitSamplers()
@@ -160,65 +160,65 @@ void GenerateColorPalette()
 
 }
 
-  void UpdateTexture(unsigned char* image, int w, int h, int index)
-  {
-    //SetFilterModes(index, &imageViews[imageViewCount-1]);
-    unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
-    zone::Q_memcpy(staging_memory, image, (w * h * 4));
+void UpdateTexture(unsigned char* image, int w, int h, int index)
+{
+	//SetFilterModes(index, &imageViews[imageViewCount-1]);
+	unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
+	zone::Q_memcpy(staging_memory, image, (w * h * 4));
 
-    VkBufferImageCopy regions = {};
-    regions.bufferOffset = staging_buffers[current_staging_buffer].current_offset;
-    regions.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    regions.imageSubresource.layerCount = 1;
-    regions.imageSubresource.mipLevel = 0;
-    regions.imageOffset = {0, 0, 0};
-    regions.imageExtent.width = w;
-    regions.imageExtent.height = h;
-    regions.imageExtent.depth = 1;
+	VkBufferImageCopy regions = {};
+	regions.bufferOffset = staging_buffers[current_staging_buffer].current_offset;
+	regions.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	regions.imageSubresource.layerCount = 1;
+	regions.imageSubresource.mipLevel = 0;
+	regions.imageOffset = {0, 0, 0};
+	regions.imageExtent.width = w;
+	regions.imageExtent.height = h;
+	regions.imageExtent.depth = 1;
 
-    control::SetCommandBuffer(current_staging_buffer);
+	control::SetCommandBuffer(current_staging_buffer);
 
-    VkImageMemoryBarrier image_memory_barrier;
-    memset(&image_memory_barrier, 0, sizeof(image_memory_barrier));
-    image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    image_memory_barrier.image = v_image[index];
-    image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    image_memory_barrier.subresourceRange.baseMipLevel = 0;
-    image_memory_barrier.subresourceRange.levelCount = 1;
-    image_memory_barrier.subresourceRange.baseArrayLayer = 0;
-    image_memory_barrier.subresourceRange.layerCount = 1;
+	VkImageMemoryBarrier image_memory_barrier;
+	memset(&image_memory_barrier, 0, sizeof(image_memory_barrier));
+	image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	image_memory_barrier.image = v_image[index];
+	image_memory_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	image_memory_barrier.subresourceRange.baseMipLevel = 0;
+	image_memory_barrier.subresourceRange.levelCount = 1;
+	image_memory_barrier.subresourceRange.baseArrayLayer = 0;
+	image_memory_barrier.subresourceRange.layerCount = 1;
 
-    image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    image_memory_barrier.srcAccessMask = 0;
-    image_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
+	image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	image_memory_barrier.srcAccessMask = 0;
+	image_memory_barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
 
-    vkCmdCopyBufferToImage(command_buffer, staging_buffers[current_staging_buffer].buffer, v_image[index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regions);
+	vkCmdCopyBufferToImage(command_buffer, staging_buffers[current_staging_buffer].buffer, v_image[index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &regions);
 
-    image_memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    image_memory_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
+	image_memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	image_memory_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier);
 
-    control::SetCommandBuffer(0);
-    control::SubmitStagingBuffer();
-  }
+	control::SetCommandBuffer(0);
+	control::SubmitStagingBuffer();
+}
 
 void UploadTexture(unsigned char* image, int w, int h)
-{  
+{
 	VkDescriptorSetAllocateInfo dsai;
 	memset(&dsai, 0, sizeof(dsai));
 	dsai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	dsai.descriptorPool = descriptor_pool;
 	dsai.descriptorSetCount = 1;
 	dsai.pSetLayouts = &tex_dsl;
-	
+
 	vkAllocateDescriptorSets(logical_device, &dsai, &tex_descriptor_sets[current_tex_ds_index]);
-	
+
 	v_image[current_tex_ds_index] = render::Create2DImage(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
 
 	VkMemoryRequirements memory_requirements;
@@ -226,21 +226,22 @@ void UploadTexture(unsigned char* image, int w, int h)
 
 	int mem_type = control::MemoryTypeFromProperties(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 0);
 
- try_again:;
+try_again:
+	;
 	VkDeviceSize aligned_offset;
-	vram_heap* heap = control::VramHeapDigress(memory_requirements.size, memory_requirements.alignment, &aligned_offset);	
+	vram_heap* heap = control::VramHeapDigress(memory_requirements.size, memory_requirements.alignment, &aligned_offset);
 	if(!heap)
-	  {
-	    if(current_tex_ds_index > 0)
-	      {
-		//1st allocation - OK. Do not warn.
-	        warn("Failed to align the memory");
-	      }
+	{
+		if(current_tex_ds_index > 0)
+		{
+			//1st allocation - OK. Do not warn.
+			warn("Failed to align the memory");
+		}
 		control::VramHeapAllocate((VkDeviceSize)1073741824, mem_type);
 		goto try_again;
 	}
 	VK_CHECK(vkBindImageMemory(logical_device, v_image[current_tex_ds_index], heap->memory, aligned_offset));
-	
+
 	//render::CreateImageViews(1, &v_image[current_tex_ds_index], VK_FORMAT_R8G8B8A8_UNORM, 0, 1);
 
 	VkImageViewCreateInfo createInfo = {};
@@ -262,7 +263,7 @@ void UploadTexture(unsigned char* image, int w, int h)
 	SetFilterModes(current_tex_ds_index, &imageViews[imageViewCount-1]);
 
 	//	p("%d", current_staging_buffer);
-	
+
 	unsigned char* staging_memory = control::StagingBufferDigress((w*h*4), 4);
 	zone::Q_memcpy(staging_memory, image, (w * h * 4));
 
@@ -384,7 +385,7 @@ bool SampleTextureUpdate()
 	unsigned int *usepal = data;
 	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
 
-        UpdateTexture(image, w, h, 0);
+	UpdateTexture(image, w, h, 0);
 	zone::Hunk_FreeToLowMark(mark);
 
 	return true;

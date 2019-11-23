@@ -151,21 +151,21 @@ VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h)
 
 void DestroyDepthBuffer()
 {
-  vkDestroyImage(logical_device, depth_buffer, nullptr);
-  vkFreeMemory(logical_device, depth_buffer_memory, nullptr);      
+	vkDestroyImage(logical_device, depth_buffer, nullptr);
+	vkFreeMemory(logical_device, depth_buffer_memory, nullptr);
 }
-  
+
 void CreateDepthBuffer()
 {
 	trace("Creating depth buffer\n");
 
 	VkResult err;
 	if(depth_buffer)
-	  {
-	    DestroyDepthBuffer();
-	    vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images], nullptr);	
-	  }
-	  
+	{
+		DestroyDepthBuffer();
+		vkDestroyImageView(logical_device, imageViews[number_of_swapchain_images], nullptr);
+	}
+
 	//todo: check if this is supported before attempting.
 	depth_buffer = Create2DImage(VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, window_width, window_height);
 
@@ -423,7 +423,7 @@ void CreateGraphicsPipeline
 	createInfo.pDepthStencilState = &depthStencilState;
 
 	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
-        colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_TRUE;
 	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -436,13 +436,13 @@ void CreateGraphicsPipeline
 	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlendState.attachmentCount = 1;
 	colorBlendState.logicOpEnable = VK_FALSE;
-        colorBlendState.logicOp = VK_LOGIC_OP_COPY;
-        colorBlendState.attachmentCount = 1;
-        colorBlendState.pAttachments = &colorBlendAttachment;
-        colorBlendState.blendConstants[0] = 0.0f;
-        colorBlendState.blendConstants[1] = 0.0f;
-        colorBlendState.blendConstants[2] = 0.0f;
-        colorBlendState.blendConstants[3] = 0.0f; 
+	colorBlendState.logicOp = VK_LOGIC_OP_COPY;
+	colorBlendState.attachmentCount = 1;
+	colorBlendState.pAttachments = &colorBlendAttachment;
+	colorBlendState.blendConstants[0] = 0.0f;
+	colorBlendState.blendConstants[1] = 0.0f;
+	colorBlendState.blendConstants[2] = 0.0f;
+	colorBlendState.blendConstants[3] = 0.0f;
 	colorBlendState.pAttachments = &colorBlendAttachment;
 	createInfo.pColorBlendState = &colorBlendState;
 

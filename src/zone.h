@@ -75,7 +75,7 @@ Zone block
 */
 
 #include "startup.h"
- 
+
 extern unsigned char* stack_mem;
 typedef struct cache_user_s
 {
@@ -89,8 +89,8 @@ void VEtherFree(void* pusd, void* ptr);
 namespace zone
 {
 void Q_memcpy(void *dest, const void *src, size_t count);
- void Q_memset(void *dest, int fill, size_t count);
- 
+void Q_memset(void *dest, int fill, size_t count);
+
 __attribute__((noinline)) void stack_alloc(int size);
 void stack_clear(int size);
 

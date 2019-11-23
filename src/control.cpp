@@ -624,10 +624,10 @@ void ResetStagingBuffer()
 	stagingbuffer_t* staging_buffer = &staging_buffers[current_staging_buffer];
 
 	if (!staging_buffer->submitted)
-	  {
-	    current_staging_buffer++; 
+	{
+		current_staging_buffer++;
 		return;
-	  }
+	}
 	err = vkWaitForFences(logical_device, 1, &staging_buffer->fence, VK_TRUE, UINT64_MAX);
 	if (err != VK_SUCCESS)
 		error("vkWaitForFences failed \n");
@@ -640,7 +640,7 @@ void ResetStagingBuffer()
 	staging_buffer->submitted = false;
 	command_buffer = staging_buffer->command_buffer;
 	BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr);
-	SetCommandBuffer(0);	
+	SetCommandBuffer(0);
 }
 
 void SubmitStagingBuffer()

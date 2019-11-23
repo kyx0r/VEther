@@ -350,7 +350,7 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 #endif
 
 	//define custom vulkan allocators
-        allocators.pUserData = nullptr;
+	allocators.pUserData = nullptr;
 	allocators.pfnAllocation = &VEtherAlloc;
 	allocators.pfnReallocation = &VEtherRealloc;
 	allocators.pfnFree = &VEtherFree;
@@ -553,10 +553,10 @@ bool LoadDeviceLevelFunctions()
 }
 
 void ReleaseVulkanLoaderLibrary()
-{	
-	vkDestroyDevice(logical_device, &allocators);	
+{
+	vkDestroyDevice(logical_device, &allocators);
 	vkDestroyInstance(instance, &allocators);
-	
+
 	instance = VK_NULL_HANDLE;
 	logical_device = VK_NULL_HANDLE;
 

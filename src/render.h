@@ -28,7 +28,7 @@ typedef struct
 {
 	float pos[3];   // = vec3
 	float tex_coord[2]; // = vec2
-        uint32_t color;
+	uint32_t color;
 } Uivertex;
 
 typedef struct

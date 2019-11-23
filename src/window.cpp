@@ -45,7 +45,7 @@ mu_Context* ctx;
 //}
 
 static ParsedOBJ kitty;
-static int mu_eidx = 500;
+static int mu_eidx;
 
 namespace window
 {
@@ -55,10 +55,9 @@ void window_size_callback(GLFWwindow* _window, int width, int height)
 	//handle minimization.
 	while (width == 0 || height == 0)
 	{
+		glfwGetFramebufferSize(_window, &width, &height);
 		glfwWaitEvents();
 	}
-
-	glfwGetFramebufferSize(_window, &width, &height);
 
 	VK_CHECK(vkDeviceWaitIdle(logical_device));
 
@@ -108,21 +107,21 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 			glfwSetWindowShouldClose(_window, true);
 		}
 		if(key == GLFW_KEY_M)
-		  {
-		    static bool state = true;
-		    if(state)
-		      {
-		        info("Mouse focused.");
-			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			state = false;
-		      }
-		    else
-		      {
-			info("Default mouse.");
-			glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			state = true;
-		      }
-		  }
+		{
+			static bool state = true;
+			if(state)
+			{
+				info("Mouse focused.");
+				glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				state = false;
+			}
+			else
+			{
+				info("Default mouse.");
+				glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				state = true;
+			}
+		}
 
 	}
 }
@@ -158,8 +157,8 @@ void processInput()
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-        static float lastX = window_height / 2.0f;
-        static float lastY = window_width / 2.0f;
+	static float lastX = window_height / 2.0f;
+	static float lastY = window_width / 2.0f;
 	//  printf("Xpos: %.6f \n", xpos);
 	//printf("Ypos: %.6f \n", ypos);
 	xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
@@ -226,107 +225,129 @@ void initWindow()
 static  char logbuf[64000];
 static   int logbuf_updated = 0;
 
-static void write_log(const char *text) {
-  if (logbuf[0]) { strcat(logbuf, "\n"); }
-  strcat(logbuf, text);
-  logbuf_updated = 1;
+static void write_log(const char *text)
+{
+	if (logbuf[0])
+	{
+		strcat(logbuf, "\n");
+	}
+	strcat(logbuf, text);
+	logbuf_updated = 1;
 }
 
-static void log_window(mu_Context *ctx) {
-  static mu_Container window;
+static void log_window(mu_Context *ctx)
+{
+	static mu_Container window;
 
-  /* init window manually so we can set its position and size */
-  if (!window.inited) {
-    mu_init_window(ctx, &window, 0);
-    window.rect = mu_rect(350, 40, 300, 200);
-  }
+	/* init window manually so we can set its position and size */
+	if (!window.inited)
+	{
+		mu_init_window(ctx, &window, 0);
+		window.rect = mu_rect(350, 40, 300, 200);
+	}
 
-  if (mu_begin_window(ctx, &window, "Log Window")) {
+	if (mu_begin_window(ctx, &window, "Log Window"))
+	{
 
-    /* output text panel */
-    static mu_Container panel;
-    int width[] = {-1};
-    mu_layout_row(ctx, 1, width, -28);
-    mu_begin_panel(ctx, &panel);
-    mu_layout_row(ctx, 1, width, -1);
-    mu_text(ctx, logbuf);
-    mu_end_panel(ctx);
-    if (logbuf_updated) {
-      panel.scroll.y = panel.content_size.y;
-      logbuf_updated = 0;
-    }
+		/* output text panel */
+		static mu_Container panel;
+		int width[] = {-1};
+		mu_layout_row(ctx, 1, width, -28);
+		mu_begin_panel(ctx, &panel);
+		mu_layout_row(ctx, 1, width, -1);
+		mu_text(ctx, logbuf);
+		mu_end_panel(ctx);
+		if (logbuf_updated)
+		{
+			panel.scroll.y = panel.content_size.y;
+			logbuf_updated = 0;
+		}
 
-    /* input textbox + submit button */
-    static char buf[128];
-    int submitted = 0;
-    int _width[] = { -70, -1 };
-    mu_layout_row(ctx, 2, _width, 0);
-    if (mu_textbox(ctx, buf, sizeof(buf)) & MU_RES_SUBMIT) {
-      mu_set_focus(ctx, ctx->last_id);
-      submitted = 1;
-    }
-    if (mu_button(ctx, "Submit")) { submitted = 1; }
-    if (submitted) {
-      write_log(buf);
-      buf[0] = '\0';
-    }
+		/* input textbox + submit button */
+		static char buf[128];
+		int submitted = 0;
+		int _width[] = { -70, -1 };
+		mu_layout_row(ctx, 2, _width, 0);
+		if (mu_textbox(ctx, buf, sizeof(buf)) & MU_RES_SUBMIT)
+		{
+			mu_set_focus(ctx, ctx->last_id);
+			submitted = 1;
+		}
+		if (mu_button(ctx, "Submit"))
+		{
+			submitted = 1;
+		}
+		if (submitted)
+		{
+			write_log(buf);
+			buf[0] = '\0';
+		}
 
-    mu_end_window(ctx);
-  }
+		mu_end_window(ctx);
+	}
 }
 
-static int uint8_slider(mu_Context *ctx, unsigned char *value, int low, int high) {
-  static float tmp;
-  mu_push_id(ctx, &value, sizeof(value));
-  tmp = *value;
-  int res = mu_slider_ex(ctx, &tmp, low, high, 0, "%.0f", MU_OPT_ALIGNCENTER);
-  *value = tmp;
-  mu_pop_id(ctx);
-  return res;
+static int uint8_slider(mu_Context *ctx, unsigned char *value, int low, int high)
+{
+	static float tmp;
+	mu_push_id(ctx, &value, sizeof(value));
+	tmp = *value;
+	int res = mu_slider_ex(ctx, &tmp, low, high, 0, "%.0f", MU_OPT_ALIGNCENTER);
+	*value = tmp;
+	mu_pop_id(ctx);
+	return res;
 }
 
 static void style_window(mu_Context *ctx)
 {
-  static mu_Container window;
+	static mu_Container window;
 
-  /* init window manually so we can set its position and size */
-  if (!window.inited) {
-    mu_init_window(ctx, &window, 0);
-    window.rect = mu_rect(350, 250, 300, 240);
-  }
+	/* init window manually so we can set its position and size */
+	if (!window.inited)
+	{
+		mu_init_window(ctx, &window, 0);
+		window.rect = mu_rect(350, 250, 300, 240);
+	}
 
-  static struct { const char *label; int idx; } colors[] = {
-    { "text:",         MU_COLOR_TEXT        },
-    { "border:",       MU_COLOR_BORDER      },
-    { "windowbg:",     MU_COLOR_WINDOWBG    },
-    { "titlebg:",      MU_COLOR_TITLEBG     },
-    { "titletext:",    MU_COLOR_TITLETEXT   },
-    { "panelbg:",      MU_COLOR_PANELBG     },
-    { "button:",       MU_COLOR_BUTTON      },
-    { "buttonhover:",  MU_COLOR_BUTTONHOVER },
-    { "buttonfocus:",  MU_COLOR_BUTTONFOCUS },
-    { "base:",         MU_COLOR_BASE        },
-    { "basehover:",    MU_COLOR_BASEHOVER   },
-    { "basefocus:",    MU_COLOR_BASEFOCUS   },
-    { "scrollbase:",   MU_COLOR_SCROLLBASE  },
-    { "scrollthumb:",  MU_COLOR_SCROLLTHUMB },
-    { NULL, 0 }
-  };
+	static struct
+	{
+		const char *label;
+		int idx;
+	} colors[] =
+	{
+		{ "text:",         MU_COLOR_TEXT        },
+		{ "border:",       MU_COLOR_BORDER      },
+		{ "windowbg:",     MU_COLOR_WINDOWBG    },
+		{ "titlebg:",      MU_COLOR_TITLEBG     },
+		{ "titletext:",    MU_COLOR_TITLETEXT   },
+		{ "panelbg:",      MU_COLOR_PANELBG     },
+		{ "button:",       MU_COLOR_BUTTON      },
+		{ "buttonhover:",  MU_COLOR_BUTTONHOVER },
+		{ "buttonfocus:",  MU_COLOR_BUTTONFOCUS },
+		{ "base:",         MU_COLOR_BASE        },
+		{ "basehover:",    MU_COLOR_BASEHOVER   },
+		{ "basefocus:",    MU_COLOR_BASEFOCUS   },
+		{ "scrollbase:",   MU_COLOR_SCROLLBASE  },
+		{ "scrollthumb:",  MU_COLOR_SCROLLTHUMB },
+		{ NULL, 0 }
+	};
 
-  if (mu_begin_window(ctx, &window, "Style Editor")) {
-    int sw = mu_get_container(ctx)->body.w * 0.14;
-    int widths[] = { 80, sw, sw, sw, sw, -1 };
-    mu_layout_row(ctx, 6, widths, 0);
-    for (int i = 0; colors[i].label; i++) {
-      mu_label(ctx, colors[i].label);
-      uint8_slider(ctx, &ctx->style->colors[i].r, 0, 255);
-      uint8_slider(ctx, &ctx->style->colors[i].g, 0, 255);
-      uint8_slider(ctx, &ctx->style->colors[i].b, 0, 255);
-      uint8_slider(ctx, &ctx->style->colors[i].a, 0, 255);
-      mu_draw_rect(ctx, mu_layout_next(ctx), ctx->style->colors[i]);
-    }
-    mu_end_window(ctx);
-  }
+	if (mu_begin_window(ctx, &window, "Style Editor"))
+	{
+		int sw = mu_get_container(ctx)->body.w * 0.14;
+		int widths[] = { 80, sw, sw, sw, sw, -1 };
+		mu_layout_row(ctx, 6, widths, 0);
+		for (int i = 0; colors[i].label; i++)
+		{
+			mu_label(ctx, colors[i].label);
+			uint8_slider(ctx, &ctx->style->colors[i].r, 0, 255);
+			uint8_slider(ctx, &ctx->style->colors[i].g, 0, 255);
+			uint8_slider(ctx, &ctx->style->colors[i].b, 0, 255);
+			uint8_slider(ctx, &ctx->style->colors[i].a, 0, 255);
+			mu_draw_rect(ctx, mu_layout_next(ctx), ctx->style->colors[i]);
+		}
+		mu_end_window(ctx);
+	}
 }
 
 
@@ -334,8 +355,8 @@ inline uint8_t Draw()
 {
 	uint32_t image_index;
 	VkResult result;
-	mu_Command* cmd = nullptr;               
-	
+	mu_Command* cmd = nullptr;
+
 	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);
 	vkResetFences(logical_device, 1, &Fence_one);
 	uint8_t ret = swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index);
@@ -419,8 +440,8 @@ inline uint8_t Draw()
 		present_info.pImageIndices = &image_index;
 		present_info.pResults = nullptr;
 
-		draw::buf_idx = mu_eidx;
-		
+		mu_eidx = draw::buf_idx;
+
 		once = false;
 	}
 
@@ -431,18 +452,22 @@ inline uint8_t Draw()
 
 	//record ui commands.
 	while (mu_next_command(ctx, &cmd))
-	  {	  
-	    switch (cmd->type)
-	    {
-	      case MU_COMMAND_TEXT: draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color); break;
-	      case MU_COMMAND_RECT: draw::r_draw_rect(cmd->rect.rect, cmd->rect.color); break;
-	      // case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
-	      // case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
-	    }
-	    //break;
-	  }
+	{
+		switch (cmd->type)
+		{
+		case MU_COMMAND_TEXT:
+			draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color);
+			break;
+		case MU_COMMAND_RECT:
+			draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
+			break;
+			// case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
+			// case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
+		}
+		//break;
+	}
 	draw::buf_idx = mu_eidx;
-	
+
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
 	render_area.extent.height = window_height;
@@ -474,10 +499,10 @@ inline uint8_t Draw()
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
-       	
+
 	draw::PresentUI();
-	
- 	// static Uivertex vertices[4] = {};
+
+	// static Uivertex vertices[4] = {};
 
 	// vertices[0].pos[0] = 300;   //x
 	// vertices[0].pos[1] = 200;   //y
@@ -510,7 +535,7 @@ inline uint8_t Draw()
 	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 1};
 
 	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
-  
+
 	// static Vertex_ vertices[4] = {};
 
 	// vertices[0].pos[0] = -0.5f;   //x
@@ -524,7 +549,7 @@ inline uint8_t Draw()
 
 	// vertices[1].pos[0] = 0.5f;
 	// vertices[1].pos[1] = -0.5f;
-	// vertices[1].pos[2] = 0.0f;   
+	// vertices[1].pos[2] = 0.0f;
 	// vertices[1].color[0] = 0.0f;
 	// vertices[1].color[1] = 1.0f;
 	// vertices[1].color[2] = 0.0f;
@@ -552,7 +577,7 @@ inline uint8_t Draw()
 	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
 
 	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
-	
+
 	//vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
 	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
 
@@ -575,9 +600,9 @@ inline uint8_t Draw()
 
 	control::ResetStagingBuffer();
 	//textures::SampleTextureUpdate();
-	
+
 	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
-		
+
 	switch(result)
 	{
 	case VK_SUCCESS:
@@ -639,13 +664,13 @@ void mainLoop()
 	ctx->text_height = draw::text_height;
 
 	draw::InitAtlasTexture();
-	
+
 	double time2 = 0;
 	double maxfps;
 	double realtime = 0;
 	double oldrealtime = 0;
 	double deltatime = 0;
-	
+
 	while (!glfwWindowShouldClose(_window))
 	{
 		glfwPollEvents();
