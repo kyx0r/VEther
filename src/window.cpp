@@ -459,7 +459,7 @@ inline uint8_t Draw()
 			draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color);
 			break;
 		case MU_COMMAND_RECT:
-			draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
+		        draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
 			break;
 			// case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
 			// case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
@@ -638,9 +638,11 @@ void mainLoop()
 	VkShaderModule triangleVS = shaders::loadShaderMem(1);
 	ASSERT(triangleVS, "Failed to load triangleVS.");
 	VkShaderModule screenFS = shaders::loadShaderMem(2);
-	ASSERT(triangleVS, "Failed to load screenFS.");
+	ASSERT(screenFS, "Failed to load screenFS.");
 	VkShaderModule screenVS = shaders::loadShaderMem(3);
-	ASSERT(triangleVS, "Failed to load screenVS.");
+	ASSERT(screenVS, "Failed to load screenVS.");
+	VkShaderModule colFS = shaders::loadShaderMem(4);
+	ASSERT(colFS, "Failed to load colFS.");
 
 	//textures::SampleTexture();
 
@@ -653,6 +655,8 @@ void mainLoop()
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 
 	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
+
+	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, colFS);
 
 	//fov setup.
 	entity::InitCamera();
@@ -724,6 +728,7 @@ c:
 	vkDestroyShaderModule(logical_device, triangleFS, nullptr);
 	vkDestroyShaderModule(logical_device, screenVS, nullptr);
 	vkDestroyShaderModule(logical_device, screenFS, nullptr);
+	vkDestroyShaderModule(logical_device, colFS, nullptr);
 	render::DestroyRenderPasses();
 	swapchain::DestroySwapchain(_swapchain);
 	surface::DestroyPresentationSurface();

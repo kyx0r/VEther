@@ -19,7 +19,8 @@ void CompileShaders()
 		{"dummy", "./res/shaders/triangle.frag.glsl", "-V", "-o", "./res/shaders/triangle.frag.spv"},
 		{"dummy", "./res/shaders/triangle.vert.glsl", "-V", "-o", "./res/shaders/triangle.vert.spv"},
 		{"dummy", "./res/shaders/screen.frag.glsl", "-V", "-o", "./res/shaders/screen.frag.spv"},
-		{"dummy", "./res/shaders/screen.vert.glsl", "-V", "-o", "./res/shaders/screen.vert.spv"}
+		{"dummy", "./res/shaders/screen.vert.glsl", "-V", "-o", "./res/shaders/screen.vert.spv"},
+		{"dummy", "./res/shaders/col.frag.glsl", "-V", "-o", "./res/shaders/col.frag.spv"}
 
 	};
 	for(uint32_t i = 0; i<ARRAYSIZE(shaders); ++i)

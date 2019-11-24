@@ -97,7 +97,7 @@ int r_get_text_width(const char *text, int len)
 			continue;
 		}
 		int chr = mu_min((unsigned char) *p, 127);
-		res += atlas[6 + chr - 32].w;
+		res += atlas[chr-27].w;
 	}
 	return res;
 }
@@ -194,15 +194,17 @@ void PresentUI()
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);		
 	vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
+
+	// vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[2]);
+	// vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);		
+	// vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
 }
 
 void InitAtlasTexture()
 {
-	int mark = zone::Hunk_LowMark();
-	unsigned char* out = textures::Tex8to32(atlas_texture, ATLAS_WIDTH * ATLAS_HEIGHT);
-	textures::UploadTexture(out, ATLAS_WIDTH, ATLAS_HEIGHT);
-	zone::Hunk_FreeToLowMark(mark);
+	textures::UploadTexture(atlas_texture, ATLAS_WIDTH, ATLAS_HEIGHT, VK_FORMAT_R8_UNORM);
 }
 
 void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
@@ -216,9 +218,10 @@ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
 		}
 		int chr = mu_min((unsigned char) *p, 127);
 		//p("%d",chr+6-32);
-		mu_Rect src = atlas[chr+6-32];
+		mu_Rect src = atlas[chr-27];
 		dst.w = src.w;
 		dst.h = src.h;
+		color.a = 0;
 		push_quad(dst, src, color);
 		dst.x += dst.w;
 	}
@@ -226,6 +229,7 @@ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
 
 void r_draw_rect(mu_Rect rect, mu_Color color)
 {
+        color.a = 0xFF;
 	push_quad(rect, atlas[5], color);
 }
 

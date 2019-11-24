@@ -60,14 +60,14 @@ void InitSamplers()
 		sampler_create_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 		sampler_create_info.magFilter = VK_FILTER_NEAREST;
 		sampler_create_info.minFilter = VK_FILTER_NEAREST;
-		sampler_create_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		sampler_create_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 		sampler_create_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		sampler_create_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		sampler_create_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		sampler_create_info.mipLodBias = 0.0f;
 		sampler_create_info.maxAnisotropy = 1.0f;
 		sampler_create_info.minLod = 0;
-		sampler_create_info.maxLod = 0;
+		sampler_create_info.maxLod = 0.25f;
 
 		err = vkCreateSampler(logical_device, &sampler_create_info, nullptr, &point_sampler);
 		if (err != VK_SUCCESS)
@@ -208,7 +208,7 @@ void UpdateTexture(unsigned char* image, int w, int h, int index)
 	control::SubmitStagingBuffer();
 }
 
-void UploadTexture(unsigned char* image, int w, int h)
+void UploadTexture(unsigned char* image, int w, int h, VkFormat format)
 {
 	VkDescriptorSetAllocateInfo dsai;
 	memset(&dsai, 0, sizeof(dsai));
@@ -219,7 +219,7 @@ void UploadTexture(unsigned char* image, int w, int h)
 
 	vkAllocateDescriptorSets(logical_device, &dsai, &tex_descriptor_sets[current_tex_ds_index]);
 
-	v_image[current_tex_ds_index] = render::Create2DImage(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
+	v_image[current_tex_ds_index] = render::Create2DImage(format, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, w, h);
 
 	VkMemoryRequirements memory_requirements;
 	vkGetImageMemoryRequirements(logical_device, v_image[current_tex_ds_index], &memory_requirements);
@@ -247,7 +247,7 @@ try_again:
 	VkImageViewCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	createInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	createInfo.format = format;
 	createInfo.components.r = VK_COMPONENT_SWIZZLE_R;
 	createInfo.components.g = VK_COMPONENT_SWIZZLE_G;
 	createInfo.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -330,7 +330,7 @@ void FsLoadPngTexture(const char* filename)
 
 	unsigned int* usepal = data;
 	unsigned char* img = (unsigned char*)TexMgr8to32(image->data(), (width * height), usepal);
-	UploadTexture(img, width, height);
+	UploadTexture(img, width, height, VK_FORMAT_R8G8B8A8_UNORM);
 }
 
 bool SampleTexture()
@@ -356,7 +356,7 @@ bool SampleTexture()
 	unsigned int *usepal = data;
 	image = (unsigned char*)TexMgr8to32(image, (w * h), usepal);
 
-	UploadTexture(image, w, h);
+	UploadTexture(image, w, h, VK_FORMAT_R8G8B8A8_UNORM);
 	zone::Hunk_FreeToLowMark(mark);
 
 	return true;
