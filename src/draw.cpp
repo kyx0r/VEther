@@ -117,19 +117,19 @@ int text_height(mu_Font font)
 }
 
 #define BUFFER_SIZE 1000
-int buf_idx = BUFFER_SIZE;
+int buf_idx;
 Uivertex vert[BUFFER_SIZE * 4];
 uint32_t index_buf[BUFFER_SIZE * 6];
 
 static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color)
 {
-	buf_idx--;
 	int texvert_idx = buf_idx * 4;
 	int   index_idx = buf_idx * 6;
-	if(buf_idx == 0)
+	buf_idx++;
+	if(buf_idx == BUFFER_SIZE)
 	{
-		buf_idx = BUFFER_SIZE;
-		warn("buf_idx overflow reached.");
+		warn("Possibly out of ui memory!");
+		return;
 	}
 
 	vert[texvert_idx + 0].pos[0] = dst.x;
@@ -194,12 +194,10 @@ void PresentUI()
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);		
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
 
-	// vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[2]);
-	// vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);		
-	// vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
+	buf_idx = 0;
 }
 
 void InitAtlasTexture()
@@ -217,7 +215,6 @@ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
 			continue;
 		}
 		int chr = mu_min((unsigned char) *p, 127);
-		//p("%d",chr+6-32);
 		mu_Rect src = atlas[chr-27];
 		dst.w = src.w;
 		dst.h = src.h;
@@ -229,8 +226,18 @@ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
 
 void r_draw_rect(mu_Rect rect, mu_Color color)
 {
-        color.a = 0xFF;
+	color.a = 0xFF;
 	push_quad(rect, atlas[5], color);
+}
+
+
+void r_draw_icon(int id, mu_Rect rect, mu_Color color)
+{
+	mu_Rect src = atlas[id-1];
+	int x = rect.x + (rect.w - src.w) / 2;
+	int y = rect.y + (rect.h - src.h) / 2;
+	color.a = 0x0;
+	push_quad(mu_rect(x, y, src.w, src.h), src, color);
 }
 
 

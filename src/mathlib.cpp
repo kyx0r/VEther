@@ -679,10 +679,6 @@ void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 	matrix[2*4 + 3] = 0.0f;
 
 	// Fourth column
-
-	//matrix[3*4 + 0] = 0.0f;
-	//matrix[3*4 + 1] = 0.0f;
-	//matrix[3*4 + 2] = 0.0f;
 	matrix[3*4 + 0] = -_DotProduct(s, eye);
 	matrix[3*4 + 1] = -_DotProduct(t, eye);
 	matrix[3*4 + 2] = _DotProduct(f, eye);

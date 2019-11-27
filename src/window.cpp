@@ -45,7 +45,6 @@ mu_Context* ctx;
 //}
 
 static ParsedOBJ kitty;
-static int mu_eidx;
 
 namespace window
 {
@@ -101,13 +100,13 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 {
 	if (action == GLFW_PRESS)
 	{
-		if(key == GLFW_KEY_ESCAPE)
+		switch(key)
 		{
+		case GLFW_KEY_ESCAPE:
 			trace("Quiting cleanly");
 			glfwSetWindowShouldClose(_window, true);
-		}
-		if(key == GLFW_KEY_M)
-		{
+			break;
+		case GLFW_KEY_M:
 			static bool state = true;
 			if(state)
 			{
@@ -121,8 +120,8 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 				glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				state = true;
 			}
+			break;
 		}
-
 	}
 }
 
@@ -351,9 +350,73 @@ static void style_window(mu_Context *ctx)
 }
 
 
+static VkClearValue clearColor[2] = {};
+static VkClearColorValue color = {};
+static VkImageSubresourceRange range = {};
+static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
+static VkImageMemoryBarrier image_memory_barrier_before_present = {};
+static VkSubmitInfo submit_info = {};
+static VkPresentInfoKHR present_info = {};
+static 	uint32_t image_index;
+static VkPipelineStageFlags flags = {VK_PIPELINE_STAGE_ALL_COMMANDS_BIT};
+
+static void PreDraw()
+{
+	color.float32[0] = 0;
+	color.float32[1] = 0;
+	color.float32[2] = 0;
+	color.float32[3] = 1;
+	clearColor[0].color = color;
+	clearColor[1].depthStencil = {1.0f, 0};
+
+	range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	range.baseMipLevel = 0;
+	range.levelCount = VK_REMAINING_MIP_LEVELS;
+	range.baseArrayLayer = 0;
+	range.layerCount = VK_REMAINING_ARRAY_LAYERS;
+
+	image_memory_barrier_before_draw.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	image_memory_barrier_before_draw.pNext = nullptr;
+	image_memory_barrier_before_draw.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+	image_memory_barrier_before_draw.dstAccessMask = 0;
+	image_memory_barrier_before_draw.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	image_memory_barrier_before_draw.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	image_memory_barrier_before_draw.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	image_memory_barrier_before_draw.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	image_memory_barrier_before_draw.subresourceRange = range;
+
+	image_memory_barrier_before_present.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	image_memory_barrier_before_present.pNext = nullptr;
+	image_memory_barrier_before_present.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+	image_memory_barrier_before_present.dstAccessMask = 0;
+	image_memory_barrier_before_present.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	image_memory_barrier_before_present.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	image_memory_barrier_before_present.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	image_memory_barrier_before_present.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	image_memory_barrier_before_present.subresourceRange = range;
+
+	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submit_info.pNext = nullptr;
+	submit_info.waitSemaphoreCount = 1;
+	submit_info.pWaitSemaphores = &AcquiredSemaphore;
+	submit_info.pWaitDstStageMask = &flags;
+	submit_info.commandBufferCount = 1;
+	submit_info.pCommandBuffers = &command_buffer;
+	submit_info.signalSemaphoreCount = 1;
+	submit_info.pSignalSemaphores = &ReadySemaphore;
+
+	present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	present_info.pNext = nullptr;
+	present_info.waitSemaphoreCount = 1;
+	present_info.pWaitSemaphores = &ReadySemaphore;
+	present_info.swapchainCount = 1;
+	present_info.pSwapchains = &_swapchain;
+	present_info.pImageIndices = &image_index;
+	present_info.pResults = nullptr;
+}
+
 inline uint8_t Draw()
 {
-	uint32_t image_index;
 	VkResult result;
 	mu_Command* cmd = nullptr;
 
@@ -373,78 +436,6 @@ inline uint8_t Draw()
 
 	assert(control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr));
 
-	VkPipelineStageFlags flags =
-	{
-		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
-	};
-
-	static bool once = true;
-	static VkClearValue clearColor[2] = {};
-	static VkClearColorValue color = {};
-	static VkImageSubresourceRange range = {};
-	static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
-	static VkImageMemoryBarrier image_memory_barrier_before_present = {};
-	static VkSubmitInfo submit_info = {};
-	static VkPresentInfoKHR present_info = {};
-	if(once)
-	{
-		color.float32[0] = 0;
-		color.float32[1] = 0;
-		color.float32[2] = 0;
-		color.float32[3] = 1;
-		clearColor[0].color = color;
-		clearColor[1].depthStencil = {1.0f, 0};
-
-		range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		range.baseMipLevel = 0;
-		range.levelCount = VK_REMAINING_MIP_LEVELS;
-		range.baseArrayLayer = 0;
-		range.layerCount = VK_REMAINING_ARRAY_LAYERS;
-
-		image_memory_barrier_before_draw.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		image_memory_barrier_before_draw.pNext = nullptr;
-		image_memory_barrier_before_draw.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		image_memory_barrier_before_draw.dstAccessMask = 0;
-		image_memory_barrier_before_draw.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		image_memory_barrier_before_draw.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		image_memory_barrier_before_draw.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		image_memory_barrier_before_draw.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		image_memory_barrier_before_draw.subresourceRange = range;
-
-		image_memory_barrier_before_present.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		image_memory_barrier_before_present.pNext = nullptr;
-		image_memory_barrier_before_present.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		image_memory_barrier_before_present.dstAccessMask = 0;
-		image_memory_barrier_before_present.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		image_memory_barrier_before_present.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		image_memory_barrier_before_present.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		image_memory_barrier_before_present.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		image_memory_barrier_before_present.subresourceRange = range;
-
-		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submit_info.pNext = nullptr;
-		submit_info.waitSemaphoreCount = 1;
-		submit_info.pWaitSemaphores = &AcquiredSemaphore;
-		submit_info.pWaitDstStageMask = &flags;
-		submit_info.commandBufferCount = 1;
-		submit_info.pCommandBuffers = &command_buffer;
-		submit_info.signalSemaphoreCount = 1;
-		submit_info.pSignalSemaphores = &ReadySemaphore;
-
-		present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-		present_info.pNext = nullptr;
-		present_info.waitSemaphoreCount = 1;
-		present_info.pWaitSemaphores = &ReadySemaphore;
-		present_info.swapchainCount = 1;
-		present_info.pSwapchains = &_swapchain;
-		present_info.pImageIndices = &image_index;
-		present_info.pResults = nullptr;
-
-		mu_eidx = draw::buf_idx;
-
-		once = false;
-	}
-
 	mu_begin(ctx);
 	log_window(ctx);
 	style_window(ctx);
@@ -459,14 +450,14 @@ inline uint8_t Draw()
 			draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color);
 			break;
 		case MU_COMMAND_RECT:
-		        draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
+			draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
 			break;
-			// case MU_COMMAND_ICON: r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color); break;
-			// case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
+		case MU_COMMAND_ICON:
+			draw::r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
+			break;
+			//case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
 		}
-		//break;
 	}
-	draw::buf_idx = mu_eidx;
 
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
@@ -499,8 +490,6 @@ inline uint8_t Draw()
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
-
-	draw::PresentUI();
 
 	// static Uivertex vertices[4] = {};
 
@@ -583,6 +572,8 @@ inline uint8_t Draw()
 
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
+
+	draw::PresentUI();
 
 	vkCmdEndRenderPass(command_buffer);
 
@@ -668,6 +659,8 @@ void mainLoop()
 	ctx->text_height = draw::text_height;
 
 	draw::InitAtlasTexture();
+
+	PreDraw();
 
 	double time2 = 0;
 	double maxfps;
