@@ -74,7 +74,7 @@ static void* lodepng_realloc(void* ptr, size_t new_size)
 #ifdef LODEPNG_MAX_ALLOC
 	if(new_size > LODEPNG_MAX_ALLOC) return 0;
 #endif
-	return zone::Z_Realloc(ptr, new_size);
+	return zone::Z_Realloc(ptr, new_size, 8);
 }
 
 static void lodepng_free(void* ptr)

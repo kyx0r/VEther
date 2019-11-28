@@ -6,11 +6,16 @@
    GVAR: PFN_* -> vulkan_decl.h
    } */
 
+static VkAllocationCallbacks allocator;  
+   
+/*    Warning! if making a 32 bit build, set allocators to null and remove the respectable 
+   structures, as there is a driver bug! Else we will crash hard.  */
+   
 //{
 VkInstance instance;
 VkPhysicalDevice target_device = VK_NULL_HANDLE;
 VkDevice logical_device;
-VkAllocationCallbacks allocators;
+VkAllocationCallbacks* allocators = &allocator;
 uint32_t max2DTex_size = 0;
 uint32_t queue_families_count = 0;
 //}
@@ -20,7 +25,7 @@ static uint32_t device_count = 0;
 static uint32_t desired_count = 0;
 static const char** desired_extensions = nullptr;
 static VkExtensionProperties* available_extensions = nullptr;
-static VkPhysicalDevice *available_devices = nullptr;
+static VkPhysicalDevice* available_devices = nullptr;
 static VkPhysicalDeviceFeatures device_features;
 static VkPhysicalDeviceProperties device_properties;
 
@@ -207,8 +212,8 @@ bool LoadVulkan()
       {									\
 	warn("Could not load exported Vulkan function: %s", #name);	\
 	return false;							\
-      }else								\
-      info("Exported Vulkan function: %s" #name);			\
+      }else	{							\
+      info("Exported Vulkan function: %s" #name);}			\
 
 #include "vulkan_functions_list.inl"
 
@@ -224,7 +229,7 @@ bool LoadVulkanGlobalFuncs()
 	warn("Could not load global Vulkan function: %s", #name);	\
 	return false;							\
       }else								\
-      info("Loaded global Vulkan function: %s", #name);		\
+      {info("Loaded global Vulkan function: %s", #name);}	\
 
 #include "vulkan_functions_list.inl"
 	return true;
@@ -240,7 +245,7 @@ bool LoadInstanceFunctions()
 	warn("Could not load instance-level Vulkan function: %s", #name); \
 	return false;							\
       }else								\
-      info("Loaded instance-level Vulkan function: %s", #name);	\
+      {info("Loaded instance-level Vulkan function: %s", #name);}	\
 
 #include "vulkan_functions_list.inl"
 
@@ -249,11 +254,11 @@ bool LoadInstanceFunctions()
     for(uint32_t i = 0; i<desired_count; i++) {				\
       if( std::string( desired_extensions[i] ) == std::string( extension ) ) { \
         name = (PFN_##name)vkGetInstanceProcAddr( instance, #name );	\
-        if( name == nullptr ) {						\
-          warn("Could not load instance-level Vulkan function named: %s", #name);  \
-    return false;                                                         \
+        if( name == nullptr ){						\
+		warn("Could not load instance-level Vulkan function named: %s", #name);  \
+		return false;                                                        \
   }else                                                                       \
-     info("Loaded function from extension: %s", #name);		\
+  {info("Loaded function from extension: %s", #name);}		\
 }                                                                         \
 }
 
@@ -350,15 +355,16 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 #endif
 
 	//define custom vulkan allocators
-	allocators.pUserData = nullptr;
-	allocators.pfnAllocation = &VEtherAlloc;
-	allocators.pfnReallocation = &VEtherRealloc;
-	allocators.pfnFree = &VEtherFree;
-	allocators.pfnInternalAllocation = nullptr;
-	allocators.pfnInternalFree = nullptr;
+	//allocators = nullptr;
+	allocators->pUserData = nullptr;
+	allocators->pfnAllocation = (PFN_vkAllocationFunction)&VEtherAlloc;
+	allocators->pfnReallocation = (PFN_vkReallocationFunction)&VEtherRealloc;
+	allocators->pfnFree = (PFN_vkFreeFunction)&VEtherFree;
+	allocators->pfnInternalAllocation = nullptr;
+	allocators->pfnInternalFree = nullptr;
 
 	VkResult result = VK_SUCCESS;
-	result = vkCreateInstance(&instance_create_info, &allocators, &instance);
+	result = vkCreateInstance(&instance_create_info, allocators, &instance);
 	if(result != VK_SUCCESS)
 	{
 		fatal("Could not create Vulkan Instance!  ");
@@ -511,7 +517,7 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 	device_create_info.ppEnabledExtensionNames = &desired_extensions[0];
 	device_create_info.pEnabledFeatures = &device_features;
 
-	VkResult result = vkCreateDevice(target_device, &device_create_info, &allocators, &logical_device);
+	VkResult result = vkCreateDevice(target_device, &device_create_info, allocators, &logical_device);
 	if(result != VK_SUCCESS || logical_device == VK_NULL_HANDLE)
 	{
 		fatal("Could not create logical device.");
@@ -531,8 +537,8 @@ bool LoadDeviceLevelFunctions()
   if( name == nullptr ) {						\
 	  warn("Could not load device-level Vulkan function named: %s",#name); \
     return false;							\
-  }else									\
-    info("Loaded device-level function: %s",#name);
+  }else	{								\
+  info("Loaded device-level function: %s",#name);} \
 
 #include "vulkan_functions_list.inl"
 
@@ -544,8 +550,8 @@ bool LoadDeviceLevelFunctions()
       if( name == nullptr ) {						\
 	      warn("Could not load device-level Vulkan function from extension: %s", #name); \
 	return false;							\
-      }else								\
-        info("Loaded device-level function from extension: %s", #name);	\
+      }else{								\
+	  info("Loaded device-level function from extension: %s", #name);}	\
     }									\
   }
 #include "vulkan_functions_list.inl"
@@ -554,8 +560,8 @@ bool LoadDeviceLevelFunctions()
 
 void ReleaseVulkanLoaderLibrary()
 {
-	vkDestroyDevice(logical_device, &allocators);
-	vkDestroyInstance(instance, &allocators);
+	vkDestroyDevice(logical_device, allocators);
+	vkDestroyInstance(instance, allocators);
 
 	instance = VK_NULL_HANDLE;
 	logical_device = VK_NULL_HANDLE;

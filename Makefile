@@ -49,7 +49,7 @@ VETHER = -lVEther -lglfw -lglslang
 OBJ_NAME = VEther.exe 
 
 #for further optimization use -flto flag.
-SHARED_FLAGS = -O3 -g -Wl,--no-relax -m64 -Wall -Wextra -masm=intel -fno-align-functions -fno-exceptions -Wno-deprecated-copy -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
+SHARED_FLAGS = -O3 -s -Wl,--no-relax -m64 -Wall -Wextra -masm=intel -fno-align-functions -fno-exceptions -Wno-deprecated-copy -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
 export SHARED_FLAGS
 #-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 

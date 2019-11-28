@@ -122,6 +122,9 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 			}
 			break;
 		}
+		char k[1];
+		k[0] = (char)key;
+		mu_input_text(ctx, k);
 	}
 }
 
@@ -185,6 +188,8 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	if (cam.pitch < -89.0f)
 		cam.pitch = -89.0f;
 	entity::UpdateCamera();
+
+	mu_input_mousemove(ctx, xm, ym);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -196,13 +201,34 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		cam.zoom = 1.0f;
 	if (cam.zoom >= 45.0f)
 		cam.zoom = 45.0f;
+
+	mu_input_scroll(ctx, 0, (int)yoffset * -30);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	switch(action)
 	{
-
+	case GLFW_PRESS:
+		if (button == GLFW_MOUSE_BUTTON_RIGHT)
+		{
+			mu_input_mousedown(ctx, xm, ym, 2);
+		}
+		else
+		{
+			mu_input_mousedown(ctx, xm, ym, 1);
+		}
+		break;
+	case GLFW_RELEASE:
+		if (button == GLFW_MOUSE_BUTTON_RIGHT)
+		{
+			mu_input_mouseup(ctx, xm, ym, 2);
+		}
+		else
+		{
+			mu_input_mouseup(ctx, xm, ym, 1);
+		}
+		break;
 	}
 }
 
@@ -710,12 +736,12 @@ c:
 	control::DestroyIndexBuffers();
 	control::DestroyVramHeaps();
 	textures::TexDeinit();
-	vkDestroySemaphore(logical_device, AcquiredSemaphore, &allocators);
-	vkDestroySemaphore(logical_device, ReadySemaphore, &allocators);
-	vkDestroyFence(logical_device, Fence_one, &allocators);
+	vkDestroySemaphore(logical_device, AcquiredSemaphore, allocators);
+	vkDestroySemaphore(logical_device, ReadySemaphore, allocators);
+	vkDestroyFence(logical_device, Fence_one, allocators);
 	render::DestroyImageViews();
 	render::DestroyFramebuffers();
-	vkDestroyPipelineLayout(logical_device, pipeline_layout, &allocators);
+	vkDestroyPipelineLayout(logical_device, pipeline_layout, allocators);
 	render::DestroyPipeLines();
 	vkDestroyShaderModule(logical_device, triangleVS, nullptr);
 	vkDestroyShaderModule(logical_device, triangleFS, nullptr);

@@ -25,7 +25,7 @@ unsigned char* stack_mem = nullptr;
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
-	void* p = zone::Z_TagMalloc(size, 1);
+	void* p = zone::Z_TagMalloc(size, 1, 8);
 	ASSERT(p,"operator new failed.");
 	return p;
 }
@@ -49,18 +49,16 @@ void operator delete(void* p, size_t size)
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-	ASSERT(align <= 8, "wrong alignment from driver!");
-	void* p = zone::Z_TagMalloc(size, 1);
-	//void* p = malloc(aligned_size);
+	void* p = zone::Z_TagMalloc(size, 1, align);
+	//void* p = malloc(size);
 	ASSERT(p,"VEtherAlloc failed.");
 	return p;
 }
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-	ASSERT(align <= 8, "wrong alignment from driver!");
-	void* p = zone::Z_Realloc(porg, size);
-	//void* p = realloc(porg, aligned_size);
+	void* p = zone::Z_Realloc(porg, size, align);
+	//void* p = realloc(porg, size);
 	ASSERT(p,"VEtherRealloc failed.");
 	return p;
 }
@@ -365,7 +363,7 @@ void Z_Free (void *ptr)
 }
 
 
-void *Z_TagMalloc (int size, int tag)
+void *Z_TagMalloc (int size, int tag, int align)
 {
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
@@ -378,7 +376,7 @@ void *Z_TagMalloc (int size, int tag)
 //
 	size += sizeof(memblock_t);	// account for size of block header
 	size += 4;					// space for memory trash tester
-	size = (size + 7) & ~7;		// align to 8-unsigned char boundary
+	size = (size + (align-1)) & -align;		// align to spec char boundary
 
 	base = rover = mainzone->rover;
 	start = base->prev;
@@ -458,7 +456,7 @@ void *Z_Malloc (int size)
 
 	//Z_CheckHeap ();
 
-	buf = Z_TagMalloc (size, 1);
+	buf = Z_TagMalloc (size, 1, 8);
 	if (!buf)
 		printf ("Z_Malloc: failed on allocation of %i bytes",size);
 	Q_memset (buf, 0, size);
@@ -471,7 +469,7 @@ void *Z_Malloc (int size)
 Z_Realloc
 ========================
 */
-void *Z_Realloc(void *ptr, int size)
+void *Z_Realloc(void *ptr, int size, int align)
 {
 	int old_size;
 	void *old_ptr;
@@ -491,7 +489,7 @@ void *Z_Realloc(void *ptr, int size)
 	old_ptr = ptr;
 
 	Z_Free (ptr);
-	ptr = Z_TagMalloc (size, 1);
+	ptr = Z_TagMalloc (size, 1, align);
 	if (!ptr)
 		printf ("Z_Realloc: failed on allocation of %i bytes", size);
 

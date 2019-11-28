@@ -97,9 +97,9 @@ void stack_clear(int size);
 void Memory_Init (void *buf, int size);
 
 void Z_Free (void *ptr);
-void *Z_TagMalloc (int size, int tag);
+void *Z_TagMalloc (int size, int tag, int align);
 void *Z_Malloc (int size); // returns 0 filled memory.
-void *Z_Realloc (void *ptr, int size);
+void *Z_Realloc (void *ptr, int size, int align);
 char *Z_Strdup (const char *s);
 
 void *Hunk_Alloc (int size);		// returns 0 filled memory

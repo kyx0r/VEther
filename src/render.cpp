@@ -285,7 +285,7 @@ void CreatePipelineLayout()
 	createInfo.pushConstantRangeCount = 1;
 	createInfo.pPushConstantRanges = &push_constant_range;
 
-	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, &allocators, &pipeline_layout));
+	VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, allocators, &pipeline_layout));
 }
 
 void Viewport(float x, float y, float width, float height, float min_depth, float max_depth)

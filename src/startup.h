@@ -32,7 +32,7 @@
 #pragma once
 #include "vulkan_decl.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #   define ASSERT(condition, message) \
@@ -72,7 +72,7 @@
 extern VkDevice logical_device;
 extern VkInstance instance;
 extern VkPhysicalDevice target_device;
-extern VkAllocationCallbacks allocators;
+extern VkAllocationCallbacks* allocators;
 extern uint32_t max2DTex_size;
 
 extern uint32_t queue_families_count;
