@@ -24,12 +24,10 @@ void CompileShaders()
 		{"dummy", "./res/shaders/col.frag.glsl", "-V", "-o", "./res/shaders/col.frag.spv"}
 
 	};
-	newtmp = true;
 	for(uint32_t i = 0; i<ARRAYSIZE(shaders); ++i)
 	{
 		GLSL_COMPILER_ENTRY(ARRAYSIZE(shaders[i]), shaders[i]);
 	}
-	zone::Z_TmpExec();
 	trace("SHADERS COMPILED. \n");
 }
 

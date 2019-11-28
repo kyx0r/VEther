@@ -19,18 +19,12 @@ Copyright (C) 2019-.... FAETHER / Etherr
 */
 
 unsigned char* stack_mem = nullptr;
-bool newtmp = false;
 
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
-  if(newtmp)
-    {
-      zone::Z_TmpExec();
-      newtmp = false;
-    }
 	void* p = zone::Z_TagMalloc(size, 1, 8);
 	ASSERT(p,"operator new failed.");
 	return p;
@@ -319,6 +313,7 @@ typedef struct
 
 void Cache_FreeLow (int new_low_hunk);
 void Cache_FreeHigh (int new_high_hunk);
+static void Memory_InitZone (memzone_t *zone, int size);
 
 static memzone_t	*mainzone;
 
@@ -370,19 +365,18 @@ void Z_Free (void *ptr)
 
 void Z_TmpExec()
 {
-  static memblock_t* block = nullptr;
-  if(!block)
+  static memzone_t* _zone = nullptr;
+  if(!_zone)
     {
-      block = mainzone->rover;
-      p("%p", block);
+      _zone = mainzone;
+	  mainzone = (memzone_t *) Hunk_TempAlloc(DYNAMIC_SIZE);
+	  Memory_InitZone(mainzone, DYNAMIC_SIZE);
     }
   else
     {
-      p("here");
-      p("%p", mainzone->rover);
-      //Q_memset(block->next, 0, mainzone->rover-block);      
-      //mainzone->rover = block;
-      block = nullptr;
+	  Hunk_HighMark();
+      mainzone = _zone;
+	  _zone = nullptr;
     }  
 }
 

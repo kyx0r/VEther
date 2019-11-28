@@ -77,7 +77,6 @@ Zone block
 #include "startup.h"
 
 extern unsigned char* stack_mem;
-extern bool newtmp;
 typedef struct cache_user_s
 {
 	void	*data;
