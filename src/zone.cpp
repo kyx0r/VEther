@@ -19,12 +19,18 @@ Copyright (C) 2019-.... FAETHER / Etherr
 */
 
 unsigned char* stack_mem = nullptr;
+bool newtmp = false;
 
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
+  if(newtmp)
+    {
+      zone::Z_TmpExec();
+      newtmp = false;
+    }
 	void* p = zone::Z_TagMalloc(size, 1, 8);
 	ASSERT(p,"operator new failed.");
 	return p;
@@ -49,7 +55,7 @@ void operator delete(void* p, size_t size)
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-	void* p = zone::Z_TagMalloc(size, 1, align);
+	void* p = zone::Z_TagMalloc(size, 1, 8);
 	//void* p = malloc(size);
 	ASSERT(p,"VEtherAlloc failed.");
 	return p;
@@ -57,7 +63,7 @@ void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-	void* p = zone::Z_Realloc(porg, size, align);
+	void* p = zone::Z_Realloc(porg, size, 8);
 	//void* p = realloc(porg, size);
 	ASSERT(p,"VEtherRealloc failed.");
 	return p;
@@ -362,14 +368,61 @@ void Z_Free (void *ptr)
 	}
 }
 
+void Z_TmpExec()
+{
+  static memblock_t* block = nullptr;
+  if(!block)
+    {
+      block = mainzone->rover;
+      p("%p", block);
+    }
+  else
+    {
+      p("here");
+      p("%p", mainzone->rover);
+      //Q_memset(block->next, 0, mainzone->rover-block);      
+      //mainzone->rover = block;
+      block = nullptr;
+    }  
+}
+
+/*
+========================
+Z_Print
+========================
+*/
+void Z_Print (memzone_t *zone)
+{
+	memblock_t	*block;
+	uint64_t sum = 0;
+	debug("zone size: %i  location: %p",mainzone->size,mainzone);
+
+	for (block = zone->blocklist.next ; ; block = block->next)
+	{
+		debug("block:%p    size:%7i    tag:%3i", block, block->size, block->tag);
+		if(block->tag)
+		  {
+		    sum += block->size;
+		  }
+		if (block->next == &zone->blocklist)
+			break;			// all blocks have been hit
+		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
+			fatal("ERROR: block size does not touch the next block");
+		if ( block->next->prev != block)
+		        fatal("ERROR: next block doesn't have proper back link");
+		if (!block->tag && !block->next->tag)
+		        fatal("ERROR: two consecutive free blocks");
+	}
+	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB", sum, DYNAMIC_SIZE, (float)sum/(float)(1024*1024), (float)DYNAMIC_SIZE/(float)(1024*1024));
+}
 
 void *Z_TagMalloc (int size, int tag, int align)
 {
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
 
-	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");
-
+	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");	
+	
 //
 // scan through the block list looking for the first free block
 // of sufficient size
@@ -509,33 +562,6 @@ char *Z_Strdup (const char *s)
 	return ptr;
 }
 
-/*
-========================
-Z_Print
-========================
-*/
-void Z_Print (memzone_t *zone)
-{
-	memblock_t	*block;
-
-	printf("zone size: %i  location: %p\n",mainzone->size,mainzone);
-
-	for (block = zone->blocklist.next ; ; block = block->next)
-	{
-		printf("block:%p    size:%7i    tag:%3i\n", block, block->size, block->tag);
-
-		if (block->next == &zone->blocklist)
-			break;			// all blocks have been hit
-		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
-			printf ("ERROR: block size does not touch the next block\n");
-		if ( block->next->prev != block)
-			printf ("ERROR: next block doesn't have proper back link\n");
-		if (!block->tag && !block->next->tag)
-			printf ("ERROR: two consecutive free blocks\n");
-	}
-}
-
-
 //============================================================================
 
 #define	HUNK_SENTINAL	0x1df001ed
@@ -571,9 +597,9 @@ void Hunk_Check (void)
 	for (h = (hunk_t *)hunk_base ; (unsigned char *)h != hunk_base + hunk_low_used ; )
 	{
 		if (h->sentinal != HUNK_SENTINAL)
-			printf ("Hunk_Check: trahsed sentinal");
+			debug ("Hunk_Check: trahsed sentinal");
 		if (h->size < (int) sizeof(hunk_t) || h->size + (unsigned char *)h - hunk_base > hunk_size)
-			printf ("Hunk_Check: bad size");
+		        debug ("Hunk_Check: bad size");
 		h = (hunk_t *)((unsigned char *)h+h->size);
 	}
 }
@@ -989,7 +1015,9 @@ Cache_Report
 */
 void Cache_Report (void)
 {
-	printf("%4.1f megabyte data cache\n", (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024*1024) );
+  debug("%0.2fMB data cache", (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024*1024));
+  debug("%0.2fMB data cache avail", hunk_size/(float)(1024*1024));
+  debug("%0.2fMB hunk_high_used | %0.2fMB hunk_low_used", hunk_high_used/(float)(1024*1024), (hunk_low_used-DYNAMIC_SIZE)/(float)(1024*1024));
 }
 
 /*
@@ -1114,6 +1142,13 @@ static void Memory_InitZone (memzone_t *zone, int size)
 	block->tag = 0;			// free block
 	block->id = ZONEID;
 	block->size = size - sizeof(memzone_t);
+}
+
+void MemPrint()
+{
+  Z_Print(mainzone);
+  Cache_Report();
+  Hunk_Check();
 }
 
 /*

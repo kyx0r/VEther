@@ -121,10 +121,13 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 				state = true;
 			}
 			break;
+		case GLFW_KEY_BACKSPACE:
+			  mu_input_keydown(ctx, 8);
+			  break;
+		case GLFW_KEY_ENTER:
+			  mu_input_keydown(ctx, 16);
+			  break;	
 		}
-		char k[1];
-		k[0] = (char)key;
-		mu_input_text(ctx, k);
 	}
 }
 
@@ -232,6 +235,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	}
 }
 
+void character_callback(GLFWwindow* window, unsigned int codepoint)
+{
+		char k[1];
+		k[0] = codepoint;
+		mu_input_text(ctx, k);  
+}
+
 void initWindow()
 {
 	glfwInit();
@@ -245,6 +255,7 @@ void initWindow()
 	glfwSetCursorPosCallback(_window, cursor_position_callback);
 	glfwSetScrollCallback(_window, scroll_callback);
 	glfwSetMouseButtonCallback(_window, mouse_button_callback);
+	glfwSetCharCallback(_window, character_callback);
 }
 
 static  char logbuf[64000];
@@ -439,6 +450,11 @@ static void PreDraw()
 	present_info.pSwapchains = &_swapchain;
 	present_info.pImageIndices = &image_index;
 	present_info.pResults = nullptr;
+
+	#ifdef DEBUG
+	zone::MemPrint();
+	#endif
+	
 }
 
 inline uint8_t Draw()
@@ -719,7 +735,7 @@ void mainLoop()
 c:
 		;
 		if(deltatime < 0.02f)
-		{
+		{		  	
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 		time2 = time1;

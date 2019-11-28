@@ -32,7 +32,7 @@
 #pragma once
 #include "vulkan_decl.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #   define ASSERT(condition, message) \
