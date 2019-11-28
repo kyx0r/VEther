@@ -58,10 +58,6 @@ int main(int argc, char *lpCmdLine[])
 	FILE* f = fopen("./log.txt","w");
 	log_set_fp(f);
 	
-	char* str = (char*) zone::Z_TagMalloc(256, 1, 4);
-	memcpy(str, "basdfks", 8);
-	p("%s",str);
-
 	window::initWindow();
 
 	if (
