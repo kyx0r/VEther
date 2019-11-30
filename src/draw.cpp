@@ -15,7 +15,7 @@ GVAR: time1 -> window.cpp
 namespace draw
 {
 
-void DrawQuad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* index_array)
+void Quad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* index_array)
 {
 	static VkBuffer buffer[2];
 	static VkDeviceSize buffer_offset[2];
@@ -40,7 +40,7 @@ void DrawQuad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* ind
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 
-void DrawIndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array)
+void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array)
 {
 	//printf("goto \n");
 	static VkBuffer buffer[3];
@@ -214,7 +214,7 @@ void InitAtlasTexture()
 	textures::UploadTexture(atlas_texture, ATLAS_WIDTH, ATLAS_HEIGHT, VK_FORMAT_R8_UNORM);
 }
 
-void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
+void Text(const char *text, mu_Vec2 pos, mu_Color color)
 {
 	mu_Rect dst = { pos.x, pos.y, 0, 0 };
 	for (const char *p = text; *p; p++)
@@ -232,13 +232,13 @@ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
 	}
 }
 
-void r_draw_rect(mu_Rect rect, mu_Color color)
+void Rect(mu_Rect rect, mu_Color color)
 {
   push_quad(rect, atlas[5], color, false);
 }
 
 
-void r_draw_icon(int id, mu_Rect rect, mu_Color color)
+void Icon(int id, mu_Rect rect, mu_Color color)
 {
 	mu_Rect src = atlas[id-1];
 	int x = rect.x + (rect.w - src.w) / 2;
@@ -246,6 +246,14 @@ void r_draw_icon(int id, mu_Rect rect, mu_Color color)
 	push_quad(mu_rect(x, y, src.w, src.h), src, color, true);
 }
 
-
+void Stats()
+{
+  char output[75] = "Frametime:            ";
+  snprintf(&output[12], 50, "%f", frametime);
+  Text(output, {0,0}, {255, 0, 0, 255});
+  zone::Q_memcpy(output, "FPS:            ", 16);
+  snprintf(&output[5], 50, "%f", lastfps);
+  Text(output, {0,10}, {255, 0, 0, 255});
+}
 
 }

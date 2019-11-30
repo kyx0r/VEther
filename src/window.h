@@ -17,6 +17,7 @@ extern double y_wheel;
 extern double xm_norm;
 extern double ym_norm;
 extern double frametime;
+extern double lastfps;
 //------------------------
 
 namespace window

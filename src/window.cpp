@@ -41,6 +41,7 @@ double ym_norm = 0;
 uint32_t xm = 0;
 uint32_t ym = 0;
 double frametime;
+double lastfps;
 mu_Context* ctx;
 //}
 
@@ -489,18 +490,20 @@ inline uint8_t Draw()
 		switch (cmd->type)
 		{
 		case MU_COMMAND_TEXT:
-			draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color);
+			draw::Text(cmd->text.str, cmd->text.pos, cmd->text.color);
 			break;
 		case MU_COMMAND_RECT:
-		        draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
+		        draw::Rect(cmd->rect.rect, cmd->rect.color);
 			break;
 		case MU_COMMAND_ICON:
-		        draw::r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
+		        draw::Icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
 			break;
 			//case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
 		}
 	}
 
+	draw::Stats();
+	
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
 	render_area.extent.height = window_height;
@@ -522,98 +525,15 @@ inline uint8_t Draw()
 	entity::UpdateCamera();
 	float m[16];
 	float c[16];
-	//SetupMatrix(m);
-	//IdentityMatrix(m);
-	//FrustumMatrix(m, DEG2RAD(fovx), DEG2RAD(fovy));
 	Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
 	entity::ViewMatrix(c);
-	//PrintMatrix(c);
 	MatrixMultiply(m, c);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
 
-	// static Uivertex vertices[4] = {};
-
-	// vertices[0].pos[0] = 300;   //x
-	// vertices[0].pos[1] = 200;   //y
-	// vertices[0].pos[2] = 0.0f;   //z
-	// vertices[0].color = 0xFFFFFFFF;
-	// vertices[0].tex_coord[0] = 1.0f;
-	// vertices[0].tex_coord[1] = 0.0f;
-
-	// vertices[1].pos[0] = 400;
-	// vertices[1].pos[1] = 200;
-	// vertices[1].pos[2] = 0.0f;
-	// vertices[1].color = 0xFFFFFFFF;
-	// vertices[1].tex_coord[0] = 0.0f;
-	// vertices[1].tex_coord[1] = 0.0f;
-
-	// vertices[2].pos[0] = 300;
-	// vertices[2].pos[1] = 100;
-	// vertices[2].pos[2] = 0.0f;
-	// vertices[2].color = 0xFFFFFFFF;
-	// vertices[2].tex_coord[0] = 0.0f;
-	// vertices[2].tex_coord[1] = 1.0f;
-
-	// vertices[3].pos[0] = 400;
-	// vertices[3].pos[1] = 100;
-	// vertices[3].pos[2] = 0.0f;
-	// vertices[3].color = 0xFFFFFFFF;
-	// vertices[3].tex_coord[0] = 1.0f;
-	// vertices[3].tex_coord[1] = 1.0f;
-
-	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 1};
-
-	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
-
-	// static Vertex_ vertices[4] = {};
-
-	// vertices[0].pos[0] = -0.5f;   //x
-	// vertices[0].pos[1] = -0.5f;   //y
-	// vertices[0].pos[2] = 0.0f;   //z
-	// vertices[0].color[0] = 1.0f; //r
-	// vertices[0].color[1] = 0.0f; //g
-	// vertices[0].color[2] = 0.0f; //b
-	// vertices[0].tex_coord[0] = 1.0f;
-	// vertices[0].tex_coord[1] = 0.0f;
-
-	// vertices[1].pos[0] = 0.5f;
-	// vertices[1].pos[1] = -0.5f;
-	// vertices[1].pos[2] = 0.0f;
-	// vertices[1].color[0] = 0.0f;
-	// vertices[1].color[1] = 1.0f;
-	// vertices[1].color[2] = 0.0f;
-	// vertices[1].tex_coord[0] = 0.0f;
-	// vertices[1].tex_coord[1] = 0.0f;
-
-	// vertices[2].pos[0] = 0.5f;
-	// vertices[2].pos[1] = 0.5f;
-	// vertices[2].pos[2] = 0.0f;
-	// vertices[2].color[0] = 0.0f;
-	// vertices[2].color[1] = 0.0f;
-	// vertices[2].color[2] = 1.0f;
-	// vertices[2].tex_coord[0] = 0.0f;
-	// vertices[2].tex_coord[1] = 1.0f;
-
-	// vertices[3].pos[0] = -0.5f;
-	// vertices[3].pos[1] = 0.5f;
-	// vertices[3].pos[2] = 0.0f;
-	// vertices[3].color[0] = 1.0f;
-	// vertices[3].color[1] = 1.0f;
-	// vertices[3].color[2] = 1.0f;
-	// vertices[3].tex_coord[0] = 1.0f;
-	// vertices[3].tex_coord[1] = 1.0f;
-
-	// uint16_t indeces[6] = {0, 1, 2, 2, 3, 0};
-
-	// draw::DrawQuad(sizeof(vertices[0]) * ARRAYSIZE(vertices), &vertices[0], ARRAYSIZE(indeces), indeces);
-
-	//vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	//vkCmdDraw(command_buffer, 6, 1, 0, 0);
-
 	ParsedOBJSubModel p = *kitty.models->sub_models;
-	draw::DrawIndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
+	draw::IndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
 
 	draw::PresentUI();
 
@@ -708,7 +628,12 @@ void mainLoop()
 	double maxfps;
 	double realtime = 0;
 	double oldrealtime = 0;
+	double oldtime = 0;
 	double deltatime = 0;
+	double elapsedtime = 0;
+	int framecount = 0;
+	int oldframecount = 0;
+	int frames = 0;
 
 	while (!glfwWindowShouldClose(_window))
 	{
@@ -716,13 +641,29 @@ void mainLoop()
 		time1 = glfwGetTime();
 		deltatime = time1 - time2;
 		realtime += deltatime;
-		maxfps = CLAMP (10.0, 60.0, 1000.0); //60 fps
-
+		maxfps = CLAMP (10.0, 60.0, 1000.0); //60 fps		
 		if(realtime - oldrealtime < 1.0/maxfps)
 		{
 			goto c; //framerate is too high
 		}
 		frametime = realtime - oldrealtime;
+		elapsedtime = realtime - oldtime;
+		frames = framecount - oldframecount;
+		
+		if (elapsedtime < 0 || frames < 0)
+		  {
+		    oldtime = realtime;
+		    oldframecount = framecount;
+		    goto wait;
+		  }
+		
+		if (elapsedtime > 0.75) // update value every 3/4 second
+		  {
+		    lastfps = frames / elapsedtime;
+		    oldtime = realtime;
+		    oldframecount = framecount;
+		  }
+wait:
 		oldrealtime = realtime;
 		frametime = CLAMP (0.0001, frametime, 0.1);
 
@@ -731,9 +672,8 @@ void mainLoop()
 			fatal("Critical Error! Abandon the ship.");
 			break;
 		}
-
-c:
-		;
+		framecount++;
+c:		
 		if(deltatime < 0.02f)
 		{		  	
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
