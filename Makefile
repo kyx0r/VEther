@@ -26,6 +26,8 @@ ASTYLE = astyle
 SRCS=$(wildcard ./src/*.cpp)
 PROGS = $(patsubst ./src/%.cpp, ./build/%.o,$(SRCS))
 
+.DEFAULT_GOAL := default
+
 # -w suppresses all warnings 
 # -Wl,-subsystem,windows gets rid of the console window 
 #COMPILER_FLAGS = -fpermissive -m64 -s -Wall
@@ -46,7 +48,7 @@ _UNIX = -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
 VETHER = -lVEther -lglfw -lglslang
  
 #OBJ_NAME specifies the name of our exectuable 
-OBJ_NAME = VEther.exe 
+OBJ_NAME = vether.exe 
 
 #for further optimization use -flto flag.
 SHARED_FLAGS = -O3 -s -Wl,--no-relax -m64 -Wall -Wextra -masm=intel -fno-align-functions -fno-exceptions -Wno-deprecated-copy -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
@@ -109,8 +111,6 @@ c:
 	$(ASTYLE) --style=allman --indent=tab ./*.cpp, *.h
 	$(ASTYLE) --style=allman --indent=tab ./src/*.cpp, *.h
 	$(ASTYLE) --style=allman --indent=tab --recursive ./src/*.cpp, *.h
-	
-	
-	
-	
-	
+
+default:
+	echo "Please specify the target."

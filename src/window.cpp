@@ -492,10 +492,10 @@ inline uint8_t Draw()
 			draw::r_draw_text(cmd->text.str, cmd->text.pos, cmd->text.color);
 			break;
 		case MU_COMMAND_RECT:
-			draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
+		        draw::r_draw_rect(cmd->rect.rect, cmd->rect.color);
 			break;
 		case MU_COMMAND_ICON:
-			draw::r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
+		        draw::r_draw_icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
 			break;
 			//case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
 		}

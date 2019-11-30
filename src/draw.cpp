@@ -121,7 +121,7 @@ int buf_idx;
 Uivertex vert[BUFFER_SIZE * 4];
 uint32_t index_buf[BUFFER_SIZE * 6];
 
-static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color)
+  static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
 {
 	int texvert_idx = buf_idx * 4;
 	int   index_idx = buf_idx * 6;
@@ -144,20 +144,29 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color)
 	vert[texvert_idx + 3].pos[0] = dst.x + dst.w;
 	vert[texvert_idx + 3].pos[1] = dst.y + dst.h;
 
-	/* update texture buffer */
-	float x = src.x / (float) ATLAS_WIDTH;
-	float y = src.y / (float) ATLAS_HEIGHT;
-	float w = src.w / (float) ATLAS_WIDTH;
-	float h = src.h / (float) ATLAS_HEIGHT;
-	vert[texvert_idx + 0].tex_coord[0] = x;
-	vert[texvert_idx + 0].tex_coord[1] = y;
-	vert[texvert_idx + 1].tex_coord[0] = x + w;
-	vert[texvert_idx + 1].tex_coord[1] = y;
-	vert[texvert_idx + 2].tex_coord[0] = x;
-	vert[texvert_idx + 2].tex_coord[1] = y + h;
-	vert[texvert_idx + 3].tex_coord[0] = x + w;
-	vert[texvert_idx + 3].tex_coord[1] = y + h;
-
+	if(tex)
+	  {
+	    /* update texture buffer */
+	    float x = src.x / (float) ATLAS_WIDTH;
+	    float y = src.y / (float) ATLAS_HEIGHT;
+	    float w = src.w / (float) ATLAS_WIDTH;
+	    float h = src.h / (float) ATLAS_HEIGHT;
+	    vert[texvert_idx + 0].tex_coord[0] = x;
+	    vert[texvert_idx + 0].tex_coord[1] = y;
+	    vert[texvert_idx + 1].tex_coord[0] = x + w;
+	    vert[texvert_idx + 1].tex_coord[1] = y;
+	    vert[texvert_idx + 2].tex_coord[0] = x;
+	    vert[texvert_idx + 2].tex_coord[1] = y + h;
+	    vert[texvert_idx + 3].tex_coord[0] = x + w;
+	    vert[texvert_idx + 3].tex_coord[1] = y + h;
+	  }
+	else
+	  {
+	    vert[texvert_idx + 0].tex_coord[0] = FLT_MAX;
+	    vert[texvert_idx + 1].tex_coord[0] = FLT_MAX;
+	    vert[texvert_idx + 2].tex_coord[0] = FLT_MAX;
+	    vert[texvert_idx + 3].tex_coord[0] = FLT_MAX;
+	  }
 	memcpy(&vert[texvert_idx + 0].color, &color, 4);
 	memcpy(&vert[texvert_idx + 1].color, &color, 4);
 	memcpy(&vert[texvert_idx + 2].color, &color, 4);
@@ -218,16 +227,14 @@ void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color)
 		mu_Rect src = atlas[chr-27];
 		dst.w = src.w;
 		dst.h = src.h;
-		color.a = 0;
-		push_quad(dst, src, color);
+		push_quad(dst, src, color, true);
 		dst.x += dst.w;
 	}
 }
 
 void r_draw_rect(mu_Rect rect, mu_Color color)
 {
-	color.a = 0xFF;
-	push_quad(rect, atlas[5], color);
+  push_quad(rect, atlas[5], color, false);
 }
 
 
@@ -236,8 +243,7 @@ void r_draw_icon(int id, mu_Rect rect, mu_Color color)
 	mu_Rect src = atlas[id-1];
 	int x = rect.x + (rect.w - src.w) / 2;
 	int y = rect.y + (rect.h - src.h) / 2;
-	color.a = 0x0;
-	push_quad(mu_rect(x, y, src.w, src.h), src, color);
+	push_quad(mu_rect(x, y, src.w, src.h), src, color, true);
 }
 
 
