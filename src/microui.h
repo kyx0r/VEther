@@ -259,7 +259,9 @@ struct mu_Context
 	int mouse_pressed;
 	int key_down;
 	int key_pressed;
-	char text_input[32];
+  char text_input[32];
+  mu_Id resizing_id;
+  mu_Vec2 resize_cursor_pos;
 };
 
 

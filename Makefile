@@ -7,16 +7,6 @@ endif
 #OBJS specifies which files to compile as part of the project 
 OBJS = ./*cpp ./src/*o 
 ifeq ($(detected_OS),Windows)
-# GP = ./glfw/src/
-# OBJS += $(GP)xkb_unicode.o $(GP)window.o $(GP)win32_window.o $(GP)win32_time.o $(GP)win32_thread.o  
-# OBJS += $(GP)win32_monitor.o $(GP)win32_init.o  $(GP)wgl_context.o $(GP)vulkan.o $(GP)egl_context.o
-# OBJS += $(GP)osmesa_context.o $(GP)monitor.o $(GP)input.o $(GP)init.o $(GP)context.o $(GP)win32_joystick.o
-# OBJS += ./glsl_compiler/OGLCompilersDLL/*.o
-# OBJS += ./glsl_compiler/glslang/OSDependent/Windows/*.o
-# OBJS += ./glsl_compiler/glslang/MachineIndependent/*.o
-# OBJS += ./glsl_compiler/glslang/MachineIndependent/preprocessor/*.o
-# OBJS += ./glsl_compiler/StandAlone/*.o
-# OBJS += ./glsl_compiler/SPIRV/*.o
 endif
 
 #CC specifies which compiler we're using 
@@ -51,7 +41,7 @@ VETHER = -lVEther -lglfw -lglslang
 OBJ_NAME = vether.exe 
 
 #for further optimization use -flto flag.
-SHARED_FLAGS = -O3 -s -Wl,--no-relax -m64 -Wall -Wextra -masm=intel -fno-align-functions -fno-exceptions -Wno-deprecated-copy -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
+SHARED_FLAGS = -O3 -g -Wl,--no-relax -m64 -Wall -Wextra -masm=intel -fno-align-functions -fno-exceptions -Wno-deprecated-copy -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
 export SHARED_FLAGS
 #-mpush-args -mno-accumulate-outgoing-args -mno-stack-arg-probe
 

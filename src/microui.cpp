@@ -174,6 +174,7 @@ void mu_init(mu_Context *ctx)
 	ctx->draw_frame = draw_frame;
 	ctx->_style = default_style;
 	ctx->style = &ctx->_style;
+	ctx->resizing_id = -1;
 }
 
 
@@ -1383,11 +1384,21 @@ int mu_begin_window_ex(mu_Context *ctx, mu_Container *cnt, const char *title,
 		mu_update_control(ctx, id, r, opt);
 		if (id == ctx->focus && ctx->mouse_down == MU_MOUSE_LEFT)
 		{
-			cnt->rect.w = mu_max(96, cnt->rect.w + ctx->mouse_delta.x);
-			cnt->rect.h = mu_max(64, cnt->rect.h + ctx->mouse_delta.y);
+		  /* if now is the first frame during resizing */
+		  if (ctx->resizing_id != id) {
+		    ctx->resizing_id = id;
+		    ctx->resize_cursor_pos = mu_vec2(ctx->mouse_pos.x - r.x, ctx->mouse_pos.y - r.y);
+		  }
+		  cnt->rect.w = ctx->mouse_pos.x - rect.x + sz - ctx->resize_cursor_pos.x;
+		  cnt->rect.h = ctx->mouse_pos.y - rect.y + sz - ctx->resize_cursor_pos.y;
+		  cnt->rect.w = mu_max(96, cnt->rect.w);
+		  cnt->rect.h = mu_max(64, cnt->rect.h);
+		}
+		else if (ctx->resizing_id == id) {
+		  ctx->resizing_id = -1;
 		}
 	}
-
+	
 	/* resize to content size */
 	if (opt & MU_OPT_AUTOSIZE)
 	{
