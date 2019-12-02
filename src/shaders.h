@@ -3,9 +3,9 @@
 #include "../glsl_compiler/SimpleFileWatcher/FileWatcher.h"
 
 namespace shaders
-{  
-  extern FW::FileWatcher* fileWatcher;
-  
+{
+extern FW::FileWatcher* fileWatcher;
+
 void CompileShaders();
 VkShaderModule loadShaderMem(int index);
 void LoadShaders();

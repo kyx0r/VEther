@@ -103,7 +103,7 @@ void *Z_Realloc (void *ptr, int size, int align);
 char *Z_Strdup (const char *s);
 void Z_TmpExec();
 void MemPrint();
- 
+
 void *Hunk_Alloc (int size);		// returns 0 filled memory
 void *Hunk_AllocName (int size, const char *name);
 void *Hunk_HighAllocName (int size, const char *name);

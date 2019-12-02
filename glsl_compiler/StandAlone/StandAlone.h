@@ -33,5 +33,7 @@
 //all shader modules will be stored here.
 extern VkShaderModule _shaders[20];
 extern uint32_t cur_shader_index;
+extern bool CompileFailed;
+extern bool LinkFailed;
 
 int C_DECL GLSL_COMPILER_ENTRY(int argc, char* argv[]);

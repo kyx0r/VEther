@@ -51,6 +51,7 @@
 #include "../SPIRV/GLSL.std.450.h"
 #include "../SPIRV/doc.h"
 #include "../SPIRV/disassemble.h"
+#include "../../src/flog.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -1076,7 +1077,7 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
     // Dump SPIR-V
     if (Options & EOptionSpv) {
         if (CompileFailed || LinkFailed)
-            printf("SPIR-V is not generated for failed compile or link\n");
+            fatal("SPIR-V is not generated for failed compile or link");
         else {
             for (int stage = 0; stage < EShLangCount; ++stage) {
                 if (program.getIntermediate((EShLanguage)stage)) {
@@ -1095,7 +1096,7 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
                     // Dump the spv to a file or stdout, etc., but only if not doing
                     // memory/perf testing, as it's not internal to programmatic use.
                     if (! (Options & EOptionMemoryLeakMode)) {
-                        printf("%s", logger.getAllMessages().c_str());
+                        trace("%s", logger.getAllMessages().c_str());
                         if (Options & EOptionOutputHexadecimal) {
                             glslang::OutputSpvHex(spirv, GetBinaryName((EShLanguage)stage), variableName);
                         } else {
@@ -1103,7 +1104,7 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
 				createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 				createInfo.codeSize = spirv.size() * sizeof(unsigned int);
 				createInfo.pCode = spirv.data();
-				VK_CHECK(vkCreateShaderModule(logical_device, &createInfo, 0, &_shaders[cur_shader_index]));
+				VK_CHECK(vkCreateShaderModule(logical_device, &createInfo, allocators, &_shaders[cur_shader_index]));
 				cur_shader_index++;
 
 			                                // zone::stack_alloc(spirv.size() * sizeof(unsigned int), 200);

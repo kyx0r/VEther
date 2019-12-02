@@ -53,11 +53,11 @@ int main(int argc, char *lpCmdLine[])
 	static VkSurfaceTransformFlagBitsKHR desired_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
-	
+
 	log_set_level(0);
 	FILE* f = fopen("./log.txt","w");
 	log_set_fp(f);
-	
+
 	window::initWindow();
 
 	if (

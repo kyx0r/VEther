@@ -6,11 +6,11 @@
    GVAR: PFN_* -> vulkan_decl.h
    } */
 
-static VkAllocationCallbacks allocator;  
-   
-/*    Warning! if making a 32 bit build, set allocators to null and remove the respectable 
+static VkAllocationCallbacks allocator;
+
+/*    Warning! if making a 32 bit build, set allocators to null and remove the respectable
    structures, as there is a driver bug! Else we will crash hard.  */
-   
+
 //{
 VkInstance instance;
 VkPhysicalDevice target_device = VK_NULL_HANDLE;

@@ -369,9 +369,9 @@ VkPipelineVertexInputStateCreateInfo* ScreenPipe()
 void CreateGraphicsPipeline
 (VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs)
 {
-  	ASSERT(vs, "Failed to load Vertex Shader.");
+	ASSERT(vs, "Failed to load Vertex Shader.");
 	ASSERT(fs, "Failed to load Fragment Shader.");
-	
+
 	VkPipelineShaderStageCreateInfo stages[2] = {};
 	stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;

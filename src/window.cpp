@@ -123,11 +123,11 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 			}
 			break;
 		case GLFW_KEY_BACKSPACE:
-			  mu_input_keydown(ctx, 8);
-			  break;
+			mu_input_keydown(ctx, 8);
+			break;
 		case GLFW_KEY_ENTER:
-			  mu_input_keydown(ctx, 16);
-			  break;	
+			mu_input_keydown(ctx, 16);
+			break;
 		}
 	}
 }
@@ -238,9 +238,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 void character_callback(GLFWwindow* window, unsigned int codepoint)
 {
-		char k[1];
-		k[0] = codepoint;
-		mu_input_text(ctx, k);  
+	char k[1];
+	k[0] = codepoint;
+	mu_input_text(ctx, k);
 }
 
 void initWindow()
@@ -452,10 +452,10 @@ static void PreDraw()
 	present_info.pImageIndices = &image_index;
 	present_info.pResults = nullptr;
 
-	#ifdef DEBUG
+#ifdef DEBUG
 	zone::MemPrint();
-	#endif
-	
+#endif
+
 }
 
 inline uint8_t Draw()
@@ -493,16 +493,16 @@ inline uint8_t Draw()
 			draw::Text(cmd->text.str, cmd->text.pos, cmd->text.color);
 			break;
 		case MU_COMMAND_RECT:
-		        draw::Rect(cmd->rect.rect, cmd->rect.color);
+			draw::Rect(cmd->rect.rect, cmd->rect.color);
 			break;
 		case MU_COMMAND_ICON:
-		        draw::Icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
-			break;			
+			draw::Icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
+			break;
 		}
 	}
 
 	draw::Stats();
-	
+
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
 	render_area.extent.height = window_height;
@@ -588,9 +588,9 @@ void mainLoop()
 	render::CreatePipelineLayout();
 
 	kitty = LoadOBJ("./res/kitty.obj");
-	
+
 	shaders::LoadShaders();
-	
+
 	//fov setup.
 	entity::InitCamera();
 
@@ -621,7 +621,7 @@ void mainLoop()
 		time1 = glfwGetTime();
 		deltatime = time1 - time2;
 		realtime += deltatime;
-		maxfps = CLAMP (10.0, 60.0, 1000.0); //60 fps		
+		maxfps = CLAMP (10.0, 60.0, 1000.0); //60 fps
 		if(realtime - oldrealtime < 1.0/maxfps)
 		{
 			goto c; //framerate is too high
@@ -629,34 +629,34 @@ void mainLoop()
 		frametime = realtime - oldrealtime;
 		elapsedtime = realtime - oldtime;
 		frames = framecount - oldframecount;
-		
+
 		if (elapsedtime < 0 || frames < 0)
-		  {
-		    oldtime = realtime;
-		    oldframecount = framecount;
-		    goto wait;
-		  }
-		
+		{
+			oldtime = realtime;
+			oldframecount = framecount;
+			goto wait;
+		}
+
 		if (elapsedtime > 0.75) // update value every 3/4 second
-		  {
-		    shaders::fileWatcher->update();
-		    lastfps = frames / elapsedtime;
-		    oldtime = realtime;
-		    oldframecount = framecount;
-		  }
+		{
+			shaders::fileWatcher->update();
+			lastfps = frames / elapsedtime;
+			oldtime = realtime;
+			oldframecount = framecount;
+		}
 wait:
 		oldrealtime = realtime;
 		frametime = CLAMP (0.0001, frametime, 0.1);
-		
+
 		if(!Draw())
 		{
 			fatal("Critical Error! Abandon the ship.");
 			break;
 		}
 		framecount++;
-c:		
+c:
 		if(deltatime < 0.02f)
-		{		  	
+		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 		time2 = time1;

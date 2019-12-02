@@ -121,7 +121,7 @@ int buf_idx;
 Uivertex vert[BUFFER_SIZE * 4];
 uint32_t index_buf[BUFFER_SIZE * 6];
 
-  static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
+static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
 {
 	int texvert_idx = buf_idx * 4;
 	int   index_idx = buf_idx * 6;
@@ -145,28 +145,28 @@ uint32_t index_buf[BUFFER_SIZE * 6];
 	vert[texvert_idx + 3].pos[1] = dst.y + dst.h;
 
 	if(tex)
-	  {
-	    /* update texture buffer */
-	    float x = src.x / (float) ATLAS_WIDTH;
-	    float y = src.y / (float) ATLAS_HEIGHT;
-	    float w = src.w / (float) ATLAS_WIDTH;
-	    float h = src.h / (float) ATLAS_HEIGHT;
-	    vert[texvert_idx + 0].tex_coord[0] = x;
-	    vert[texvert_idx + 0].tex_coord[1] = y;
-	    vert[texvert_idx + 1].tex_coord[0] = x + w;
-	    vert[texvert_idx + 1].tex_coord[1] = y;
-	    vert[texvert_idx + 2].tex_coord[0] = x;
-	    vert[texvert_idx + 2].tex_coord[1] = y + h;
-	    vert[texvert_idx + 3].tex_coord[0] = x + w;
-	    vert[texvert_idx + 3].tex_coord[1] = y + h;
-	  }
+	{
+		/* update texture buffer */
+		float x = src.x / (float) ATLAS_WIDTH;
+		float y = src.y / (float) ATLAS_HEIGHT;
+		float w = src.w / (float) ATLAS_WIDTH;
+		float h = src.h / (float) ATLAS_HEIGHT;
+		vert[texvert_idx + 0].tex_coord[0] = x;
+		vert[texvert_idx + 0].tex_coord[1] = y;
+		vert[texvert_idx + 1].tex_coord[0] = x + w;
+		vert[texvert_idx + 1].tex_coord[1] = y;
+		vert[texvert_idx + 2].tex_coord[0] = x;
+		vert[texvert_idx + 2].tex_coord[1] = y + h;
+		vert[texvert_idx + 3].tex_coord[0] = x + w;
+		vert[texvert_idx + 3].tex_coord[1] = y + h;
+	}
 	else
-	  {
-	    vert[texvert_idx + 0].tex_coord[0] = FLT_MAX;
-	    vert[texvert_idx + 1].tex_coord[0] = FLT_MAX;
-	    vert[texvert_idx + 2].tex_coord[0] = FLT_MAX;
-	    vert[texvert_idx + 3].tex_coord[0] = FLT_MAX;
-	  }
+	{
+		vert[texvert_idx + 0].tex_coord[0] = FLT_MAX;
+		vert[texvert_idx + 1].tex_coord[0] = FLT_MAX;
+		vert[texvert_idx + 2].tex_coord[0] = FLT_MAX;
+		vert[texvert_idx + 3].tex_coord[0] = FLT_MAX;
+	}
 	memcpy(&vert[texvert_idx + 0].color, &color, 4);
 	memcpy(&vert[texvert_idx + 1].color, &color, 4);
 	memcpy(&vert[texvert_idx + 2].color, &color, 4);
@@ -234,7 +234,7 @@ void Text(const char *text, mu_Vec2 pos, mu_Color color)
 
 void Rect(mu_Rect rect, mu_Color color)
 {
-  push_quad(rect, atlas[5], color, false);
+	push_quad(rect, atlas[5], color, false);
 }
 
 
@@ -248,12 +248,12 @@ void Icon(int id, mu_Rect rect, mu_Color color)
 
 void Stats()
 {
-  char output[75] = "Frametime:            ";
-  snprintf(&output[12], 50, "%f", frametime);
-  Text(output, {0,0}, {255, 0, 0, 255});
-  zone::Q_memcpy(output, "FPS:            ", 16);
-  snprintf(&output[5], 50, "%f", lastfps);
-  Text(output, {0,10}, {255, 0, 0, 255});
+	char output[75] = "Frametime:            ";
+	snprintf(&output[12], 50, "%f", frametime);
+	Text(output, {0,0}, {255, 0, 0, 255});
+	zone::Q_memcpy(output, "FPS:            ", 16);
+	snprintf(&output[5], 50, "%f", lastfps);
+	Text(output, {0,10}, {255, 0, 0, 255});
 }
 
 }

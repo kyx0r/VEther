@@ -365,19 +365,19 @@ void Z_Free (void *ptr)
 
 void Z_TmpExec()
 {
-  static memzone_t* _zone = nullptr;
-  if(!_zone)
-    {
-      _zone = mainzone;
-	  mainzone = (memzone_t *) Hunk_TempAlloc(DYNAMIC_SIZE);
-	  Memory_InitZone(mainzone, DYNAMIC_SIZE);
-    }
-  else
-    {
-	  Hunk_HighMark();
-      mainzone = _zone;
-	  _zone = nullptr;
-    }  
+	static memzone_t* _zone = nullptr;
+	if(!_zone)
+	{
+		_zone = mainzone;
+		mainzone = (memzone_t *) Hunk_TempAlloc(DYNAMIC_SIZE);
+		Memory_InitZone(mainzone, DYNAMIC_SIZE);
+	}
+	else
+	{
+		Hunk_HighMark();
+		mainzone = _zone;
+		_zone = nullptr;
+	}
 }
 
 /*
@@ -395,17 +395,17 @@ void Z_Print (memzone_t *zone)
 	{
 		debug("block:%p    size:%7i    tag:%3i", block, block->size, block->tag);
 		if(block->tag)
-		  {
-		    sum += block->size;
-		  }
+		{
+			sum += block->size;
+		}
 		if (block->next == &zone->blocklist)
 			break;			// all blocks have been hit
 		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
 			fatal("ERROR: block size does not touch the next block");
 		if ( block->next->prev != block)
-		        fatal("ERROR: next block doesn't have proper back link");
+			fatal("ERROR: next block doesn't have proper back link");
 		if (!block->tag && !block->next->tag)
-		        fatal("ERROR: two consecutive free blocks");
+			fatal("ERROR: two consecutive free blocks");
 	}
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB", sum, DYNAMIC_SIZE, (float)sum/(float)(1024*1024), (float)DYNAMIC_SIZE/(float)(1024*1024));
 }
@@ -415,7 +415,7 @@ void *Z_TagMalloc (int size, int tag, int align)
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
 
-	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");	
+	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");
 	//p("%d, %d, %d", size, tag, align);
 //
 // scan through the block list looking for the first free block
@@ -505,9 +505,9 @@ void *Z_Malloc (int size)
 
 	buf = Z_TagMalloc (size, 1, 8);
 	if (!buf)
-	  {
-	        fatal("Z_Malloc: failed on allocation of %i bytes", size);
-	  }
+	{
+		fatal("Z_Malloc: failed on allocation of %i bytes", size);
+	}
 	Q_memset (buf, 0, size);
 
 	return buf;
@@ -595,7 +595,7 @@ void Hunk_Check (void)
 		if (h->sentinal != HUNK_SENTINAL)
 			debug ("Hunk_Check: trahsed sentinal");
 		if (h->size < (int) sizeof(hunk_t) || h->size + (unsigned char *)h - hunk_base > hunk_size)
-		        debug ("Hunk_Check: bad size");
+			debug ("Hunk_Check: bad size");
 		h = (hunk_t *)((unsigned char *)h+h->size);
 	}
 }
@@ -1011,9 +1011,9 @@ Cache_Report
 */
 void Cache_Report (void)
 {
-  debug("%0.2fMB data cache", (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024*1024));
-  debug("%0.2fMB data cache avail", hunk_size/(float)(1024*1024));
-  debug("%0.2fMB hunk_high_used | %0.2fMB hunk_low_used", hunk_high_used/(float)(1024*1024), (hunk_low_used-DYNAMIC_SIZE)/(float)(1024*1024));
+	debug("%0.2fMB data cache", (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024*1024));
+	debug("%0.2fMB data cache avail", hunk_size/(float)(1024*1024));
+	debug("%0.2fMB hunk_high_used | %0.2fMB hunk_low_used", hunk_high_used/(float)(1024*1024), (hunk_low_used-DYNAMIC_SIZE)/(float)(1024*1024));
 }
 
 /*
@@ -1142,9 +1142,9 @@ static void Memory_InitZone (memzone_t *zone, int size)
 
 void MemPrint()
 {
-  Z_Print(mainzone);
-  Cache_Report();
-  Hunk_Check();
+	Z_Print(mainzone);
+	Cache_Report();
+	Hunk_Check();
 }
 
 /*
