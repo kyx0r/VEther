@@ -497,8 +497,7 @@ inline uint8_t Draw()
 			break;
 		case MU_COMMAND_ICON:
 		        draw::Icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
-			break;
-			//case MU_COMMAND_CLIP: r_set_clip_rect(cmd->clip.rect); break;
+			break;			
 		}
 	}
 
@@ -586,31 +585,12 @@ void mainLoop()
 
 	shaders::CompileShaders();
 
-	VkShaderModule triangleFS = shaders::loadShaderMem(0);
-	ASSERT(triangleFS, "Failed to load triangleFS.");
-	VkShaderModule triangleVS = shaders::loadShaderMem(1);
-	ASSERT(triangleVS, "Failed to load triangleVS.");
-	VkShaderModule screenFS = shaders::loadShaderMem(2);
-	ASSERT(screenFS, "Failed to load screenFS.");
-	VkShaderModule screenVS = shaders::loadShaderMem(3);
-	ASSERT(screenVS, "Failed to load screenVS.");
-	VkShaderModule colFS = shaders::loadShaderMem(4);
-	ASSERT(colFS, "Failed to load colFS.");
-
-	//textures::SampleTexture();
-
-	kitty = LoadOBJ("./res/kitty.obj");
-
-	VkPipelineCache pipelineCache = 0;
-
 	render::CreatePipelineLayout();
 
-	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
-
-	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
-
-	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, colFS);
-
+	kitty = LoadOBJ("./res/kitty.obj");
+	
+	shaders::LoadShaders();
+	
 	//fov setup.
 	entity::InitCamera();
 
@@ -659,6 +639,7 @@ void mainLoop()
 		
 		if (elapsedtime > 0.75) // update value every 3/4 second
 		  {
+		    shaders::fileWatcher->update();
 		    lastfps = frames / elapsedtime;
 		    oldtime = realtime;
 		    oldframecount = framecount;
@@ -666,7 +647,7 @@ void mainLoop()
 wait:
 		oldrealtime = realtime;
 		frametime = CLAMP (0.0001, frametime, 0.1);
-
+		
 		if(!Draw())
 		{
 			fatal("Critical Error! Abandon the ship.");
@@ -699,12 +680,8 @@ c:
 	render::DestroyFramebuffers();
 	vkDestroyPipelineLayout(logical_device, pipeline_layout, allocators);
 	render::DestroyPipeLines();
-	vkDestroyShaderModule(logical_device, triangleVS, nullptr);
-	vkDestroyShaderModule(logical_device, triangleFS, nullptr);
-	vkDestroyShaderModule(logical_device, screenVS, nullptr);
-	vkDestroyShaderModule(logical_device, screenFS, nullptr);
-	vkDestroyShaderModule(logical_device, colFS, nullptr);
 	render::DestroyRenderPasses();
+	shaders::DestroyShaders();
 	swapchain::DestroySwapchain(_swapchain);
 	surface::DestroyPresentationSurface();
 	glfwDestroyWindow(_window);

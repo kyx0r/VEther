@@ -416,7 +416,7 @@ void *Z_TagMalloc (int size, int tag, int align)
 	memblock_t	*start, *rover, *newblock, *base;
 
 	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");	
-	
+	//p("%d, %d, %d", size, tag, align);
 //
 // scan through the block list looking for the first free block
 // of sufficient size
@@ -505,7 +505,9 @@ void *Z_Malloc (int size)
 
 	buf = Z_TagMalloc (size, 1, 8);
 	if (!buf)
-		printf ("Z_Malloc: failed on allocation of %i bytes",size);
+	  {
+	        fatal("Z_Malloc: failed on allocation of %i bytes", size);
+	  }
 	Q_memset (buf, 0, size);
 
 	return buf;
