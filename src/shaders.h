@@ -11,5 +11,5 @@ VkShaderModule loadShaderMem(int index);
 void LoadShaders();
 VkShaderModule loadShader(const char* path);
 void DestroyShaders();
-
+void CreatePipelineCache();
 } //namespace shaders

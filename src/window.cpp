@@ -589,6 +589,7 @@ void mainLoop()
 
 	kitty = LoadOBJ("./res/kitty.obj");
 
+	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 
 	//fov setup.

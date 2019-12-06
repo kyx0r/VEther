@@ -22,6 +22,6 @@ void main()
 		vec4 fc = texture(texSampler, fragTexCoord);
 		afc = vec4(fragColor.r, fragColor.g, fragColor.b, fc.r) * fragColor.a;	 
 	}
-
+	
 	outColor = afc;	     	 
 }

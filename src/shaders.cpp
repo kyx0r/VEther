@@ -109,6 +109,14 @@ void LoadShaders()
 
 }
 
+void CreatePipelineCache()
+{
+	VkPipelineCacheCreateInfo cci;
+	memset(&cci, 0, sizeof(cci));
+	cci.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	VK_CHECK(vkCreatePipelineCache(logical_device, &cci, allocators, &pipelineCache));
+}
+
 void DestroyShaders()
 {
 	VkShaderModule triangleFS = shaders::loadShaderMem(0);
@@ -122,6 +130,7 @@ void DestroyShaders()
 	vkDestroyShaderModule(logical_device, screenVS, allocators);
 	vkDestroyShaderModule(logical_device, screenFS, allocators);
 	vkDestroyShaderModule(logical_device, colFS, allocators);
+	vkDestroyPipelineCache(logical_device, pipelineCache, allocators);
 }
 
 VkShaderModule loadShader(const char* path)
