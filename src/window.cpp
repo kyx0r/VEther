@@ -451,11 +451,6 @@ static void PreDraw()
 	present_info.pSwapchains = &_swapchain;
 	present_info.pImageIndices = &image_index;
 	present_info.pResults = nullptr;
-
-#ifdef DEBUG
-	zone::MemPrint();
-#endif
-
 }
 
 inline uint8_t Draw()
@@ -612,6 +607,7 @@ void mainLoop()
 	double oldtime = 0;
 	double deltatime = 0;
 	double elapsedtime = 0;
+	double stamp = 0;
 	int framecount = 0;
 	int oldframecount = 0;
 	int frames = 0;
@@ -645,6 +641,13 @@ void mainLoop()
 			oldtime = realtime;
 			oldframecount = framecount;
 		}
+		#ifdef DEBUG
+	        if (realtime-stamp > 5.0)
+		  {
+		    std::thread (zone::MemPrint).detach();
+		    stamp = realtime;
+		  }
+		#endif
 wait:
 		oldrealtime = realtime;
 		frametime = CLAMP (0.0001, frametime, 0.1);
