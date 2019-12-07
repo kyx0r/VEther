@@ -391,7 +391,7 @@ OBJParseLoadEntireFileAndNullTerminate(char *filename, int* size)
 	}
 	else
 	{
-		error("Failed to open file!  %s\n", filename);
+		error("Failed to open file!  %s", filename);
 	}
 	return result;
 }
@@ -405,42 +405,34 @@ OBJParseFreeFileData(void *file_data)
 void
 OBJParseDefaultCRTErrorCallback(OBJParseError error)
 {
-	error("OBJ PARSE ERROR (%s:%i): %s\n", error.filename, error.line, error.message);
+	error("OBJ PARSE ERROR (%s:%i): %s", error.filename, error.line, error.message);
 }
 
 void
 OBJParseDefaultCRTWarningCallback(OBJParseWarning warning)
 {
-	warn("OBJ PARSE WARNING (%s:%i): %s\n", warning.filename, warning.line, warning.message);
+	warn("OBJ PARSE WARNING (%s:%i): %s", warning.filename, warning.line, warning.message);
 }
 
 ParsedOBJ
 LoadOBJ(char *filename)
 {
 	int mark = zone::Hunk_LowMark();
-	cache_user_t cache;
-	cache.data = nullptr;
-	char ma = 0;
 	int size;
 
 	OBJParseInfo info;
 	memset(&info, 0, sizeof(OBJParseInfo));
 	ParsedOBJ obj;
+	obj.mark = zone::Hunk_HighMark();
 	{
 		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename, &size);
-		info.parse_memory_size = size * 3; //give it 3 time as much as of a filesize itself.
-		if(zone::Cache_Alloc(&cache, info.parse_memory_size, "model"))
-		{
-			info.parse_memory = cache.data;
-		}
-		else
-		{
-			info.parse_memory = malloc(info.parse_memory_size);
-			ma = 1;
-		}
+		info.parse_memory_size = size * 3; //give it 3 time as much as of a filesize itself.		
+		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
 		if(!info.parse_memory)
 		{
-			info.parse_memory_size = 0;
+		        warn("LoadOBJ: Using malloc instead of Hunk!");
+			info.parse_memory = malloc(info.parse_memory_size);
+			obj.mark = -1;
 		}
 		info.filename = filename;
 		info.error_callback    = OBJParseDefaultCRTErrorCallback;
@@ -448,9 +440,9 @@ LoadOBJ(char *filename)
 	}
 	if(info.obj_data)
 	{
+	        int tmp = obj.mark;
 		obj = ParseOBJ(&info);
-		obj.malloc = ma;
-		//OBJParseFreeFileData(info.obj_data);
+		obj.mark = tmp;
 		zone::Hunk_FreeToLowMark(mark);
 	}
 	obj.parse_memory_to_free = info.parse_memory;
@@ -460,17 +452,17 @@ LoadOBJ(char *filename)
 void
 FreeParsedOBJ(ParsedOBJ *obj)
 {
-	if(obj->malloc)
+	if(obj->mark == -1)
 	{
 		free(obj->parse_memory_to_free);
 		return;
 	}
-	cache_user_t cache;
-	cache.data = obj->parse_memory_to_free;
-	if(obj->parse_memory_to_free)
-	{
-		zone::Cache_Free(&cache, false);
-	}
+	else
+	  {
+	    p("%d", obj->mark);
+	    zone::Hunk_FreeToHighMark(obj->mark);
+	  }
+	
 }
 
 #endif // OBJ_PARSE_NO_CRT
@@ -604,7 +596,7 @@ ParseOBJ(OBJParseInfo *info)
 					model = (OBJParsedModelListNode*) OBJParserArenaAllocate(arena, sizeof(*model));
 					if(!model)
 					{
-						printf("ERROR: Out of memory.\n");
+						fatal("ERROR: Out of memory.");
 						goto end_parse;
 					}
 					model->first_sub_model = 0;
@@ -788,7 +780,7 @@ ParseOBJ(OBJParseInfo *info)
 							memory = OBJParserArenaAllocate(arena, needed_memory_for_initial_obj_read);
 							if(!memory)
 							{
-								printf("ERROR: Out of memory.\n");
+								fatal("ERROR: Out of memory.");
 								goto end_parse;
 							}
 						}
@@ -1060,7 +1052,7 @@ ParseOBJ(OBJParseInfo *info)
 
 							if(!vertex_uv_and_normal_indices_buffer)
 							{
-								printf("ERROR: Out of memory.\n");
+								fatal("ERROR: Out of memory.");
 								goto end_parse;
 							}
 
@@ -1095,7 +1087,7 @@ ParseOBJ(OBJParseInfo *info)
 											VertexUVAndNormalIndices *duplicate = (VertexUVAndNormalIndices *)OBJParserArenaAllocate(arena, sizeof(VertexUVAndNormalIndices));
 											if(!duplicate)
 											{
-												printf("ERROR: Out of memory.\n");
+												fatal("ERROR: Out of memory.");
 												goto end_parse;
 											}
 											duplicate->position_index  = position_index+1;
@@ -1132,7 +1124,7 @@ ParseOBJ(OBJParseInfo *info)
 						int *final_index_buffer = (int *)OBJParserArenaAllocate(arena, bytes_needed_for_final_index_buffer);
 						if(!final_vertex_buffer || !final_index_buffer)
 						{
-							printf("ERROR: Out of memory.\n");
+							fatal("ERROR: Out of memory.");
 							goto end_parse;
 						}
 
@@ -1179,7 +1171,7 @@ ParseOBJ(OBJParseInfo *info)
 
 						if(!sub_model)
 						{
-							printf("ERROR: Out of memory.\n");
+							fatal("ERROR: Out of memory.");
 							goto end_parse;
 						}
 
@@ -1216,7 +1208,7 @@ ParseOBJ(OBJParseInfo *info)
 					model->sub_models = (ParsedOBJSubModel *)OBJParserArenaAllocate(arena, sizeof(ParsedOBJSubModel)*sub_model_list_node_count);
 					if(!model->sub_models)
 					{
-						printf("ERROR: Out of memory.\n");
+						fatal("ERROR: Out of memory.");
 						goto end_parse;
 					}
 
@@ -1241,7 +1233,7 @@ ParseOBJ(OBJParseInfo *info)
 	obj->models = (ParsedOBJModel *)OBJParserArenaAllocate(arena, sizeof(ParsedOBJModel)*model_list_node_count);
 	if(!obj->models)
 	{
-		printf("ERROR: Out of memory.\n");
+	        fatal("ERROR: Out of memory.");
 		goto end_parse;
 	}
 	obj->model_count = 0;

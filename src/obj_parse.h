@@ -42,7 +42,7 @@ struct ParsedOBJModel
 typedef struct ParsedOBJ ParsedOBJ;
 struct ParsedOBJ
 {
-	char malloc;
+        int mark;
 	unsigned int model_count;
 	ParsedOBJModel *models;
 	void *parse_memory_to_free;

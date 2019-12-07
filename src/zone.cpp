@@ -393,7 +393,7 @@ void Z_Print (memzone_t *zone)
 
 	for (block = zone->blocklist.next ; ; block = block->next)
 	{
-		debug("block:%p    size:%7i    tag:%3i", block, block->size, block->tag);
+	  //debug("block:%p    size:%7i    tag:%3i", block, block->size, block->tag);
 		if(block->tag)
 		{
 			sum += block->size;
@@ -401,11 +401,17 @@ void Z_Print (memzone_t *zone)
 		if (block->next == &zone->blocklist)
 			break;			// all blocks have been hit
 		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
+		  {
 			fatal("ERROR: block size does not touch the next block");
+		  }
 		if ( block->next->prev != block)
+		  {
 			fatal("ERROR: next block doesn't have proper back link");
+		  }
 		if (!block->tag && !block->next->tag)
+		  {
 			fatal("ERROR: two consecutive free blocks");
+		  }
 	}
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB", sum, DYNAMIC_SIZE, (float)sum/(float)(1024*1024), (float)DYNAMIC_SIZE/(float)(1024*1024));
 }
@@ -529,10 +535,13 @@ void *Z_Realloc(void *ptr, int size, int align)
 
 	block = (memblock_t *) ((unsigned char *) ptr - sizeof (memblock_t));
 	if (block->id != ZONEID)
-		printf ("Z_Realloc: realloced a pointer without ZONEID");
+	  {
+		fatal ("Z_Realloc: realloced a pointer without ZONEID");
+	  }
 	if (block->tag == 0)
-		printf ("Z_Realloc: realloced a freed pointer");
-
+	  {
+		fatal ("Z_Realloc: realloced a freed pointer");
+	  }
 	old_size = block->size;
 	old_size -= (4 + (int)sizeof(memblock_t));	/* see Z_TagMalloc() */
 	old_ptr = ptr;
@@ -540,8 +549,9 @@ void *Z_Realloc(void *ptr, int size, int align)
 	Z_Free (ptr);
 	ptr = Z_TagMalloc (size, 1, align);
 	if (!ptr)
-		printf ("Z_Realloc: failed on allocation of %i bytes", size);
-
+	  {
+		fatal("Z_Realloc: failed on allocation of %i bytes", size);
+	  }
 	if (ptr != old_ptr)
 		memmove (ptr, old_ptr, q_min(old_size, size));
 	if (old_size < size)
@@ -593,9 +603,13 @@ void Hunk_Check (void)
 	for (h = (hunk_t *)hunk_base ; (unsigned char *)h != hunk_base + hunk_low_used ; )
 	{
 		if (h->sentinal != HUNK_SENTINAL)
+		  {
 			debug ("Hunk_Check: trahsed sentinal");
+		  }
 		if (h->size < (int) sizeof(hunk_t) || h->size + (unsigned char *)h - hunk_base > hunk_size)
+		  {
 			debug ("Hunk_Check: bad size");
+		  }
 		h = (hunk_t *)((unsigned char *)h+h->size);
 	}
 }
@@ -617,7 +631,6 @@ void *Hunk_AllocName (int size, const char *name)
 	if (size < 0)
 	{
 		fatal("Hunk_Alloc: bad size: %i", size);
-		startup::debug_pause();
 	}
 
 	size = sizeof(hunk_t) + ((size+15)&~15);
@@ -625,7 +638,6 @@ void *Hunk_AllocName (int size, const char *name)
 	if (hunk_size - hunk_low_used - hunk_high_used < size)
 	{
 		fatal("Hunk_Alloc: failed on %i bytes",size);
-		startup::debug_pause();
 	}
 	h = (hunk_t *)(hunk_base + hunk_low_used);
 	hunk_low_used += size;
@@ -659,7 +671,9 @@ int	Hunk_LowMark (void)
 void Hunk_FreeToLowMark (int mark)
 {
 	if (mark < 0 || mark > hunk_low_used)
-		printf ("Hunk_FreeToLowMark: bad mark %i", mark);
+	  {
+	        fatal("Hunk_FreeToLowMark: bad mark %i", mark);
+	  }
 	Q_memset (hunk_base + mark, 0, hunk_low_used - mark);
 	hunk_low_used = mark;
 }
@@ -672,7 +686,9 @@ void Hunk_FreeToHighMark (int mark)
 		Hunk_FreeToHighMark (hunk_tempmark);
 	}
 	if (mark < 0 || mark > hunk_high_used)
-		printf ("Hunk_FreeToHighMark: bad mark %i", mark);
+	  {
+		fatal ("Hunk_FreeToHighMark: bad mark %i", mark);
+	  }
 	Q_memset (hunk_base + hunk_size - hunk_high_used, 0, hunk_high_used - mark);
 	hunk_high_used = mark;
 }
@@ -698,7 +714,7 @@ void *Hunk_HighAllocName (int size, const char *name)
 	hunk_t	*h;
 
 	if (size < 0)
-		printf("Hunk_HighAllocName: bad size: %i", size);
+		fatal("Hunk_HighAllocName: bad size: %i", size);
 
 	if (hunk_tempactive)
 	{
@@ -714,7 +730,7 @@ void *Hunk_HighAllocName (int size, const char *name)
 
 	if (hunk_size - hunk_low_used - hunk_high_used < size)
 	{
-		printf("Hunk_HighAlloc: failed on %i bytes\n",size);
+		fatal("Hunk_HighAlloc: failed on %i bytes\n",size);
 		return NULL;
 	}
 
@@ -803,7 +819,7 @@ void Cache_Move ( cache_system_t *c)
 	new_cs = Cache_TryAlloc (c->size, true);
 	if (new_cs)
 	{
-		printf("cache_move ok\n");
+		fatal("cache_move ok\n");
 
 		Q_memcpy ( new_cs+1, c+1, c->size - sizeof(cache_system_t) );
 		new_cs->user = c->user;
@@ -813,7 +829,7 @@ void Cache_Move ( cache_system_t *c)
 	}
 	else
 	{
-		printf ("cache_move failed\n");
+		fatal ("cache_move failed\n");
 
 		Cache_Free (c->user, true); // tough luck... //johnfitz -- added second argument
 	}
@@ -873,7 +889,7 @@ void Cache_FreeHigh (int new_high_hunk)
 void Cache_UnlinkLRU (cache_system_t *cs)
 {
 	if (!cs->lru_next || !cs->lru_prev)
-		printf ("Cache_UnlinkLRU: NULL link");
+		fatal ("Cache_UnlinkLRU: NULL link");
 
 	cs->lru_next->lru_prev = cs->lru_prev;
 	cs->lru_prev->lru_next = cs->lru_next;
@@ -884,7 +900,7 @@ void Cache_UnlinkLRU (cache_system_t *cs)
 void Cache_MakeLRU (cache_system_t *cs)
 {
 	if (cs->lru_next || cs->lru_prev)
-		printf ("Cache_MakeLRU: active link");
+		fatal ("Cache_MakeLRU: active link");
 
 	cache_head.lru_next->lru_prev = cs;
 	cs->lru_next = cache_head.lru_next;
@@ -909,7 +925,7 @@ cache_system_t *Cache_TryAlloc (int size, bool nobottom)
 	if (!nobottom && cache_head.prev == &cache_head)
 	{
 		if (hunk_size - hunk_high_used - hunk_low_used < size)
-			printf ("Cache_TryAlloc: %i is greater then free hunk", size);
+			fatal ("Cache_TryAlloc: %i is greater then free hunk", size);
 
 		new_cs = (cache_system_t *) (hunk_base + hunk_low_used);
 		Q_memset (new_cs, 0, sizeof(*new_cs));
@@ -999,7 +1015,7 @@ void Cache_Print (void)
 
 	for (cd = cache_head.next ; cd != &cache_head ; cd = cd->next)
 	{
-		printf("%8i : %s\n", cd->size, cd->name);
+	        p("%8i : %s", cd->size, cd->name);
 	}
 }
 
@@ -1042,7 +1058,9 @@ void Cache_Free (cache_user_t *c, bool freetextures) //johnfitz -- added second 
 	cache_system_t	*cs;
 
 	if (!c->data)
-		printf ("Cache_Free: not allocated");
+	  {
+		error("Cache_Free: not allocated");
+	  }
 
 	cs = ((cache_system_t *)c->data) - 1;
 
@@ -1089,11 +1107,14 @@ void *Cache_Alloc (cache_user_t *c, int size, const char *name)
 	cache_system_t	*cs;
 
 	if (c->data)
-		printf ("Cache_Alloc: allready allocated");
-
+	  {
+		fatal("Cache_Alloc: allready allocated");
+	  }
 	if (size <= 0)
-		printf ("Cache_Alloc: size %i", size);
-
+	  {
+	        fatal("Cache_Alloc: size %i", size);
+	  }
+	
 	size = (size + sizeof(cache_system_t) + 15) & ~15;
 
 // find memory for it
@@ -1110,7 +1131,9 @@ void *Cache_Alloc (cache_user_t *c, int size, const char *name)
 
 		// free the least recently used candedat
 		if (cache_head.lru_prev == &cache_head)
-			printf ("Cache_Alloc: out of memory"); // not enough memory at all
+		  {
+			fatal("Cache_Alloc: out of memory"); // not enough memory at all
+		  }
 
 		Cache_Free (cache_head.lru_prev->user, true); //johnfitz -- added second argument
 	}

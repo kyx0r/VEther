@@ -46,6 +46,7 @@ mu_Context* ctx;
 //}
 
 static ParsedOBJ kitty;
+static ParsedOBJ SkyBox;
 
 namespace window
 {
@@ -529,6 +530,9 @@ inline uint8_t Draw()
 	ParsedOBJSubModel p = *kitty.models->sub_models;
 	draw::IndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
 
+	p = *SkyBox.models->sub_models;
+	draw::IndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
+	
 	draw::PresentUI();
 
 	vkCmdEndRenderPass(command_buffer);
@@ -583,19 +587,20 @@ void mainLoop()
 	render::CreatePipelineLayout();
 
 	kitty = LoadOBJ("./res/kitty.obj");
-
+        SkyBox = LoadOBJ("./res/cube.obj");
+        
 	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 
 	//fov setup.
 	entity::InitCamera();
-
+	
 	/* init microui */
-	ctx = (mu_Context*) zone::Hunk_Alloc(sizeof(mu_Context));
+	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");
 	mu_init(ctx);
 	ctx->text_width = draw::text_width;
 	ctx->text_height = draw::text_height;
-
+	
 	draw::InitAtlasTexture();
 
 	PreDraw();
@@ -642,7 +647,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 		#ifdef DEBUG
-	        if (realtime-stamp > 5.0)
+	        if (realtime-stamp > 60.0)
 		  {
 		    std::thread (zone::MemPrint).detach();
 		    stamp = realtime;
