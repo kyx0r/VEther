@@ -526,6 +526,7 @@ LoadOBJ(char *filename)
   if (setjmp(OBJFatal))
     {
       fatal("LoadOBJ: out of memory!");
+      ASSERT(0, "");
     }
   
 	int mark = zone::Hunk_LowMark();
@@ -535,7 +536,7 @@ LoadOBJ(char *filename)
 	obj.mark = zone::Hunk_HighMark();
 	{
 		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename, &size);
-		info.parse_memory_size = size*3; //give it 3 time as much as of a filesize itself.
+		info.parse_memory_size = size*10; //give it 10 time as much as of a filesize itself.
 		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
 		if(!info.parse_memory)
 		{

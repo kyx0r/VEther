@@ -47,6 +47,9 @@ void CreateRenderPass(VkFormat depthFormat, bool late);
 void CreateSwapchainImageViews();
 void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpassContents subpass_contents, int render_index, int buffer_index);
 void CreateGraphicsPipeline(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs);
+void CreateTessGraphicsPipeline
+(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(),
+ int render_index, VkShaderModule vs, VkShaderModule fs, VkShaderModule cs, VkShaderModule es);
 void CreatePipelineLayout();
 void DestroyDepthBuffer();
 void CreateDepthBuffer();

@@ -587,8 +587,8 @@ void mainLoop()
 	render::CreatePipelineLayout();
 
 	kitty = LoadOBJ("./res/kitty.obj");
-	SkyBox = LoadOBJ("./res/cube.obj");
-
+	SkyBox = LoadOBJ("./res/cube.obj");	
+	
 	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 

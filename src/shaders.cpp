@@ -20,7 +20,10 @@ static char* sfilenames[][1] =
 	{"./res/shaders/triangle.vert.glsl"},
 	{"./res/shaders/screen.frag.glsl"},
 	{"./res/shaders/screen.vert.glsl"},
-	{"./res/shaders/col.frag.glsl"}
+	{"./res/shaders/shader.frag.glsl"},
+	{"./res/shaders/shader.vert.glsl"},
+	{"./res/shaders/shader.tesc.glsl"},
+	{"./res/shaders/shader.tese.glsl"}
 };
 
 static char* shaders[][5] =
@@ -29,7 +32,10 @@ static char* shaders[][5] =
 	{"1", sfilenames[1][0], "-V", "-o", "./res/shaders/triangle.vert.spv"},
 	{"2", sfilenames[2][0], "-V", "-o", "./res/shaders/screen.frag.spv"},
 	{"3", sfilenames[3][0], "-V", "-o", "./res/shaders/screen.vert.spv"},
-	{"4", sfilenames[4][0], "-V", "-o", "./res/shaders/col.frag.spv"}
+	{"4", sfilenames[4][0], "-V", "-o", "./res/shaders/shader.frag.spv"},
+  	{"5", sfilenames[5][0], "-V", "-o", "./res/shaders/shader.vert.spv"},
+	{"6", sfilenames[6][0], "-V", "-o", "./res/shaders/shader.tesc.spv"},
+	{"7", sfilenames[7][0], "-V", "-o", "./res/shaders/shader.tese.spv"}
 };
 
 class UpdateListener : public FW::FileWatchListener
@@ -62,6 +68,7 @@ attempt:
 				goto attempt;
 			}
 		}
+		CreatePipelineCache();
 		LoadShaders();
 	}
 };
@@ -101,12 +108,14 @@ void LoadShaders()
 	VkShaderModule triangleVS = shaders::loadShaderMem(1);
 	VkShaderModule screenFS = shaders::loadShaderMem(2);
 	VkShaderModule screenVS = shaders::loadShaderMem(3);
-	VkShaderModule colFS = shaders::loadShaderMem(4);
+	VkShaderModule shaderFS = shaders::loadShaderMem(4);
+	VkShaderModule shaderVS = shaders::loadShaderMem(5);
+	VkShaderModule shaderTCS = shaders::loadShaderMem(6);
+	VkShaderModule shaderTES = shaders::loadShaderMem(7);
 
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
-	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, colFS);
-
+	render::CreateTessGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, shaderVS, shaderFS, shaderTCS, shaderTES);	
 }
 
 void CreatePipelineCache()
@@ -119,17 +128,10 @@ void CreatePipelineCache()
 
 void DestroyShaders()
 {
-	VkShaderModule triangleFS = shaders::loadShaderMem(0);
-	VkShaderModule triangleVS = shaders::loadShaderMem(1);
-	VkShaderModule screenFS = shaders::loadShaderMem(2);
-	VkShaderModule screenVS = shaders::loadShaderMem(3);
-	VkShaderModule colFS = shaders::loadShaderMem(4);
-
-	vkDestroyShaderModule(logical_device, triangleVS, allocators);
-	vkDestroyShaderModule(logical_device, triangleFS, allocators);
-	vkDestroyShaderModule(logical_device, screenVS, allocators);
-	vkDestroyShaderModule(logical_device, screenFS, allocators);
-	vkDestroyShaderModule(logical_device, colFS, allocators);
+	for(uint32_t i = 0; i<cur_shader_index; i++)
+	  {
+	    vkDestroyShaderModule(logical_device, _shaders[i], allocators);	    
+	  }	
 	vkDestroyPipelineCache(logical_device, pipelineCache, allocators);
 }
 

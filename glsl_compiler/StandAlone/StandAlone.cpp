@@ -1397,6 +1397,7 @@ EShLanguage FindLanguage(const std::string& name, bool parseStageName)
         return EShLangTaskNV;
 #endif
 
+    error("Glsllang: Probably invalid file extension!");
     usage();
     return EShLangVertex;
 }
@@ -1453,7 +1454,7 @@ void CompileFile(const char* fileName, ShHandle compiler)
 //   print usage to stdout
 //
 void usage()
-{
+{  
     printf("Usage: glslangValidator [option]... [file]...\n"
            "\n"
            "'file' can end in .<stage> for auto-stage classification, where <stage> is:\n"

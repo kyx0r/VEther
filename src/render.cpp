@@ -326,6 +326,8 @@ VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe()
 
 	VkPipelineVertexInputStateCreateInfo* vertexInput = new(&attributeDescriptions[0] + sizeof(attributeDescriptions)) VkPipelineVertexInputStateCreateInfo[0];
 	vertexInput[0].sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInput[0].pNext = nullptr;
+	vertexInput[0].flags = 0;
 	vertexInput[0].vertexBindingDescriptionCount = 1;
 	vertexInput[0].vertexAttributeDescriptionCount = 3;
 	vertexInput[0].pVertexBindingDescriptions = bindingDescription;
@@ -469,6 +471,130 @@ void CreateGraphicsPipeline
 
 	VK_CHECK(vkCreateGraphicsPipelines(logical_device, pipelineCache, 1, &createInfo, 0, &pipelines[pipelineCount++]));
 	return;
+}
+
+void CreateTessGraphicsPipeline
+(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(),
+ int render_index, VkShaderModule vs, VkShaderModule fs,  VkShaderModule cs, VkShaderModule es)
+{
+	ASSERT(vs, "Failed to load Vertex Shader.");
+	ASSERT(fs, "Failed to load Fragment Shader.");
+	ASSERT(cs, "Failed to load Tesselation Control Shader.");
+	ASSERT(es, "Failed to load Tesselation Evaluation Shader.");
+
+	VkPipelineShaderStageCreateInfo stages[4] = {};
+	stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+	stages[0].module = vs;
+	stages[0].pName = "main";
+	stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stages[1].stage = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+	stages[1].module = cs;
+	stages[1].pName = "main";
+	stages[2].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stages[2].stage = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+	stages[2].module = es;
+	stages[2].pName = "main";
+	stages[3].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stages[3].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	stages[3].module = fs;
+	stages[3].pName = "main";
+
+	VkGraphicsPipelineCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	createInfo.stageCount = ARRAYSIZE(stages);
+	createInfo.pStages = stages;
+	createInfo.pVertexInputState = vertexInput();
+
+	VkPipelineTessellationStateCreateInfo tsci;
+	tsci.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
+	tsci.pNext = nullptr;
+	tsci.flags = 0;
+	tsci.patchControlPoints = 3;
+	createInfo.pTessellationState = &tsci;
+	
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
+	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
+	createInfo.pInputAssemblyState = &inputAssembly;
+
+	VkPipelineViewportStateCreateInfo viewportState = {};
+	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportState.viewportCount = 1;
+	viewportState.scissorCount = 1;
+	createInfo.pViewportState = &viewportState;
+
+	VkPipelineRasterizationStateCreateInfo rasterizationState = {};
+	rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
+	rasterizationState.cullMode = VK_CULL_MODE_NONE;
+	rasterizationState.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizationState.depthClampEnable = VK_FALSE;
+	rasterizationState.rasterizerDiscardEnable = VK_FALSE;
+	rasterizationState.depthBiasEnable = VK_FALSE;
+	rasterizationState.lineWidth = 1.f;
+	createInfo.pRasterizationState = &rasterizationState;
+
+	VkPipelineMultisampleStateCreateInfo multisampleState = {};
+	multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	multisampleState.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+	createInfo.pMultisampleState = &multisampleState;
+
+	VkPipelineDepthStencilStateCreateInfo depthStencilState = {};
+	
+	depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	createInfo.pDepthStencilState = &depthStencilState;
+
+	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+	VkPipelineColorBlendStateCreateInfo colorBlendState = {};
+	colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlendState.attachmentCount = 1;
+	colorBlendState.pAttachments = &colorBlendAttachment;
+	createInfo.pColorBlendState = &colorBlendState;
+
+	if(vertexInput == ScreenPipe)
+	{
+		colorBlendAttachment.blendEnable = VK_TRUE;
+		colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+		colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+
+		colorBlendState.logicOpEnable = VK_FALSE;
+		colorBlendState.logicOp = VK_LOGIC_OP_COPY;
+		colorBlendState.attachmentCount = 1;
+		colorBlendState.blendConstants[0] = 1.0f;
+		colorBlendState.blendConstants[1] = 1.0f;
+		colorBlendState.blendConstants[2] = 1.0f;
+		colorBlendState.blendConstants[3] = 1.0f;
+	}
+	else
+	{
+		depthStencilState.depthTestEnable = VK_TRUE;
+		depthStencilState.depthWriteEnable = VK_TRUE;
+		depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS;
+		depthStencilState.depthBoundsTestEnable = VK_FALSE;
+		depthStencilState.stencilTestEnable = VK_FALSE;
+	}
+
+	VkDynamicState dynamicStates[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
+	VkPipelineDynamicStateCreateInfo dynamicState = {};
+	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicState.dynamicStateCount = ARRAYSIZE(dynamicStates);
+	dynamicState.pDynamicStates = dynamicStates;
+	createInfo.pDynamicState = &dynamicState;
+
+	createInfo.layout = pipeline_layout;
+	createInfo.renderPass = renderPasses[render_index];
+
+	VK_CHECK(vkCreateGraphicsPipelines(logical_device, pipelineCache, 1, &createInfo, 0, &pipelines[pipelineCount++]));
+	return;
+
 }
 
 } //namespace render
