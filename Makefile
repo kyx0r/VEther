@@ -48,29 +48,29 @@ export SHARED_FLAGS
 #Monolithic compile.
 all : 
 	$(CC) -Os -static $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
-	
+
 allwin : 
 	$(CC) -Os -static $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)	
 
 all_individual : $(PROGS)
 ./build/%.o: ./src/%.cpp
 	$(CC) -c -static $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $@ $<
-	
+
 VEther: 
 	$(MAKE) all -C ./glsl_compiler
 	$(MAKE) all -C ./glfw
 	$(MAKE) all -C ./src
-	
+
 #Building a static lib out of src files. Benefits - faster compile time. Makes project modular.
 #all_slwin <- use this for compilation on windows OS.
 all_slwin: VEther
 	$(CC) -flto -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
-	
+
 glsl_m32: SHARED_FLAGS = -Os -m32 -s -Wall -Wextra -fno-align-functions -fno-exceptions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings	
-	
+
 glsl_m32: 
 	$(MAKE) all -C ./glsl_compiler
-	
+
 all_flto: SHARED_FLAGS = -flto -O3 -m32 -s -Wall -Wextra -fno-align-functions -fno-exceptions -Wno-unused-parameter -Wno-cast-function-type -Wno-write-strings
 
 all_flto: glsl_m32
@@ -81,26 +81,29 @@ all_flto: glsl_m32
 #all_sl <- any other system.	
 all_sl: VEther
 	$(CC) -O3 main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
-	
+
 debug:
 	objcopy --only-keep-debug $(OBJ_NAME) main.debug
-	
+
 clean_f:
 	find . -type f -name '*.orig' -delete
-	
+
 clean_o:
 	$(MAKE) clean -C ./glsl_compiler
 	$(MAKE) clean -C ./src
 	$(MAKE) clean -C ./glfw
 	find . -type f -name '*.o' -delete
-	
+
 c:
 	$(MAKE) clean -C ./src
-	
+
 .IGNORE format:
 	$(ASTYLE) --style=allman --indent=tab ./*.cpp, *.h
 	$(ASTYLE) --style=allman --indent=tab ./src/*.cpp, *.h
 	$(ASTYLE) --style=allman --indent=tab --recursive ./src/*.cpp, *.h
+
+etags:
+	 find . \( -name "*[tT]est*" -o -name "CVS" -o -name "*#*" -o -name "html" -o -name "*~" -o -name "*.ca*" \) -prune -o \( -iname "*.c" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h"  -o -iname "*.hh" \) -exec etags -a {} \;
 
 default:
 	echo "Please specify the target."
