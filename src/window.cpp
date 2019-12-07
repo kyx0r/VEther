@@ -527,12 +527,12 @@ inline uint8_t Draw()
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
 
-	ParsedOBJSubModel p = *kitty.models->sub_models;
-	draw::IndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
+	ParsedOBJRenderable* p = kitty.renderables;
+	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
 
-	p = *SkyBox.models->sub_models;
-	draw::IndexedTriangle(32 * p.vertex_count, (Vertex_*)p.vertices, p.index_count, (uint32_t*)p.indices);
-	
+	p = SkyBox.renderables;
+	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
+
 	draw::PresentUI();
 
 	vkCmdEndRenderPass(command_buffer);
@@ -587,20 +587,20 @@ void mainLoop()
 	render::CreatePipelineLayout();
 
 	kitty = LoadOBJ("./res/kitty.obj");
-        SkyBox = LoadOBJ("./res/cube.obj");
-        
+	SkyBox = LoadOBJ("./res/cube.obj");
+
 	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 
 	//fov setup.
 	entity::InitCamera();
-	
+
 	/* init microui */
 	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");
 	mu_init(ctx);
 	ctx->text_width = draw::text_width;
 	ctx->text_height = draw::text_height;
-	
+
 	draw::InitAtlasTexture();
 
 	PreDraw();
@@ -646,13 +646,13 @@ void mainLoop()
 			oldtime = realtime;
 			oldframecount = framecount;
 		}
-		#ifdef DEBUG
-	        if (realtime-stamp > 60.0)
-		  {
-		    std::thread (zone::MemPrint).detach();
-		    stamp = realtime;
-		  }
-		#endif
+#ifdef DEBUG
+		if (realtime-stamp > 60.0)
+		{
+			std::thread (zone::MemPrint).detach();
+			stamp = realtime;
+		}
+#endif
 wait:
 		oldrealtime = realtime;
 		frametime = CLAMP (0.0001, frametime, 0.1);
