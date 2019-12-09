@@ -88,9 +88,16 @@ void VEtherFree(void* pusd, void* ptr);
 
 namespace zone
 {
+float Q_atof (const char *str);
+int Q_strlen(const char *str);
 void Q_memcpy(void *dest, const void *src, size_t count);
+size_t q_strlcpy (char *dst, const char *src, size_t siz);
+char *Z_Strdup (const char *s);
+int Q_strncmp(const char *s1, const char *s2, int count);
+int Q_strcmp(const char *s1, const char *s2);
 void Q_memset(void *dest, int fill, size_t count);
-
+size_t Q_sstrlen (const char* s) ;
+ 
 __attribute__((noinline)) void stack_alloc(int size);
 void stack_clear(int size);
 

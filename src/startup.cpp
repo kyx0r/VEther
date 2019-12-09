@@ -509,6 +509,7 @@ bool CreateLogicalDevice(QueueInfo *array, int number_of_queues, uint32_t ext_co
 	}
 
 	device_features.tessellationShader = true;
+	device_features.fillModeNonSolid = true;
 
 	VkDeviceCreateInfo device_create_info;
 	memset(&device_create_info, 0, sizeof(device_create_info));

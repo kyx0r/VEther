@@ -6,6 +6,7 @@
 #include "obj_parse.h"
 #include "flog.h"
 #include "entity.h"
+#include "cvar.h"
 
 /* {
 GVAR: framebufferCount -> render.cpp
@@ -263,8 +264,11 @@ void initWindow()
 static  char logbuf[64000];
 static   int logbuf_updated = 0;
 
-static void write_log(const char *text)
+static void write_log(char *text)
 {
+        int len = zone::Q_sstrlen(text);
+        text[len] = '\0';
+        Cvar_Set(text, &text[len+1]);
 	if (logbuf[0])
 	{
 		strcat(logbuf, "\n");
@@ -272,8 +276,7 @@ static void write_log(const char *text)
 	strcat(logbuf, text);
 	logbuf_updated = 1;
 }
-
-static void log_window(mu_Context *ctx)
+static void console(mu_Context *ctx)
 {
 	static mu_Container window;
 
@@ -284,7 +287,7 @@ static void log_window(mu_Context *ctx)
 		window.rect = mu_rect(350, 40, 300, 200);
 	}
 
-	if (mu_begin_window(ctx, &window, "Log Window"))
+	if (mu_begin_window(ctx, &window, "Console"))
 	{
 
 		/* output text panel */
@@ -311,10 +314,6 @@ static void log_window(mu_Context *ctx)
 			mu_set_focus(ctx, ctx->last_id);
 			submitted = 1;
 		}
-		if (mu_button(ctx, "Submit"))
-		{
-			submitted = 1;
-		}
 		if (submitted)
 		{
 			write_log(buf);
@@ -324,6 +323,7 @@ static void log_window(mu_Context *ctx)
 		mu_end_window(ctx);
 	}
 }
+
 
 static int uint8_slider(mu_Context *ctx, unsigned char *value, int low, int high)
 {
@@ -476,7 +476,7 @@ inline uint8_t Draw()
 	assert(control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr));
 
 	mu_begin(ctx);
-	log_window(ctx);
+	console(ctx);
 	style_window(ctx);
 	mu_end(ctx);
 
@@ -523,15 +523,33 @@ inline uint8_t Draw()
 	Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
 	entity::ViewMatrix(c);
 	MatrixMultiply(m, c);
-	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
-	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
-	vkCmdPushConstants(command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
+	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
+	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
+	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
 
 	ParsedOBJRenderable* p = kitty.renderables;
 	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
 
-	p = SkyBox.renderables;
-	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
+	//p = SkyBox.renderables;
+	//draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
+
+	float4_t flt[3];
+	flt[0].pos[0] = 0.0f;
+	flt[0].pos[1] = -0.75f;
+	flt[0].pos[2] = 0.0f;
+	flt[0].pos[3] = 1.0f;
+
+	flt[1].pos[0] = 0.25f;
+	flt[1].pos[1] = 0.75f;
+	flt[1].pos[2] = 0.0f;
+	flt[1].pos[3] = 1.0f;
+
+	flt[2].pos[0] = -0.75f;
+	flt[2].pos[1] = 0.75f;
+	flt[2].pos[2] = 0.0f;
+	flt[2].pos[3] = 1.0f;
+
+	draw::Triangle(sizeof(float4_t)*3, &flt[0]);
 
 	draw::PresentUI();
 
@@ -587,8 +605,8 @@ void mainLoop()
 	render::CreatePipelineLayout();
 
 	kitty = LoadOBJ("./res/kitty.obj");
-	SkyBox = LoadOBJ("./res/cube.obj");	
-	
+	SkyBox = LoadOBJ("./res/cube.obj");
+
 	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 
@@ -687,7 +705,8 @@ c:
 	vkDestroyFence(logical_device, Fence_one, allocators);
 	render::DestroyImageViews();
 	render::DestroyFramebuffers();
-	vkDestroyPipelineLayout(logical_device, pipeline_layout, allocators);
+	vkDestroyPipelineLayout(logical_device, pipeline_layout[0], allocators);
+	vkDestroyPipelineLayout(logical_device, pipeline_layout[1], allocators);
 	render::DestroyPipeLines();
 	render::DestroyRenderPasses();
 	shaders::DestroyShaders();

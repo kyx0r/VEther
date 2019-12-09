@@ -36,13 +36,31 @@ void Quad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* index_a
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT16);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
+}
+
+void Triangle(size_t size, float4_t* vertices)
+{
+	static VkBuffer buffer;
+	static VkDeviceSize buffer_offset;
+	static bool once = true;
+	static unsigned char* data;
+	if(once)
+	{
+		data = control::VertexBufferDigress(size, &buffer, &buffer_offset);
+		once = false;
+	}
+
+	zone::Q_memcpy(data, &vertices[0], size);
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer, &buffer_offset);
+
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[2]);
+	vkCmdDraw(command_buffer, 3, 1, 0, 0);
 }
 
 void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array)
 {
-	//printf("goto \n");
 	static VkBuffer buffer[3];
 	static VkDeviceSize buffer_offset[2];
 	static VkDescriptorSet dset;
@@ -82,7 +100,7 @@ void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_
 	//PrintMatrix(mat->view);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &dset, 1, &uniform_offset);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &dset, 1, &uniform_offset);
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
@@ -203,7 +221,7 @@ void PresentUI()
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
 
 	buf_idx = 0;

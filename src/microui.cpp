@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "microui.h"
+#include "flog.h"
 
 #define unused(x) ((void) (x))
 

@@ -1,7 +1,8 @@
 #include "startup.h"
 #include "swapchain.h"
 #include "zone.h"
-
+#include "cvar.h"
+#include "shaders.h"
 //GVAR: command_buffer -> control.cpp
 
 extern VkRenderPass renderPasses[10];
@@ -14,8 +15,13 @@ extern uint32_t framebufferCount;
 extern uint32_t imageViewCount;
 extern uint32_t pipelineCount;
 
-extern VkPipelineLayout pipeline_layout;
+extern VkPipelineLayout pipeline_layout[20];
 extern VkPipeline current_pipeline;
+
+typedef struct
+{
+	float pos[4];   // = vec4
+} float4_t;
 
 typedef struct
 {
@@ -57,6 +63,7 @@ void Viewport(float x, float y, float width, float height, float min_depth, floa
 //-----------------------
 VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe();
 VkPipelineVertexInputStateCreateInfo* ScreenPipe();
+VkPipelineVertexInputStateCreateInfo* Vec4FloatPipe();
 VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h);
 
 //----------------------- inline
@@ -85,6 +92,9 @@ inline void DestroyPipeLines()
 		vkDestroyPipeline(logical_device, pipelines[i], nullptr);
 }
 
+//---------------------- callback
+void RebuildPipelines(struct cvar_s*);
+ 
 } // namespace render
 
 //

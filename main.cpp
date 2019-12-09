@@ -5,6 +5,7 @@
 #include "src/control.h"
 #include "src/shaders.h"
 #include "src/textures.h"
+#include "src/cvar.h"
 #include "src/flog.h"
 
 #define number_of_queues 1 // <- change this if more queues needed
@@ -54,6 +55,8 @@ int main(int argc, char *lpCmdLine[])
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
 
+	Cvar_Init();
+	
 	log_set_level(0);
 	FILE* f = fopen("./log.txt","w");
 	log_set_fp(f);

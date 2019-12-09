@@ -33,7 +33,7 @@ static char* shaders[][5] =
 	{"2", sfilenames[2][0], "-V", "-o", "./res/shaders/screen.frag.spv"},
 	{"3", sfilenames[3][0], "-V", "-o", "./res/shaders/screen.vert.spv"},
 	{"4", sfilenames[4][0], "-V", "-o", "./res/shaders/shader.frag.spv"},
-  	{"5", sfilenames[5][0], "-V", "-o", "./res/shaders/shader.vert.spv"},
+	{"5", sfilenames[5][0], "-V", "-o", "./res/shaders/shader.vert.spv"},
 	{"6", sfilenames[6][0], "-V", "-o", "./res/shaders/shader.tesc.spv"},
 	{"7", sfilenames[7][0], "-V", "-o", "./res/shaders/shader.tese.spv"}
 };
@@ -115,7 +115,7 @@ void LoadShaders()
 
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
-	render::CreateTessGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, shaderVS, shaderFS, shaderTCS, shaderTES);	
+	render::CreateTessGraphicsPipeline(pipelineCache, render::Vec4FloatPipe, 0, shaderVS, shaderFS, shaderTCS, shaderTES);
 }
 
 void CreatePipelineCache()
@@ -129,9 +129,9 @@ void CreatePipelineCache()
 void DestroyShaders()
 {
 	for(uint32_t i = 0; i<cur_shader_index; i++)
-	  {
-	    vkDestroyShaderModule(logical_device, _shaders[i], allocators);	    
-	  }	
+	{
+		vkDestroyShaderModule(logical_device, _shaders[i], allocators);
+	}
 	vkDestroyPipelineCache(logical_device, pipelineCache, allocators);
 }
 

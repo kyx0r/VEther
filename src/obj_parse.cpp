@@ -523,12 +523,12 @@ ParsedOBJ
 LoadOBJ(char *filename)
 {
 
-  if (setjmp(OBJFatal))
-    {
-      fatal("LoadOBJ: out of memory!");
-      ASSERT(0, "");
-    }
-  
+	if (setjmp(OBJFatal))
+	{
+		fatal("LoadOBJ: out of memory!");
+		ASSERT(0, "");
+	}
+
 	int mark = zone::Hunk_LowMark();
 	int size;
 	OBJParseInfo info = {};
@@ -804,7 +804,7 @@ ParseOBJ(OBJParseInfo *info)
 			if(!memory)
 			{
 				// TODO(rjf): ERROR: Out of memory.
-			  longjmp(OBJFatal, 1);
+				longjmp(OBJFatal, 1);
 			}
 		}
 
