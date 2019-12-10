@@ -23,7 +23,9 @@ static char* sfilenames[][1] =
 	{"./res/shaders/shader.frag.glsl"},
 	{"./res/shaders/shader.vert.glsl"},
 	{"./res/shaders/shader.tesc.glsl"},
-	{"./res/shaders/shader.tese.glsl"}
+	{"./res/shaders/shader.tese.glsl"},
+	{"./res/shaders/skydome.frag.glsl"},
+	{"./res/shaders/skydome.vert.glsl"}
 };
 
 static char* shaders[][5] =
@@ -35,7 +37,9 @@ static char* shaders[][5] =
 	{"4", sfilenames[4][0], "-V", "-o", "./res/shaders/shader.frag.spv"},
 	{"5", sfilenames[5][0], "-V", "-o", "./res/shaders/shader.vert.spv"},
 	{"6", sfilenames[6][0], "-V", "-o", "./res/shaders/shader.tesc.spv"},
-	{"7", sfilenames[7][0], "-V", "-o", "./res/shaders/shader.tese.spv"}
+	{"7", sfilenames[7][0], "-V", "-o", "./res/shaders/shader.tese.spv"},
+	{"8", sfilenames[8][0], "-V", "-o", "./res/shaders/skydome.tese.spv"},
+	{"9", sfilenames[9][0], "-V", "-o", "./res/shaders/skydome.tese.spv"}
 };
 
 class UpdateListener : public FW::FileWatchListener
@@ -112,10 +116,13 @@ void LoadShaders()
 	VkShaderModule shaderVS = shaders::loadShaderMem(5);
 	VkShaderModule shaderTCS = shaders::loadShaderMem(6);
 	VkShaderModule shaderTES = shaders::loadShaderMem(7);
+	VkShaderModule SkyDomeFS = shaders::loadShaderMem(8);
+	VkShaderModule SkyDomeVS = shaders::loadShaderMem(9);
 
 	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
 	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
 	render::CreateTessGraphicsPipeline(pipelineCache, render::Vec4FloatPipe, 0, shaderVS, shaderFS, shaderTCS, shaderTES);
+	render::CreateGraphicsPipeline(pipelineCache, render::Vec3FloatPipe, 0, SkyDomeVS, SkyDomeFS);
 }
 
 void CreatePipelineCache()

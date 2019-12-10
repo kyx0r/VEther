@@ -14,7 +14,8 @@
 extern VkCommandBuffer command_buffer;
 extern VkPhysicalDeviceMemoryProperties	memory_properties;
 extern VkDescriptorPool descriptor_pool;
-extern VkDescriptorSetLayout ubo_dsl;
+extern VkDescriptorSetLayout vubo_dsl;
+extern VkDescriptorSetLayout fubo_dsl;
 extern VkDescriptorSetLayout tex_dsl;
 extern uint8_t current_cmd_buffer_index;
 extern int current_dyn_buffer_index;

@@ -13,7 +13,8 @@ GVAR: allocators -> startup.cpp
 VkCommandBuffer command_buffer;
 VkPhysicalDeviceMemoryProperties memory_properties;
 VkDescriptorPool descriptor_pool;
-VkDescriptorSetLayout ubo_dsl;
+VkDescriptorSetLayout vubo_dsl;
+VkDescriptorSetLayout fubo_dsl;
 VkDescriptorSetLayout tex_dsl;
 vram_heap texmgr_heaps[TEXTURE_MAX_HEAPS];
 dynbuffer_t dyn_index_buffers[NUM_DYNAMIC_BUFFERS];
@@ -32,7 +33,7 @@ static VkDeviceMemory dyn_index_buffer_memory;
 static VkDeviceMemory dyn_vertex_buffer_memory;
 static VkDeviceMemory dyn_uniform_buffer_memory;
 static VkDeviceMemory	staging_memory;
-static VkDescriptorSet	ubo_descriptor_sets[2];
+static VkDescriptorSet	ubo_descriptor_sets[3];
 
 namespace control
 {
@@ -156,49 +157,61 @@ bool BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCom
 
 void CreateDescriptorPool()
 {
-	VkDescriptorPoolSize pool_sizes[2] = {};
+	VkDescriptorPoolSize pool_sizes[2];
 	pool_sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 	pool_sizes[0].descriptorCount = 32;
 	pool_sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	pool_sizes[1].descriptorCount = 2048;
-
-	VkDescriptorPoolCreateInfo descriptor_pool_create_info = {};
+	
+	VkDescriptorPoolCreateInfo descriptor_pool_create_info;
 	descriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	descriptor_pool_create_info.pNext = nullptr;
+	descriptor_pool_create_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 	descriptor_pool_create_info.maxSets = 2048 + 32;
 	descriptor_pool_create_info.poolSizeCount = 2;
 	descriptor_pool_create_info.pPoolSizes = pool_sizes;
-	descriptor_pool_create_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-
 	VK_CHECK(vkCreateDescriptorPool(logical_device, &descriptor_pool_create_info, allocators, &descriptor_pool));
 }
 
 void CreateDescriptorSetLayouts()
 {
-	//ubo = uniform buffer object
-	VkDescriptorSetLayoutBinding ubo = {};
-	ubo.binding = 0;
-	ubo.descriptorCount = 1;
-	ubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	ubo.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	ubo.pImmutableSamplers = nullptr;
+	//vubo = vertex uniform buffer object
+	VkDescriptorSetLayoutBinding vubo;
+	vubo.binding = 0;	
+	vubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	vubo.descriptorCount = 1;
+	vubo.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	vubo.pImmutableSamplers = nullptr;
 
+	//fubo = fragment uniform buffer object
+	VkDescriptorSetLayoutBinding fubo;
+	fubo.binding = 1;	
+	fubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	fubo.descriptorCount = 1;
+	fubo.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	fubo.pImmutableSamplers = nullptr;
+	
 	//slb = sampler layout binding
-	VkDescriptorSetLayoutBinding slb = {};
-	slb.binding = 0;
-	slb.descriptorCount = 1;
+	VkDescriptorSetLayoutBinding slb;
+	slb.binding = 0;	
 	slb.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	slb.descriptorCount = 1;
 	slb.pImmutableSamplers = nullptr;
 	slb.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
+	
 	//dslci = descriptor set layout create info
-	VkDescriptorSetLayoutCreateInfo dslci = {};
+	VkDescriptorSetLayoutCreateInfo dslci;
 	dslci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	dslci.pNext = nullptr;
+	dslci.flags = 0;
 	dslci.bindingCount = 1;
-	dslci.pBindings = &ubo;
+	dslci.pBindings = &vubo;
 
-	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &ubo_dsl));
+	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &vubo_dsl));
 	dslci.pBindings = &slb;
 	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &tex_dsl));
+	dslci.pBindings = &fubo;
+	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &fubo_dsl));
 }
 
 void BindDescriptorSet
@@ -562,37 +575,47 @@ void UniformBuffersAllocate()
 
 	CreateDescriptorPool();
 	CreateDescriptorSetLayouts();
-
+	
 	VkDescriptorSetAllocateInfo descriptor_set_allocate_info;
-	memset(&descriptor_set_allocate_info, 0, sizeof(descriptor_set_allocate_info));
 	descriptor_set_allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	descriptor_set_allocate_info.pNext = nullptr;	
 	descriptor_set_allocate_info.descriptorPool = descriptor_pool;
 	descriptor_set_allocate_info.descriptorSetCount = 1;
-	descriptor_set_allocate_info.pSetLayouts = &ubo_dsl;
+	descriptor_set_allocate_info.pSetLayouts = &vubo_dsl;
 
 	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[0]);
 	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[1]);
-
+	descriptor_set_allocate_info.pSetLayouts = &fubo_dsl;
+	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[2]); //skydome
+	
 	VkDescriptorBufferInfo buffer_info;
-	memset(&buffer_info, 0, sizeof(buffer_info));
+	buffer_info.buffer = 0;
 	buffer_info.offset = 0;
 	buffer_info.range = MAX_UNIFORM_ALLOC;
-
+	
 	VkWriteDescriptorSet ubo_write;
-	memset(&ubo_write, 0, sizeof(ubo_write));
 	ubo_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	ubo_write.pNext = nullptr;	
 	ubo_write.dstBinding = 0;
 	ubo_write.dstArrayElement = 0;
 	ubo_write.descriptorCount = 1;
 	ubo_write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 	ubo_write.pBufferInfo = &buffer_info;
+	ubo_write.pTexelBufferView = nullptr;
 
+	ASSERT(NUM_DYNAMIC_BUFFERS == 2, "Code does not forsee anything other than 2 dynamic buffers!");
+	
 	for (i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 	{
 		buffer_info.buffer = dyn_uniform_buffers[i].buffer;
 		ubo_write.dstSet = ubo_descriptor_sets[i];
 		vkUpdateDescriptorSets(logical_device, 1, &ubo_write, 0, nullptr);
 	}
+
+	ubo_write.dstBinding = 1;
+	ubo_write.dstSet = ubo_descriptor_sets[2];
+	vkUpdateDescriptorSets(logical_device, 1, &ubo_write, 0, nullptr); //skydome
+	
 }
 
 void DestroyUniformBuffers()
@@ -602,8 +625,9 @@ void DestroyUniformBuffers()
 		vkDestroyBuffer(logical_device, dyn_uniform_buffers[i].buffer, allocators);
 	}
 
-	vkDestroyDescriptorSetLayout(logical_device, ubo_dsl, allocators);
+	vkDestroyDescriptorSetLayout(logical_device, vubo_dsl, allocators);
 	vkDestroyDescriptorSetLayout(logical_device, tex_dsl, allocators);
+	vkDestroyDescriptorSetLayout(logical_device, fubo_dsl, allocators);
 	vkFreeMemory(logical_device, dyn_uniform_buffer_memory, allocators);
 	vkDestroyDescriptorPool(logical_device, descriptor_pool, allocators);
 }

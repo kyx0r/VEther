@@ -266,15 +266,20 @@ static   int logbuf_updated = 0;
 
 static void write_log(char *text)
 {
+  if(text[0])
+    {
         int len = zone::Q_sstrlen(text);
         text[len] = '\0';
-        Cvar_Set(text, &text[len+1]);
-	if (logbuf[0])
-	{
-		strcat(logbuf, "\n");
+	logbuf_updated = 1;
+        if(!Cvar_Set(text, &text[len+1]))
+	{	  
+	  strcat(strcat(logbuf, text), ": command not found.");
+	  strcat(logbuf, "\n");
+	  return;
 	}
 	strcat(logbuf, text);
-	logbuf_updated = 1;
+	strcat(logbuf, "\n");
+    }
 }
 static void console(mu_Context *ctx)
 {

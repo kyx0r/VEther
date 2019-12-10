@@ -101,7 +101,7 @@ void	Cvar_RegisterVariable (cvar_t *variable);
 void Cvar_SetCallback (cvar_t *var, cvarcallback_t func);
 // set a callback function to the var
 
-void	Cvar_Set (const char *var_name, const char *value);
+bool	Cvar_Set (const char *var_name, const char *value);
 // equivelant to "<name> <variable>" typed at the console
 
 void	Cvar_SetValue (const char *var_name, const float value);

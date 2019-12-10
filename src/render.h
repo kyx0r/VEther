@@ -26,6 +26,11 @@ typedef struct
 typedef struct
 {
 	float pos[3];   // = vec3
+} float3_t;
+
+typedef struct
+{
+	float pos[3];   // = vec3
 	float tex_coord[2]; // = vec2
 	float color[3]; // = vec3
 } Vertex_;
@@ -43,6 +48,15 @@ typedef struct
 	float	view[16];
 	float	proj[16];
 } UniformMatrix;
+
+typedef struct
+{
+	float SkyColor[4];   // = vec4
+        float almoshereColor[4];   // = vec4
+        float groundColor[4];   // = vec4
+        float atmosphereHeight;
+        float padding[3];   // = vec3
+} UniformSkydome;
 
 namespace render
 {
@@ -64,6 +78,7 @@ void Viewport(float x, float y, float width, float height, float min_depth, floa
 VkPipelineVertexInputStateCreateInfo* BasicTrianglePipe();
 VkPipelineVertexInputStateCreateInfo* ScreenPipe();
 VkPipelineVertexInputStateCreateInfo* Vec4FloatPipe();
+VkPipelineVertexInputStateCreateInfo* Vec3FloatPipe();
 VkImage Create2DImage(VkFormat format, VkImageUsageFlags usage, int w, int h);
 
 //----------------------- inline

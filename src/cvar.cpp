@@ -1,9 +1,9 @@
 // cvar.c -- dynamic variable tracking
 #include <stdarg.h>
 #include "cvar.h"
-#include "flog.h"
 #include "zone.h"
 #include "render.h"
+#include "flog.h"
 
 cvar_t	wireframe = {"wireframe","0", CVAR_NONE, 0.0f, nullptr, 0, nullptr};
 
@@ -296,7 +296,7 @@ void Cvar_SetValueQuick (cvar_t *var, const float value)
 Cvar_Set
 ============
 */
-void Cvar_Set (const char *var_name, const char *value)
+bool Cvar_Set (const char *var_name, const char *value)
 {
 	cvar_t		*var;
 
@@ -305,10 +305,11 @@ void Cvar_Set (const char *var_name, const char *value)
 	{
 		// there is an error in C code if this happens
 	        warn("Cvar_Set: variable %s not found", var_name);
-		return;
+		return false;
 	}
 
 	Cvar_SetQuick (var, value);
+	return true;
 }
 
 /*

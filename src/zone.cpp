@@ -23,7 +23,6 @@ unsigned char* stack_mem = nullptr;
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
-
 void* operator new(size_t size)
 {
 	void* p = zone::Z_TagMalloc(size, 1, 8);
