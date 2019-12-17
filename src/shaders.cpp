@@ -1,8 +1,8 @@
 #include "shaders.h"
-#include "flog.h"
 #include "zone.h"
 #include "render.h"
-
+#include "../glsl_compiler/StandAlone/StandAlone.h"
+#include "flog.h"
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: VkShaderModule _shaders[20] -> /standalone/standalone.cpp

@@ -98,7 +98,8 @@ int Q_strcmp(const char *s1, const char *s2);
 void Q_memset(void *dest, int fill, size_t count);
 size_t Q_sstrlen (const char* s) ;
 void Q_strcpy(char *dest, const char *src);
- 
+void Q_strcat(char *dest, const char *src);
+
 __attribute__((noinline)) void stack_alloc(int size);
 void stack_clear(int size);
 

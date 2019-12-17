@@ -22,7 +22,7 @@ dynbuffer_t dyn_vertex_buffers[NUM_DYNAMIC_BUFFERS];
 dynbuffer_t dyn_uniform_buffers[NUM_DYNAMIC_BUFFERS];
 stagingbuffer_t	staging_buffers[NUM_STAGING_BUFFERS];
 uint8_t current_cmd_buffer_index = 0;
-int current_dyn_buffer_index = 0; //influences vertex & uniform buffers.
+int current_dyn_buffer_index = 0;
 int current_staging_buffer = 1;
 int current_vheap_index  = 0;
 //}
@@ -33,7 +33,7 @@ static VkDeviceMemory dyn_index_buffer_memory;
 static VkDeviceMemory dyn_vertex_buffer_memory;
 static VkDeviceMemory dyn_uniform_buffer_memory;
 static VkDeviceMemory	staging_memory;
-static VkDescriptorSet	ubo_descriptor_sets[3];
+static VkDescriptorSet	ubo_descriptor_sets[NUM_DYNAMIC_BUFFERS];
 
 namespace control
 {
@@ -136,7 +136,7 @@ bool CreateFence(VkFence &fence, VkSemaphoreCreateFlags flags)
 	return true;
 }
 
-bool BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCommandBufferInheritanceInfo *secondary_command_buffer_info)
+void BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCommandBufferInheritanceInfo *secondary_command_buffer_info)
 {
 	VkCommandBufferBeginInfo command_buffer_begin_info =
 	{
@@ -147,12 +147,7 @@ bool BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCom
 	};
 
 	VkResult result = vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info);
-	if(result != VK_SUCCESS)
-	{
-		fatal("Could not begin command buffer recording operation.");
-		return false;
-	}
-	return true;
+	ASSERT(result == VK_SUCCESS, "Could not begin command buffer recording operation.");
 }
 
 void CreateDescriptorPool()
@@ -162,7 +157,7 @@ void CreateDescriptorPool()
 	pool_sizes[0].descriptorCount = 32;
 	pool_sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	pool_sizes[1].descriptorCount = 2048;
-	
+
 	VkDescriptorPoolCreateInfo descriptor_pool_create_info;
 	descriptor_pool_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	descriptor_pool_create_info.pNext = nullptr;
@@ -175,9 +170,31 @@ void CreateDescriptorPool()
 
 void CreateDescriptorSetLayouts()
 {
+	// VkDescriptorSetLayoutBinding b[2];
+	// b[0].binding = 0;
+	// b[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	// b[0].descriptorCount = 1;
+	// b[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	// b[0].pImmutableSamplers = nullptr;
+	// b[1].binding = 1;
+	// b[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	// b[1].descriptorCount = 1;
+	// b[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	// b[1].pImmutableSamplers = nullptr;
+
+	// //dslci = descriptor set layout create info
+	// VkDescriptorSetLayoutCreateInfo dslci;
+	// dslci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	// dslci.pNext = nullptr;
+	// dslci.flags = 0;
+	// dslci.bindingCount = ARRAYSIZE(b);
+	// dslci.pBindings = &b[0];
+
+	// VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &vubo_dsl));
+
 	//vubo = vertex uniform buffer object
 	VkDescriptorSetLayoutBinding vubo;
-	vubo.binding = 0;	
+	vubo.binding = 0;
 	vubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 	vubo.descriptorCount = 1;
 	vubo.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -185,20 +202,20 @@ void CreateDescriptorSetLayouts()
 
 	//fubo = fragment uniform buffer object
 	VkDescriptorSetLayoutBinding fubo;
-	fubo.binding = 1;	
+	fubo.binding = 0;
 	fubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 	fubo.descriptorCount = 1;
 	fubo.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 	fubo.pImmutableSamplers = nullptr;
-	
+
 	//slb = sampler layout binding
 	VkDescriptorSetLayoutBinding slb;
-	slb.binding = 0;	
+	slb.binding = 0;
 	slb.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	slb.descriptorCount = 1;
 	slb.pImmutableSamplers = nullptr;
 	slb.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	
+
 	//dslci = descriptor set layout create info
 	VkDescriptorSetLayoutCreateInfo dslci;
 	dslci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -399,7 +416,7 @@ unsigned char* IndexBufferDigress(int size, VkBuffer* buffer, VkDeviceSize* buff
 
 	if ((dyn_ib->current_offset + aligned_size) > (DYNAMIC_INDEX_BUFFER_SIZE_KB * 1024))
 	{
-		warn("Out of dynamic index buffer space, increase DYNAMIC_INDEX_BUFFER_SIZE_KB \n");
+		warn("Out of dynamic index buffer space, increase DYNAMIC_INDEX_BUFFER_SIZE_KB");
 		dyn_ib->current_offset = 0;
 	}
 
@@ -415,7 +432,7 @@ unsigned char* IndexBufferDigress(int size, VkBuffer* buffer, VkDeviceSize* buff
 void IndexBuffersAllocate()
 {
 	int i;
-	trace("Initializing dynamic index buffers\n");
+	trace("Initializing dynamic index buffers");
 
 	VkResult err;
 	VkBufferCreateInfo buffer_create_info;
@@ -488,19 +505,20 @@ void DestroyIndexBuffers()
 ==============================================================================
 */
 
-unsigned char* UniformBufferDigress(int size, VkBuffer* buffer, uint32_t* buffer_offset, VkDescriptorSet* descriptor_set)
+unsigned char* UniformBufferDigress(int size, VkBuffer* buffer, uint32_t* buffer_offset, VkDescriptorSet* descriptor_set, int index)
 {
 	if (size > MAX_UNIFORM_ALLOC)
+	{
 		warn("Increase MAX_UNIFORM_ALLOC");
-
+	}
 	const int align_mod = size % 256;
 	const int aligned_size = ((size % 256) == 0) ? size : (size + 256 - align_mod);
 
-	dynbuffer_t *dyn_ub = &dyn_uniform_buffers[current_dyn_buffer_index];
+	dynbuffer_t *dyn_ub = &dyn_uniform_buffers[index];
 
 	if ((dyn_ub->current_offset + MAX_UNIFORM_ALLOC) > (DYNAMIC_UNIFORM_BUFFER_SIZE_KB * 1024))
 	{
-		error("Out of dynamic uniform buffer space, increase DYNAMIC_UNIFORM_BUFFER_SIZE_KB \n");
+		error("Out of dynamic uniform buffer space, increase DYNAMIC_UNIFORM_BUFFER_SIZE_KB");
 		dyn_ub->current_offset = 0;
 	}
 	*buffer = dyn_ub->buffer;
@@ -509,7 +527,8 @@ unsigned char* UniformBufferDigress(int size, VkBuffer* buffer, uint32_t* buffer
 	unsigned char *data = dyn_ub->data + dyn_ub->current_offset;
 	dyn_ub->current_offset += aligned_size;
 
-	*descriptor_set = ubo_descriptor_sets[current_dyn_buffer_index];
+	ASSERT(index < NUM_DYNAMIC_BUFFERS, "Out of uniform descriptors!");
+	*descriptor_set = ubo_descriptor_sets[index];
 	return data;
 }
 
@@ -517,7 +536,7 @@ void UniformBuffersAllocate()
 {
 	int i;
 
-	trace("Initializing dynamic uniform buffers\n");
+	trace("Initializing dynamic uniform buffers");
 
 	VkResult err;
 
@@ -575,27 +594,26 @@ void UniformBuffersAllocate()
 
 	CreateDescriptorPool();
 	CreateDescriptorSetLayouts();
-	
+
 	VkDescriptorSetAllocateInfo descriptor_set_allocate_info;
 	descriptor_set_allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	descriptor_set_allocate_info.pNext = nullptr;	
+	descriptor_set_allocate_info.pNext = nullptr;
 	descriptor_set_allocate_info.descriptorPool = descriptor_pool;
 	descriptor_set_allocate_info.descriptorSetCount = 1;
 	descriptor_set_allocate_info.pSetLayouts = &vubo_dsl;
 
 	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[0]);
-	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[1]);
 	descriptor_set_allocate_info.pSetLayouts = &fubo_dsl;
-	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[2]); //skydome
-	
+	vkAllocateDescriptorSets(logical_device, &descriptor_set_allocate_info, &ubo_descriptor_sets[1]); //skydome
+
 	VkDescriptorBufferInfo buffer_info;
 	buffer_info.buffer = 0;
 	buffer_info.offset = 0;
 	buffer_info.range = MAX_UNIFORM_ALLOC;
-	
+
 	VkWriteDescriptorSet ubo_write;
 	ubo_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	ubo_write.pNext = nullptr;	
+	ubo_write.pNext = nullptr;
 	ubo_write.dstBinding = 0;
 	ubo_write.dstArrayElement = 0;
 	ubo_write.descriptorCount = 1;
@@ -603,19 +621,12 @@ void UniformBuffersAllocate()
 	ubo_write.pBufferInfo = &buffer_info;
 	ubo_write.pTexelBufferView = nullptr;
 
-	ASSERT(NUM_DYNAMIC_BUFFERS == 2, "Code does not forsee anything other than 2 dynamic buffers!");
-	
 	for (i = 0; i < NUM_DYNAMIC_BUFFERS; ++i)
 	{
 		buffer_info.buffer = dyn_uniform_buffers[i].buffer;
 		ubo_write.dstSet = ubo_descriptor_sets[i];
 		vkUpdateDescriptorSets(logical_device, 1, &ubo_write, 0, nullptr);
 	}
-
-	ubo_write.dstBinding = 1;
-	ubo_write.dstSet = ubo_descriptor_sets[2];
-	vkUpdateDescriptorSets(logical_device, 1, &ubo_write, 0, nullptr); //skydome
-	
 }
 
 void DestroyUniformBuffers()

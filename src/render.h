@@ -1,3 +1,7 @@
+
+#ifndef __RENDER__
+#define __RENDER__
+
 #include "startup.h"
 #include "swapchain.h"
 #include "zone.h"
@@ -17,6 +21,12 @@ extern uint32_t pipelineCount;
 
 extern VkPipelineLayout pipeline_layout[20];
 extern VkPipeline current_pipeline;
+
+//These structs define renderables. Ie used in pipeline creation and in shaders.
+typedef struct
+{
+	float x, y, z; //vec3
+} Vertex;
 
 typedef struct
 {
@@ -52,10 +62,9 @@ typedef struct
 typedef struct
 {
 	float SkyColor[4];   // = vec4
-        float almoshereColor[4];   // = vec4
-        float groundColor[4];   // = vec4
-        float atmosphereHeight;
-        float padding[3];   // = vec3
+	float almoshereColor[4];   // = vec4
+	float groundColor[4];   // = vec4
+	float atmosphereHeight;
 } UniformSkydome;
 
 namespace render
@@ -109,7 +118,8 @@ inline void DestroyPipeLines()
 
 //---------------------- callback
 void RebuildPipelines(struct cvar_s*);
- 
+
 } // namespace render
 
+#endif
 //

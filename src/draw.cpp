@@ -3,6 +3,9 @@
 #include "textures.h"
 #include "atlas.h"
 #include "flog.h"
+#include "entity.h"
+#include "obj_parse.h"
+
 /* {
 GVAR: logical_device -> startup.cpp
 GVAR: command_buffer -> control.cpp
@@ -19,14 +22,12 @@ void Quad(size_t size, Uivertex* vertices, size_t index_count, uint16_t* index_a
 {
 	static VkBuffer buffer[2];
 	static VkDeviceSize buffer_offset[2];
-	static bool once = true;
-	static unsigned char* data;
+	static unsigned char* data = nullptr;
 	static uint16_t* index_data;
-	if(once)
+	if(!data)
 	{
 		data = control::VertexBufferDigress(size, &buffer[0], &buffer_offset[0]);
 		index_data = (uint16_t*) control::IndexBufferDigress(index_count * sizeof(uint16_t), &buffer[1], &buffer_offset[1]);
-		once = false;
 	}
 
 	zone::Q_memcpy(data, &vertices[0], size);
@@ -44,12 +45,10 @@ void Triangle(size_t size, float4_t* vertices)
 {
 	static VkBuffer buffer;
 	static VkDeviceSize buffer_offset;
-	static bool once = true;
-	static unsigned char* data;
-	if(once)
+	static unsigned char* data = nullptr;
+	if(!data)
 	{
 		data = control::VertexBufferDigress(size, &buffer, &buffer_offset);
-		once = false;
 	}
 
 	zone::Q_memcpy(data, &vertices[0], size);
@@ -61,20 +60,18 @@ void Triangle(size_t size, float4_t* vertices)
 
 void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array)
 {
-	static VkBuffer buffer[3];
+	static VkBuffer buffer[4];
 	static VkDeviceSize buffer_offset[2];
-	static VkDescriptorSet dset;
-	static uint32_t uniform_offset;
-	static bool once = true;
-	static unsigned char* data;
+	static VkDescriptorSet dset[2];
+	static uint32_t uniform_offset[2];
+	static unsigned char* data = nullptr;
 	static uint32_t* index_data;
-	static	UniformMatrix* mat;
-	if(once)
+	static UniformMatrix* mat;
+	if(!data)
 	{
 		data = control::VertexBufferDigress(size, &buffer[0], &buffer_offset[0]);
 		index_data = (uint32_t*) control::IndexBufferDigress(index_count * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
-		mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &buffer[2], &uniform_offset, &dset);
-		once = false;
+		mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &buffer[2], &uniform_offset[0], &dset[0], 0);
 	}
 
 	zone::Q_memcpy(data, &vertices[0], size);
@@ -94,14 +91,18 @@ void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_
 	//PrintMatrix(mat->proj);
 	//TranslationMatrix(mat->model, (float)xm_norm, (float)ym_norm, 0.0f);
 
-	RotationMatrix(mat->model, DEG2RAD(0), 0.0f, 0.0f, 1.0f);
-	RotationMatrix(mat->proj, DEG2RAD(0), 1.0f, 0.0f, 0.0f);
-	RotationMatrix(mat->view, DEG2RAD(0), 0.0f, 1.0f, 0.0f);
+	IdentityMatrix(mat->proj);
+	IdentityMatrix(mat->model);
+	IdentityMatrix(mat->view);
+	//RotationMatrix(mat->model, DEG2RAD(0), 0.0f, 0.0f, 1.0f);
+	//RotationMatrix(mat->proj, DEG2RAD(0), 1.0f, 0.0f, 0.0f);
+	//RotationMatrix(mat->view, DEG2RAD(0), 0.0f, 1.0f, 0.0f);
 	//PrintMatrix(mat->view);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &dset, 1, &uniform_offset);
-	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 1, 1, &tex_descriptor_sets[0], 0, nullptr);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &dset[0], 1, &uniform_offset[0]);
+	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &dset[1], 1, &uniform_offset[1]);
+	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 2, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 
@@ -204,14 +205,12 @@ void PresentUI()
 {
 	static VkBuffer buffer[2];
 	static VkDeviceSize buffer_offset[2];
-	static bool once = true;
-	static unsigned char* data;
+	static unsigned char* data = nullptr;
 	static uint32_t* index_data;
-	if(once)
+	if(!data)
 	{
 		data = control::VertexBufferDigress(sizeof(Uivertex) * BUFFER_SIZE * 8, &buffer[0], &buffer_offset[0]);
 		index_data = (uint32_t*) control::IndexBufferDigress(BUFFER_SIZE * 6 * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
-		once = false;
 	}
 
 	zone::Q_memcpy(data, &vert[0], sizeof(Uivertex) * 4 * buf_idx);
@@ -221,7 +220,7 @@ void PresentUI()
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &tex_descriptor_sets[0], 0, nullptr);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 2, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
 
 	buf_idx = 0;
@@ -272,6 +271,108 @@ void Stats()
 	zone::Q_memcpy(output, "FPS:            ", 16);
 	snprintf(&output[5], 50, "%f", lastfps);
 	Text(output, {0,10}, {255, 0, 0, 255});
+}
+
+static sky_ent_t sky;
+void InitSkydome()
+{
+	// Generate sphere
+	float radius = 10.0f;
+	unsigned int slices = 25;
+	unsigned int stacks = 25;
+
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+
+	Vertex vertex;
+	vertex.x = 0.0f;
+	vertex.y = radius;
+	vertex.z = 0.0f;
+	vertices.push_back(vertex);
+
+	float phiStep = M_PI / stacks;
+	float thetaStep = 2.0f * M_PI / slices;
+
+	for (unsigned int i = 1; i <= stacks - 1; i++)
+	{
+		float phi = i * phiStep;
+		for (unsigned int j = 0; j <= slices; j++)
+		{
+			float theta = j * thetaStep;
+			vertex.x = radius * sin(phi) * cos(theta);
+			vertex.y = radius * cos(phi);
+			vertex.z = radius * sin(phi) * sin(theta);
+			vertices.push_back(vertex);
+		}
+	}
+
+	vertex.x = 0.0f;
+	vertex.y = -radius;
+	vertex.z = 0.0f;
+	vertices.push_back(vertex);
+
+	for (unsigned int i = 1; i <= slices; i++)
+	{
+		indices.push_back(0);
+		indices.push_back(i + 1);
+		indices.push_back(i);
+	}
+
+	int baseIndex = 1;
+	int ringVertexCount = slices + 1;
+	for (unsigned int i = 0; i < stacks - 2; i++)
+	{
+		for (unsigned int j = 0; j < slices; j++)
+		{
+			indices.push_back(baseIndex + i * ringVertexCount + j);
+			indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+		}
+	}
+
+	int southPoleIndex = (int)vertices.size() - 1;
+	baseIndex = southPoleIndex - ringVertexCount;
+	for (unsigned int i = 0; i < slices; i++)
+	{
+		indices.push_back(southPoleIndex);
+		indices.push_back(baseIndex + i);
+		indices.push_back(baseIndex + i + 1);
+	}
+
+	sky.n_vertices = (unsigned int)vertices.size();
+	sky.n_indices = (unsigned int)indices.size();
+	sky.vertex_data = control::VertexBufferDigress(sizeof(Vertex) *  sky.n_vertices, &sky.buffer[0], &sky.buffer_offset[0]);
+	sky.index_data = (uint32_t*) control::IndexBufferDigress(sizeof(uint32_t) * sky.n_indices, &sky.buffer[1], &sky.buffer_offset[1]);
+	sky.sky_uniform = (UniformSkydome*) control::UniformBufferDigress(sizeof(UniformSkydome), &sky.buffer[2], &sky.uniform_offset, &sky.dset, 1);
+	zone::Q_memcpy(sky.vertex_data, vertices.data(), sizeof(Vertex) * sky.n_vertices);
+	zone::Q_memcpy(sky.index_data, indices.data(), sizeof(uint32_t) * sky.n_indices);
+}
+
+void SkyDome()
+{
+	sky.sky_uniform->SkyColor[0] =+ 0.33f;
+	sky.sky_uniform->SkyColor[1] =+ 0.66f;
+	sky.sky_uniform->SkyColor[2] =+ 0.99f;
+	sky.sky_uniform->SkyColor[3] = 1.0f;
+	sky.sky_uniform->almoshereColor[0] = 1.0f;
+	sky.sky_uniform->almoshereColor[1] = 0.4f;
+	sky.sky_uniform->almoshereColor[2] = 1.0f;
+	sky.sky_uniform->almoshereColor[3] = 1.0f;
+	sky.sky_uniform->groundColor[0] = 0.5f;
+	sky.sky_uniform->groundColor[1] = 0.5f;
+	sky.sky_uniform->groundColor[2] = 0.5f;
+	sky.sky_uniform->groundColor[3] = 0.5f;
+	sky.sky_uniform->atmosphereHeight = 0.25f;
+
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &sky.buffer[0], &sky.buffer_offset[0]);
+	vkCmdBindIndexBuffer(command_buffer, sky.buffer[1], sky.buffer_offset[1], VK_INDEX_TYPE_UINT32);
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[3]);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &sky.dset, 1, &sky.uniform_offset);
+	vkCmdDrawIndexed(command_buffer, sky.n_indices, 1, 0, 0, 0);
 }
 
 }

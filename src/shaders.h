@@ -1,5 +1,4 @@
 #include "startup.h"
-#include "../glsl_compiler/StandAlone/StandAlone.h"
 #include "../glsl_compiler/SimpleFileWatcher/FileWatcher.h"
 
 namespace shaders

@@ -7,6 +7,7 @@
 #include "src/textures.h"
 #include "src/cvar.h"
 #include "src/flog.h"
+#include "src/zone.h"
 
 #define number_of_queues 1 // <- change this if more queues needed
 
@@ -53,10 +54,14 @@ int main(int argc, char *lpCmdLine[])
 	static VkImageUsageFlags desired_usages = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |  VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 	static VkSurfaceTransformFlagBitsKHR desired_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 
+#ifdef DEBUG
+	double init = glfwGetTime();
+#endif
+
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
 
 	Cvar_Init();
-	
+
 	log_set_level(0);
 	FILE* f = fopen("./log.txt","w");
 	log_set_fp(f);
@@ -140,6 +145,12 @@ int main(int argc, char *lpCmdLine[])
 
 	textures::InitSamplers();
 	textures::GenerateColorPalette();
+
+	window::PreDraw();
+
+#ifdef DEBUG
+	p("Startup time: %f", glfwGetTime()-init);
+#endif
 
 	window::mainLoop();
 

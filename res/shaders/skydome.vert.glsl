@@ -11,10 +11,10 @@ layout(push_constant) uniform PushConsts {
 
 layout (location = 0) in vec3 pos;
 
-layout (location = 0) out float height;
+layout (location = 2) out float height;
 
 void main()
 {
-	height = pos.y;
-	gl_Position = push_constants.mvp * vec4(pos, 1.0f);
+        height = pos.y;
+	gl_Position = push_constants.mvp * vec4(-pos, 1.0f);
 }

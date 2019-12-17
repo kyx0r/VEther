@@ -3,7 +3,7 @@
 
 //-----------------------------------
 #define DYNAMIC_VERTEX_BUFFER_SIZE_KB	4096
-#define DYNAMIC_UNIFORM_BUFFER_SIZE_KB  2048
+#define DYNAMIC_UNIFORM_BUFFER_SIZE_KB  1024
 #define DYNAMIC_INDEX_BUFFER_SIZE_KB    2048
 #define MAX_UNIFORM_ALLOC		2048
 #define NUM_DYNAMIC_BUFFERS 2
@@ -69,7 +69,7 @@ void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);
 bool CreateFence(VkFence &fence, VkFenceCreateFlags flags);
 void SetCommandBuffer(uint8_t i);
-bool BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCommandBufferInheritanceInfo *secondary_command_buffer_info);
+void BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCommandBufferInheritanceInfo *secondary_command_buffer_info);
 bool EndCommandBufferRecordingOperation();
 bool ResetCommandPool(bool release_resources);
 bool ResetCommandBuffer(bool release_resources);
@@ -93,7 +93,7 @@ vram_heap* VramHeapDigress(VkDeviceSize size, VkDeviceSize alignment, VkDeviceSi
 unsigned char* IndexBufferDigress(int size, VkBuffer* buffer, VkDeviceSize* buffer_offset);
 unsigned char* VertexBufferDigress(int size, VkBuffer *buffer, VkDeviceSize *buffer_offset);
 unsigned char* StagingBufferDigress(int size, int alignment);
-unsigned char* UniformBufferDigress(int size, VkBuffer* buffer, uint32_t* buffer_offset, VkDescriptorSet* descriptor_set);
+unsigned char* UniformBufferDigress(int size, VkBuffer* buffer, uint32_t* buffer_offset, VkDescriptorSet* descriptor_set, int index);
 
 void FlushDynamicBuffers();
 void InvalidateDynamicBuffers();

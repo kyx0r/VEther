@@ -24,6 +24,7 @@ namespace window
 {
 
 void initWindow();
+void PreDraw();
 void mainLoop();
 
 } //namespace window

@@ -19,26 +19,45 @@ Copyright (C) 2019-.... FAETHER / Etherr
 */
 
 unsigned char* stack_mem = nullptr;
+static char semaphore = 0;
 
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	void* p = zone::Z_TagMalloc(size, 1, 8);
 	ASSERT(p,"operator new failed.");
+	semaphore = 0;
 	return p;
 }
 
 void operator delete(void* p)
 {
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	zone::Z_Free(p);
+	semaphore = 0;
 	return;
 }
 
 void operator delete(void* p, size_t size)
 {
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	zone::Z_Free(p);
+	semaphore = 0;
 	// Here this will keep the memory alive but does not is free.
 	// I question size parameter.
 	// "If present, the std::size_t size argument must equal the
@@ -49,24 +68,42 @@ void operator delete(void* p, size_t size)
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	void* p = zone::Z_TagMalloc(size, 1, 8);
 	//void* p = malloc(size);
 	ASSERT(p,"VEtherAlloc failed.");
+	semaphore = 0;
 	return p;
 }
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	void* p = zone::Z_Realloc(porg, size, 8);
 	//void* p = realloc(porg, size);
 	ASSERT(p,"VEtherRealloc failed.");
+	semaphore = 0;
 	return p;
 }
 
 void VEtherFree(void* pusd, void* ptr)
 {
 	//free(ptr);
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	zone::Z_Free(ptr);
+	semaphore = 0;
 	return;
 }
 
@@ -249,13 +286,13 @@ int Q_strlen(const char *str)
 	return count;
 }
 
-size_t Q_sstrlen (const char* s) 
+size_t Q_sstrlen (const char* s)
 {
 	register const char* i;
 	for(i=s; *i != ' '; ++i);
 	return (i-s);
 }
-  
+
 char *Q_strrchr(const char *s, char c)
 {
 	int len = Q_strlen(s);
@@ -336,14 +373,14 @@ ret:
 	if(stack_mem != nullptr)
 	{
 		unsigned char mem[*((int*)stack_mem)+size];
-		*((int*)mem) = size;
-		*((int*)mem + sizeof(int)) = reinterpret_cast<uintptr_t>(stack_mem);
+		*((int*)mem - sizeof(int)) = size;
+		*((int*)mem - (sizeof(int)*2)) = reinterpret_cast<uintptr_t>(stack_mem);
 		stack_mem = mem;
 	}
 	else
 	{
 		unsigned char mem[size];
-		*((int*)mem) = size;
+		*((int*)mem - sizeof(int)) = size;
 		stack_mem = mem;
 	}
 	val = 1;
@@ -1248,9 +1285,15 @@ static void Memory_InitZone (memzone_t *zone, int size)
 
 void MemPrint()
 {
+	while(semaphore > 0)
+	{
+		semaphore++;
+	};
+	semaphore = 1;
 	Z_Print(mainzone);
 	Cache_Report();
 	Hunk_Check();
+	semaphore = 0;
 }
 
 /*

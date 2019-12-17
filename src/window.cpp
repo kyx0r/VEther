@@ -47,7 +47,6 @@ mu_Context* ctx;
 //}
 
 static ParsedOBJ kitty;
-static ParsedOBJ SkyBox;
 
 namespace window
 {
@@ -263,24 +262,26 @@ void initWindow()
 
 static  char logbuf[64000];
 static   int logbuf_updated = 0;
-
 static void write_log(char *text)
 {
-  if(text[0])
-    {
-        int len = zone::Q_sstrlen(text);
-        text[len] = '\0';
-	logbuf_updated = 1;
-        if(!Cvar_Set(text, &text[len+1]))
-	{	  
-	  strcat(strcat(logbuf, text), ": command not found.");
-	  strcat(logbuf, "\n");
-	  return;
+	if(text[0])
+	{
+		int len = zone::Q_sstrlen(text);
+		text[len] = '\0';
+		logbuf_updated = 1;
+		if(!Cvar_Set(text, &text[len+1]))
+		{
+			len = zone::Q_strlen(text);
+			char s[] = ": command not found.\n";
+			zone::Q_memcpy(text+len, s, ARRAYSIZE(s));
+			zone::Q_strcat(logbuf, text);
+			return;
+		}
+		zone::Q_strcat(logbuf, text);
+		zone::Q_strcat(logbuf, "\n");
 	}
-	strcat(logbuf, text);
-	strcat(logbuf, "\n");
-    }
 }
+
 static void console(mu_Context *ctx)
 {
 	static mu_Container window;
@@ -309,10 +310,10 @@ static void console(mu_Context *ctx)
 			logbuf_updated = 0;
 		}
 
-		/* input textbox + submit button */
+		/* input textbox */
 		static char buf[128];
 		int submitted = 0;
-		int _width[] = { -70, -1 };
+		int _width[] = { -1, -1 };
 		mu_layout_row(ctx, 2, _width, 0);
 		if (mu_textbox(ctx, buf, sizeof(buf)) & MU_RES_SUBMIT)
 		{
@@ -404,8 +405,41 @@ static VkPresentInfoKHR present_info = {};
 static 	uint32_t image_index;
 static VkPipelineStageFlags flags = {VK_PIPELINE_STAGE_ALL_COMMANDS_BIT};
 
-static void PreDraw()
+void PreDraw()
 {
+	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
+	render::CreateRenderPass(depthFormat, false);
+	render::CreateSwapchainImageViews();
+
+	render::CreateDepthBuffer();
+
+	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
+	{
+		render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
+	}
+
+	shaders::CompileShaders();
+
+	draw::InitAtlasTexture();
+
+	render::CreatePipelineLayout();
+
+	kitty = LoadOBJ("./res/kitty.obj");
+
+	shaders::CreatePipelineCache();
+	shaders::LoadShaders();
+
+	//fov setup.
+	entity::InitCamera();
+
+	/* init microui */
+	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");
+	mu_init(ctx);
+	ctx->text_width = draw::text_width;
+	ctx->text_height = draw::text_height;
+
+	draw::InitSkydome();
+
 	color.float32[0] = 0;
 	color.float32[1] = 0;
 	color.float32[2] = 0;
@@ -478,7 +512,7 @@ inline uint8_t Draw()
 		return 0;
 	}
 
-	assert(control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr));
+	control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr);
 
 	mu_begin(ctx);
 	console(ctx);
@@ -535,26 +569,24 @@ inline uint8_t Draw()
 	ParsedOBJRenderable* p = kitty.renderables;
 	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
 
-	//p = SkyBox.renderables;
-	//draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
+	// float4_t flt[3];
+	// flt[0].pos[0] = 0.0f;
+	// flt[0].pos[1] = -0.75f;
+	// flt[0].pos[2] = 0.0f;
+	// flt[0].pos[3] = 1.0f;
 
-	float4_t flt[3];
-	flt[0].pos[0] = 0.0f;
-	flt[0].pos[1] = -0.75f;
-	flt[0].pos[2] = 0.0f;
-	flt[0].pos[3] = 1.0f;
+	// flt[1].pos[0] = 0.25f;
+	// flt[1].pos[1] = 0.75f;
+	// flt[1].pos[2] = 0.0f;
+	// flt[1].pos[3] = 1.0f;
 
-	flt[1].pos[0] = 0.25f;
-	flt[1].pos[1] = 0.75f;
-	flt[1].pos[2] = 0.0f;
-	flt[1].pos[3] = 1.0f;
+	// flt[2].pos[0] = -0.75f;
+	// flt[2].pos[1] = 0.75f;
+	// flt[2].pos[2] = 0.0f;
+	// flt[2].pos[3] = 1.0f;
 
-	flt[2].pos[0] = -0.75f;
-	flt[2].pos[1] = 0.75f;
-	flt[2].pos[2] = 0.0f;
-	flt[2].pos[3] = 1.0f;
-
-	draw::Triangle(sizeof(float4_t)*3, &flt[0]);
+	//draw::Triangle(sizeof(float4_t)*3, &flt[0]);
+	draw::SkyDome();
 
 	draw::PresentUI();
 
@@ -594,40 +626,6 @@ inline uint8_t Draw()
 
 void mainLoop()
 {
-	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
-	render::CreateRenderPass(depthFormat, false);
-	render::CreateSwapchainImageViews();
-
-	render::CreateDepthBuffer();
-
-	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
-	{
-		render::CreateFramebuffer(&imageViews[i], &imageViews[number_of_swapchain_images], 0, window_width, window_height);
-	}
-
-	shaders::CompileShaders();
-
-	render::CreatePipelineLayout();
-
-	kitty = LoadOBJ("./res/kitty.obj");
-	SkyBox = LoadOBJ("./res/cube.obj");
-
-	shaders::CreatePipelineCache();
-	shaders::LoadShaders();
-
-	//fov setup.
-	entity::InitCamera();
-
-	/* init microui */
-	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");
-	mu_init(ctx);
-	ctx->text_width = draw::text_width;
-	ctx->text_height = draw::text_height;
-
-	draw::InitAtlasTexture();
-
-	PreDraw();
-
 	double time2 = 0;
 	double maxfps;
 	double realtime = 0;
@@ -670,7 +668,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 60.0)
+		if (realtime-stamp > 10.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;

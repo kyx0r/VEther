@@ -83,8 +83,8 @@ Cvar_Init -- johnfitz
 
 void Cvar_Init (void)
 {
-   Cvar_RegisterVariable (&wireframe);
-   Cvar_SetCallback(&wireframe, render::RebuildPipelines);
+	Cvar_RegisterVariable (&wireframe);
+	Cvar_SetCallback(&wireframe, render::RebuildPipelines);
 }
 
 //==============================================================================
@@ -304,7 +304,7 @@ bool Cvar_Set (const char *var_name, const char *value)
 	if (!var)
 	{
 		// there is an error in C code if this happens
-	        warn("Cvar_Set: variable %s not found", var_name);
+		warn("Cvar_Set: variable %s not found", var_name);
 		return false;
 	}
 

@@ -36,9 +36,9 @@ namespace render
 
 void CreateRenderPass(VkFormat depthFormat, bool late)
 {
-	VkAttachmentDescription attachments[2] = {};
-	attachments[0].format = image_format;
+	VkAttachmentDescription attachments[2];
 	attachments[0].flags = VK_ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT;
+	attachments[0].format = image_format;
 	attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
 	attachments[0].loadOp = late ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
 	attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -56,7 +56,6 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
 	attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
 
 	VkAttachmentReference colorAttachment;
 	colorAttachment.attachment = 0;
@@ -113,9 +112,13 @@ void CreateRenderPass(VkFormat depthFormat, bool late)
 
 void CreateFramebuffer(VkImageView *colorView, VkImageView *depthView, int render_index, uint32_t width, uint32_t height)
 {
-	VkFramebufferCreateInfo createInfo = {};
+	VkFramebufferCreateInfo createInfo;
 	createInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
 	createInfo.renderPass = renderPasses[render_index];
+	createInfo.attachmentCount = 0;
+	createInfo.pAttachments = nullptr;
 	createInfo.width = width;
 	createInfo.height = height;
 	createInfo.layers = 1;
@@ -174,9 +177,10 @@ void CreateDepthBuffer()
 	vkGetImageMemoryRequirements(logical_device, depth_buffer, &memory_requirements);
 
 	VkMemoryDedicatedAllocateInfoKHR dedicated_allocation_info;
-	memset(&dedicated_allocation_info, 0, sizeof(dedicated_allocation_info));
 	dedicated_allocation_info.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO_KHR;
+	dedicated_allocation_info.pNext = nullptr;
 	dedicated_allocation_info.image = depth_buffer;
+	dedicated_allocation_info.buffer = VK_NULL_HANDLE;
 
 	VkMemoryAllocateInfo memory_allocate_info;
 	memset(&memory_allocate_info, 0, sizeof(memory_allocate_info));
@@ -186,12 +190,14 @@ void CreateDepthBuffer()
 
 	err = vkAllocateMemory(logical_device, &memory_allocate_info, nullptr, &depth_buffer_memory);
 	if (err != VK_SUCCESS)
+	{
 		error("vkAllocateMemory failed\n");
-
+	}
 	err = vkBindImageMemory(logical_device, depth_buffer, depth_buffer_memory, 0);
 	if (err != VK_SUCCESS)
+	{
 		error("vkBindImageMemory failed\n");
-
+	}
 	VkImageViewCreateInfo image_view_create_info;
 	memset(&image_view_create_info, 0, sizeof(image_view_create_info));
 	image_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -207,8 +213,9 @@ void CreateDepthBuffer()
 
 	err = vkCreateImageView(logical_device, &image_view_create_info, nullptr, &imageViews[imageViewCount++]);
 	if (err != VK_SUCCESS)
+	{
 		error("vkCreateImageView failed");
-
+	}
 	// VkImageMemoryBarrier image_memory_barrier;
 	// memset(&image_memory_barrier, 0, sizeof(image_memory_barrier));
 	// image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -231,8 +238,10 @@ void CreateDepthBuffer()
 
 void CreateSwapchainImageViews()
 {
-	VkImageViewCreateInfo createInfo = {};
+	VkImageViewCreateInfo createInfo;
 	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
 	createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	createInfo.format = image_format;
 	createInfo.components.r = VK_COMPONENT_SWIZZLE_R;
@@ -242,6 +251,7 @@ void CreateSwapchainImageViews()
 	createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	createInfo.subresourceRange.baseMipLevel = 0;
 	createInfo.subresourceRange.levelCount = 1;
+	createInfo.subresourceRange.baseArrayLayer = 0;
 	createInfo.subresourceRange.layerCount = 1;
 
 	for(uint16_t i = 0; i<number_of_swapchain_images; i++)
@@ -255,7 +265,7 @@ void CreateSwapchainImageViews()
 
 void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpassContents subpass_contents, int render_index, int buffer_index)
 {
-	VkRenderPassBeginInfo render_pass_begin_info = {};
+	VkRenderPassBeginInfo render_pass_begin_info;
 	render_pass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	render_pass_begin_info.pNext = nullptr;
 	render_pass_begin_info.renderPass = renderPasses[render_index];
@@ -270,10 +280,31 @@ void StartRenderPass(VkRect2D render_area, VkClearValue *clear_values, VkSubpass
 void CreatePipelineLayout()
 {
 
-        VkDescriptorSetLayout basic_descriptor_set_layouts[3] = {vubo_dsl, tex_dsl, fubo_dsl};
+
+	// VkPushConstantRange push_constant_range;
+	// push_constant_range.offset = 0;
+	// push_constant_range.size = 21 * sizeof(float); //limit is 256 bytes
+	// push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	// VkPipelineLayoutCreateInfo createInfo;
+	// createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	// createInfo.pNext = nullptr;
+	// createInfo.flags = 0;
+	// createInfo.setLayoutCount = 1;
+	// createInfo.pSetLayouts = &vubo_dsl;
+	// createInfo.pushConstantRangeCount = 1;
+	// createInfo.pPushConstantRanges = &push_constant_range;
+
+	// VK_CHECK(vkCreatePipelineLayout(logical_device, &createInfo, allocators, &pipeline_layout[0]));
+
+	VkDescriptorSetLayout basic_descriptor_set_layouts[] = {vubo_dsl, fubo_dsl, tex_dsl};
+
+	for(uint32_t i = 0; i<ARRAYSIZE(basic_descriptor_set_layouts); i++)
+	{
+		ASSERT(basic_descriptor_set_layouts[i], "Descriptor set layout must be initialized before pipeline layout!");
+	}
 
 	VkPushConstantRange push_constant_range;
-	memset(&push_constant_range, 0, sizeof(push_constant_range));
 	push_constant_range.offset = 0;
 	push_constant_range.size = 21 * sizeof(float); //limit is 256 bytes
 	push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -727,11 +758,11 @@ void CreateTessGraphicsPipeline
 
 void RebuildPipelines(struct cvar_s*)
 {
-  p("Rebuilding pipeleines.");
-  VK_CHECK(vkDeviceWaitIdle(logical_device));
-  DestroyPipeLines();
-  pipelineCount = 0;
-  shaders::LoadShaders();
+	p("Rebuilding pipeleines.");
+	VK_CHECK(vkDeviceWaitIdle(logical_device));
+	DestroyPipeLines();
+	pipelineCount = 0;
+	shaders::LoadShaders();
 }
 
 } //namespace render
