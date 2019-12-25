@@ -39,14 +39,15 @@ double time1 = 0;
 double y_wheel = 0;
 double xm_norm = 0;
 double ym_norm = 0;
-uint32_t xm = 0;
-uint32_t ym = 0;
+int32_t xm = 0;
+int32_t ym = 0;
 double frametime;
 double lastfps;
 mu_Context* ctx;
 //}
 
 static ParsedOBJ kitty;
+static bool mfocus = false;
 
 namespace window
 {
@@ -104,31 +105,33 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 	{
 		switch(key)
 		{
-		case GLFW_KEY_ESCAPE:
-			trace("Quiting cleanly");
-			glfwSetWindowShouldClose(_window, true);
-			break;
-		case GLFW_KEY_M:
-			static bool state = true;
-			if(state)
-			{
-				info("Mouse focused.");
-				glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-				state = false;
-			}
-			else
-			{
-				info("Default mouse.");
-				glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				state = true;
-			}
-			break;
-		case GLFW_KEY_BACKSPACE:
-			mu_input_keydown(ctx, 8);
-			break;
-		case GLFW_KEY_ENTER:
-			mu_input_keydown(ctx, 16);
-			break;
+			case GLFW_KEY_ESCAPE:
+				trace("Quiting cleanly");
+				glfwSetWindowShouldClose(_window, true);
+				break;
+			case GLFW_KEY_M:
+				if(!ctx->focus)
+				{
+					if(!mfocus)
+					{
+						info("Mouse focused.");
+						glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+						mfocus = true;
+					}
+					else
+					{
+						info("Default mouse.");
+						glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+						mfocus = false;
+					}
+				}
+				break;
+			case GLFW_KEY_BACKSPACE:
+				mu_input_keydown(ctx, 8);
+				break;
+			case GLFW_KEY_ENTER:
+				mu_input_keydown(ctx, 16);
+				break;
 		}
 	}
 }
@@ -166,15 +169,14 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	static float lastX = window_height / 2.0f;
 	static float lastY = window_width / 2.0f;
-	//  printf("Xpos: %.6f \n", xpos);
-	//printf("Ypos: %.6f \n", ypos);
+//	printf("Xpos: %.6f \n", xpos);
+//	printf("Ypos: %.6f \n", ypos);
 	xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
 	ym_norm = (ypos - ((window_height - 0.001) / 2)) / ((window_height - 0.001) / 2);
-	xm = (uint32_t)xpos;
-	ym = (uint32_t)ypos;
-	//printf("Xpos: %.6f \n", x);
-	//printf("Ypos: %.6f \n", y);
-
+	xm = (int32_t)xpos;
+	ym = (int32_t)ypos;
+//	p("Xpos: %d", xm);
+//	p("Ypos: %d", ym);
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
@@ -535,7 +537,10 @@ inline uint8_t Draw()
 		}
 	}
 
-	draw::Cursor();
+	if(mfocus)
+	{
+		draw::Cursor();
+	}
 	draw::Stats();
 
 	VkRect2D render_area = {};

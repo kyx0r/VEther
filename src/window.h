@@ -16,8 +16,8 @@ extern double time1;
 extern double y_wheel;
 extern double xm_norm;
 extern double ym_norm;
-extern uint32_t xm;
-extern uint32_t ym;
+extern int32_t xm;
+extern int32_t ym;
 extern double frametime;
 extern double lastfps;
 //------------------------

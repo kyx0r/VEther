@@ -278,67 +278,71 @@ void Cursor()
 {
 	static int alpha = 255;
 	static char direction = 0;
-	(direction) ? alpha-- : alpha++;
-	if(alpha > 254)
+
+	if(xm > 0 && ym > 0)
 	{
-		direction = 1;
-	}
-	if (alpha < 50)
-	{
-		direction = 0;
-	}
-	for(int i = 0; i<2; i++)
-	{
-		int texvert_idx = buf_idx * 4;
-		int   index_idx = buf_idx * 6;
-		buf_idx++;
-		if(buf_idx == BUFFER_SIZE)
+		(direction) ? alpha-- : alpha++;
+		if(alpha > 254)
 		{
-			warn("Possibly out of ui memory!");
-			return;
+			direction = 1;
 		}
-
-		vert[texvert_idx + 0].pos[0] = xm;
-		vert[texvert_idx + 0].pos[1] = ym;
-		vert[texvert_idx + 1].pos[0] = xm+10;
-		vert[texvert_idx + 1].pos[1] = ym+10;
-		if(!i)
+		if (alpha < 50)
 		{
-			vert[texvert_idx + 2].pos[0] = xm+10;
-			vert[texvert_idx + 2].pos[1] = ym+25;
+			direction = 0;
 		}
-		else
+		for(int i = 0; i<2; i++)
 		{
-			//draw the second half of the cursor
-			vert[texvert_idx + 2].pos[0] = xm+25;
-			vert[texvert_idx + 2].pos[1] = ym+10;
+			int texvert_idx = buf_idx * 4;
+			int   index_idx = buf_idx * 6;
+			buf_idx++;
+			if(buf_idx == BUFFER_SIZE)
+			{
+				warn("Possibly out of ui memory!");
+				return;
+			}
+
+			vert[texvert_idx + 0].pos[0] = xm;
+			vert[texvert_idx + 0].pos[1] = ym;
+			vert[texvert_idx + 1].pos[0] = xm+10;
+			vert[texvert_idx + 1].pos[1] = ym+10;
+			if(!i)
+			{
+				vert[texvert_idx + 2].pos[0] = xm+10;
+				vert[texvert_idx + 2].pos[1] = ym+25;
+			}
+			else
+			{
+				//draw the second half of the cursor
+				vert[texvert_idx + 2].pos[0] = xm+25;
+				vert[texvert_idx + 2].pos[1] = ym+10;
+			}
+
+			vert[texvert_idx + 3].pos[0] = vert[texvert_idx + 2].pos[0];  
+			vert[texvert_idx + 3].pos[1] = vert[texvert_idx + 2].pos[1]; 
+			vert[texvert_idx + 0].tex_coord[0] = FLT_MAX;
+			vert[texvert_idx + 1].tex_coord[0] = FLT_MAX;
+			vert[texvert_idx + 2].tex_coord[0] = FLT_MAX;
+			vert[texvert_idx + 3].tex_coord[0] = FLT_MAX;
+
+			mu_Color color;
+			color.r = 255;
+			color.g = 69;
+			color.b = 0;
+			color.a = alpha;
+			memcpy(&vert[texvert_idx + 0].color, &color, 4);
+			memcpy(&vert[texvert_idx + 1].color, &color, 4);
+			memcpy(&vert[texvert_idx + 2].color, &color, 4);
+			memcpy(&vert[texvert_idx + 3].color, &color, 4);
+
+			/* update index buffer */
+			index_buf[index_idx + 0] = texvert_idx + 0;
+			index_buf[index_idx + 1] = texvert_idx + 1;
+			index_buf[index_idx + 2] = texvert_idx + 2;
+			index_buf[index_idx + 3] = texvert_idx + 2;
+			index_buf[index_idx + 4] = texvert_idx + 3;
+			index_buf[index_idx + 5] = texvert_idx + 1;
+
 		}
-
-		vert[texvert_idx + 3].pos[0] = vert[texvert_idx + 2].pos[0];  
-		vert[texvert_idx + 3].pos[1] = vert[texvert_idx + 2].pos[1]; 
-		vert[texvert_idx + 0].tex_coord[0] = FLT_MAX;
-		vert[texvert_idx + 1].tex_coord[0] = FLT_MAX;
-		vert[texvert_idx + 2].tex_coord[0] = FLT_MAX;
-		vert[texvert_idx + 3].tex_coord[0] = FLT_MAX;
-
-		mu_Color color;
-		color.r = 255;
-		color.g = 69;
-		color.b = 0;
-		color.a = alpha;
-		memcpy(&vert[texvert_idx + 0].color, &color, 4);
-		memcpy(&vert[texvert_idx + 1].color, &color, 4);
-		memcpy(&vert[texvert_idx + 2].color, &color, 4);
-		memcpy(&vert[texvert_idx + 3].color, &color, 4);
-
-		/* update index buffer */
-		index_buf[index_idx + 0] = texvert_idx + 0;
-		index_buf[index_idx + 1] = texvert_idx + 1;
-		index_buf[index_idx + 2] = texvert_idx + 2;
-		index_buf[index_idx + 3] = texvert_idx + 2;
-		index_buf[index_idx + 4] = texvert_idx + 3;
-		index_buf[index_idx + 5] = texvert_idx + 1;
-
 	}
 }
 
