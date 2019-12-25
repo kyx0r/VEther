@@ -20,6 +20,7 @@ void Rect(mu_Rect rect, mu_Color color);
 void Text(const char *text, mu_Vec2 pos, mu_Color color);
 void Icon(int id, mu_Rect rect, mu_Color color);
 void Stats();
+void Cursor();
 void InitSkydome();
 void SkyDome();
 } //namespace draw

@@ -311,6 +311,10 @@ void mu_push_clip_rect(mu_Context *ctx, mu_Rect rect)
 	push(ctx->clip_stack, clip_rect(rect, last));
 }
 
+void mu_init_clip_rect(mu_Context *ctx, mu_Rect rect)
+{
+	push(ctx->clip_stack, rect);
+}
 
 void mu_pop_clip_rect(mu_Context *ctx)
 {

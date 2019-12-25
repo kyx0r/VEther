@@ -277,6 +277,7 @@ mu_Id mu_get_id(mu_Context *ctx, const void *data, int size);
 void mu_push_id(mu_Context *ctx, const void *data, int size);
 void mu_pop_id(mu_Context *ctx);
 void mu_push_clip_rect(mu_Context *ctx, mu_Rect rect);
+void mu_init_clip_rect(mu_Context *ctx, mu_Rect rect);
 void mu_pop_clip_rect(mu_Context *ctx);
 mu_Rect mu_get_clip_rect(mu_Context *ctx);
 int mu_check_clip(mu_Context *ctx, mu_Rect r);

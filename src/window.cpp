@@ -394,7 +394,6 @@ static void style_window(mu_Context *ctx)
 	}
 }
 
-
 static VkClearValue clearColor[2] = {};
 static VkClearColorValue color = {};
 static VkImageSubresourceRange range = {};
@@ -514,7 +513,7 @@ inline uint8_t Draw()
 
 	control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr);
 
-	mu_begin(ctx);
+	mu_begin(ctx);	
 	console(ctx);
 	style_window(ctx);
 	mu_end(ctx);
@@ -536,6 +535,7 @@ inline uint8_t Draw()
 		}
 	}
 
+	draw::Cursor();
 	draw::Stats();
 
 	VkRect2D render_area = {};
