@@ -145,9 +145,10 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
 	int texvert_idx = buf_idx * 4;
 	int   index_idx = buf_idx * 6;
 	buf_idx++;
-	if(buf_idx == BUFFER_SIZE)
+	if(buf_idx == BUFFER_SIZE-1)
 	{
 		warn("Possibly out of ui memory!");
+		buf_idx--;
 		return;
 	}
 
@@ -209,7 +210,7 @@ void PresentUI()
 	static uint32_t* index_data;
 	if(!data)
 	{
-		data = control::VertexBufferDigress(sizeof(Uivertex) * BUFFER_SIZE * 8, &buffer[0], &buffer_offset[0]);
+		data = control::VertexBufferDigress(sizeof(Uivertex) * BUFFER_SIZE * 4, &buffer[0], &buffer_offset[0]);
 		index_data = (uint32_t*) control::IndexBufferDigress(BUFFER_SIZE * 6 * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
 	}
 
@@ -224,6 +225,11 @@ void PresentUI()
 	vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
 
 	buf_idx = 0;
+}
+
+void InitUI()
+{
+
 }
 
 void InitAtlasTexture()
@@ -421,16 +427,17 @@ void InitSkydome()
 	sky.n_indices = (unsigned int)indices.size();
 	sky.vertex_data = control::VertexBufferDigress(sizeof(Vertex) *  sky.n_vertices, &sky.buffer[0], &sky.buffer_offset[0]);
 	sky.index_data = (uint32_t*) control::IndexBufferDigress(sizeof(uint32_t) * sky.n_indices, &sky.buffer[1], &sky.buffer_offset[1]);
-	sky.sky_uniform = (UniformSkydome*) control::UniformBufferDigress(sizeof(UniformSkydome), &sky.buffer[2], &sky.uniform_offset, &sky.dset, 1);
+	sky.sky_uniform = (UniformSkydome*) control::UniformBufferDigress(sizeof(UniformSkydome), &sky.buffer[2], &sky.uniform_offset[0], &sky.dset[0], 1);
+	sky.tmat = (Matrix*) control::UniformBufferDigress(sizeof(Matrix), &sky.buffer[3], &sky.uniform_offset[1], &sky.dset[1], 0);
 	zone::Q_memcpy(sky.vertex_data, vertices.data(), sizeof(Vertex) * sky.n_vertices);
 	zone::Q_memcpy(sky.index_data, indices.data(), sizeof(uint32_t) * sky.n_indices);
 }
 
 void SkyDome()
 {
-	sky.sky_uniform->SkyColor[0] =+ 0.33f;
-	sky.sky_uniform->SkyColor[1] =+ 0.66f;
-	sky.sky_uniform->SkyColor[2] =+ 0.99f;
+	sky.sky_uniform->SkyColor[0] = 0.33f;
+	sky.sky_uniform->SkyColor[1] = 0.66f;
+	sky.sky_uniform->SkyColor[2] = 0.99f;
 	sky.sky_uniform->SkyColor[3] = 1.0f;
 	sky.sky_uniform->almoshereColor[0] = 1.0f;
 	sky.sky_uniform->almoshereColor[1] = 0.4f;
@@ -442,10 +449,13 @@ void SkyDome()
 	sky.sky_uniform->groundColor[3] = 0.5f;
 	sky.sky_uniform->atmosphereHeight = 0.25f;
 
+	TranslationMatrix(sky.tmat->mat, cam.pos[0], cam.pos[1], cam.pos[2]);
+
 	vkCmdBindVertexBuffers(command_buffer, 0, 1, &sky.buffer[0], &sky.buffer_offset[0]);
 	vkCmdBindIndexBuffer(command_buffer, sky.buffer[1], sky.buffer_offset[1], VK_INDEX_TYPE_UINT32);
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[3]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &sky.dset, 1, &sky.uniform_offset);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &sky.dset[0], 1, &sky.uniform_offset[0]);	
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &sky.dset[1], 1, &sky.uniform_offset[1]);
 	vkCmdDrawIndexed(command_buffer, sky.n_indices, 1, 0, 0, 0);
 }
 

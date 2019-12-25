@@ -9,6 +9,10 @@ layout(push_constant) uniform PushConsts {
 	uint window_height;
 } push_constants;
 
+layout(set = 0, binding = 0) uniform UniformBufferObject {
+    mat4 translation_matrix;
+} ubo;
+
 layout (location = 0) in vec3 pos;
 
 layout (location = 2) out float height;
@@ -16,5 +20,5 @@ layout (location = 2) out float height;
 void main()
 {
         height = pos.y;
-	gl_Position = push_constants.mvp * vec4(-pos, 1.0f);
+	gl_Position = push_constants.mvp * ubo.translation_matrix * vec4(-pos, 1.0f);
 }

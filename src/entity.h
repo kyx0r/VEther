@@ -22,17 +22,30 @@ typedef struct cam_ent_t
 } cam_ent_t;
 extern cam_ent_t cam;
 
+typedef struct ui_ent_t
+{
+	VkBuffer buffer[2];
+	VkDeviceSize buffer_offset[2];
+	unsigned char* data;
+	uint32_t* index_data;
+	int buffer_size;
+	int buf_idx;
+	Uivertex* vert;
+	uint32_t* index_buf;
+} ui_ent_t;
+
 typedef struct sky_ent_t
 {
-	VkBuffer buffer[3];
-	VkDeviceSize buffer_offset[2];
-	VkDescriptorSet dset;
-	uint32_t uniform_offset;
+	VkBuffer buffer[4];
+	VkDeviceSize buffer_offset[3];
+	VkDescriptorSet dset[2];
+	uint32_t uniform_offset[2];
 	unsigned char* vertex_data;
 	uint32_t* index_data;
 	uint32_t n_indices;
 	uint32_t n_vertices;
 	UniformSkydome* sky_uniform;
+	Matrix* tmat;
 } sky_ent_t;
 
 namespace entity
