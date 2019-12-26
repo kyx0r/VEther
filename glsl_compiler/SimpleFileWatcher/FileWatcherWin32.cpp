@@ -24,17 +24,9 @@
 
 #if FILEWATCHER_PLATFORM == FILEWATCHER_PLATFORM_WIN32
 
-#define _WIN32_WINNT 0x0550
+//#define _WIN32_WINNT 0x0550
 #include <windows.h>
-
-#if defined(_MSC_VER)
-#pragma comment(lib, "comctl32.lib")
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "ole32.lib")
-
-// disable secure warnings
-#pragma warning (disable: 4996)
-#endif
+#include "../../src/flog.h"
 
 namespace FW
 {
@@ -53,8 +45,6 @@ namespace FW
 		WatchID mWatchid;
 		bool mIsRecursive;
 	};
-
-#pragma region Internal Functions
 
 	// forward decl
 	bool RefreshWatch(WatchStruct* pWatch, bool _clear = false);
@@ -133,7 +123,7 @@ namespace FW
 			CloseHandle(pWatch->mOverlapped.hEvent);
 			CloseHandle(pWatch->mDirHandle);
 			delete pWatch->mDirName;
-			HeapFree(GetProcessHeap(), 0, pWatch);
+			delete pWatch;
 		}
 	}
 
@@ -141,8 +131,7 @@ namespace FW
 	WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter)
 	{
 		WatchStruct* pWatch;
-		size_t ptrsize = sizeof(*pWatch);
-		pWatch = static_cast<WatchStruct*>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, ptrsize));
+		pWatch = new WatchStruct;
 
 		pWatch->mDirHandle = CreateFileA(szDirectory, FILE_LIST_DIRECTORY,
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, 
@@ -165,11 +154,9 @@ namespace FW
 			}
 		}
 
-		HeapFree(GetProcessHeap(), 0, pWatch);
+		delete pWatch;
 		return NULL;
 	}
-
-#pragma endregion
 
 	//--------
 	FileWatcherWin32::FileWatcherWin32()
@@ -196,10 +183,12 @@ namespace FW
 
 		WatchStruct* watch = CreateWatch(directory.c_str(), recursive,
 			FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_FILE_NAME);
-
+	
 		if(!watch)
-			throw FileNotFoundException(directory);
-
+		{
+			error("File not found: %s", directory.c_str());
+			return watchid;
+		}
 		watch->mWatchid = watchid;
 		watch->mFileWatcher = this;
 		watch->mFileWatchListener = watcher;
