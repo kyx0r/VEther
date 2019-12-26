@@ -26,6 +26,7 @@
 
 //#define _WIN32_WINNT 0x0550
 #include <windows.h>
+#include "../../src/startup.h"
 #include "../../src/flog.h"
 
 namespace FW

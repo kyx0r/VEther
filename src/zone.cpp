@@ -453,9 +453,13 @@ void Z_Free (void *ptr)
 	}
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
+	{
 		warn("Z_Free: freed a pointer without ZONEID");
+	}
 	if (block->tag == 0)
+	{
 		warn("Z_Free: freed a freed pointer");
+	}
 
 	block->tag = 0;		// mark as free
 
