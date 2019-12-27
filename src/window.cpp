@@ -420,7 +420,7 @@ void PreDraw()
 	}
 
 	shaders::CompileShaders();
-
+	draw::InitUI();
 	draw::InitAtlasTexture();
 
 	render::CreatePipelineLayout();

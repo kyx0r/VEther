@@ -15,6 +15,9 @@ GVAR: y_wheel = window.cpp;
 GVAR: time1 -> window.cpp
 } */
 
+static ui_ent_t ui;
+static sky_ent_t sky;
+
 namespace draw
 {
 
@@ -135,20 +138,17 @@ int text_height(mu_Font font)
 	return 18;
 }
 
-#define BUFFER_SIZE 1000
-int buf_idx;
-Uivertex vert[BUFFER_SIZE * 4];
-uint32_t index_buf[BUFFER_SIZE * 6];
-
 static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
 {
-	int texvert_idx = buf_idx * 4;
-	int   index_idx = buf_idx * 6;
-	buf_idx++;
-	if(buf_idx == BUFFER_SIZE-1)
+	int texvert_idx = ui.buf_idx * 4;
+	int   index_idx = ui.buf_idx * 6;
+	Uivertex* vert = (Uivertex*) ui.vertex_data;
+	uint32_t* index_buf = ui.index_data;
+	ui.buf_idx++;
+	if(ui.buf_idx == ui.buffer_size-1)
 	{
 		warn("Possibly out of ui memory!");
-		buf_idx--;
+		ui.buf_idx--;
 		return;
 	}
 
@@ -204,32 +204,19 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
 
 void PresentUI()
 {
-	static VkBuffer buffer[2];
-	static VkDeviceSize buffer_offset[2];
-	static unsigned char* data = nullptr;
-	static uint32_t* index_data;
-	if(!data)
-	{
-		data = control::VertexBufferDigress(sizeof(Uivertex) * BUFFER_SIZE * 4, &buffer[0], &buffer_offset[0]);
-		index_data = (uint32_t*) control::IndexBufferDigress(BUFFER_SIZE * 6 * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
-	}
-
-	zone::Q_memcpy(data, &vert[0], sizeof(Uivertex) * 4 * buf_idx);
-	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer[0], &buffer_offset[0]);
-
-	zone::Q_memcpy(index_data, index_buf, buf_idx * 6 * sizeof(uint32_t));
-	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
-
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &ui.buffer[0], &ui.buffer_offset[0]);
+	vkCmdBindIndexBuffer(command_buffer, ui.buffer[1], ui.buffer_offset[1], VK_INDEX_TYPE_UINT32);
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[1]);
 	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 2, 1, &tex_descriptor_sets[0], 0, nullptr);
-	vkCmdDrawIndexed(command_buffer, buf_idx * 6, 1, 0, 0, 0);
-
-	buf_idx = 0;
+	vkCmdDrawIndexed(command_buffer, ui.buf_idx * 6, 1, 0, 0, 0);
+	ui.buf_idx = 0;
 }
 
 void InitUI()
 {
-
+	ui.buffer_size = 1000;	
+	ui.vertex_data = control::VertexBufferDigress(sizeof(Uivertex) * ui.buffer_size * 8, &ui.buffer[0], &ui.buffer_offset[0]);
+	ui.index_data = (uint32_t*) control::IndexBufferDigress(ui.buffer_size * 12 * sizeof(uint32_t), &ui.buffer[1], &ui.buffer_offset[1]);
 }
 
 void InitAtlasTexture()
@@ -298,14 +285,19 @@ void Cursor()
 		}
 		for(int i = 0; i<2; i++)
 		{
-			int texvert_idx = buf_idx * 4;
-			int   index_idx = buf_idx * 6;
-			buf_idx++;
-			if(buf_idx == BUFFER_SIZE)
+
+			int texvert_idx = ui.buf_idx * 4;
+			int   index_idx = ui.buf_idx * 6;
+			Uivertex* vert = (Uivertex*) ui.vertex_data;
+			uint32_t* index_buf = ui.index_data;
+			ui.buf_idx++;
+			if(ui.buf_idx == ui.buffer_size-1)
 			{
 				warn("Possibly out of ui memory!");
+				ui.buf_idx--;
 				return;
 			}
+
 
 			vert[texvert_idx + 0].pos[0] = xm;
 			vert[texvert_idx + 0].pos[1] = ym;
@@ -352,8 +344,6 @@ void Cursor()
 	}
 }
 
-
-static sky_ent_t sky;
 void InitSkydome()
 {
 	// Generate sphere

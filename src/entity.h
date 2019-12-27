@@ -26,12 +26,10 @@ typedef struct ui_ent_t
 {
 	VkBuffer buffer[2];
 	VkDeviceSize buffer_offset[2];
-	unsigned char* data;
+	unsigned char* vertex_data;
 	uint32_t* index_data;
 	int buffer_size;
 	int buf_idx;
-	Uivertex* vert;
-	uint32_t* index_buf;
 } ui_ent_t;
 
 typedef struct sky_ent_t

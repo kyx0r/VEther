@@ -15,6 +15,7 @@ void PresentUI();
 int r_get_text_width(const char *text, int len);
 int text_width(mu_Font font, const char *text, int len);
 int text_height(mu_Font font);
+void InitUI();
 void InitAtlasTexture();
 void Rect(mu_Rect rect, mu_Color color);
 void Text(const char *text, mu_Vec2 pos, mu_Color color);
