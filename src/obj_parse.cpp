@@ -529,6 +529,7 @@ LoadOBJ(char *filename)
 		ASSERT(0, "");
 	}
 
+	OBJParserPersistentState *persistent_state = nullptr; 
 	int mark = zone::Hunk_LowMark();
 	int size;
 	OBJParseInfo info = {};
@@ -548,14 +549,13 @@ LoadOBJ(char *filename)
 		info.error_callback    = OBJParseDefaultCRTErrorCallback;
 		info.warning_callback  = OBJParseDefaultCRTWarningCallback;
 	}
-
 	if(info.obj_data)
 	{
 		int tmp = obj.mark;
 		obj = ParseOBJ(&info);
 		obj.mark = tmp;
 		zone::Hunk_FreeToLowMark(mark);
-		OBJParserPersistentState *persistent_state = (OBJParserPersistentState *)((char *)obj.renderables - sizeof(OBJParserPersistentState));
+		persistent_state = (OBJParserPersistentState *)((char *)obj.renderables - sizeof(OBJParserPersistentState));
 		persistent_state->parse_memory_to_free = info.parse_memory;
 	}
 
@@ -580,7 +580,13 @@ LoadOBJ(char *filename)
 			LoadMTLForOBJ(mtl_filename, &obj);
 		}
 	}
-
+	//reclaim any extra allocated space.
+	if(obj.mark != -1)
+	{
+		OBJParserArena *arena = &persistent_state->parser_arena;
+		info("Objparse: arena used = %d  |  arena max = %d", arena->memory_alloc_position, info.parse_memory_size);
+		zone::Hunk_ShrinkHigh(info.parse_memory_size - arena->memory_alloc_position);
+	}
 	return obj;
 }
 

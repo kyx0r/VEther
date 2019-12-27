@@ -838,7 +838,7 @@ void DestroyDynBuffers()
 	vkFreeMemory(logical_device, dyn_vertex_buffer_memory, allocators);
 }
 
-unsigned char* VertexBufferDigress(int size, VkBuffer *buffer, VkDeviceSize *buffer_offset)
+unsigned char* VertexBufferDigress(int size, VkBuffer* buffer, VkDeviceSize* buffer_offset)
 {
 	dynbuffer_t* dyn_vb = &dyn_vertex_buffers[current_dyn_buffer_index];
 

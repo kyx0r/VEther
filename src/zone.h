@@ -116,6 +116,7 @@ void MemPrint();
 void *Hunk_Alloc (int size);		// returns 0 filled memory
 void *Hunk_AllocName (int size, const char *name);
 void *Hunk_HighAllocName (int size, const char *name);
+void *Hunk_ShrinkHigh(int size);
 char *Hunk_Strdup (const char *s, const char *name);
 
 int	Hunk_LowMark (void);

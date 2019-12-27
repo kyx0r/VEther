@@ -142,15 +142,14 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color, bool tex)
 {
 	int texvert_idx = ui.buf_idx * 4;
 	int   index_idx = ui.buf_idx * 6;
-	Uivertex* vert = (Uivertex*) ui.vertex_data;
-	uint32_t* index_buf = ui.index_data;
 	ui.buf_idx++;
 	if(ui.buf_idx == ui.buffer_size-1)
 	{
 		warn("Possibly out of ui memory!");
-		ui.buf_idx--;
-		return;
+		InitUI();
 	}
+	Uivertex* vert = (Uivertex*) ui.vertex_data;
+	uint32_t* index_buf = ui.index_data;
 
 	vert[texvert_idx + 0].pos[0] = dst.x;
 	vert[texvert_idx + 0].pos[1] = dst.y;
@@ -214,9 +213,9 @@ void PresentUI()
 
 void InitUI()
 {
-	ui.buffer_size = 1000;	
-	ui.vertex_data = control::VertexBufferDigress(sizeof(Uivertex) * ui.buffer_size * 8, &ui.buffer[0], &ui.buffer_offset[0]);
-	ui.index_data = (uint32_t*) control::IndexBufferDigress(ui.buffer_size * 12 * sizeof(uint32_t), &ui.buffer[1], &ui.buffer_offset[1]);
+	ui.buffer_size += 1000;	
+	ui.vertex_data = control::VertexBufferDigress(sizeof(Uivertex) * ui.buffer_size * 4, &ui.buffer[0], &ui.buffer_offset[0]);
+	ui.index_data = (uint32_t*) control::IndexBufferDigress(ui.buffer_size * 6 * sizeof(uint32_t), &ui.buffer[1], &ui.buffer_offset[1]);
 }
 
 void InitAtlasTexture()
@@ -288,16 +287,14 @@ void Cursor()
 
 			int texvert_idx = ui.buf_idx * 4;
 			int   index_idx = ui.buf_idx * 6;
-			Uivertex* vert = (Uivertex*) ui.vertex_data;
-			uint32_t* index_buf = ui.index_data;
 			ui.buf_idx++;
 			if(ui.buf_idx == ui.buffer_size-1)
 			{
 				warn("Possibly out of ui memory!");
-				ui.buf_idx--;
-				return;
+				InitUI();
 			}
-
+			Uivertex* vert = (Uivertex*) ui.vertex_data;
+			uint32_t* index_buf = ui.index_data;
 
 			vert[texvert_idx + 0].pos[0] = xm;
 			vert[texvert_idx + 0].pos[1] = ym;

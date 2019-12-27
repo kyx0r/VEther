@@ -591,6 +591,7 @@ inline uint8_t Draw()
 	// flt[2].pos[3] = 1.0f;
 
 	//draw::Triangle(sizeof(float4_t)*3, &flt[0]);
+
 	draw::SkyDome();
 
 	draw::PresentUI();

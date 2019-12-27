@@ -871,6 +871,22 @@ void *Hunk_HighAllocName (int size, const char *name)
 	return (void *)(h+1);
 }
 
+//@size how much to shrink? 
+void *Hunk_ShrinkHigh(int size)
+{
+	hunk_t	*h;
+	hunk_t *nh;
+	h = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
+	hunk_high_used -= size;
+	nh = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
+	nh->size = h->size - size;
+	nh->sentinal = HUNK_SENTINAL;
+	q_strlcpy (nh->name, h->name, HUNKNAME_LEN);
+        h->size = 0;
+	h->sentinal = 0;
+	Q_memset(h->name, 0, HUNKNAME_LEN);
+	return (void *)(h+1);
+}
 
 /*
 =================
