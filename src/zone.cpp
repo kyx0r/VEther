@@ -1188,7 +1188,7 @@ void Cache_Print (void)
 
 	for (cd = cache_head.next ; cd != &cache_head ; cd = cd->next)
 	{
-		p("%8i : %s", cd->size, cd->name);
+		debug("%8i : %s", cd->size, cd->name);
 	}
 }
 
@@ -1200,6 +1200,7 @@ Cache_Report
 */
 void Cache_Report (void)
 {
+	Cache_Print();
 	debug("%0.2fMB data cache", (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024*1024));
 	debug("%0.2fMB data cache avail", hunk_size/(float)(1024*1024));
 	debug("%0.2fMB hunk_high_used | %0.2fMB hunk_low_used", hunk_high_used/(float)(1024*1024), (hunk_low_used-DYNAMIC_SIZE)/(float)(1024*1024));
@@ -1274,6 +1275,11 @@ void *Cache_Check (cache_user_t *c)
 ==============
 Cache_Alloc
 ==============
+
+template for future: 
+ 
+cache_user_t cn = {};
+void* a = zone::Cache_Alloc(&cn, 200, "test");
 */
 void *Cache_Alloc (cache_user_t *c, int size, const char *name)
 {
