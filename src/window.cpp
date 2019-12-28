@@ -3,7 +3,6 @@
 #include "shaders.h"
 #include "textures.h"
 #include "draw.h"
-#include "obj_parse.h"
 #include "flog.h"
 #include "entity.h"
 #include "cvar.h"
@@ -425,13 +424,17 @@ void PreDraw()
 
 	render::CreatePipelineLayout();
 
-	kitty = LoadOBJ("./res/kitty.obj");
-
 	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 
 	//fov setup.
 	entity::InitCamera();
+	//entity::InitMeshes();
+
+
+	kitty = LoadOBJ("./res/kitty.obj");
+
+	LoadOBJ("./res/kitty.obj");
 
 	/* init microui */
 	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");

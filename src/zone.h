@@ -22,12 +22,8 @@ can display usage.
 
 Hunk allocations are guaranteed to be 16 byte aligned.
 
-The video buffers are allocated high to avoid leaving a hole underneath
-server allocations when changing to a higher video mode.
-
-
 Z_??? Zone memory functions used for small, dynamic allocations like text
-strings from command input.  There is only about 48K for it, allocated at
+strings from command input.  There is only 64MB for it, allocated at
 the very bottom of the hunk.
 
 Cache_??? Cache memory is for objects that can be dynamically loaded and
@@ -36,33 +32,15 @@ fluctuates from level to level.
 
 To allocate a cachable object
 
-
-Temp_??? Temp memory is used for file loading and surface caching.  The size
-of the cache memory is adjusted so that there is a minimum of 512k remaining
-for temp memory.
-
-
 ------ Top of Memory -------
 
 high hunk allocations
-
-<--- high hunk reset point held by vid
-
-video buffer
-
-z buffer
-
-surface cache
 
 <--- high hunk used
 
 cachable memory
 
 <--- low hunk used
-
-client and server low hunk allocations
-
-<-- low hunk reset point held by host
 
 startup hunk allocations
 
@@ -113,6 +91,7 @@ char *Z_Strdup (const char *s);
 void Z_TmpExec();
 void MemPrint();
 
+void* Hunk_HighPos();
 void *Hunk_Alloc (int size);		// returns 0 filled memory
 void *Hunk_AllocName (int size, const char *name);
 void *Hunk_HighAllocName (int size, const char *name);

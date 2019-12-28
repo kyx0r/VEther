@@ -1,6 +1,7 @@
 #include "startup.h"
 #include "mathlib.h"
 #include "render.h"
+#include "obj_parse.h"
 
 typedef struct cam_ent_t
 {
@@ -46,10 +47,25 @@ typedef struct sky_ent_t
 	Matrix* tmat;
 } sky_ent_t;
 
+
+typedef struct mesh_ent_t
+{
+	ParsedOBJ obj;
+	VkBuffer buffer[4];
+	VkDeviceSize buffer_offset[2];
+	VkDescriptorSet dset[2];
+	uint32_t uniform_offset[2];
+	UniformMatrix* mat;
+	unsigned char* vertex_data;
+	uint32_t* index_data;
+	struct mesh_ent_t* next;
+} mesh_ent_t;
+extern mesh_ent_t* meshes;
+
 namespace entity
 {
 void UpdateCamera();
 void InitCamera();
 void ViewMatrix(float matrix[16]);
-
+void InitMeshes();
 } //namespace entity

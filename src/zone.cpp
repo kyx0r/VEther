@@ -748,10 +748,6 @@ void *Hunk_AllocName (int size, const char *name)
 {
 	hunk_t	*h;
 
-#ifdef DEBUG
-	//Hunk_Check ();
-#endif
-
 	if (size < 0)
 	{
 		fatal("Hunk_Alloc: bad size: %i", size);
@@ -828,11 +824,30 @@ int	Hunk_HighMark (void)
 	return hunk_high_used;
 }
 
+
+void* Hunk_HighPos()
+{
+
+	hunk_t	*h;
+	h = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
+	return (void*) (h-1);//reserve growth
+}
+
 /*
 ===================
 Hunk_HighAllocName
 ===================
+
+Scheme is as follows:
+ 
+| 0xC | <- hunkhigh (used 0, goes down) |
+| 0x8 |                                 | ^
+| 0x4 |					v |
+| 0x0 | <- hunklow  (used 0, goes up)     |
+
+
 */
+
 void *Hunk_HighAllocName (int size, const char *name)
 {
 	hunk_t	*h;
@@ -846,10 +861,6 @@ void *Hunk_HighAllocName (int size, const char *name)
 		hunk_tempactive = false;
 	}
 
-#ifdef PARANOID
-	Hunk_Check ();
-#endif
-
 	size = sizeof(hunk_t) + ((size+15)&~15);
 
 	if (hunk_size - hunk_low_used - hunk_high_used < size)
@@ -862,7 +873,6 @@ void *Hunk_HighAllocName (int size, const char *name)
 	Cache_FreeHigh (hunk_high_used);
 
 	h = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
-
 	Q_memset (h, 0, size);
 	h->size = size;
 	h->sentinal = HUNK_SENTINAL;
@@ -871,9 +881,10 @@ void *Hunk_HighAllocName (int size, const char *name)
 	return (void *)(h+1);
 }
 
-//@size how much to shrink? 
+/*@size how much to shrink?*/ 
 void *Hunk_ShrinkHigh(int size)
 {
+	size = ((size+15)&~15) - sizeof(hunk_t);
 	hunk_t	*h;
 	hunk_t *nh;
 	h = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
@@ -882,10 +893,11 @@ void *Hunk_ShrinkHigh(int size)
 	nh->size = h->size - size;
 	nh->sentinal = HUNK_SENTINAL;
 	q_strlcpy (nh->name, h->name, HUNKNAME_LEN);
+	Q_memcpy(nh+1, h+1, nh->size); //have to relocate the block
         h->size = 0;
 	h->sentinal = 0;
 	Q_memset(h->name, 0, HUNKNAME_LEN);
-	return (void *)(h+1);
+	return (void *)(nh+1);
 }
 
 /*

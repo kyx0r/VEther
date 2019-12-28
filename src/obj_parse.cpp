@@ -538,6 +538,7 @@ LoadOBJ(char *filename)
 	{
 		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename, &size);
 		info.parse_memory_size = size*10; //give it 10 time as much as of a filesize itself.
+		//info.parse_memory = zone::Hunk_HighPos();
 		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
 		if(!info.parse_memory)
 		{
@@ -556,7 +557,6 @@ LoadOBJ(char *filename)
 		obj.mark = tmp;
 		zone::Hunk_FreeToLowMark(mark);
 		persistent_state = (OBJParserPersistentState *)((char *)obj.renderables - sizeof(OBJParserPersistentState));
-		persistent_state->parse_memory_to_free = info.parse_memory;
 	}
 
 	// NOTE(rjf): Load in material libraries.
@@ -581,11 +581,19 @@ LoadOBJ(char *filename)
 		}
 	}
 	//reclaim any extra allocated space.
-	if(obj.mark != -1)
+/*	if(obj.mark != -1)
 	{
 		OBJParserArena *arena = &persistent_state->parser_arena;
 		info("Objparse: arena used = %d  |  arena max = %d", arena->memory_alloc_position, info.parse_memory_size);
-		zone::Hunk_ShrinkHigh(info.parse_memory_size - arena->memory_alloc_position);
+		persistent_state->parse_memory_to_free = zone::Hunk_ShrinkHigh(info.parse_memory_size - arena->memory_alloc_position);
+		obj.renderables->vertices = (obj.renderables->vertices - (float*)info.parse_memory) + (float*)persistent_state->parse_memory_to_free;
+		obj.renderables->indices = (obj.renderables->indices - (int*)info.parse_memory) + (int*)persistent_state->parse_memory_to_free;
+		p("%p   %p",obj.renderables->vertices,  info.parse_memory);
+
+	}
+	else */
+	{
+		persistent_state->parse_memory_to_free = info.parse_memory;
 	}
 	return obj;
 }
