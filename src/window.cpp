@@ -434,7 +434,7 @@ void PreDraw()
 
 	kitty = LoadOBJ("./res/kitty.obj");
 
-	LoadOBJ("./res/kitty.obj");
+	//LoadOBJ("./res/kitty.obj");
 
 	/* init microui */
 	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");

@@ -442,15 +442,23 @@ static memzone_t	*mainzone;
 Z_Free
 ========================
 */
+
 void Z_Free (void *ptr)
 {
 	memblock_t	*block, *other;
 
+#ifdef DEBUG
+    static bool once = true; //silence	
 	if (!ptr)
 	{
-		info("Z_Free: NULL pointer");
+		if(once)
+		{
+		   info("Z_Free: NULL pointer");
+		   once = false;
+		}
 		return;
 	}
+#endif	
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
 	{
@@ -830,7 +838,7 @@ void* Hunk_HighPos()
 
 	hunk_t	*h;
 	h = (hunk_t *)(hunk_base + hunk_size - hunk_high_used);
-	return (void*) (h-1);//reserve growth
+	return (void*) (h+1);
 }
 
 /*
@@ -840,11 +848,24 @@ Hunk_HighAllocName
 
 Scheme is as follows:
  
-| 0xC | <- hunkhigh (used 0, goes down) |
-| 0x8 |                                 | ^
-| 0x4 |					v |
-| 0x0 | <- hunklow  (used 0, goes up)     |
+| 0x0 | <- hunklow (used 0, goes down)        |
+| 0x4 |                                       |  ^
+| 0x8 |                                       v  |
+| 0xC | <- hunkhigh  (used 0, goes up)           |
 
+Direction tells how memory grows during allocation only.
+Now in the cpu, real direction always goes down because of direction flag.
+
+Sample:
+
+| 0x0 | 
+| 0x4 | <- size gets writen (both hunks work the same way)                              
+| 0x8 | <- sentinal right after                                    
+| 0xC | <- 16 byte alignment
+| 0x10 | <- pointer retured by allocator
+| 0x14 | <- data you use goes down
+
+Sample only for demo, not an exact model;
 
 */
 
@@ -894,7 +915,7 @@ void *Hunk_ShrinkHigh(int size)
 	nh->sentinal = HUNK_SENTINAL;
 	q_strlcpy (nh->name, h->name, HUNKNAME_LEN);
 	Q_memcpy(nh+1, h+1, nh->size); //have to relocate the block
-        h->size = 0;
+    h->size = 0;
 	h->sentinal = 0;
 	Q_memset(h->name, 0, HUNKNAME_LEN);
 	return (void *)(nh+1);

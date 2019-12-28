@@ -522,14 +522,6 @@ OBJParseDefaultCRTWarningCallback(OBJParseWarning warning)
 ParsedOBJ
 LoadOBJ(char *filename)
 {
-
-	if (setjmp(OBJFatal))
-	{
-		fatal("LoadOBJ: out of memory!");
-		ASSERT(0, "");
-	}
-
-	OBJParserPersistentState *persistent_state = nullptr; 
 	int mark = zone::Hunk_LowMark();
 	int size;
 	OBJParseInfo info = {};
@@ -537,8 +529,7 @@ LoadOBJ(char *filename)
 	obj.mark = zone::Hunk_HighMark();
 	{
 		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename, &size);
-		info.parse_memory_size = size*10; //give it 10 time as much as of a filesize itself.
-		//info.parse_memory = zone::Hunk_HighPos();
+		info.parse_memory_size = size;
 		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
 		if(!info.parse_memory)
 		{
@@ -550,13 +541,29 @@ LoadOBJ(char *filename)
 		info.error_callback    = OBJParseDefaultCRTErrorCallback;
 		info.warning_callback  = OBJParseDefaultCRTWarningCallback;
 	}
+	
+	if (setjmp(OBJFatal))
+	{
+		fatal("LoadOBJ: out of memory!");
+		zone::Hunk_FreeToHighMark(obj.mark);
+		info.parse_memory_size += (size/10);
+		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
+		if(!info.parse_memory)
+		{
+			warn("LoadOBJ: Using malloc instead of Hunk!");
+			info.parse_memory = malloc(info.parse_memory_size);
+			obj.mark = -1;
+		}		
+	}	
+	
 	if(info.obj_data)
 	{
 		int tmp = obj.mark;
 		obj = ParseOBJ(&info);
 		obj.mark = tmp;
 		zone::Hunk_FreeToLowMark(mark);
-		persistent_state = (OBJParserPersistentState *)((char *)obj.renderables - sizeof(OBJParserPersistentState));
+		OBJParserPersistentState* persistent_state = (OBJParserPersistentState *)((char *)obj.renderables - sizeof(OBJParserPersistentState));
+		persistent_state->parse_memory_to_free = info.parse_memory;
 	}
 
 	// NOTE(rjf): Load in material libraries.
@@ -581,20 +588,21 @@ LoadOBJ(char *filename)
 		}
 	}
 	//reclaim any extra allocated space.
-/*	if(obj.mark != -1)
+	//memory is not relocable, pointers need to be reasigned, but seems impossible with current design
+/* 	if(obj.mark != -1)
 	{
 		OBJParserArena *arena = &persistent_state->parser_arena;
-		info("Objparse: arena used = %d  |  arena max = %d", arena->memory_alloc_position, info.parse_memory_size);
+		p("Objparse: arena used = %d  |  arena max = %d", arena->memory_alloc_position, info.parse_memory_size);
+		p(" org %p ", info.parse_memory);
 		persistent_state->parse_memory_to_free = zone::Hunk_ShrinkHigh(info.parse_memory_size - arena->memory_alloc_position);
+		p(" Pers %p ", persistent_state->parse_memory_to_free);
+		p(" V1 %p   %p",obj.renderables->vertices,  obj.renderables->indices);
 		obj.renderables->vertices = (obj.renderables->vertices - (float*)info.parse_memory) + (float*)persistent_state->parse_memory_to_free;
 		obj.renderables->indices = (obj.renderables->indices - (int*)info.parse_memory) + (int*)persistent_state->parse_memory_to_free;
-		p("%p   %p",obj.renderables->vertices,  info.parse_memory);
+		p(" V 2%p   %p",obj.renderables->vertices,  obj.renderables->indices);
 
-	}
-	else */
-	{
-		persistent_state->parse_memory_to_free = info.parse_memory;
-	}
+	} 
+*/	
 	return obj;
 }
 
