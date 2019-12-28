@@ -529,7 +529,7 @@ LoadOBJ(char *filename)
 	obj.mark = zone::Hunk_HighMark();
 	{
 		info.obj_data = OBJParseLoadEntireFileAndNullTerminate(filename, &size);
-		info.parse_memory_size = size;
+		info.parse_memory_size = size*10;
 		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
 		if(!info.parse_memory)
 		{
@@ -561,9 +561,20 @@ LoadOBJ(char *filename)
 		int tmp = obj.mark;
 		obj = ParseOBJ(&info);
 		obj.mark = tmp;
-		zone::Hunk_FreeToLowMark(mark);
 		OBJParserPersistentState* persistent_state = (OBJParserPersistentState *)((char *)obj.renderables - sizeof(OBJParserPersistentState));
 		persistent_state->parse_memory_to_free = info.parse_memory;
+		//reclaim any extra allocated space.
+		//yeah besically have to redo the whole computation twice for each model
+		//but so far there is no better way to tell how much memory this will need and
+		//triangulation creates internal memory pointers that I am not sure how to reassign.
+		OBJParserArena *arena = &persistent_state->parser_arena;
+		info.parse_memory_size = arena->memory_alloc_position;
+		zone::Hunk_FreeToHighMark(obj.mark);
+		info.parse_memory = zone::Hunk_HighAllocName(info.parse_memory_size, "model");
+		tmp = obj.mark;
+		obj = ParseOBJ(&info);
+		obj.mark = tmp;
+		zone::Hunk_FreeToLowMark(mark);
 	}
 
 	// NOTE(rjf): Load in material libraries.
@@ -587,7 +598,6 @@ LoadOBJ(char *filename)
 			LoadMTLForOBJ(mtl_filename, &obj);
 		}
 	}
-	//reclaim any extra allocated space.
 	//memory is not relocable, pointers need to be reasigned, but seems impossible with current design
 /* 	if(obj.mark != -1)
 	{

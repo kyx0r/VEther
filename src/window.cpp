@@ -45,7 +45,6 @@ double lastfps;
 mu_Context* ctx;
 //}
 
-static ParsedOBJ kitty;
 static bool mfocus = false;
 
 namespace window
@@ -429,12 +428,7 @@ void PreDraw()
 
 	//fov setup.
 	entity::InitCamera();
-	//entity::InitMeshes();
-
-
-	kitty = LoadOBJ("./res/kitty.obj");
-
-	//LoadOBJ("./res/kitty.obj");
+	entity::InitMeshes();
 
 	/* init microui */
 	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");
@@ -574,8 +568,8 @@ inline uint8_t Draw()
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
 
-	ParsedOBJRenderable* p = kitty.renderables;
-	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
+//	ParsedOBJRenderable* p = kitty.renderables;
+//	draw::IndexedTriangle(32 * p->vertex_count, (Vertex_*)p->vertices, p->index_count, (uint32_t*)p->indices);
 
 	// float4_t flt[3];
 	// flt[0].pos[0] = 0.0f;
