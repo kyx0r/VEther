@@ -10,6 +10,7 @@ mesh_ent_t* meshes;
 static char* smeshes[][1] =
 {
 	{"./res/kitty.obj"},
+	{"./res/kitty.obj"},
 };
 
 namespace entity
@@ -68,11 +69,14 @@ void InitMeshes()
 		head->index_data = (uint32_t*) control::IndexBufferDigress(
 				head->obj.renderables->index_count * sizeof(uint32_t), &head->buffer[1], &head->buffer_offset[1]);
 		head->mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &head->buffer[3], &head->uniform_offset[0], &head->dset[0], 0);
-		if(ARRAYSIZE(smeshes) > 1)
-		{
-			head->next = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
-			head = head->next;
-		}
+
+		//IdentityMatrix(head->mat->proj);
+		TranslationMatrix(head->mat->proj, (float)i, 1.0f, 1.0f);
+		IdentityMatrix(head->mat->model);
+		IdentityMatrix(head->mat->view);
+		head->next = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
+		head->next->prev = head;
+		head = head->next;
 	}
 }
 

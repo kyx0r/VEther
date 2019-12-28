@@ -13,6 +13,7 @@ GVAR: pipeline_layout -> render.cpp
 GVAR: pipelines -> render.cpp
 GVAR: y_wheel = window.cpp;
 GVAR: time1 -> window.cpp
+GVAR: meshes -> entity.cpp
 } */
 
 static ui_ent_t ui;
@@ -107,6 +108,22 @@ void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &dset[1], 1, &uniform_offset[1]);
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 2, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
+}
+
+void Meshes()
+{
+	mesh_ent_t* head = meshes;
+	while(head->vertex_data != nullptr)
+	{
+		zone::Q_memcpy(head->vertex_data, head->obj.renderables->vertices, head->obj.renderables->vertex_count * sizeof(Vertex_));
+		vkCmdBindVertexBuffers(command_buffer, 0, 1, &head->buffer[0], &head->buffer_offset[0]);
+		zone::Q_memcpy(head->index_data, head->obj.renderables->indices, head->obj.renderables->index_count * sizeof(uint32_t));
+		vkCmdBindIndexBuffer(command_buffer, head->buffer[1], head->buffer_offset[1], VK_INDEX_TYPE_UINT32);
+		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
+		vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &head->dset[0], 1, &head->uniform_offset[0]);
+		vkCmdDrawIndexed(command_buffer, head->obj.renderables->index_count, 1, 0, 0, 0);
+		head = head->next;
+	}
 }
 
 int r_get_text_width(const char *text, int len)

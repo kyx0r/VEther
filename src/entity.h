@@ -59,6 +59,7 @@ typedef struct mesh_ent_t
 	unsigned char* vertex_data;
 	uint32_t* index_data;
 	struct mesh_ent_t* next;
+	struct mesh_ent_t* prev;
 } mesh_ent_t;
 extern mesh_ent_t* meshes;
 
