@@ -88,6 +88,9 @@ static inline int IS_NAN (float x)
 
 #define DEG2RAD( a ) ( (a) * M_PI_DIV_180 )
 
+void InitRandSeed(long s);
+double NextRandDouble();
+double Drand(double min, double max);
 void TurnVector (vec3_t out, const vec3_t forward, const vec3_t side, float angle); //johnfitz
 void VectorAngles (const vec3_t forward, vec3_t angles); //johnfitz
 

@@ -31,6 +31,35 @@ vec3_t vec3_origin = {0,0,0};
 
 /*-----------------------------------------------------------------*/
 
+static long seed;
+void InitRandSeed(long s)
+{
+	seed = s;
+}
+
+double NextRandDouble()
+{
+	// Robert Jenkins' 32 bit integer hash function.
+	seed = ((seed + 0x7ed55d16) + (seed << 12)) & 0xffffffff;
+	seed = ((seed ^ 0xc761c23c) ^ (seed >> 19)) & 0xffffffff;
+	seed = ((seed + 0x165667b1) + (seed << 5)) & 0xffffffff;
+	seed = ((seed + 0xd3a2646c) ^ (seed << 9)) & 0xffffffff;
+	seed = ((seed + 0xfd7046c5) + (seed << 3)) & 0xffffffff;
+	seed = ((seed ^ 0xb55a4f09) ^ (seed >> 16)) & 0xffffffff;
+	return static_cast <double> (seed & 0xfffffff) / static_cast <double> (0x10000000);
+}
+
+double Drand(double min, double max)
+{
+	//naiive way
+	double result = NextRandDouble();
+	while(result < min || result > max)
+	{
+		result = NextRandDouble() * max;
+	}
+	return result;
+}
+
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 {
 	float d;

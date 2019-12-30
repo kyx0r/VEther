@@ -50,6 +50,7 @@ typedef struct sky_ent_t
 
 typedef struct mesh_ent_t
 {
+	uint8_t id;
 	ParsedOBJ obj;
 	VkBuffer buffer[4];
 	VkDeviceSize buffer_offset[2];
@@ -58,8 +59,11 @@ typedef struct mesh_ent_t
 	UniformMatrix* mat;
 	unsigned char* vertex_data;
 	uint32_t* index_data;
+	float speed;
+	float scale;
 	struct mesh_ent_t* next;
 	struct mesh_ent_t* prev;
+	struct mesh_ent_t* parent;
 } mesh_ent_t;
 extern mesh_ent_t* meshes;
 
@@ -69,4 +73,8 @@ void UpdateCamera();
 void InitCamera();
 void ViewMatrix(float matrix[16]);
 void InitMeshes();
+mesh_ent_t* GetMesh(int id, mesh_ent_t** last);
+void InstanceMesh(int id);
+void MoveTo(int id, vec3_t pos);
+
 } //namespace entity

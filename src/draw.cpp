@@ -115,9 +115,7 @@ void Meshes()
 	mesh_ent_t* head = meshes;
 	while(head->vertex_data != nullptr)
 	{
-		zone::Q_memcpy(head->vertex_data, head->obj.renderables->vertices, head->obj.renderables->vertex_count * sizeof(Vertex_));
 		vkCmdBindVertexBuffers(command_buffer, 0, 1, &head->buffer[0], &head->buffer_offset[0]);
-		zone::Q_memcpy(head->index_data, head->obj.renderables->indices, head->obj.renderables->index_count * sizeof(uint32_t));
 		vkCmdBindIndexBuffer(command_buffer, head->buffer[1], head->buffer_offset[1], VK_INDEX_TYPE_UINT32);
 		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
 		vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &head->dset[0], 1, &head->uniform_offset[0]);

@@ -426,9 +426,16 @@ void PreDraw()
 	shaders::CreatePipelineCache();
 	shaders::LoadShaders();
 
+	InitRandSeed(12345);
+
 	//fov setup.
 	entity::InitCamera();
 	entity::InitMeshes();
+
+	for(int i = 0; i<10; i++)
+	{
+		entity::InstanceMesh(0);
+	}
 
 	/* init microui */
 	ctx = (mu_Context*) zone::Hunk_AllocName(sizeof(mu_Context), "ctx");
@@ -567,6 +574,17 @@ inline uint8_t Draw()
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
+
+	static double rands[11] = {};
+	for(int i = 0; i<11; i++)
+	{
+		if(!rands[i])
+		{
+			rands[i] = Drand(0.5f, 30.0f);
+		}
+		vec3_t v = {float(sin(time1)*rands[i]), (float)i, float(cos(time1)*rands[i])};
+		entity::MoveTo(i, v);
+	}
 
 	draw::Meshes();
 //	ParsedOBJRenderable* p = kitty.renderables;
