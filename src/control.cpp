@@ -11,6 +11,7 @@ GVAR: allocators -> startup.cpp
 
 //{
 VkCommandBuffer command_buffer;
+VkCommandBuffer scommand_buffer;
 VkPhysicalDeviceMemoryProperties memory_properties;
 VkDescriptorPool descriptor_pool;
 VkDescriptorSetLayout vubo_dsl;
@@ -29,6 +30,7 @@ int current_vheap_index  = 0;
 
 static VkCommandPool command_pool;
 static VkCommandBuffer *command_buffers = nullptr;
+static VkCommandBuffer *scommand_buffers = nullptr;
 static VkDeviceMemory dyn_index_buffer_memory;
 static VkDeviceMemory dyn_vertex_buffer_memory;
 static VkDeviceMemory dyn_uniform_buffer_memory;
@@ -70,14 +72,14 @@ bool ResetCommandPool(bool release_resources)
 	return true;
 }
 
-bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count)
+bool AllocatePrimaryCommandBuffers(uint32_t count)
 {
 	VkCommandBufferAllocateInfo command_buffer_allocate_info =
 	{
 		VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,   // VkStructureType          sType
 		nullptr,                                          // const void             * pNext
 		command_pool,                                     // VkCommandPool            commandPool
-		level,                                            // VkCommandBufferLevel     level
+		VK_COMMAND_BUFFER_LEVEL_PRIMARY,                  // VkCommandBufferLevel     level
 		count                                             // uint32_t                 commandBufferCount
 	};
 
@@ -87,10 +89,35 @@ bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count)
 	VkResult result = vkAllocateCommandBuffers(logical_device, &command_buffer_allocate_info, &command_buffers[0]);
 	if(result != VK_SUCCESS)
 	{
-		fatal("Could not allocate command buffers.");
+		fatal("Could not allocate primary command buffers.");
 		return false;
 	}
 	command_buffer = command_buffers[0];
+	return true;
+}
+
+
+bool AllocateSecondaryCommandBuffers(uint32_t count)
+{
+	VkCommandBufferAllocateInfo command_buffer_allocate_info =
+	{
+		VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,   // VkStructureType          sType
+		nullptr,                                          // const void             * pNext
+		command_pool,                                     // VkCommandPool            commandPool
+		VK_COMMAND_BUFFER_LEVEL_SECONDARY,                  // VkCommandBufferLevel     level
+		count                                             // uint32_t                 commandBufferCount
+	};
+
+	char* mem = (char*) zone::Z_Malloc(sizeof(VkCommandBuffer) * count);
+	scommand_buffers = new(mem) VkCommandBuffer[count];
+
+	VkResult result = vkAllocateCommandBuffers(logical_device, &command_buffer_allocate_info, &scommand_buffers[0]);
+	if(result != VK_SUCCESS)
+	{
+		fatal("Could not allocate secondary command buffers.");
+		return false;
+	}
+	scommand_buffer = scommand_buffers[0];
 	return true;
 }
 

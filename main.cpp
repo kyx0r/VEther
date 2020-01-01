@@ -128,7 +128,8 @@ int main(int argc, char *lpCmdLine[])
 	    !control::CreateSemaphore(ReadySemaphore)||
 	    !control::CreateFence(Fence_one, VK_FENCE_CREATE_SIGNALED_BIT)||
 	    !control::CreateCommandPool(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, graphics_queue_family_index)||
-	    !control::AllocateCommandBuffers(VK_COMMAND_BUFFER_LEVEL_PRIMARY, NUM_COMMAND_BUFFERS)
+	    !control::AllocatePrimaryCommandBuffers(NUM_COMMAND_BUFFERS)||
+	    !control::AllocateSecondaryCommandBuffers(NUM_COMMAND_BUFFERS)
 	)
 	{
 		startup::debug_pause();

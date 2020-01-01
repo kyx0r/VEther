@@ -12,6 +12,7 @@
 #define NUM_COMMAND_BUFFERS 5
 
 extern VkCommandBuffer command_buffer;
+extern VkCommandBuffer scommand_buffer;
 extern VkPhysicalDeviceMemoryProperties	memory_properties;
 extern VkDescriptorPool descriptor_pool;
 extern VkDescriptorSetLayout vubo_dsl;
@@ -64,7 +65,8 @@ void DestroyStagingBuffers();
 void DestroyUniformBuffers();
 void DestroyIndexBuffers();
 void DestroyVramHeaps();
-bool AllocateCommandBuffers(VkCommandBufferLevel level, uint32_t count);
+bool AllocatePrimaryCommandBuffers(uint32_t count);
+bool AllocateSecondaryCommandBuffers(uint32_t count);
 void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);
 bool CreateFence(VkFence &fence, VkFenceCreateFlags flags);
