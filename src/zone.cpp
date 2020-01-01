@@ -9,7 +9,7 @@ Copyright (C) 2019-.... FAETHER / Etherr
 #include <cstddef>
 #include <csetjmp>
 #include "flog.h"
-
+#include <mutex>
 /*
 ==============================================================================
 
@@ -19,27 +19,33 @@ Copyright (C) 2019-.... FAETHER / Etherr
 */
 
 unsigned char* stack_mem = nullptr;
-static char semaphore = 0;
-
+std::mutex mtx;
+std::mutex mtx1;
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
+	mtx.lock();
 	void* p = zone::Z_TagMalloc(size, 1, 8, 1);
 	ASSERT(p,"operator new failed.");
+	mtx.unlock();
 	return p;
 }
 
 void operator delete(void* p)
 {
+	mtx.lock();
 	zone::Z_Free(p, 1);
+	mtx.unlock();
 	return;
 }
 
 void operator delete(void* p, size_t size)
 {
+	mtx.lock();
 	zone::Z_Free(p, 1);
+	mtx.unlock();
 	// Here this will keep the memory alive but does not is free.
 	// I question size parameter.
 	// "If present, the std::size_t size argument must equal the
@@ -50,24 +56,30 @@ void operator delete(void* p, size_t size)
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
+	mtx1.lock();
 	void* p = zone::Z_TagMalloc(size, 1, 8, 2);
 	//void* p = malloc(size);
 	ASSERT(p,"VEtherAlloc failed.");
+	mtx1.unlock();
 	return p;
 }
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
+	mtx1.lock();
 	void* p = zone::Z_Realloc(porg, size, 8, 2);
 	//void* p = realloc(porg, size);
 	ASSERT(p,"VEtherRealloc failed.");
+	mtx1.unlock();
 	return p;
 }
 
 void VEtherFree(void* pusd, void* ptr)
 {
 	//free(ptr);
+	mtx1.lock();
 	zone::Z_Free(ptr, 2);
+	mtx1.unlock();
 	return;
 }
 
@@ -487,7 +499,7 @@ void Z_Print (uint8_t zoneid)
 	memblock_t	*block;
 	memzone_t *zone = mainzone[zoneid];
 	uint64_t sum = 0;
-	debug("zone size: %i  location: %p", zsizes[zoneid], zone);
+	debug("zone size: %i  location: %p, id: %d", zsizes[zoneid], zone, zoneid);
 
 	for (block = zone->blocklist.next ; ; block = block->next)
 	{
