@@ -432,7 +432,7 @@ void PreDraw()
 	entity::InitCamera();
 	entity::InitMeshes();
 
-	for(int i = 0; i<10; i++)
+	for(int i = 0; i<100; i++)
 	{
 		entity::InstanceMesh(0);
 	}
@@ -498,6 +498,25 @@ void PreDraw()
 	present_info.pResults = nullptr;
 }
 
+void UiThread()
+{
+	VkCommandBufferInheritanceInfo cbii;
+	cbii.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+	cbii.pNext = nullptr;
+	cbii.renderPass = renderPasses[0];
+	cbii.subpass = 0;
+	cbii.framebuffer = framebuffers[0];
+	cbii.occlusionQueryEnable = VK_FALSE;
+	cbii.queryFlags = 0;
+	cbii.pipelineStatistics = 0;
+	control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT, &cbii);
+
+
+	VK_CHECK(vkEndCommandBuffer(scommand_buffer));
+
+	vkCmdExecuteCommands(command_buffer, 1, &scommand_buffer);
+}
+
 inline uint8_t Draw()
 {
 	VkResult result;
@@ -518,6 +537,8 @@ inline uint8_t Draw()
 	}
 
 	control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, nullptr);
+
+	//UiThread();
 
 	mu_begin(ctx);	
 	console(ctx);
@@ -575,12 +596,12 @@ inline uint8_t Draw()
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
 	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
 
-	static double rands[11] = {};
-	for(int i = 0; i<11; i++)
+	static double rands[101] = {};
+	for(int i = 0; i<101; i++)
 	{
 		if(!rands[i])
 		{
-			rands[i] = Drand(0.5f, 30.0f);
+			rands[i] = Drand(0.5f, 3.0f);
 		}
 		vec3_t v = {float(sin(time1)*rands[i]), (float)i, float(cos(time1)*rands[i])};
 		entity::MoveTo(i, v);
@@ -619,10 +640,7 @@ inline uint8_t Draw()
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_present);
 
-	if(!control::EndCommandBufferRecordingOperation())
-	{
-		return 0;
-	}
+	VK_CHECK(vkEndCommandBuffer(command_buffer));
 
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
 

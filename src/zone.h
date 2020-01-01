@@ -83,10 +83,10 @@ void stack_clear(int size);
 
 void Memory_Init (void *buf, int size);
 
-void Z_Free (void *ptr);
-void *Z_TagMalloc (int size, int tag, int align);
-void *Z_Malloc (int size); // returns 0 filled memory.
-void *Z_Realloc (void *ptr, int size, int align);
+void Z_Free (void *ptr, uint8_t zoneid = 0);
+void *Z_TagMalloc (int size, int tag, int align, uint8_t zoneid = 0);
+void *Z_Malloc (int size, uint8_t zoneid = 0); // returns 0 filled memory.
+void *Z_Realloc (void *ptr, int size, int align, uint8_t zoneid = 0);
 char *Z_Strdup (const char *s);
 void Z_TmpExec();
 void MemPrint();

@@ -127,6 +127,11 @@ void SetCommandBuffer(uint8_t i)
 	command_buffer = command_buffers[i];
 }
 
+void SetSCommandBuffer(uint8_t i)
+{
+	scommand_buffer = scommand_buffers[i];
+}
+
 bool CreateSemaphore(VkSemaphore &semaphore)
 {
 	VkSemaphoreCreateInfo semaphore_create_info =
@@ -172,7 +177,12 @@ void BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCom
 		usage,                                          // VkCommandBufferUsageFlags              flags
 		secondary_command_buffer_info                   // const VkCommandBufferInheritanceInfo * pInheritanceInfo
 	};
-
+	if(secondary_command_buffer_info)
+	{
+		VkResult result = vkBeginCommandBuffer(scommand_buffer, &command_buffer_begin_info);
+		ASSERT(result == VK_SUCCESS, "Could not begin command buffer recording operation.");
+		return;
+	}
 	VkResult result = vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info);
 	ASSERT(result == VK_SUCCESS, "Could not begin command buffer recording operation.");
 }
@@ -256,28 +266,6 @@ void CreateDescriptorSetLayouts()
 	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &tex_dsl));
 	dslci.pBindings = &fubo;
 	VK_CHECK(vkCreateDescriptorSetLayout(logical_device, &dslci, allocators, &fubo_dsl));
-}
-
-void BindDescriptorSet
-(	VkPipelineBindPoint                         pipelineBindPoint,
-    VkPipelineLayout                            layout,
-    uint32_t                                    firstSet,
-    uint32_t                                    descriptorSetCount,
-    uint32_t                                    dynamicOffsetCount,
-    const uint32_t*                             pDynamicOffsets)
-{
-	vkCmdBindDescriptorSets(command_buffer, pipelineBindPoint, layout, firstSet, descriptorSetCount, &ubo_descriptor_sets[current_dyn_buffer_index], dynamicOffsetCount, pDynamicOffsets);
-}
-
-bool EndCommandBufferRecordingOperation()
-{
-	VkResult result = vkEndCommandBuffer(command_buffer);
-	if(result != VK_SUCCESS)
-	{
-		fatal("Error occurred during command buffer recording.");
-		return false;
-	}
-	return true;
 }
 
 bool ResetCommandBuffer(bool release_resources)

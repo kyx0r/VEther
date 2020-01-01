@@ -71,19 +71,12 @@ void FreeCommandBuffers(uint32_t count);
 bool CreateSemaphore(VkSemaphore &semaphore);
 bool CreateFence(VkFence &fence, VkFenceCreateFlags flags);
 void SetCommandBuffer(uint8_t i);
+void SetSCommandBuffer(uint8_t i);
 void BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCommandBufferInheritanceInfo *secondary_command_buffer_info);
-bool EndCommandBufferRecordingOperation();
 bool ResetCommandPool(bool release_resources);
 bool ResetCommandBuffer(bool release_resources);
 void CreateDescriptorPool();
 int MemoryTypeFromProperties(uint32_t type_bits, VkFlags requirements_mask, VkFlags preferred_mask);
-void BindDescriptorSet
-(	VkPipelineBindPoint                         pipelineBindPoint,
-    VkPipelineLayout                            layout,
-    uint32_t                                    firstSet,
-    uint32_t                                    descriptorSetCount,
-    uint32_t                                    dynamicOffsetCount,
-    const uint32_t*                             pDynamicOffsets);
 
 void VramHeapAllocate(VkDeviceSize size, uint32_t memory_type_index);
 void IndexBuffersAllocate();
