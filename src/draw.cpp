@@ -228,7 +228,7 @@ void PresentUI()
 
 void InitUI()
 {
-	ui.buffer_size += 1000;	
+	ui.buffer_size += 1000;
 	ui.vertex_data = control::VertexBufferDigress(sizeof(Uivertex) * ui.buffer_size * 4, &ui.buffer[0], &ui.buffer_offset[0]);
 	ui.index_data = (uint32_t*) control::IndexBufferDigress(ui.buffer_size * 6 * sizeof(uint32_t), &ui.buffer[1], &ui.buffer_offset[1]);
 }
@@ -327,8 +327,8 @@ void Cursor()
 				vert[texvert_idx + 2].pos[1] = ym+10;
 			}
 
-			vert[texvert_idx + 3].pos[0] = vert[texvert_idx + 2].pos[0];  
-			vert[texvert_idx + 3].pos[1] = vert[texvert_idx + 2].pos[1]; 
+			vert[texvert_idx + 3].pos[0] = vert[texvert_idx + 2].pos[0];
+			vert[texvert_idx + 3].pos[1] = vert[texvert_idx + 2].pos[1];
 			vert[texvert_idx + 0].tex_coord[0] = FLT_MAX;
 			vert[texvert_idx + 1].tex_coord[0] = FLT_MAX;
 			vert[texvert_idx + 2].tex_coord[0] = FLT_MAX;
@@ -456,7 +456,7 @@ void SkyDome()
 	vkCmdBindVertexBuffers(command_buffer, 0, 1, &sky.buffer[0], &sky.buffer_offset[0]);
 	vkCmdBindIndexBuffer(command_buffer, sky.buffer[1], sky.buffer_offset[1], VK_INDEX_TYPE_UINT32);
 	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[3]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &sky.dset[0], 1, &sky.uniform_offset[0]);	
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &sky.dset[0], 1, &sky.uniform_offset[0]);
 	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &sky.dset[1], 1, &sky.uniform_offset[1]);
 	vkCmdDrawIndexed(command_buffer, sky.n_indices, 1, 0, 0, 0);
 }

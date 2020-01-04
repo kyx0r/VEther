@@ -63,11 +63,11 @@ void InitMeshes()
 	mesh_ent_t* head = meshes;
 	for(uint8_t i = 0; i<ARRAYSIZE(smeshes); i++)
 	{
-		head->id = i; 
+		head->id = i;
 		head->obj = LoadOBJ(smeshes[i][0]);
 		head->vertex_data = control::VertexBufferDigress(head->obj.renderables->vertex_count * sizeof(Vertex_), &head->buffer[0], &head->buffer_offset[0]);
 		head->index_data = (uint32_t*) control::IndexBufferDigress(
-				head->obj.renderables->index_count * sizeof(uint32_t), &head->buffer[1], &head->buffer_offset[1]);
+		                       head->obj.renderables->index_count * sizeof(uint32_t), &head->buffer[1], &head->buffer_offset[1]);
 		head->mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &head->buffer[3], &head->uniform_offset[0], &head->dset[0], 0);
 
 		zone::Q_memcpy(head->vertex_data, head->obj.renderables->vertices, head->obj.renderables->vertex_count * sizeof(Vertex_));
@@ -100,7 +100,7 @@ mesh_ent_t* GetMesh(int id, mesh_ent_t** last)
 	return copy;
 }
 
-//make a soft dublicate of the entity 
+//make a soft dublicate of the entity
 void InstanceMesh(int id)
 {
 	mesh_ent_t* head;

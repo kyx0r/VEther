@@ -541,7 +541,7 @@ LoadOBJ(char *filename)
 		info.error_callback    = OBJParseDefaultCRTErrorCallback;
 		info.warning_callback  = OBJParseDefaultCRTWarningCallback;
 	}
-	
+
 	if (setjmp(OBJFatal))
 	{
 		fatal("LoadOBJ: out of memory!");
@@ -553,9 +553,9 @@ LoadOBJ(char *filename)
 			warn("LoadOBJ: Using malloc instead of Hunk!");
 			info.parse_memory = malloc(info.parse_memory_size);
 			obj.mark = -1;
-		}		
-	}	
-	
+		}
+	}
+
 	if(info.obj_data)
 	{
 		int tmp = obj.mark;
@@ -599,20 +599,20 @@ LoadOBJ(char *filename)
 		}
 	}
 	//memory is not relocable, pointers need to be reasigned, but seems impossible with current design
-/* 	if(obj.mark != -1)
-	{
-		OBJParserArena *arena = &persistent_state->parser_arena;
-		p("Objparse: arena used = %d  |  arena max = %d", arena->memory_alloc_position, info.parse_memory_size);
-		p(" org %p ", info.parse_memory);
-		persistent_state->parse_memory_to_free = zone::Hunk_ShrinkHigh(info.parse_memory_size - arena->memory_alloc_position);
-		p(" Pers %p ", persistent_state->parse_memory_to_free);
-		p(" V1 %p   %p",obj.renderables->vertices,  obj.renderables->indices);
-		obj.renderables->vertices = (obj.renderables->vertices - (float*)info.parse_memory) + (float*)persistent_state->parse_memory_to_free;
-		obj.renderables->indices = (obj.renderables->indices - (int*)info.parse_memory) + (int*)persistent_state->parse_memory_to_free;
-		p(" V 2%p   %p",obj.renderables->vertices,  obj.renderables->indices);
+	/* 	if(obj.mark != -1)
+		{
+			OBJParserArena *arena = &persistent_state->parser_arena;
+			p("Objparse: arena used = %d  |  arena max = %d", arena->memory_alloc_position, info.parse_memory_size);
+			p(" org %p ", info.parse_memory);
+			persistent_state->parse_memory_to_free = zone::Hunk_ShrinkHigh(info.parse_memory_size - arena->memory_alloc_position);
+			p(" Pers %p ", persistent_state->parse_memory_to_free);
+			p(" V1 %p   %p",obj.renderables->vertices,  obj.renderables->indices);
+			obj.renderables->vertices = (obj.renderables->vertices - (float*)info.parse_memory) + (float*)persistent_state->parse_memory_to_free;
+			obj.renderables->indices = (obj.renderables->indices - (int*)info.parse_memory) + (int*)persistent_state->parse_memory_to_free;
+			p(" V 2%p   %p",obj.renderables->vertices,  obj.renderables->indices);
 
-	} 
-*/	
+		}
+	*/
 	return obj;
 }
 

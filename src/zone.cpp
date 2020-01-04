@@ -425,17 +425,17 @@ void Z_Free (void *ptr, uint8_t zoneid)
 	memblock_t	*block, *other;
 
 #ifdef DEBUG
-    static bool once = true; //silence	
+	static bool once = true; //silence
 	if (!ptr)
 	{
 		if(once)
 		{
-		   info("Z_Free: NULL pointer");
-		   once = false;
+			info("Z_Free: NULL pointer");
+			once = false;
 		}
 		return;
 	}
-#endif	
+#endif
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
 	{
@@ -524,8 +524,8 @@ void Z_Print (uint8_t zoneid)
 		}
 	}
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB",
-        sum,  zsizes[zoneid], (float)sum/(float)(1024*1024),
-        (float)zsizes[zoneid]/(float)(1024*1024));
+	      sum,  zsizes[zoneid], (float)sum/(float)(1024*1024),
+	      (float)zsizes[zoneid]/(float)(1024*1024));
 }
 
 void *Z_TagMalloc (int size, int tag, int align, uint8_t zoneid)
@@ -827,7 +827,7 @@ Hunk_HighAllocName
 ===================
 
 Scheme is as follows:
- 
+
 | 0x0 | <- hunklow (used 0, goes down)        |
 | 0x4 |                                       |  ^
 | 0x8 |                                       v  |
@@ -838,9 +838,9 @@ Now in the cpu, real direction always goes down because of direction flag.
 
 Sample:
 
-| 0x0 | 
-| 0x4 | <- size gets writen (both hunks work the same way)                              
-| 0x8 | <- sentinal right after                                    
+| 0x0 |
+| 0x4 | <- size gets writen (both hunks work the same way)
+| 0x8 | <- sentinal right after
 | 0xC | <- 16 byte alignment
 | 0x10 | <- pointer retured by allocator
 | 0x14 | <- data you use goes down
@@ -882,7 +882,7 @@ void *Hunk_HighAllocName (int size, const char *name)
 	return (void *)(h+1);
 }
 
-/*@size how much to shrink?*/ 
+/*@size how much to shrink?*/
 void *Hunk_ShrinkHigh(int size)
 {
 	size = ((size+15)&~15) - sizeof(hunk_t);
@@ -895,7 +895,7 @@ void *Hunk_ShrinkHigh(int size)
 	nh->sentinal = HUNK_SENTINAL;
 	q_strlcpy (nh->name, h->name, HUNKNAME_LEN);
 	Q_memcpy(nh+1, h+1, nh->size); //have to relocate the block
-    h->size = 0;
+	h->size = 0;
 	h->sentinal = 0;
 	Q_memset(h->name, 0, HUNKNAME_LEN);
 	return (void *)(nh+1);
@@ -1256,8 +1256,8 @@ void *Cache_Check (cache_user_t *c)
 Cache_Alloc
 ==============
 
-template for future: 
- 
+template for future:
+
 cache_user_t cn = {};
 void* a = zone::Cache_Alloc(&cn, 200, "test");
 */

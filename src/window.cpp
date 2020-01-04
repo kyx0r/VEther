@@ -7,6 +7,9 @@
 #include "entity.h"
 #include "cvar.h"
 
+#include <mutex>
+#include <condition_variable>
+
 /* {
 GVAR: framebufferCount -> render.cpp
 GVAR: imageViewCount -> render.cpp
@@ -46,6 +49,19 @@ mu_Context* ctx;
 //}
 
 static bool mfocus = false;
+static VkClearValue clearColor[2] = {};
+static VkClearColorValue color = {};
+static VkImageSubresourceRange range = {};
+static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
+static VkImageMemoryBarrier image_memory_barrier_before_present = {};
+static VkSubmitInfo submit_info = {};
+static VkPresentInfoKHR present_info = {};
+static 	uint32_t image_index;
+static VkPipelineStageFlags flags = {VK_PIPELINE_STAGE_ALL_COMMANDS_BIT};
+static std::mutex mtx[2]; //locking
+static std::condition_variable cvx[2]; //signaling
+static bool run_threads[2] = {};
+static bool quit = false;
 
 namespace window
 {
@@ -103,33 +119,33 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 	{
 		switch(key)
 		{
-			case GLFW_KEY_ESCAPE:
-				trace("Quiting cleanly");
-				glfwSetWindowShouldClose(_window, true);
-				break;
-			case GLFW_KEY_M:
-				if(!ctx->focus)
+		case GLFW_KEY_ESCAPE:
+			trace("Quiting cleanly");
+			glfwSetWindowShouldClose(_window, true);
+			break;
+		case GLFW_KEY_M:
+			if(!ctx->focus)
+			{
+				if(!mfocus)
 				{
-					if(!mfocus)
-					{
-						info("Mouse focused.");
-						glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-						mfocus = true;
-					}
-					else
-					{
-						info("Default mouse.");
-						glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-						mfocus = false;
-					}
+					info("Mouse focused.");
+					glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					mfocus = true;
 				}
-				break;
-			case GLFW_KEY_BACKSPACE:
-				mu_input_keydown(ctx, 8);
-				break;
-			case GLFW_KEY_ENTER:
-				mu_input_keydown(ctx, 16);
-				break;
+				else
+				{
+					info("Default mouse.");
+					glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					mfocus = false;
+				}
+			}
+			break;
+		case GLFW_KEY_BACKSPACE:
+			mu_input_keydown(ctx, 8);
+			break;
+		case GLFW_KEY_ENTER:
+			mu_input_keydown(ctx, 16);
+			break;
 		}
 	}
 }
@@ -394,15 +410,143 @@ static void style_window(mu_Context *ctx)
 	}
 }
 
-static VkClearValue clearColor[2] = {};
-static VkClearColorValue color = {};
-static VkImageSubresourceRange range = {};
-static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
-static VkImageMemoryBarrier image_memory_barrier_before_present = {};
-static VkSubmitInfo submit_info = {};
-static VkPresentInfoKHR present_info = {};
-static 	uint32_t image_index;
-static VkPipelineStageFlags flags = {VK_PIPELINE_STAGE_ALL_COMMANDS_BIT};
+void UIThread()
+{
+	for(;;)
+	{
+		// Wait until Draw() signals
+		std::unique_lock<std::mutex> lk(mtx[1]);
+		cvx[1].wait(lk, [] {return run_threads[1];});
+
+		if(quit)
+		{
+
+			run_threads[1] = false;
+			lk.unlock();
+			cvx[1].notify_one();
+			return;
+		}
+		mu_Command* cmd = nullptr;
+		mu_begin(ctx);
+		console(ctx);
+		style_window(ctx);
+		mu_end(ctx);
+
+		//record ui commands.
+		while (mu_next_command(ctx, &cmd))
+		{
+			switch (cmd->type)
+			{
+			case MU_COMMAND_TEXT:
+				draw::Text(cmd->text.str, cmd->text.pos, cmd->text.color);
+				break;
+			case MU_COMMAND_RECT:
+				draw::Rect(cmd->rect.rect, cmd->rect.color);
+				break;
+			case MU_COMMAND_ICON:
+				draw::Icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
+				break;
+			}
+		}
+
+		if(mfocus)
+		{
+			draw::Cursor();
+		}
+		draw::Stats();
+
+		VkCommandBufferInheritanceInfo cbii;
+		cbii.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+		cbii.pNext = nullptr;
+		cbii.renderPass = renderPasses[0];
+		cbii.subpass = 0;
+		cbii.framebuffer = framebuffers[image_index];
+		cbii.occlusionQueryEnable = VK_FALSE;
+		cbii.queryFlags = 0;
+		cbii.pipelineStatistics = 0;
+
+		command_buffer = scommand_buffers[1];
+		control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, &cbii);
+
+		VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
+		VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
+
+		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT,
+		                   16 * sizeof(float), sizeof(uint32_t), &window_width);
+		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT,
+		                   16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
+
+		draw::PresentUI();
+
+		VK_CHECK(vkEndCommandBuffer(command_buffer));
+		run_threads[1] = false;
+		lk.unlock();
+		cvx[1].notify_one();
+	}
+}
+
+void Main3DThread()
+{
+	for(;;)
+	{
+
+		std::unique_lock<std::mutex> lk(mtx[0]);
+		cvx[0].wait(lk, [] {return run_threads[0];});
+		if(quit)
+		{
+
+			run_threads[0] = false;
+			lk.unlock();
+			cvx[0].notify_one();
+			return;
+		}
+		VkCommandBufferInheritanceInfo cbii;
+		cbii.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+		cbii.pNext = nullptr;
+		cbii.renderPass = renderPasses[0];
+		cbii.subpass = 0;
+		cbii.framebuffer = framebuffers[image_index];
+		cbii.occlusionQueryEnable = VK_FALSE;
+		cbii.queryFlags = 0;
+		cbii.pipelineStatistics = 0;
+
+		command_buffer = scommand_buffers[0];
+		control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, &cbii);
+
+		VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
+		VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
+
+		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+		float m[16];
+		float c[16];
+		Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
+		entity::ViewMatrix(c);
+		MatrixMultiply(m, c);
+		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
+
+		static double rands[101] = {};
+		for(int i = 0; i<101; i++)
+		{
+			if(!rands[i])
+			{
+				rands[i] = Drand(0.5f, 3.0f);
+			}
+			vec3_t v = {float(sin(time1)*rands[i]), (float)i, float(cos(time1)*rands[i])};
+			entity::MoveTo(i, v);
+		}
+		draw::Meshes();
+		draw::SkyDome();
+
+		VK_CHECK(vkEndCommandBuffer(command_buffer));
+
+		run_threads[0] = false;
+		lk.unlock();
+		cvx[0].notify_one();
+	}
+}
 
 void PreDraw()
 {
@@ -496,109 +640,23 @@ void PreDraw()
 	present_info.pSwapchains = &_swapchain;
 	present_info.pImageIndices = &image_index;
 	present_info.pResults = nullptr;
+
+	std::thread (UIThread).detach();
+	std::thread (Main3DThread).detach();
 }
 
-void UIThread()
+void AwakeWorkers()
 {
-
-	mu_Command* cmd = nullptr;
-	mu_begin(ctx);	
-	console(ctx);
-	style_window(ctx);
-	mu_end(ctx);
-
-	//record ui commands.
-	while (mu_next_command(ctx, &cmd))
+	for(uint8_t i = 0; i<ARRAYSIZE(mtx); i++)
 	{
-		switch (cmd->type)
 		{
-		case MU_COMMAND_TEXT:
-			draw::Text(cmd->text.str, cmd->text.pos, cmd->text.color);
-			break;
-		case MU_COMMAND_RECT:
-			draw::Rect(cmd->rect.rect, cmd->rect.color);
-			break;
-		case MU_COMMAND_ICON:
-			draw::Icon(cmd->icon.id, cmd->icon.rect, cmd->icon.color);
-			break;
+			std::lock_guard<std::mutex> lk(mtx[i]);
+			run_threads[i] = true;
 		}
+		cvx[i].notify_one();
+		std::unique_lock<std::mutex> post_lk(mtx[i]);
+		cvx[i].wait(post_lk, [&] {return !run_threads[i];});
 	}
-
-	if(mfocus)
-	{
-		draw::Cursor();
-	}
-	draw::Stats();
-
-	VkCommandBufferInheritanceInfo cbii;
-	cbii.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
-	cbii.pNext = nullptr;
-	cbii.renderPass = renderPasses[0];
-	cbii.subpass = 0;
-	cbii.framebuffer = framebuffers[image_index];
-	cbii.occlusionQueryEnable = VK_FALSE;
-	cbii.queryFlags = 0;
-	cbii.pipelineStatistics = 0;
-
-	command_buffer = scommand_buffers[1];
-	control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, &cbii);
-
-	VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
-	VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
-
-	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
-	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
-	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), sizeof(uint32_t), &window_width);
-	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + sizeof(uint32_t), sizeof(uint32_t), &window_height);
-
-	draw::PresentUI();
-
-	VK_CHECK(vkEndCommandBuffer(command_buffer));
-	control::SetCommandBuffer(current_cmd_buffer_index);
-}
-
-void Main3D()
-{
-	VkCommandBufferInheritanceInfo cbii;
-	cbii.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
-	cbii.pNext = nullptr;
-	cbii.renderPass = renderPasses[0];
-	cbii.subpass = 0;
-	cbii.framebuffer = framebuffers[image_index];
-	cbii.occlusionQueryEnable = VK_FALSE;
-	cbii.queryFlags = 0;
-	cbii.pipelineStatistics = 0;
-
-	command_buffer = scommand_buffers[0];
-	control::BeginCommandBufferRecordingOperation(VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, &cbii);
-
-	VkViewport viewport = {0, 0, float(window_width), float(window_height), 0, 1 };
-	VkRect2D scissor = { {0, 0}, {uint32_t(window_width), uint32_t(window_height)} };
-
-	vkCmdSetViewport(command_buffer, 0, 1, &viewport);
-	vkCmdSetScissor(command_buffer, 0, 1, &scissor);
-	float m[16];
-	float c[16];
-	Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
-	entity::ViewMatrix(c);
-	MatrixMultiply(m, c);
-	vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
-
-	static double rands[101] = {};
-	for(int i = 0; i<101; i++)
-	{
-		if(!rands[i])
-		{
-			rands[i] = Drand(0.5f, 3.0f);
-		}
-		vec3_t v = {float(sin(time1)*rands[i]), (float)i, float(cos(time1)*rands[i])};
-		entity::MoveTo(i, v);
-	}
-	draw::Meshes();
-	draw::SkyDome();
-
-	VK_CHECK(vkEndCommandBuffer(command_buffer));
-	control::SetCommandBuffer(current_cmd_buffer_index);
 }
 
 inline uint8_t Draw()
@@ -635,13 +693,9 @@ inline uint8_t Draw()
 
 	render::StartRenderPass(render_area, &clearColor[0], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS, 0, image_index);
 
-	std::thread _3d(Main3D);
-	std::thread ui(UIThread);
-	ui.join();
-	_3d.join();
+	AwakeWorkers();
 
-	//Main3D();
-	//UIThread();
+	control::SetCommandBuffer(current_cmd_buffer_index);
 	vkCmdExecuteCommands(command_buffer, 2, &scommand_buffers[0]);
 
 	vkCmdEndRenderPass(command_buffer);
@@ -744,6 +798,8 @@ c:
 	}
 
 	//CLEANUP -----------------------------------
+	quit = true;
+	AwakeWorkers();
 	VK_CHECK(vkDeviceWaitIdle(logical_device));
 	control::FreeCommandBuffers(NUM_COMMAND_BUFFERS);
 	render::DestroyDepthBuffer();

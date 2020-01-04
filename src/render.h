@@ -67,7 +67,7 @@ typedef struct
 	float atmosphereHeight;
 } UniformSkydome;
 
-typedef struct 
+typedef struct
 {
 	float mat[16];
 } Matrix;
