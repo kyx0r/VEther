@@ -11,8 +11,8 @@
 #define TEXTURE_MAX_HEAPS 5
 #define NUM_COMMAND_BUFFERS 5
 
-extern VkCommandBuffer command_buffer;
-extern VkCommandBuffer scommand_buffer;
+extern thread_local VkCommandBuffer command_buffer;
+extern VkCommandBuffer *scommand_buffers;
 extern VkPhysicalDeviceMemoryProperties	memory_properties;
 extern VkDescriptorPool descriptor_pool;
 extern VkDescriptorSetLayout vubo_dsl;
@@ -58,7 +58,7 @@ extern stagingbuffer_t	staging_buffers[NUM_STAGING_BUFFERS];
 namespace control
 {
 
-bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_family);
+bool CreateCommandPools(VkCommandPoolCreateFlags parameters, uint32_t queue_family, uint32_t count);
 void DestroyCommandPool();
 void DestroyDynBuffers();
 void DestroyStagingBuffers();

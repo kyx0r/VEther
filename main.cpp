@@ -127,7 +127,7 @@ int main(int argc, char *lpCmdLine[])
 	    !control::CreateSemaphore(AcquiredSemaphore)||
 	    !control::CreateSemaphore(ReadySemaphore)||
 	    !control::CreateFence(Fence_one, VK_FENCE_CREATE_SIGNALED_BIT)||
-	    !control::CreateCommandPool(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, graphics_queue_family_index)||
+	    !control::CreateCommandPools(VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, graphics_queue_family_index, NUM_COMMAND_BUFFERS)||
 	    !control::AllocatePrimaryCommandBuffers(NUM_COMMAND_BUFFERS)||
 	    !control::AllocateSecondaryCommandBuffers(NUM_COMMAND_BUFFERS)
 	)

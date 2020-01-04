@@ -10,8 +10,8 @@ GVAR: allocators -> startup.cpp
 } */
 
 //{
-VkCommandBuffer command_buffer;
-VkCommandBuffer scommand_buffer;
+thread_local VkCommandBuffer command_buffer;
+VkCommandBuffer *scommand_buffers = nullptr;
 VkPhysicalDeviceMemoryProperties memory_properties;
 VkDescriptorPool descriptor_pool;
 VkDescriptorSetLayout vubo_dsl;
@@ -28,9 +28,8 @@ int current_staging_buffer = 1;
 int current_vheap_index  = 0;
 //}
 
-static VkCommandPool command_pool;
+static VkCommandPool* command_pools;
 static VkCommandBuffer *command_buffers = nullptr;
-static VkCommandBuffer *scommand_buffers = nullptr;
 static VkDeviceMemory dyn_index_buffer_memory;
 static VkDeviceMemory dyn_vertex_buffer_memory;
 static VkDeviceMemory dyn_uniform_buffer_memory;
@@ -40,7 +39,7 @@ static VkDescriptorSet	ubo_descriptor_sets[NUM_DYNAMIC_BUFFERS];
 namespace control
 {
 
-bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_family)
+bool CreateCommandPools(VkCommandPoolCreateFlags parameters, uint32_t queue_family, uint32_t count)
 {
 	VkCommandPoolCreateInfo command_pool_create_info =
 	{
@@ -50,11 +49,15 @@ bool CreateCommandPool(VkCommandPoolCreateFlags parameters, uint32_t queue_famil
 		queue_family                                  // uint32_t                     queueFamilyIndex
 	};
 
-	VkResult result = vkCreateCommandPool(logical_device, &command_pool_create_info, allocators, &command_pool);
-	if(result != VK_SUCCESS)
+	command_pools = (VkCommandPool*) zone::Z_Malloc(sizeof(VkCommandPool) * count);
+	for(uint32_t i = 0; i<count; i++)
 	{
-		fatal("Could not create command pool.");
-		return false;
+		VkResult result = vkCreateCommandPool(logical_device, &command_pool_create_info, allocators, &command_pools[i]);
+		if(result != VK_SUCCESS)
+		{
+			fatal("Could not create command pool.");
+			return false;
+		}
 	}
 	return true;
 }
@@ -63,7 +66,7 @@ bool ResetCommandPool(bool release_resources)
 {
 	//VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT -> let the driver handle the pool automatically.
 	//VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT -> this flag is not required at pool creation if you use this function.
-	VkResult result = vkResetCommandPool(logical_device, command_pool, release_resources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0);
+	VkResult result = vkResetCommandPool(logical_device, command_pools[0], release_resources ? VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT : 0);
 	if(result != VK_SUCCESS)
 	{
 		fatal("Error occurred during command pool reset.");
@@ -78,13 +81,12 @@ bool AllocatePrimaryCommandBuffers(uint32_t count)
 	{
 		VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,   // VkStructureType          sType
 		nullptr,                                          // const void             * pNext
-		command_pool,                                     // VkCommandPool            commandPool
+		command_pools[0],                                     // VkCommandPool            commandPool
 		VK_COMMAND_BUFFER_LEVEL_PRIMARY,                  // VkCommandBufferLevel     level
 		count                                             // uint32_t                 commandBufferCount
 	};
 
-	char* mem = (char*) zone::Z_Malloc(sizeof(VkCommandBuffer) * count);
-	command_buffers = new(mem) VkCommandBuffer[count];
+	command_buffers = (VkCommandBuffer*) zone::Z_Malloc(sizeof(VkCommandBuffer) * count);
 
 	VkResult result = vkAllocateCommandBuffers(logical_device, &command_buffer_allocate_info, &command_buffers[0]);
 	if(result != VK_SUCCESS)
@@ -99,25 +101,23 @@ bool AllocatePrimaryCommandBuffers(uint32_t count)
 
 bool AllocateSecondaryCommandBuffers(uint32_t count)
 {
-	VkCommandBufferAllocateInfo command_buffer_allocate_info =
-	{
-		VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,   // VkStructureType          sType
-		nullptr,                                          // const void             * pNext
-		command_pool,                                     // VkCommandPool            commandPool
-		VK_COMMAND_BUFFER_LEVEL_SECONDARY,                  // VkCommandBufferLevel     level
-		count                                             // uint32_t                 commandBufferCount
-	};
+	scommand_buffers = (VkCommandBuffer*) zone::Z_Malloc(sizeof(VkCommandBuffer) * count);
+	VkCommandBufferAllocateInfo command_buffer_allocate_info;
+	command_buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	command_buffer_allocate_info.pNext = nullptr;
+	command_buffer_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+	command_buffer_allocate_info.commandBufferCount = 1;
 
-	char* mem = (char*) zone::Z_Malloc(sizeof(VkCommandBuffer) * count);
-	scommand_buffers = new(mem) VkCommandBuffer[count];
-
-	VkResult result = vkAllocateCommandBuffers(logical_device, &command_buffer_allocate_info, &scommand_buffers[0]);
-	if(result != VK_SUCCESS)
+	for(uint32_t i = 0; i<count; i++)
 	{
-		fatal("Could not allocate secondary command buffers.");
-		return false;
+		command_buffer_allocate_info.commandPool = command_pools[i];
+		VkResult result = vkAllocateCommandBuffers(logical_device, &command_buffer_allocate_info, &scommand_buffers[i]);
+		if(result != VK_SUCCESS)
+		{
+			fatal("Could not allocate secondary command buffers.");
+			return false;
+		}
 	}
-	scommand_buffer = scommand_buffers[0];
 	return true;
 }
 
@@ -125,11 +125,6 @@ void SetCommandBuffer(uint8_t i)
 {
 	current_cmd_buffer_index = i;
 	command_buffer = command_buffers[i];
-}
-
-void SetSCommandBuffer(uint8_t i)
-{
-	scommand_buffer = scommand_buffers[i];
 }
 
 bool CreateSemaphore(VkSemaphore &semaphore)
@@ -177,12 +172,6 @@ void BeginCommandBufferRecordingOperation(VkCommandBufferUsageFlags usage, VkCom
 		usage,                                          // VkCommandBufferUsageFlags              flags
 		secondary_command_buffer_info                   // const VkCommandBufferInheritanceInfo * pInheritanceInfo
 	};
-	if(secondary_command_buffer_info)
-	{
-		VkResult result = vkBeginCommandBuffer(scommand_buffer, &command_buffer_begin_info);
-		ASSERT(result == VK_SUCCESS, "Could not begin command buffer recording operation.");
-		return;
-	}
 	VkResult result = vkBeginCommandBuffer(command_buffer, &command_buffer_begin_info);
 	ASSERT(result == VK_SUCCESS, "Could not begin command buffer recording operation.");
 }
@@ -282,12 +271,15 @@ bool ResetCommandBuffer(bool release_resources)
 
 void FreeCommandBuffers(uint32_t count)
 {
-	vkFreeCommandBuffers(logical_device, command_pool, count, command_buffers);
+	vkFreeCommandBuffers(logical_device, command_pools[0], count, command_buffers);
 }
 
 void DestroyCommandPool()
 {
-	vkDestroyCommandPool(logical_device, command_pool, allocators);
+	for(int i = 0; i<NUM_COMMAND_BUFFERS; i++)
+	{
+		vkDestroyCommandPool(logical_device, command_pools[i], allocators);
+	}
 }
 
 int MemoryTypeFromProperties(uint32_t type_bits, VkFlags requirements_mask, VkFlags preferred_mask)
