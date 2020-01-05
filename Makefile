@@ -35,7 +35,7 @@ WINAPI+= -lcomctl32 -luuid -lrpcrt4 -ladvapi32 -lwsock32 -lshlwapi -lversion -ld
 
 _UNIX = -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
 
-VETHER = -lVEther -lglfw -lglslang
+VETHER = -lVEther -lglfw -lglslang -lbullet3
  
 #OBJ_NAME specifies the name of our exectuable 
 OBJ_NAME = vether.exe 
@@ -59,6 +59,7 @@ all_individual : $(PROGS)
 VEther: 
 	$(MAKE) all -C ./glsl_compiler
 	$(MAKE) all -C ./glfw
+	$(MAKE) all -C ./bullet3
 	$(MAKE) all -C ./src
 
 #Building a static lib out of src files. Benefits - faster compile time. Makes project modular.
