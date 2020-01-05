@@ -12,9 +12,9 @@
 inline b3Float4 b3Lerp3(b3Float4ConstArg a, b3Float4ConstArg b, float t)
 {
 	return b3MakeFloat4(a.x + (b.x - a.x) * t,
-						a.y + (b.y - a.y) * t,
-						a.z + (b.z - a.z) * t,
-						0.f);
+	                    a.y + (b.y - a.y) * t,
+	                    a.z + (b.z - a.z) * t,
+	                    0.f);
 }
 
 // Clips a face to the back of a plane, return the number of vertices out, stored in ppVtxOut
@@ -65,14 +65,14 @@ int clipFaceGlobal(__global const b3Float4* pVtxIn, int numVertsIn, b3Float4Cons
 }
 
 __kernel void clipFacesAndFindContactsKernel(__global const b3Float4* separatingNormals,
-											 __global const int* hasSeparatingAxis,
-											 __global b3Int4* clippingFacesOut,
-											 __global b3Float4* worldVertsA1,
-											 __global b3Float4* worldNormalsA1,
-											 __global b3Float4* worldVertsB1,
-											 __global b3Float4* worldVertsB2,
-											 int vertexFaceCapacity,
-											 int pairIndex)
+        __global const int* hasSeparatingAxis,
+        __global b3Int4* clippingFacesOut,
+        __global b3Float4* worldVertsA1,
+        __global b3Float4* worldNormalsA1,
+        __global b3Float4* worldVertsB1,
+        __global b3Float4* worldVertsB2,
+        int vertexFaceCapacity,
+        int pairIndex)
 {
 	//    int i = get_global_id(0);
 	//int pairIndex = i;
@@ -150,7 +150,7 @@ __kernel void clipFacesAndFindContactsKernel(__global const b3Float4* separating
 							printf("maxDepth = %f\n", maxDepth);
 
 						}
-*/
+						*/
 						if (depth <= maxDist)
 						{
 							b3Float4 pointInWorld = pVtxIn[i];

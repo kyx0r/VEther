@@ -39,166 +39,192 @@
 
 #include "ParseHelper.h"
 
-namespace glslang {
+namespace glslang
+{
 
-class TConstTraverser : public TIntermTraverser {
+class TConstTraverser : public TIntermTraverser
+{
 public:
-    TConstTraverser(const TConstUnionArray& cUnion, bool singleConstParam, TOperator constructType, const TType& t)
-      : unionArray(cUnion), type(t),
-        constructorType(constructType), singleConstantParam(singleConstParam), error(false), isMatrix(false),
-        matrixCols(0), matrixRows(0) {  index = 0; tOp = EOpNull; }
+	TConstTraverser(const TConstUnionArray& cUnion, bool singleConstParam, TOperator constructType, const TType& t)
+		: unionArray(cUnion), type(t),
+		  constructorType(constructType), singleConstantParam(singleConstParam), error(false), isMatrix(false),
+		  matrixCols(0), matrixRows(0)
+	{
+		index = 0;
+		tOp = EOpNull;
+	}
 
-    virtual void visitConstantUnion(TIntermConstantUnion* node);
-    virtual bool visitAggregate(TVisit, TIntermAggregate* node);
+	virtual void visitConstantUnion(TIntermConstantUnion* node);
+	virtual bool visitAggregate(TVisit, TIntermAggregate* node);
 
-    int index;
-    TConstUnionArray unionArray;
-    TOperator tOp;
-    const TType& type;
-    TOperator constructorType;
-    bool singleConstantParam;
-    bool error;
-    int size; // size of the constructor ( 4 for vec4)
-    bool isMatrix;
-    int matrixCols;
-    int matrixRows;
+	int index;
+	TConstUnionArray unionArray;
+	TOperator tOp;
+	const TType& type;
+	TOperator constructorType;
+	bool singleConstantParam;
+	bool error;
+	int size; // size of the constructor ( 4 for vec4)
+	bool isMatrix;
+	int matrixCols;
+	int matrixRows;
 
 protected:
-    TConstTraverser(TConstTraverser&);
-    TConstTraverser& operator=(TConstTraverser&);
+	TConstTraverser(TConstTraverser&);
+	TConstTraverser& operator=(TConstTraverser&);
 };
 
 bool TConstTraverser::visitAggregate(TVisit /* visit */, TIntermAggregate* node)
 {
-    if (! node->isConstructor() && node->getOp() != EOpComma) {
-        error = true;
+	if (! node->isConstructor() && node->getOp() != EOpComma)
+	{
+		error = true;
 
-        return false;
-    }
+		return false;
+	}
 
-    bool flag = node->getSequence().size() == 1 && node->getSequence()[0]->getAsTyped()->getAsConstantUnion();
-    if (flag) {
-        singleConstantParam = true;
-        constructorType = node->getOp();
-        size = node->getType().computeNumComponents();
+	bool flag = node->getSequence().size() == 1 && node->getSequence()[0]->getAsTyped()->getAsConstantUnion();
+	if (flag)
+	{
+		singleConstantParam = true;
+		constructorType = node->getOp();
+		size = node->getType().computeNumComponents();
 
-        if (node->getType().isMatrix()) {
-            isMatrix = true;
-            matrixCols = node->getType().getMatrixCols();
-            matrixRows = node->getType().getMatrixRows();
-        }
-    }
+		if (node->getType().isMatrix())
+		{
+			isMatrix = true;
+			matrixCols = node->getType().getMatrixCols();
+			matrixRows = node->getType().getMatrixRows();
+		}
+	}
 
-    for (TIntermSequence::iterator p = node->getSequence().begin();
-                                   p != node->getSequence().end(); p++) {
+	for (TIntermSequence::iterator p = node->getSequence().begin();
+	        p != node->getSequence().end(); p++)
+	{
 
-        if (node->getOp() == EOpComma)
-            index = 0;
+		if (node->getOp() == EOpComma)
+			index = 0;
 
-        (*p)->traverse(this);
-    }
-    if (flag)
-    {
-        singleConstantParam = false;
-        constructorType = EOpNull;
-        size = 0;
-        isMatrix = false;
-        matrixCols = 0;
-        matrixRows = 0;
-    }
+		(*p)->traverse(this);
+	}
+	if (flag)
+	{
+		singleConstantParam = false;
+		constructorType = EOpNull;
+		size = 0;
+		isMatrix = false;
+		matrixCols = 0;
+		matrixRows = 0;
+	}
 
-    return false;
+	return false;
 }
 
 void TConstTraverser::visitConstantUnion(TIntermConstantUnion* node)
 {
-    TConstUnionArray leftUnionArray(unionArray);
-    int instanceSize = type.computeNumComponents();
+	TConstUnionArray leftUnionArray(unionArray);
+	int instanceSize = type.computeNumComponents();
 
-    if (index >= instanceSize)
-        return;
+	if (index >= instanceSize)
+		return;
 
-    if (! singleConstantParam) {
-        int rightUnionSize = node->getType().computeNumComponents();
+	if (! singleConstantParam)
+	{
+		int rightUnionSize = node->getType().computeNumComponents();
 
-        const TConstUnionArray& rightUnionArray = node->getConstArray();
-        for (int i = 0; i < rightUnionSize; i++) {
-            if (index >= instanceSize)
-                return;
-            leftUnionArray[index] = rightUnionArray[i];
+		const TConstUnionArray& rightUnionArray = node->getConstArray();
+		for (int i = 0; i < rightUnionSize; i++)
+		{
+			if (index >= instanceSize)
+				return;
+			leftUnionArray[index] = rightUnionArray[i];
 
-            index++;
-        }
-    } else {
-        int endIndex = index + size;
-        const TConstUnionArray& rightUnionArray = node->getConstArray();
-        if (! isMatrix) {
-            int count = 0;
-            int nodeComps = node->getType().computeNumComponents();
-            for (int i = index; i < endIndex; i++) {
-                if (i >= instanceSize)
-                    return;
+			index++;
+		}
+	}
+	else
+	{
+		int endIndex = index + size;
+		const TConstUnionArray& rightUnionArray = node->getConstArray();
+		if (! isMatrix)
+		{
+			int count = 0;
+			int nodeComps = node->getType().computeNumComponents();
+			for (int i = index; i < endIndex; i++)
+			{
+				if (i >= instanceSize)
+					return;
 
-                leftUnionArray[i] = rightUnionArray[count];
+				leftUnionArray[i] = rightUnionArray[count];
 
-                (index)++;
+				(index)++;
 
-                if (nodeComps > 1)
-                    count++;
-            }
-        } else {
-            // constructing a matrix, but from what?
-            if (node->isMatrix()) {
-                // Matrix from a matrix; this has the outer matrix, node is the argument matrix.
-                // Traverse the outer, potentially bigger matrix, fill in missing pieces with the
-                // identity matrix.
-                for (int c = 0; c < matrixCols; ++c) {
-                    for (int r = 0; r < matrixRows; ++r) {
-                        int targetOffset = index + c * matrixRows + r;
-                        if (r < node->getType().getMatrixRows() && c < node->getType().getMatrixCols()) {
-                            int srcOffset = c * node->getType().getMatrixRows() + r;
-                            leftUnionArray[targetOffset] = rightUnionArray[srcOffset];
-                        } else if (r == c)
-                            leftUnionArray[targetOffset].setDConst(1.0);
-                        else
-                            leftUnionArray[targetOffset].setDConst(0.0);
-                    }
-                }
-            } else {
-                // matrix from vector
-                int count = 0;
-                const int startIndex = index;
-                int nodeComps = node->getType().computeNumComponents();
-                for (int i = startIndex; i < endIndex; i++) {
-                    if (i >= instanceSize)
-                        return;
-                    if (i == startIndex || (i - startIndex) % (matrixRows + 1) == 0 )
-                        leftUnionArray[i] = rightUnionArray[count];
-                    else
-                        leftUnionArray[i].setDConst(0.0);
+				if (nodeComps > 1)
+					count++;
+			}
+		}
+		else
+		{
+			// constructing a matrix, but from what?
+			if (node->isMatrix())
+			{
+				// Matrix from a matrix; this has the outer matrix, node is the argument matrix.
+				// Traverse the outer, potentially bigger matrix, fill in missing pieces with the
+				// identity matrix.
+				for (int c = 0; c < matrixCols; ++c)
+				{
+					for (int r = 0; r < matrixRows; ++r)
+					{
+						int targetOffset = index + c * matrixRows + r;
+						if (r < node->getType().getMatrixRows() && c < node->getType().getMatrixCols())
+						{
+							int srcOffset = c * node->getType().getMatrixRows() + r;
+							leftUnionArray[targetOffset] = rightUnionArray[srcOffset];
+						}
+						else if (r == c)
+							leftUnionArray[targetOffset].setDConst(1.0);
+						else
+							leftUnionArray[targetOffset].setDConst(0.0);
+					}
+				}
+			}
+			else
+			{
+				// matrix from vector
+				int count = 0;
+				const int startIndex = index;
+				int nodeComps = node->getType().computeNumComponents();
+				for (int i = startIndex; i < endIndex; i++)
+				{
+					if (i >= instanceSize)
+						return;
+					if (i == startIndex || (i - startIndex) % (matrixRows + 1) == 0 )
+						leftUnionArray[i] = rightUnionArray[count];
+					else
+						leftUnionArray[i].setDConst(0.0);
 
-                    index++;
+					index++;
 
-                    if (nodeComps > 1)
-                        count++;
-                }
-            }
-        }
-    }
+					if (nodeComps > 1)
+						count++;
+				}
+			}
+		}
+	}
 }
 
 bool TIntermediate::parseConstTree(TIntermNode* root, TConstUnionArray unionArray, TOperator constructorType, const TType& t, bool singleConstantParam)
 {
-    if (root == 0)
-        return false;
+	if (root == 0)
+		return false;
 
-    TConstTraverser it(unionArray, singleConstantParam, constructorType, t);
+	TConstTraverser it(unionArray, singleConstantParam, constructorType, t);
 
-    root->traverse(&it);
-    if (it.error)
-        return true;
-    else
-        return false;
+	root->traverse(&it);
+	if (it.error)
+		return true;
+	else
+		return false;
 }
 
 } // end namespace glslang

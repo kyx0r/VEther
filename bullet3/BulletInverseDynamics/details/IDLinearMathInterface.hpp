@@ -21,10 +21,22 @@ class vec3 : public btVector3
 {
 public:
 	vec3() : btVector3() {}
-	vec3(const btVector3& btv) { *this = btv; }
-	idScalar& operator()(int i) { return (*this)[i]; }
-	const idScalar& operator()(int i) const { return (*this)[i]; }
-	int size() const { return 3; }
+	vec3(const btVector3& btv)
+	{
+		*this = btv;
+	}
+	idScalar& operator()(int i)
+	{
+		return (*this)[i];
+	}
+	const idScalar& operator()(int i) const
+	{
+		return (*this)[i];
+	}
+	int size() const
+	{
+		return 3;
+	}
 	const vec3& operator=(const btVector3& rhs)
 	{
 		*static_cast<btVector3*>(this) = rhs;
@@ -36,9 +48,18 @@ class mat33 : public btMatrix3x3
 {
 public:
 	mat33() : btMatrix3x3() {}
-	mat33(const btMatrix3x3& btm) { *this = btm; }
-	idScalar& operator()(int i, int j) { return (*this)[i][j]; }
-	const idScalar& operator()(int i, int j) const { return (*this)[i][j]; }
+	mat33(const btMatrix3x3& btm)
+	{
+		*this = btm;
+	}
+	idScalar& operator()(int i, int j)
+	{
+		return (*this)[i][j];
+	}
+	const idScalar& operator()(int i, int j) const
+	{
+		return (*this)[i][j];
+	}
 	const mat33& operator=(const btMatrix3x3& rhs)
 	{
 		*static_cast<btMatrix3x3*>(this) = rhs;
@@ -48,9 +69,15 @@ public:
 	friend mat33 operator/(const mat33& a, const idScalar& s);
 };
 
-inline mat33 operator/(const mat33& a, const idScalar& s) { return a * (1.0 / s); }
+inline mat33 operator/(const mat33& a, const idScalar& s)
+{
+	return a * (1.0 / s);
+}
 
-inline mat33 operator*(const idScalar& s, const mat33& a) { return a * s; }
+inline mat33 operator*(const idScalar& s, const mat33& a)
+{
+	return a * s;
+}
 
 class vecx : public btVectorX<idScalar>
 {
@@ -62,8 +89,14 @@ public:
 		return *this;
 	}
 
-	idScalar& operator()(int i) { return (*this)[i]; }
-	const idScalar& operator()(int i) const { return (*this)[i]; }
+	idScalar& operator()(int i)
+	{
+		return (*this)[i];
+	}
+	const idScalar& operator()(int i) const
+	{
+		return (*this)[i];
+	}
 
 	friend vecx operator*(const vecx& a, const idScalar& s);
 	friend vecx operator*(const idScalar& s, const vecx& a);
@@ -82,7 +115,10 @@ inline vecx operator*(const vecx& a, const idScalar& s)
 	}
 	return result;
 }
-inline vecx operator*(const idScalar& s, const vecx& a) { return a * s; }
+inline vecx operator*(const idScalar& s, const vecx& a)
+{
+	return a * s;
+}
 inline vecx operator+(const vecx& a, const vecx& b)
 {
 	vecx result(a.size());

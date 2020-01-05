@@ -3,8 +3,8 @@ Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousph
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -56,22 +56,25 @@ public:
 	//		explicit btMatrix3x3(const btScalar *m) { setFromOpenGLSubMatrix(m); }
 
 	/**@brief Constructor from Quaternion */
-	explicit btMatrix3x3(const btQuaternion& q) { setRotation(q); }
+	explicit btMatrix3x3(const btQuaternion& q)
+	{
+		setRotation(q);
+	}
 	/*
 	template <typename btScalar>
 	Matrix3x3(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
-	{ 
+	{
 	setEulerYPR(yaw, pitch, roll);
 	}
 	*/
 	/** @brief Constructor with row major formatting */
 	btMatrix3x3(const btScalar& xx, const btScalar& xy, const btScalar& xz,
-				const btScalar& yx, const btScalar& yy, const btScalar& yz,
-				const btScalar& zx, const btScalar& zy, const btScalar& zz)
+	            const btScalar& yx, const btScalar& yy, const btScalar& yz,
+	            const btScalar& zx, const btScalar& zy, const btScalar& zz)
 	{
 		setValue(xx, xy, xz,
-				 yx, yy, yz,
-				 zx, zy, zz);
+		         yx, yy, yz,
+		         zx, zy, zz);
 	}
 
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
@@ -125,24 +128,24 @@ public:
 		m_el[2] = other.m_el[2];
 		return *this;
 	}
-    
-    SIMD_FORCE_INLINE btMatrix3x3(const btVector3& v0, const btVector3& v1, const btVector3& v2)
-    {
-        m_el[0] = v0;
-        m_el[1] = v1;
-        m_el[2] = v2;
-    }
+
+	SIMD_FORCE_INLINE btMatrix3x3(const btVector3& v0, const btVector3& v1, const btVector3& v2)
+	{
+		m_el[0] = v0;
+		m_el[1] = v1;
+		m_el[2] = v2;
+	}
 
 #endif
 
-	/** @brief Get a column of the matrix as a vector 
+	/** @brief Get a column of the matrix as a vector
 	*  @param i Column number 0 indexed */
 	SIMD_FORCE_INLINE btVector3 getColumn(int i) const
 	{
 		return btVector3(m_el[0][i], m_el[1][i], m_el[2][i]);
 	}
 
-	/** @brief Get a row of the matrix as a vector 
+	/** @brief Get a row of the matrix as a vector
 	*  @param i Row number 0 indexed */
 	SIMD_FORCE_INLINE const btVector3& getRow(int i) const
 	{
@@ -150,7 +153,7 @@ public:
 		return m_el[i];
 	}
 
-	/** @brief Get a mutable reference to a row of the matrix as a vector 
+	/** @brief Get a mutable reference to a row of the matrix as a vector
 	*  @param i Row number 0 indexed */
 	SIMD_FORCE_INLINE btVector3& operator[](int i)
 	{
@@ -158,7 +161,7 @@ public:
 		return m_el[i];
 	}
 
-	/** @brief Get a const reference to a row of the matrix as a vector 
+	/** @brief Get a const reference to a row of the matrix as a vector
 	*  @param i Row number 0 indexed */
 	SIMD_FORCE_INLINE const btVector3& operator[](int i) const
 	{
@@ -167,17 +170,17 @@ public:
 	}
 
 	/** @brief Multiply by the target matrix on the right
-	*  @param m Rotation matrix to be applied 
+	*  @param m Rotation matrix to be applied
 	* Equivilant to this = this * m */
 	btMatrix3x3& operator*=(const btMatrix3x3& m);
 
 	/** @brief Adds by the target matrix on the right
-	*  @param m matrix to be applied 
+	*  @param m matrix to be applied
 	* Equivilant to this = this + m */
 	btMatrix3x3& operator+=(const btMatrix3x3& m);
 
 	/** @brief Substractss by the target matrix on the right
-	*  @param m matrix to be applied 
+	*  @param m matrix to be applied
 	* Equivilant to this = this - m */
 	btMatrix3x3& operator-=(const btMatrix3x3& m);
 
@@ -200,8 +203,8 @@ public:
 	*  @param zy Bottom Middle
 	*  @param zz Bottom Right*/
 	void setValue(const btScalar& xx, const btScalar& xy, const btScalar& xz,
-				  const btScalar& yx, const btScalar& yy, const btScalar& yz,
-				  const btScalar& zx, const btScalar& zy, const btScalar& zz)
+	              const btScalar& yx, const btScalar& yy, const btScalar& yz,
+	              const btScalar& zx, const btScalar& zy, const btScalar& zz)
 	{
 		m_el[0].setValue(xx, xy, xz);
 		m_el[1].setValue(yx, yy, yz);
@@ -273,16 +276,16 @@ public:
 		btScalar xx = q.x() * xs, xy = q.x() * ys, xz = q.x() * zs;
 		btScalar yy = q.y() * ys, yz = q.y() * zs, zz = q.z() * zs;
 		setValue(
-			btScalar(1.0) - (yy + zz), xy - wz, xz + wy,
-			xy + wz, btScalar(1.0) - (xx + zz), yz - wx,
-			xz - wy, yz + wx, btScalar(1.0) - (xx + yy));
+		    btScalar(1.0) - (yy + zz), xy - wz, xz + wy,
+		    xy + wz, btScalar(1.0) - (xx + zz), yz - wx,
+		    xz - wy, yz + wx, btScalar(1.0) - (xx + yy));
 #endif
 	}
 
 	/** @brief Set the matrix from euler angles using YPR around YXZ respectively
 	*  @param yaw Yaw about Y axis
 	*  @param pitch Pitch about X axis
-	*  @param roll Roll about Z axis 
+	*  @param roll Roll about Z axis
 	*/
 	void setEulerYPR(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
 	{
@@ -293,9 +296,9 @@ public:
 	* @param eulerX Roll about X axis
 	* @param eulerY Pitch around Y axis
 	* @param eulerZ Yaw about Z axis
-	* 
+	*
 	* These angles are used to produce a rotation matrix. The euler
-	* angles are applied in ZYX order. I.e a vector is first rotated 
+	* angles are applied in ZYX order. I.e a vector is first rotated
 	* about X then Y and then Z
 	**/
 	void setEulerZYX(btScalar eulerX, btScalar eulerY, btScalar eulerZ)
@@ -313,8 +316,8 @@ public:
 		btScalar ss = si * sh;
 
 		setValue(cj * ch, sj * sc - cs, sj * cc + ss,
-				 cj * sh, sj * ss + cc, sj * cs - sc,
-				 -sj, cj * si, cj * ci);
+		         cj * sh, sj * ss + cc, sj * cs - sc,
+		         -sj, cj * si, cj * ci);
 	}
 
 	/**@brief Set the matrix to the identity */
@@ -326,8 +329,8 @@ public:
 		m_el[2] = v0010;
 #else
 		setValue(btScalar(1.0), btScalar(0.0), btScalar(0.0),
-				 btScalar(0.0), btScalar(1.0), btScalar(0.0),
-				 btScalar(0.0), btScalar(0.0), btScalar(1.0));
+		         btScalar(0.0), btScalar(1.0), btScalar(0.0),
+		         btScalar(0.0), btScalar(0.0), btScalar(1.0));
 #endif
 	}
 
@@ -335,13 +338,13 @@ public:
 	{
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 		static const btMatrix3x3
-			identityMatrix(v1000, v0100, v0010);
+		identityMatrix(v1000, v0100, v0010);
 #else
 		static const btMatrix3x3
-			identityMatrix(
-				btScalar(1.0), btScalar(0.0), btScalar(0.0),
-				btScalar(0.0), btScalar(1.0), btScalar(0.0),
-				btScalar(0.0), btScalar(0.0), btScalar(1.0));
+		identityMatrix(
+		    btScalar(1.0), btScalar(0.0), btScalar(0.0),
+		    btScalar(0.0), btScalar(1.0), btScalar(0.0),
+		    btScalar(0.0), btScalar(0.0), btScalar(1.0));
 #endif
 		return identityMatrix;
 	}
@@ -371,7 +374,10 @@ public:
 		vm[2] = v2;
 #elif defined(BT_USE_NEON)
 		// note: zeros the w channel. We can preserve it at the cost of two more vtrn instructions.
-		static const uint32x2_t zMask = (const uint32x2_t){static_cast<uint32_t>(-1), 0};
+		static const uint32x2_t zMask = (const uint32x2_t)
+		{
+			static_cast<uint32_t>(-1), 0
+		};
 		float32x4_t* vm = (float32x4_t*)m;
 		float32x4x2_t top = vtrnq_f32(m_el[0].mVec128, m_el[1].mVec128);               // {x0 x1 z0 z1}, {y0 y1 w0 w1}
 		float32x2x2_t bl = vtrn_f32(vget_low_f32(m_el[2].mVec128), vdup_n_f32(0.0f));  // {x2  0 }, {y2 0}
@@ -399,7 +405,7 @@ public:
 #endif
 	}
 
-	/**@brief Get the matrix represented as a quaternion 
+	/**@brief Get the matrix represented as a quaternion
 	* @param q The quaternion which will be set */
 	void getRotation(btQuaternion & q) const
 	{
@@ -532,7 +538,7 @@ public:
 	/**@brief Get the matrix represented as euler angles around ZYX
 	* @param yaw Yaw around Z axis
 	* @param pitch Pitch around Y axis
-	* @param roll around X axis 
+	* @param roll around X axis
 	* @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/
 	void getEulerZYX(btScalar & yaw, btScalar & pitch, btScalar & roll, unsigned int solution_number = 1) const
 	{
@@ -576,14 +582,14 @@ public:
 			euler_out2.pitch = SIMD_PI - euler_out.pitch;
 
 			euler_out.roll = btAtan2(m_el[2].y() / btCos(euler_out.pitch),
-									 m_el[2].z() / btCos(euler_out.pitch));
+			                         m_el[2].z() / btCos(euler_out.pitch));
 			euler_out2.roll = btAtan2(m_el[2].y() / btCos(euler_out2.pitch),
-									  m_el[2].z() / btCos(euler_out2.pitch));
+			                          m_el[2].z() / btCos(euler_out2.pitch));
 
 			euler_out.yaw = btAtan2(m_el[1].x() / btCos(euler_out.pitch),
-									m_el[0].x() / btCos(euler_out.pitch));
+			                        m_el[0].x() / btCos(euler_out.pitch));
 			euler_out2.yaw = btAtan2(m_el[1].x() / btCos(euler_out2.pitch),
-									 m_el[0].x() / btCos(euler_out2.pitch));
+			                         m_el[0].x() / btCos(euler_out2.pitch));
 		}
 
 		if (solution_number == 1)
@@ -600,7 +606,7 @@ public:
 		}
 	}
 
-	/**@brief Create a scaled copy of the matrix 
+	/**@brief Create a scaled copy of the matrix
 	* @param s Scaling vector The elements of the vector will scale each column */
 
 	btMatrix3x3 scaled(const btVector3& s) const
@@ -609,9 +615,9 @@ public:
 		return btMatrix3x3(m_el[0] * s, m_el[1] * s, m_el[2] * s);
 #else
 		return btMatrix3x3(
-			m_el[0].x() * s.x(), m_el[0].y() * s.y(), m_el[0].z() * s.z(),
-			m_el[1].x() * s.x(), m_el[1].y() * s.y(), m_el[1].z() * s.z(),
-			m_el[2].x() * s.x(), m_el[2].y() * s.y(), m_el[2].z() * s.z());
+		    m_el[0].x() * s.x(), m_el[0].y() * s.y(), m_el[0].z() * s.z(),
+		    m_el[1].x() * s.x(), m_el[1].y() * s.y(), m_el[1].z() * s.z(),
+		    m_el[2].x() * s.x(), m_el[2].y() * s.y(), m_el[2].z() * s.z());
 #endif
 	}
 
@@ -678,12 +684,12 @@ public:
 		{
 			btMatrix3x3 R(q);
 			btVector3 omega = (R.getColumn(0).cross(A.getColumn(0)) + R.getColumn(1).cross(A.getColumn(1)) + R.getColumn(2).cross(A.getColumn(2))) * (btScalar(1.0) / btFabs(R.getColumn(0).dot(A.getColumn(0)) + R.getColumn(1).dot(A.getColumn(1)) + R.getColumn(2).dot(A.getColumn(2))) +
-																																					  tolerance);
+			        tolerance);
 			w = omega.norm();
 			if (w < tolerance)
 				break;
 			q = btQuaternion(btVector3((btScalar(1.0) / w) * omega), w) *
-				q;
+			q;
 			q.normalize();
 		}
 	}
@@ -742,7 +748,7 @@ public:
 			if (theta2 * theta2 < btScalar(10 / SIMD_EPSILON))
 			{
 				t = (theta >= 0) ? 1 / (theta + btSqrt(1 + theta2))
-								 : 1 / (theta - btSqrt(1 + theta2));
+				    : 1 / (theta - btSqrt(1 + theta2));
 				cos = 1 / btSqrt(1 + t * t);
 				sin = cos * t;
 			}
@@ -775,7 +781,7 @@ public:
 		}
 	}
 
-	/**@brief Calculate the matrix cofactor 
+	/**@brief Calculate the matrix cofactor
 	* @param r1 The first row to use for calculating the cofactor
 	* @param c1 The first column to use for calculating the cofactor
 	* @param r1 The second row to use for calculating the cofactor
@@ -881,9 +887,9 @@ btMatrix3x3::operator*=(const btMatrix3x3& m)
 	m_el[2].mVec128 = rv2;
 #else
 	setValue(
-		m.tdotx(m_el[0]), m.tdoty(m_el[0]), m.tdotz(m_el[0]),
-		m.tdotx(m_el[1]), m.tdoty(m_el[1]), m.tdotz(m_el[1]),
-		m.tdotx(m_el[2]), m.tdoty(m_el[2]), m.tdotz(m_el[2]));
+	    m.tdotx(m_el[0]), m.tdoty(m_el[0]), m.tdotz(m_el[0]),
+	    m.tdotx(m_el[1]), m.tdoty(m_el[1]), m.tdotz(m_el[1]),
+	    m.tdotx(m_el[2]), m.tdoty(m_el[2]), m.tdotz(m_el[2]));
 #endif
 	return *this;
 }
@@ -897,15 +903,15 @@ btMatrix3x3::operator+=(const btMatrix3x3& m)
 	m_el[2].mVec128 = m_el[2].mVec128 + m.m_el[2].mVec128;
 #else
 	setValue(
-		m_el[0][0] + m.m_el[0][0],
-		m_el[0][1] + m.m_el[0][1],
-		m_el[0][2] + m.m_el[0][2],
-		m_el[1][0] + m.m_el[1][0],
-		m_el[1][1] + m.m_el[1][1],
-		m_el[1][2] + m.m_el[1][2],
-		m_el[2][0] + m.m_el[2][0],
-		m_el[2][1] + m.m_el[2][1],
-		m_el[2][2] + m.m_el[2][2]);
+	    m_el[0][0] + m.m_el[0][0],
+	    m_el[0][1] + m.m_el[0][1],
+	    m_el[0][2] + m.m_el[0][2],
+	    m_el[1][0] + m.m_el[1][0],
+	    m_el[1][1] + m.m_el[1][1],
+	    m_el[1][2] + m.m_el[1][2],
+	    m_el[2][0] + m.m_el[2][0],
+	    m_el[2][1] + m.m_el[2][1],
+	    m_el[2][2] + m.m_el[2][2]);
 #endif
 	return *this;
 }
@@ -916,19 +922,19 @@ operator*(const btMatrix3x3& m, const btScalar& k)
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE))
 	__m128 vk = bt_splat_ps(_mm_load_ss((float*)&k), 0x80);
 	return btMatrix3x3(
-		_mm_mul_ps(m[0].mVec128, vk),
-		_mm_mul_ps(m[1].mVec128, vk),
-		_mm_mul_ps(m[2].mVec128, vk));
+	           _mm_mul_ps(m[0].mVec128, vk),
+	           _mm_mul_ps(m[1].mVec128, vk),
+	           _mm_mul_ps(m[2].mVec128, vk));
 #elif defined(BT_USE_NEON)
 	return btMatrix3x3(
-		vmulq_n_f32(m[0].mVec128, k),
-		vmulq_n_f32(m[1].mVec128, k),
-		vmulq_n_f32(m[2].mVec128, k));
+	           vmulq_n_f32(m[0].mVec128, k),
+	           vmulq_n_f32(m[1].mVec128, k),
+	           vmulq_n_f32(m[2].mVec128, k));
 #else
 	return btMatrix3x3(
-		m[0].x() * k, m[0].y() * k, m[0].z() * k,
-		m[1].x() * k, m[1].y() * k, m[1].z() * k,
-		m[2].x() * k, m[2].y() * k, m[2].z() * k);
+	           m[0].x() * k, m[0].y() * k, m[0].z() * k,
+	           m[1].x() * k, m[1].y() * k, m[1].z() * k,
+	           m[2].x() * k, m[2].y() * k, m[2].z() * k);
 #endif
 }
 
@@ -937,22 +943,22 @@ operator+(const btMatrix3x3& m1, const btMatrix3x3& m2)
 {
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 	return btMatrix3x3(
-		m1[0].mVec128 + m2[0].mVec128,
-		m1[1].mVec128 + m2[1].mVec128,
-		m1[2].mVec128 + m2[2].mVec128);
+	           m1[0].mVec128 + m2[0].mVec128,
+	           m1[1].mVec128 + m2[1].mVec128,
+	           m1[2].mVec128 + m2[2].mVec128);
 #else
 	return btMatrix3x3(
-		m1[0][0] + m2[0][0],
-		m1[0][1] + m2[0][1],
-		m1[0][2] + m2[0][2],
+	           m1[0][0] + m2[0][0],
+	           m1[0][1] + m2[0][1],
+	           m1[0][2] + m2[0][2],
 
-		m1[1][0] + m2[1][0],
-		m1[1][1] + m2[1][1],
-		m1[1][2] + m2[1][2],
+	           m1[1][0] + m2[1][0],
+	           m1[1][1] + m2[1][1],
+	           m1[1][2] + m2[1][2],
 
-		m1[2][0] + m2[2][0],
-		m1[2][1] + m2[2][1],
-		m1[2][2] + m2[2][2]);
+	           m1[2][0] + m2[2][0],
+	           m1[2][1] + m2[2][1],
+	           m1[2][2] + m2[2][2]);
 #endif
 }
 
@@ -961,22 +967,22 @@ operator-(const btMatrix3x3& m1, const btMatrix3x3& m2)
 {
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 	return btMatrix3x3(
-		m1[0].mVec128 - m2[0].mVec128,
-		m1[1].mVec128 - m2[1].mVec128,
-		m1[2].mVec128 - m2[2].mVec128);
+	           m1[0].mVec128 - m2[0].mVec128,
+	           m1[1].mVec128 - m2[1].mVec128,
+	           m1[2].mVec128 - m2[2].mVec128);
 #else
 	return btMatrix3x3(
-		m1[0][0] - m2[0][0],
-		m1[0][1] - m2[0][1],
-		m1[0][2] - m2[0][2],
+	           m1[0][0] - m2[0][0],
+	           m1[0][1] - m2[0][1],
+	           m1[0][2] - m2[0][2],
 
-		m1[1][0] - m2[1][0],
-		m1[1][1] - m2[1][1],
-		m1[1][2] - m2[1][2],
+	           m1[1][0] - m2[1][0],
+	           m1[1][1] - m2[1][1],
+	           m1[1][2] - m2[1][2],
 
-		m1[2][0] - m2[2][0],
-		m1[2][1] - m2[2][1],
-		m1[2][2] - m2[2][2]);
+	           m1[2][0] - m2[2][0],
+	           m1[2][1] - m2[2][1],
+	           m1[2][2] - m2[2][2]);
 #endif
 }
 
@@ -989,15 +995,15 @@ btMatrix3x3::operator-=(const btMatrix3x3& m)
 	m_el[2].mVec128 = m_el[2].mVec128 - m.m_el[2].mVec128;
 #else
 	setValue(
-		m_el[0][0] - m.m_el[0][0],
-		m_el[0][1] - m.m_el[0][1],
-		m_el[0][2] - m.m_el[0][2],
-		m_el[1][0] - m.m_el[1][0],
-		m_el[1][1] - m.m_el[1][1],
-		m_el[1][2] - m.m_el[1][2],
-		m_el[2][0] - m.m_el[2][0],
-		m_el[2][1] - m.m_el[2][1],
-		m_el[2][2] - m.m_el[2][2]);
+	    m_el[0][0] - m.m_el[0][0],
+	    m_el[0][1] - m.m_el[0][1],
+	    m_el[0][2] - m.m_el[0][2],
+	    m_el[1][0] - m.m_el[1][0],
+	    m_el[1][1] - m.m_el[1][1],
+	    m_el[1][2] - m.m_el[1][2],
+	    m_el[2][0] - m.m_el[2][0],
+	    m_el[2][1] - m.m_el[2][1],
+	    m_el[2][2] - m.m_el[2][2]);
 #endif
 	return *this;
 }
@@ -1013,19 +1019,19 @@ btMatrix3x3::absolute() const
 {
 #if defined BT_USE_SIMD_VECTOR3 && (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE))
 	return btMatrix3x3(
-		_mm_and_ps(m_el[0].mVec128, btvAbsfMask),
-		_mm_and_ps(m_el[1].mVec128, btvAbsfMask),
-		_mm_and_ps(m_el[2].mVec128, btvAbsfMask));
+	           _mm_and_ps(m_el[0].mVec128, btvAbsfMask),
+	           _mm_and_ps(m_el[1].mVec128, btvAbsfMask),
+	           _mm_and_ps(m_el[2].mVec128, btvAbsfMask));
 #elif defined(BT_USE_NEON)
 	return btMatrix3x3(
-		(float32x4_t)vandq_s32((int32x4_t)m_el[0].mVec128, btv3AbsMask),
-		(float32x4_t)vandq_s32((int32x4_t)m_el[1].mVec128, btv3AbsMask),
-		(float32x4_t)vandq_s32((int32x4_t)m_el[2].mVec128, btv3AbsMask));
+	           (float32x4_t)vandq_s32((int32x4_t)m_el[0].mVec128, btv3AbsMask),
+	           (float32x4_t)vandq_s32((int32x4_t)m_el[1].mVec128, btv3AbsMask),
+	           (float32x4_t)vandq_s32((int32x4_t)m_el[2].mVec128, btv3AbsMask));
 #else
 	return btMatrix3x3(
-		btFabs(m_el[0].x()), btFabs(m_el[0].y()), btFabs(m_el[0].z()),
-		btFabs(m_el[1].x()), btFabs(m_el[1].y()), btFabs(m_el[1].z()),
-		btFabs(m_el[2].x()), btFabs(m_el[2].y()), btFabs(m_el[2].z()));
+	           btFabs(m_el[0].x()), btFabs(m_el[0].y()), btFabs(m_el[0].z()),
+	           btFabs(m_el[1].x()), btFabs(m_el[1].y()), btFabs(m_el[1].z()),
+	           btFabs(m_el[2].x()), btFabs(m_el[2].y()), btFabs(m_el[2].z()));
 #endif
 }
 
@@ -1050,7 +1056,10 @@ btMatrix3x3::transpose() const
 	return btMatrix3x3(v0, v1, v2);
 #elif defined(BT_USE_NEON)
 	// note: zeros the w channel. We can preserve it at the cost of two more vtrn instructions.
-	static const uint32x2_t zMask = (const uint32x2_t){static_cast<uint32_t>(-1), 0};
+	static const uint32x2_t zMask = (const uint32x2_t)
+	{
+		static_cast<uint32_t>(-1), 0
+	};
 	float32x4x2_t top = vtrnq_f32(m_el[0].mVec128, m_el[1].mVec128);               // {x0 x1 z0 z1}, {y0 y1 w0 w1}
 	float32x2x2_t bl = vtrn_f32(vget_low_f32(m_el[2].mVec128), vdup_n_f32(0.0f));  // {x2  0 }, {y2 0}
 	float32x4_t v0 = vcombine_f32(vget_low_f32(top.val[0]), bl.val[0]);
@@ -1060,8 +1069,8 @@ btMatrix3x3::transpose() const
 	return btMatrix3x3(v0, v1, v2);
 #else
 	return btMatrix3x3(m_el[0].x(), m_el[1].x(), m_el[2].x(),
-					   m_el[0].y(), m_el[1].y(), m_el[2].y(),
-					   m_el[0].z(), m_el[1].z(), m_el[2].z());
+	                   m_el[0].y(), m_el[1].y(), m_el[2].y(),
+	                   m_el[0].z(), m_el[1].z(), m_el[2].z());
 #endif
 }
 
@@ -1069,8 +1078,8 @@ SIMD_FORCE_INLINE btMatrix3x3
 btMatrix3x3::adjoint() const
 {
 	return btMatrix3x3(cofac(1, 1, 2, 2), cofac(0, 2, 2, 1), cofac(0, 1, 1, 2),
-					   cofac(1, 2, 2, 0), cofac(0, 0, 2, 2), cofac(0, 2, 1, 0),
-					   cofac(1, 0, 2, 1), cofac(0, 1, 2, 0), cofac(0, 0, 1, 1));
+	                   cofac(1, 2, 2, 0), cofac(0, 0, 2, 2), cofac(0, 2, 1, 0),
+	                   cofac(1, 0, 2, 1), cofac(0, 1, 2, 0), cofac(0, 0, 1, 1));
 }
 
 SIMD_FORCE_INLINE btMatrix3x3
@@ -1082,8 +1091,8 @@ btMatrix3x3::inverse() const
 	btAssert(det != btScalar(0.0));
 	btScalar s = btScalar(1.0) / det;
 	return btMatrix3x3(co.x() * s, cofac(0, 2, 2, 1) * s, cofac(0, 1, 1, 2) * s,
-					   co.y() * s, cofac(0, 0, 2, 2) * s, cofac(0, 2, 1, 0) * s,
-					   co.z() * s, cofac(0, 1, 2, 0) * s, cofac(0, 0, 1, 1) * s);
+	                   co.y() * s, cofac(0, 0, 2, 2) * s, cofac(0, 2, 1, 0) * s,
+	                   co.z() * s, cofac(0, 1, 2, 0) * s, cofac(0, 0, 1, 1) * s);
 }
 
 SIMD_FORCE_INLINE btMatrix3x3
@@ -1111,7 +1120,10 @@ btMatrix3x3::transposeTimes(const btMatrix3x3& m) const
 
 #elif defined BT_USE_NEON
 	// zeros w
-	static const uint32x4_t xyzMask = (const uint32x4_t){static_cast<uint32_t>(-1), static_cast<uint32_t>(-1), static_cast<uint32_t>(-1), 0};
+	static const uint32x4_t xyzMask = (const uint32x4_t)
+	{
+		static_cast<uint32_t>(-1), static_cast<uint32_t>(-1), static_cast<uint32_t>(-1), 0
+	};
 	float32x4_t m0 = (float32x4_t)vandq_u32((uint32x4_t)m.getRow(0).mVec128, xyzMask);
 	float32x4_t m1 = (float32x4_t)vandq_u32((uint32x4_t)m.getRow(1).mVec128, xyzMask);
 	float32x4_t m2 = (float32x4_t)vandq_u32((uint32x4_t)m.getRow(2).mVec128, xyzMask);
@@ -1130,15 +1142,15 @@ btMatrix3x3::transposeTimes(const btMatrix3x3& m) const
 	return btMatrix3x3(r0, r1, r2);
 #else
 	return btMatrix3x3(
-		m_el[0].x() * m[0].x() + m_el[1].x() * m[1].x() + m_el[2].x() * m[2].x(),
-		m_el[0].x() * m[0].y() + m_el[1].x() * m[1].y() + m_el[2].x() * m[2].y(),
-		m_el[0].x() * m[0].z() + m_el[1].x() * m[1].z() + m_el[2].x() * m[2].z(),
-		m_el[0].y() * m[0].x() + m_el[1].y() * m[1].x() + m_el[2].y() * m[2].x(),
-		m_el[0].y() * m[0].y() + m_el[1].y() * m[1].y() + m_el[2].y() * m[2].y(),
-		m_el[0].y() * m[0].z() + m_el[1].y() * m[1].z() + m_el[2].y() * m[2].z(),
-		m_el[0].z() * m[0].x() + m_el[1].z() * m[1].x() + m_el[2].z() * m[2].x(),
-		m_el[0].z() * m[0].y() + m_el[1].z() * m[1].y() + m_el[2].z() * m[2].y(),
-		m_el[0].z() * m[0].z() + m_el[1].z() * m[1].z() + m_el[2].z() * m[2].z());
+	           m_el[0].x() * m[0].x() + m_el[1].x() * m[1].x() + m_el[2].x() * m[2].x(),
+	           m_el[0].x() * m[0].y() + m_el[1].x() * m[1].y() + m_el[2].x() * m[2].y(),
+	           m_el[0].x() * m[0].z() + m_el[1].x() * m[1].z() + m_el[2].x() * m[2].z(),
+	           m_el[0].y() * m[0].x() + m_el[1].y() * m[1].x() + m_el[2].y() * m[2].x(),
+	           m_el[0].y() * m[0].y() + m_el[1].y() * m[1].y() + m_el[2].y() * m[2].y(),
+	           m_el[0].y() * m[0].z() + m_el[1].y() * m[1].z() + m_el[2].y() * m[2].z(),
+	           m_el[0].z() * m[0].x() + m_el[1].z() * m[1].x() + m_el[2].z() * m[2].x(),
+	           m_el[0].z() * m[0].y() + m_el[1].z() * m[1].y() + m_el[2].z() * m[2].y(),
+	           m_el[0].z() * m[0].z() + m_el[1].z() * m[1].z() + m_el[2].z() * m[2].z());
 #endif
 }
 
@@ -1189,9 +1201,9 @@ btMatrix3x3::timesTranspose(const btMatrix3x3& m) const
 
 #else
 	return btMatrix3x3(
-		m_el[0].dot(m[0]), m_el[0].dot(m[1]), m_el[0].dot(m[2]),
-		m_el[1].dot(m[0]), m_el[1].dot(m[1]), m_el[1].dot(m[2]),
-		m_el[2].dot(m[0]), m_el[2].dot(m[1]), m_el[2].dot(m[2]));
+	           m_el[0].dot(m[0]), m_el[0].dot(m[1]), m_el[0].dot(m[2]),
+	           m_el[1].dot(m[0]), m_el[1].dot(m[1]), m_el[1].dot(m[2]),
+	           m_el[2].dot(m[0]), m_el[2].dot(m[1]), m_el[2].dot(m[2]));
 #endif
 }
 
@@ -1324,9 +1336,9 @@ operator*(const btMatrix3x3& m1, const btMatrix3x3& m2)
 
 #else
 	return btMatrix3x3(
-		m2.tdotx(m1[0]), m2.tdoty(m1[0]), m2.tdotz(m1[0]),
-		m2.tdotx(m1[1]), m2.tdoty(m1[1]), m2.tdotz(m1[1]),
-		m2.tdotx(m1[2]), m2.tdoty(m1[2]), m2.tdotz(m1[2]));
+	           m2.tdotx(m1[0]), m2.tdoty(m1[0]), m2.tdotz(m1[0]),
+	           m2.tdotx(m1[1]), m2.tdoty(m1[1]), m2.tdotz(m1[1]),
+	           m2.tdotx(m1[2]), m2.tdoty(m1[2]), m2.tdotz(m1[2]));
 #endif
 }
 
@@ -1365,8 +1377,8 @@ SIMD_FORCE_INLINE bool operator==(const btMatrix3x3& m1, const btMatrix3x3& m2)
 
 #else
 	return (m1[0][0] == m2[0][0] && m1[1][0] == m2[1][0] && m1[2][0] == m2[2][0] &&
-			m1[0][1] == m2[0][1] && m1[1][1] == m2[1][1] && m1[2][1] == m2[2][1] &&
-			m1[0][2] == m2[0][2] && m1[1][2] == m2[1][2] && m1[2][2] == m2[2][2]);
+	        m1[0][1] == m2[0][1] && m1[1][1] == m2[1][1] && m1[2][1] == m2[2][1] &&
+	        m1[0][2] == m2[0][2] && m1[1][2] == m2[1][2] && m1[2][2] == m2[2][2]);
 #endif
 }
 

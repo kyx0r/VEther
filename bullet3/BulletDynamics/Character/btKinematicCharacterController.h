@@ -4,8 +4,8 @@ Copyright (c) 2003-2008 Erwin Coumans  http://bulletphysics.com
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -33,7 +33,8 @@ class btPairCachingGhostObject;
 ///It uses a ghost object and convex sweep test to test for upcoming collisions. This is combined with discrete collision detection to recover from penetrations.
 ///Interaction between btKinematicCharacterController and dynamic rigid bodies needs to be explicity implemented by the user.
 ATTRIBUTE_ALIGNED16(class)
-btKinematicCharacterController : public btCharacterControllerInterface
+btKinematicCharacterController :
+public btCharacterControllerInterface
 {
 protected:
 	btScalar m_halfHeight;
@@ -129,7 +130,10 @@ public:
 
 	void setUp(const btVector3& up);
 
-	const btVector3& getUp() { return m_up; }
+	const btVector3& getUp()
+	{
+		return m_up;
+	}
 
 	/// This should probably be called setPositionIncrementPerSimulatorStep.
 	/// This is neither a direction nor a velocity, but the amount to
@@ -144,7 +148,7 @@ public:
 	/// This call will reset any walk direction set by setWalkDirection().
 	/// Negative time intervals will result in no motion.
 	virtual void setVelocityForTimeInterval(const btVector3& velocity,
-											btScalar timeInterval);
+	                                        btScalar timeInterval);
 
 	virtual void setAngularVelocity(const btVector3& velocity);
 	virtual const btVector3& getAngularVelocity() const;
@@ -152,9 +156,15 @@ public:
 	virtual void setLinearVelocity(const btVector3& velocity);
 	virtual btVector3 getLinearVelocity() const;
 
-	void setLinearDamping(btScalar d) { m_linearDamping = btClamped(d, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0)); }
+	void setLinearDamping(btScalar d)
+	{
+		m_linearDamping = btClamped(d, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+	}
 	btScalar getLinearDamping() const { return m_linearDamping; }
-	void setAngularDamping(btScalar d) { m_angularDamping = btClamped(d, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0)); }
+	void setAngularDamping(btScalar d)
+	{
+		m_angularDamping = btClamped(d, (btScalar)btScalar(0.0), (btScalar)btScalar(1.0));
+	}
 	btScalar getAngularDamping() const { return m_angularDamping; }
 
 	void reset(btCollisionWorld * collisionWorld);
@@ -174,7 +184,10 @@ public:
 
 	void jump(const btVector3& v = btVector3(0, 0, 0));
 
-	void applyImpulse(const btVector3& v) { jump(v); }
+	void applyImpulse(const btVector3& v)
+	{
+		jump(v);
+	}
 
 	void setGravity(const btVector3& gravity);
 	btVector3 getGravity() const;

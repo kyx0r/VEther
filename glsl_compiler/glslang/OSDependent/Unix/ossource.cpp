@@ -50,7 +50,8 @@
 #include <sys/resource.h>
 #endif
 
-namespace glslang {
+namespace glslang
+{
 
 //
 // Thread cleanup
@@ -62,7 +63,7 @@ namespace glslang {
 //
 static void DetachThreadLinux(void *)
 {
-    DetachThread();
+	DetachThread();
 }
 
 //
@@ -74,31 +75,31 @@ static void DetachThreadLinux(void *)
 void OS_CleanupThreadData(void)
 {
 #if defined(__ANDROID__) || defined(__Fuchsia__)
-    DetachThreadLinux(NULL);
+	DetachThreadLinux(NULL);
 #else
-    int old_cancel_state, old_cancel_type;
-    void *cleanupArg = NULL;
+	int old_cancel_state, old_cancel_type;
+	void *cleanupArg = NULL;
 
-    //
-    // Set thread cancel state and push cleanup handler.
-    //
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old_cancel_state);
-    pthread_cleanup_push(DetachThreadLinux, (void *) cleanupArg);
+	//
+	// Set thread cancel state and push cleanup handler.
+	//
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old_cancel_state);
+	pthread_cleanup_push(DetachThreadLinux, (void *) cleanupArg);
 
-    //
-    // Put the thread in deferred cancellation mode.
-    //
-    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &old_cancel_type);
+	//
+	// Put the thread in deferred cancellation mode.
+	//
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &old_cancel_type);
 
-    //
-    // Pop cleanup handler and execute it prior to unregistering the cleanup handler.
-    //
-    pthread_cleanup_pop(1);
+	//
+	// Pop cleanup handler and execute it prior to unregistering the cleanup handler.
+	//
+	pthread_cleanup_pop(1);
 
-    //
-    // Restore the thread's previous cancellation mode.
-    //
-    pthread_setcanceltype(old_cancel_state, NULL);
+	//
+	// Restore the thread's previous cancellation mode.
+	//
+	pthread_setcanceltype(old_cancel_state, NULL);
 #endif
 }
 
@@ -107,87 +108,91 @@ void OS_CleanupThreadData(void)
 //
 inline OS_TLSIndex PthreadKeyToTLSIndex(pthread_key_t key)
 {
-    return (OS_TLSIndex)((uintptr_t)key + 1);
+	return (OS_TLSIndex)((uintptr_t)key + 1);
 }
 
 inline pthread_key_t TLSIndexToPthreadKey(OS_TLSIndex nIndex)
 {
-    return (pthread_key_t)((uintptr_t)nIndex - 1);
+	return (pthread_key_t)((uintptr_t)nIndex - 1);
 }
 
 OS_TLSIndex OS_AllocTLSIndex()
 {
-    pthread_key_t pPoolIndex;
+	pthread_key_t pPoolIndex;
 
-    //
-    // Create global pool key.
-    //
-    if ((pthread_key_create(&pPoolIndex, NULL)) != 0) {
-        assert(0 && "OS_AllocTLSIndex(): Unable to allocate Thread Local Storage");
-        return OS_INVALID_TLS_INDEX;
-    }
-    else
-        return PthreadKeyToTLSIndex(pPoolIndex);
+	//
+	// Create global pool key.
+	//
+	if ((pthread_key_create(&pPoolIndex, NULL)) != 0)
+	{
+		assert(0 && "OS_AllocTLSIndex(): Unable to allocate Thread Local Storage");
+		return OS_INVALID_TLS_INDEX;
+	}
+	else
+		return PthreadKeyToTLSIndex(pPoolIndex);
 }
 
 bool OS_SetTLSValue(OS_TLSIndex nIndex, void *lpvValue)
 {
-    if (nIndex == OS_INVALID_TLS_INDEX) {
-        assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
-        return false;
-    }
+	if (nIndex == OS_INVALID_TLS_INDEX)
+	{
+		assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
+		return false;
+	}
 
-    if (pthread_setspecific(TLSIndexToPthreadKey(nIndex), lpvValue) == 0)
-        return true;
-    else
-        return false;
+	if (pthread_setspecific(TLSIndexToPthreadKey(nIndex), lpvValue) == 0)
+		return true;
+	else
+		return false;
 }
 
 void* OS_GetTLSValue(OS_TLSIndex nIndex)
 {
-    //
-    // This function should return 0 if nIndex is invalid.
-    //
-    assert(nIndex != OS_INVALID_TLS_INDEX);
-    return pthread_getspecific(TLSIndexToPthreadKey(nIndex));
+	//
+	// This function should return 0 if nIndex is invalid.
+	//
+	assert(nIndex != OS_INVALID_TLS_INDEX);
+	return pthread_getspecific(TLSIndexToPthreadKey(nIndex));
 }
 
 bool OS_FreeTLSIndex(OS_TLSIndex nIndex)
 {
-    if (nIndex == OS_INVALID_TLS_INDEX) {
-        assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
-        return false;
-    }
+	if (nIndex == OS_INVALID_TLS_INDEX)
+	{
+		assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
+		return false;
+	}
 
-    //
-    // Delete the global pool key.
-    //
-    if (pthread_key_delete(TLSIndexToPthreadKey(nIndex)) == 0)
-        return true;
-    else
-        return false;
+	//
+	// Delete the global pool key.
+	//
+	if (pthread_key_delete(TLSIndexToPthreadKey(nIndex)) == 0)
+		return true;
+	else
+		return false;
 }
 
-namespace {
-    pthread_mutex_t gMutex;
+namespace
+{
+pthread_mutex_t gMutex;
 }
 
 void InitGlobalLock()
 {
-  pthread_mutexattr_t mutexattr;
-  pthread_mutexattr_init(&mutexattr);
-  pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
-  pthread_mutex_init(&gMutex, &mutexattr);
+	pthread_mutexattr_t mutexattr;
+	pthread_mutexattr_init(&mutexattr);
+	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&gMutex, &mutexattr);
 }
 
 void GetGlobalLock()
 {
-  pthread_mutex_lock(&gMutex);
+	pthread_mutex_lock(&gMutex);
 }
 
 void ReleaseGlobalLock()
 {
-  pthread_mutex_unlock(&gMutex);
+	pthread_mutex_unlock(&gMutex);
 }
 
 // #define DUMP_COUNTERS
@@ -195,12 +200,12 @@ void ReleaseGlobalLock()
 void OS_DumpMemoryCounters()
 {
 #ifdef DUMP_COUNTERS
-    struct rusage usage;
+	struct rusage usage;
 
-    if (getrusage(RUSAGE_SELF, &usage) == 0)
-        printf("Working set size: %ld\n", usage.ru_maxrss * 1024);
+	if (getrusage(RUSAGE_SELF, &usage) == 0)
+		printf("Working set size: %ld\n", usage.ru_maxrss * 1024);
 #else
-    printf("Recompile with DUMP_COUNTERS defined to see counters.\n");
+	printf("Recompile with DUMP_COUNTERS defined to see counters.\n");
 #endif
 }
 

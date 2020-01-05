@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -68,27 +68,27 @@ public:
 	}
 
 	btManifoldPoint(const btVector3& pointA, const btVector3& pointB,
-					const btVector3& normal,
-					btScalar distance) : m_localPointA(pointA),
-										 m_localPointB(pointB),
-										 m_normalWorldOnB(normal),
-										 m_distance1(distance),
-										 m_combinedFriction(btScalar(0.)),
-										 m_combinedRollingFriction(btScalar(0.)),
-										 m_combinedSpinningFriction(btScalar(0.)),
-										 m_combinedRestitution(btScalar(0.)),
-										 m_userPersistentData(0),
-										 m_contactPointFlags(0),
-										 m_appliedImpulse(0.f),
-										 m_prevRHS(0.f),
-										 m_appliedImpulseLateral1(0.f),
-										 m_appliedImpulseLateral2(0.f),
-										 m_contactMotion1(0.f),
-										 m_contactMotion2(0.f),
-										 m_contactCFM(0.f),
-										 m_contactERP(0.f),
-										 m_frictionCFM(0.f),
-										 m_lifeTime(0)
+	                const btVector3& normal,
+	                btScalar distance) : m_localPointA(pointA),
+		m_localPointB(pointB),
+		m_normalWorldOnB(normal),
+		m_distance1(distance),
+		m_combinedFriction(btScalar(0.)),
+		m_combinedRollingFriction(btScalar(0.)),
+		m_combinedSpinningFriction(btScalar(0.)),
+		m_combinedRestitution(btScalar(0.)),
+		m_userPersistentData(0),
+		m_contactPointFlags(0),
+		m_appliedImpulse(0.f),
+		m_prevRHS(0.f),
+		m_appliedImpulseLateral1(0.f),
+		m_appliedImpulseLateral2(0.f),
+		m_contactMotion1(0.f),
+		m_contactMotion2(0.f),
+		m_contactCFM(0.f),
+		m_contactERP(0.f),
+		m_frictionCFM(0.f),
+		m_lifeTime(0)
 	{
 	}
 
@@ -122,12 +122,14 @@ public:
 	btScalar m_contactMotion1;
 	btScalar m_contactMotion2;
 
-	union {
+	union
+	{
 		btScalar m_contactCFM;
 		btScalar m_combinedContactStiffness1;
 	};
 
-	union {
+	union
+	{
 		btScalar m_contactERP;
 		btScalar m_combinedContactDamping1;
 	};

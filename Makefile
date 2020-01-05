@@ -93,16 +93,14 @@ clean_o:
 	$(MAKE) clean -C ./glsl_compiler
 	$(MAKE) clean -C ./src
 	$(MAKE) clean -C ./glfw
+	$(MAKE) clean -C ./bullet3
 	find . -type f -name '*.o' -delete
 
 c:
 	$(MAKE) clean -C ./src
 
 .IGNORE format:
-	$(ASTYLE) --style=allman --indent=tab ./*.cpp, *.h
-	$(ASTYLE) --style=allman --indent=tab ./src/*.cpp, *.h
-	$(ASTYLE) --style=allman --indent=tab --recursive ./src/*.cpp, *.h
-
+	$(ASTYLE) --style=allman --indent=tab --recursive *.c, *.cpp, *.h, *.hpp
 etags:
 	 find . \( -name "*[tT]est*" -o -name "CVS" -o -name "*#*" -o -name "html" -o -name "*~" -o -name "*.ca*" \) -prune -o \( -iname "*.c" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h"  -o -iname "*.hh" \) -exec etags -a {} \;
 

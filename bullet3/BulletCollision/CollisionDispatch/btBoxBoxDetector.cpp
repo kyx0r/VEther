@@ -7,8 +7,8 @@
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -54,10 +54,22 @@ PURE_INLINE btScalar dDOT13 (const btScalar *a, const btScalar *b) { return dDOT
 PURE_INLINE btScalar dDOT31 (const btScalar *a, const btScalar *b) { return dDOTpq(a,b,3,1); }
 PURE_INLINE btScalar dDOT33 (const btScalar *a, const btScalar *b) { return dDOTpq(a,b,3,3); }
 */
-static btScalar dDOT(const btScalar* a, const btScalar* b) { return dDOTpq(a, b, 1, 1); }
-static btScalar dDOT44(const btScalar* a, const btScalar* b) { return dDOTpq(a, b, 4, 4); }
-static btScalar dDOT41(const btScalar* a, const btScalar* b) { return dDOTpq(a, b, 4, 1); }
-static btScalar dDOT14(const btScalar* a, const btScalar* b) { return dDOTpq(a, b, 1, 4); }
+static btScalar dDOT(const btScalar* a, const btScalar* b)
+{
+	return dDOTpq(a, b, 1, 1);
+}
+static btScalar dDOT44(const btScalar* a, const btScalar* b)
+{
+	return dDOTpq(a, b, 4, 4);
+}
+static btScalar dDOT41(const btScalar* a, const btScalar* b)
+{
+	return dDOTpq(a, b, 4, 1);
+}
+static btScalar dDOT14(const btScalar* a, const btScalar* b)
+{
+	return dDOTpq(a, b, 1, 4);
+}
 #define dMULTIPLYOP1_331(A, op, B, C)   \
 	{                                   \
 		(A)[0] op dDOT41((B), (C));     \
@@ -78,11 +90,11 @@ static btScalar dDOT14(const btScalar* a, const btScalar* b) { return dDOTpq(a, 
 typedef btScalar dMatrix3[4 * 3];
 
 void dLineClosestApproach(const btVector3& pa, const btVector3& ua,
-						  const btVector3& pb, const btVector3& ub,
-						  btScalar* alpha, btScalar* beta);
+                          const btVector3& pb, const btVector3& ub,
+                          btScalar* alpha, btScalar* beta);
 void dLineClosestApproach(const btVector3& pa, const btVector3& ua,
-						  const btVector3& pb, const btVector3& ub,
-						  btScalar* alpha, btScalar* beta)
+                          const btVector3& pb, const btVector3& ub,
+                          btScalar* alpha, btScalar* beta)
 {
 	btVector3 p;
 	p[0] = pb[0] - pa[0];
@@ -152,7 +164,7 @@ static int intersectRectQuad2(btScalar h[2], btScalar p[8], btScalar ret[16])
 				{
 					// this line crosses the chopping line
 					pr[1 - dir] = pq[1 - dir] + (nextq[1 - dir] - pq[1 - dir]) /
-													(nextq[dir] - pq[dir]) * (sign * h[dir] - pq[dir]);
+					              (nextq[dir] - pq[dir]) * (sign * h[dir] - pq[dir]);
 					pr[dir] = sign * h[dir];
 					pr += 2;
 					nr++;
@@ -265,21 +277,21 @@ void cullPoints2(int n, btScalar p[], int m, int i0, int iret[])
 }
 
 int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
-			 const btVector3& side1, const btVector3& p2,
-			 const dMatrix3 R2, const btVector3& side2,
-			 btVector3& normal, btScalar* depth, int* return_code,
-			 int maxc, dContactGeom* /*contact*/, int /*skip*/, btDiscreteCollisionDetectorInterface::Result& output);
+             const btVector3& side1, const btVector3& p2,
+             const dMatrix3 R2, const btVector3& side2,
+             btVector3& normal, btScalar* depth, int* return_code,
+             int maxc, dContactGeom* /*contact*/, int /*skip*/, btDiscreteCollisionDetectorInterface::Result& output);
 int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
-			 const btVector3& side1, const btVector3& p2,
-			 const dMatrix3 R2, const btVector3& side2,
-			 btVector3& normal, btScalar* depth, int* return_code,
-			 int maxc, dContactGeom* /*contact*/, int /*skip*/, btDiscreteCollisionDetectorInterface::Result& output)
+             const btVector3& side1, const btVector3& p2,
+             const dMatrix3 R2, const btVector3& side2,
+             btVector3& normal, btScalar* depth, int* return_code,
+             int maxc, dContactGeom* /*contact*/, int /*skip*/, btDiscreteCollisionDetectorInterface::Result& output)
 {
 	const btScalar fudge_factor = btScalar(1.05);
 	btVector3 p, pp, normalC(0.f, 0.f, 0.f);
 	const btScalar* normalR = 0;
 	btScalar A[3], B[3], R11, R12, R13, R21, R22, R23, R31, R32, R33,
-		Q11, Q12, Q13, Q21, Q22, Q23, Q31, Q32, Q33, s, s2, l;
+	         Q11, Q12, Q13, Q21, Q22, Q23, Q31, Q32, Q33, s, s2, l;
 	int i, j, invert_normal, code;
 
 	// get vector from centers of box 1 to box 2, relative to box 1
@@ -643,7 +655,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 		btScalar k1 = m22 * (ret[j * 2] - c1) - m12 * (ret[j * 2 + 1] - c2);
 		btScalar k2 = -m21 * (ret[j * 2] - c1) + m11 * (ret[j * 2 + 1] - c2);
 		for (i = 0; i < 3; i++) point[cnum * 3 + i] =
-									center[i] + k1 * Rb[i * 4 + a1] + k2 * Rb[i * 4 + a2];
+			    center[i] + k1 * Rb[i * 4 + a1] + k2 * Rb[i * 4 + a2];
 		dep[cnum] = Sa[codeN] - dDOT(normal2, point + cnum * 3);
 		if (dep[cnum] >= 0)
 		{
@@ -756,12 +768,12 @@ void btBoxBoxDetector::getClosestPoints(const ClosestPointInput& input, Result& 
 	int maxc = 4;
 
 	dBoxBox2(transformA.getOrigin(),
-			 R1,
-			 2.f * m_box1->getHalfExtentsWithMargin(),
-			 transformB.getOrigin(),
-			 R2,
-			 2.f * m_box2->getHalfExtentsWithMargin(),
-			 normal, &depth, &return_code,
-			 maxc, contact, skip,
-			 output);
+	         R1,
+	         2.f * m_box1->getHalfExtentsWithMargin(),
+	         transformB.getOrigin(),
+	         R2,
+	         2.f * m_box2->getHalfExtentsWithMargin(),
+	         normal, &depth, &return_code,
+	         maxc, contact, skip,
+	         output);
 }

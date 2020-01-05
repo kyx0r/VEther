@@ -31,7 +31,7 @@ email: projectileman@yahoo.com
 #include "gim_box_set.h"
 
 GUINT GIM_BOX_TREE::_calc_splitting_axis(
-	gim_array<GIM_AABB_DATA>& primitive_boxes, GUINT startIndex, GUINT endIndex)
+    gim_array<GIM_AABB_DATA>& primitive_boxes, GUINT startIndex, GUINT endIndex)
 {
 	GUINT i;
 
@@ -42,7 +42,7 @@ GUINT GIM_BOX_TREE::_calc_splitting_axis(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btVector3 center = btScalar(0.5) * (primitive_boxes[i].m_bound.m_max +
-											primitive_boxes[i].m_bound.m_min);
+		                                    primitive_boxes[i].m_bound.m_min);
 		means += center;
 	}
 	means *= (btScalar(1.) / (btScalar)numIndices);
@@ -50,7 +50,7 @@ GUINT GIM_BOX_TREE::_calc_splitting_axis(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btVector3 center = btScalar(0.5) * (primitive_boxes[i].m_bound.m_max +
-											primitive_boxes[i].m_bound.m_min);
+		                                    primitive_boxes[i].m_bound.m_min);
 		btVector3 diff2 = center - means;
 		diff2 = diff2 * diff2;
 		variance += diff2;
@@ -61,8 +61,8 @@ GUINT GIM_BOX_TREE::_calc_splitting_axis(
 }
 
 GUINT GIM_BOX_TREE::_sort_and_calc_splitting_index(
-	gim_array<GIM_AABB_DATA>& primitive_boxes, GUINT startIndex,
-	GUINT endIndex, GUINT splitAxis)
+    gim_array<GIM_AABB_DATA>& primitive_boxes, GUINT startIndex,
+    GUINT endIndex, GUINT splitAxis)
 {
 	GUINT i;
 	GUINT splitIndex = startIndex;
@@ -73,7 +73,7 @@ GUINT GIM_BOX_TREE::_sort_and_calc_splitting_index(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		splitValue += 0.5f * (primitive_boxes[i].m_bound.m_max[splitAxis] +
-							  primitive_boxes[i].m_bound.m_min[splitAxis]);
+		                      primitive_boxes[i].m_bound.m_min[splitAxis]);
 	}
 	splitValue /= (btScalar)numIndices;
 
@@ -81,7 +81,7 @@ GUINT GIM_BOX_TREE::_sort_and_calc_splitting_index(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btScalar center = 0.5f * (primitive_boxes[i].m_bound.m_max[splitAxis] +
-								  primitive_boxes[i].m_bound.m_min[splitAxis]);
+		                          primitive_boxes[i].m_bound.m_min[splitAxis]);
 		if (center > splitValue)
 		{
 			//swap
@@ -146,7 +146,7 @@ void GIM_BOX_TREE::_build_sub_tree(gim_array<GIM_AABB_DATA>& primitive_boxes, GU
 	splitIndex = _calc_splitting_axis(primitive_boxes, startIndex, endIndex);
 
 	splitIndex = _sort_and_calc_splitting_index(
-		primitive_boxes, startIndex, endIndex, splitIndex);
+	                 primitive_boxes, startIndex, endIndex, splitIndex);
 
 	//configure this inner node : the left node index
 	m_node_array[current_index].m_left = m_num_nodes;
@@ -165,7 +165,7 @@ void GIM_BOX_TREE::_build_sub_tree(gim_array<GIM_AABB_DATA>& primitive_boxes, GU
 
 //! stackless build tree
 void GIM_BOX_TREE::build_tree(
-	gim_array<GIM_AABB_DATA>& primitive_boxes)
+    gim_array<GIM_AABB_DATA>& primitive_boxes)
 {
 	// initialize node count to 0
 	m_num_nodes = 0;

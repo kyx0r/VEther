@@ -443,80 +443,80 @@ void btFactorLDLT(btScalar *A, btScalar *d, int n, int nskip1)
 	/* compute the (less than 2) rows at the bottom */
 	switch (n - i)
 	{
-		case 0:
-			break;
+	case 0:
+		break;
 
-		case 1:
-			btSolveL1_1(A, A + i * nskip1, i, nskip1);
-			/* scale the elements in a 1 x i block at A(i,0), and also */
-			/* compute Z = the outer product matrix that we'll need. */
-			Z11 = 0;
-			ell = A + i * nskip1;
-			dee = d;
-			for (j = i - 6; j >= 0; j -= 6)
-			{
-				p1 = ell[0];
-				dd = dee[0];
-				q1 = p1 * dd;
-				ell[0] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				p1 = ell[1];
-				dd = dee[1];
-				q1 = p1 * dd;
-				ell[1] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				p1 = ell[2];
-				dd = dee[2];
-				q1 = p1 * dd;
-				ell[2] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				p1 = ell[3];
-				dd = dee[3];
-				q1 = p1 * dd;
-				ell[3] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				p1 = ell[4];
-				dd = dee[4];
-				q1 = p1 * dd;
-				ell[4] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				p1 = ell[5];
-				dd = dee[5];
-				q1 = p1 * dd;
-				ell[5] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				ell += 6;
-				dee += 6;
-			}
-			/* compute left-over iterations */
-			j += 6;
-			for (; j > 0; j--)
-			{
-				p1 = ell[0];
-				dd = dee[0];
-				q1 = p1 * dd;
-				ell[0] = q1;
-				m11 = p1 * q1;
-				Z11 += m11;
-				ell++;
-				dee++;
-			}
-			/* solve for diagonal 1 x 1 block at A(i,i) */
-			Z11 = ell[0] - Z11;
-			dee = d + i;
-			/* factorize 1 x 1 block Z,dee */
-			/* factorize row 1 */
-			dee[0] = btRecip(Z11);
-			/* done factorizing 1 x 1 block */
-			break;
+	case 1:
+		btSolveL1_1(A, A + i * nskip1, i, nskip1);
+		/* scale the elements in a 1 x i block at A(i,0), and also */
+		/* compute Z = the outer product matrix that we'll need. */
+		Z11 = 0;
+		ell = A + i * nskip1;
+		dee = d;
+		for (j = i - 6; j >= 0; j -= 6)
+		{
+			p1 = ell[0];
+			dd = dee[0];
+			q1 = p1 * dd;
+			ell[0] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			p1 = ell[1];
+			dd = dee[1];
+			q1 = p1 * dd;
+			ell[1] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			p1 = ell[2];
+			dd = dee[2];
+			q1 = p1 * dd;
+			ell[2] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			p1 = ell[3];
+			dd = dee[3];
+			q1 = p1 * dd;
+			ell[3] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			p1 = ell[4];
+			dd = dee[4];
+			q1 = p1 * dd;
+			ell[4] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			p1 = ell[5];
+			dd = dee[5];
+			q1 = p1 * dd;
+			ell[5] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			ell += 6;
+			dee += 6;
+		}
+		/* compute left-over iterations */
+		j += 6;
+		for (; j > 0; j--)
+		{
+			p1 = ell[0];
+			dd = dee[0];
+			q1 = p1 * dd;
+			ell[0] = q1;
+			m11 = p1 * q1;
+			Z11 += m11;
+			ell++;
+			dee++;
+		}
+		/* solve for diagonal 1 x 1 block at A(i,i) */
+		Z11 = ell[0] - Z11;
+		dee = d + i;
+		/* factorize 1 x 1 block Z,dee */
+		/* factorize row 1 */
+		dee[0] = btRecip(Z11);
+		/* done factorizing 1 x 1 block */
+		break;
 
-			//default: *((char*)0)=0;  /* this should never happen! */
+		//default: *((char*)0)=0;  /* this should never happen! */
 	}
 }
 
@@ -1050,10 +1050,10 @@ void btSolveLDLT(const btScalar *L, const btScalar *d, btScalar *b, int n, int n
 // be copied.
 
 static void btSwapRowsAndCols(BTATYPE A, int n, int i1, int i2, int nskip,
-							  int do_fast_row_swaps)
+                              int do_fast_row_swaps)
 {
 	btAssert(A && n > 0 && i1 >= 0 && i2 >= 0 && i1 < n && i2 < n &&
-			 nskip >= n && i1 < i2);
+	         nskip >= n && i1 < i2);
 
 #ifdef BTROWPTRS
 	btScalar *A_i1 = A[i1];
@@ -1125,9 +1125,9 @@ static void btSwapRowsAndCols(BTATYPE A, int n, int i1, int i2, int nskip,
 // swap two indexes in the n*n LCP problem. i1 must be <= i2.
 
 static void btSwapProblem(BTATYPE A, btScalar *x, btScalar *b, btScalar *w, btScalar *lo,
-						  btScalar *hi, int *p, bool *state, int *findex,
-						  int n, int i1, int i2, int nskip,
-						  int do_fast_row_swaps)
+                          btScalar *hi, int *p, bool *state, int *findex,
+                          int n, int i1, int i2, int nskip,
+                          int do_fast_row_swaps)
 {
 	btScalar tmpr;
 	int tmpi;
@@ -1221,21 +1221,48 @@ struct btLCP
 	int *const m_findex, *const m_p, *const m_C;
 
 	btLCP(int _n, int _nskip, int _nub, btScalar *_Adata, btScalar *_x, btScalar *_b, btScalar *_w,
-		  btScalar *_lo, btScalar *_hi, btScalar *l, btScalar *_d,
-		  btScalar *_Dell, btScalar *_ell, btScalar *_tmp,
-		  bool *_state, int *_findex, int *p, int *c, btScalar **Arows);
-	int getNub() const { return m_nub; }
+	      btScalar *_lo, btScalar *_hi, btScalar *l, btScalar *_d,
+	      btScalar *_Dell, btScalar *_ell, btScalar *_tmp,
+	      bool *_state, int *_findex, int *p, int *c, btScalar **Arows);
+	int getNub() const
+	{
+		return m_nub;
+	}
 	void transfer_i_to_C(int i);
-	void transfer_i_to_N(int i) { m_nN++; }  // because we can assume C and N span 1:i-1
+	void transfer_i_to_N(int i)
+	{
+		m_nN++;    // because we can assume C and N span 1:i-1
+	}
 	void transfer_i_from_N_to_C(int i);
 	void transfer_i_from_C_to_N(int i, btAlignedObjectArray<btScalar> &scratch);
-	int numC() const { return m_nC; }
-	int numN() const { return m_nN; }
-	int indexC(int i) const { return i; }
-	int indexN(int i) const { return i + m_nC; }
-	btScalar Aii(int i) const { return BTAROW(i)[i]; }
-	btScalar AiC_times_qC(int i, btScalar *q) const { return btLargeDot(BTAROW(i), q, m_nC); }
-	btScalar AiN_times_qN(int i, btScalar *q) const { return btLargeDot(BTAROW(i) + m_nC, q + m_nC, m_nN); }
+	int numC() const
+	{
+		return m_nC;
+	}
+	int numN() const
+	{
+		return m_nN;
+	}
+	int indexC(int i) const
+	{
+		return i;
+	}
+	int indexN(int i) const
+	{
+		return i + m_nC;
+	}
+	btScalar Aii(int i) const
+	{
+		return BTAROW(i)[i];
+	}
+	btScalar AiC_times_qC(int i, btScalar *q) const
+	{
+		return btLargeDot(BTAROW(i), q, m_nC);
+	}
+	btScalar AiN_times_qN(int i, btScalar *q) const
+	{
+		return btLargeDot(BTAROW(i) + m_nC, q + m_nC, m_nN);
+	}
 	void pN_equals_ANC_times_qC(btScalar *p, btScalar *q);
 	void pN_plusequals_ANi(btScalar *p, int i, int sign = 1);
 	void pC_plusequals_s_times_qC(btScalar *p, btScalar s, btScalar *q);
@@ -1245,28 +1272,28 @@ struct btLCP
 };
 
 btLCP::btLCP(int _n, int _nskip, int _nub, btScalar *_Adata, btScalar *_x, btScalar *_b, btScalar *_w,
-			 btScalar *_lo, btScalar *_hi, btScalar *l, btScalar *_d,
-			 btScalar *_Dell, btScalar *_ell, btScalar *_tmp,
-			 bool *_state, int *_findex, int *p, int *c, btScalar **Arows) : m_n(_n), m_nskip(_nskip), m_nub(_nub), m_nC(0), m_nN(0),
+             btScalar *_lo, btScalar *_hi, btScalar *l, btScalar *_d,
+             btScalar *_Dell, btScalar *_ell, btScalar *_tmp,
+             bool *_state, int *_findex, int *p, int *c, btScalar **Arows) : m_n(_n), m_nskip(_nskip), m_nub(_nub), m_nC(0), m_nN(0),
 #ifdef BTROWPTRS
-																			 m_A(Arows),
+	m_A(Arows),
 #else
-																			 m_A(_Adata),
+	m_A(_Adata),
 #endif
-																			 m_x(_x),
-																			 m_b(_b),
-																			 m_w(_w),
-																			 m_lo(_lo),
-																			 m_hi(_hi),
-																			 m_L(l),
-																			 m_d(_d),
-																			 m_Dell(_Dell),
-																			 m_ell(_ell),
-																			 m_tmp(_tmp),
-																			 m_state(_state),
-																			 m_findex(_findex),
-																			 m_p(p),
-																			 m_C(c)
+	m_x(_x),
+	m_b(_b),
+	m_w(_w),
+	m_lo(_lo),
+	m_hi(_hi),
+	m_L(l),
+	m_d(_d),
+	m_Dell(_Dell),
+	m_ell(_ell),
+	m_tmp(_tmp),
+	m_state(_state),
+	m_findex(_findex),
+	m_p(p),
+	m_C(c)
 {
 	{
 		btSetZero(m_x, m_n);
@@ -1289,23 +1316,23 @@ btLCP::btLCP(int _n, int _nskip, int _nub, btScalar *_Adata, btScalar *_x, btSca
 	}
 
 	/*
-  // for testing, we can do some random swaps in the area i > nub
-  {
-    const int n = m_n;
-    const int nub = m_nub;
-    if (nub < n) {
-    for (int k=0; k<100; k++) {
-      int i1,i2;
-      do {
-        i1 = dRandInt(n-nub)+nub;
-        i2 = dRandInt(n-nub)+nub;
-      }
-      while (i1 > i2); 
-      //printf ("--> %d %d\n",i1,i2);
-      btSwapProblem (m_A,m_x,m_b,m_w,m_lo,m_hi,m_p,m_state,m_findex,n,i1,i2,m_nskip,0);
-    }
-  }
-  */
+	// for testing, we can do some random swaps in the area i > nub
+	{
+	const int n = m_n;
+	const int nub = m_nub;
+	if (nub < n) {
+	for (int k=0; k<100; k++) {
+	  int i1,i2;
+	  do {
+	    i1 = dRandInt(n-nub)+nub;
+	    i2 = dRandInt(n-nub)+nub;
+	  }
+	  while (i1 > i2);
+	  //printf ("--> %d %d\n",i1,i2);
+	  btSwapProblem (m_A,m_x,m_b,m_w,m_lo,m_hi,m_p,m_state,m_findex,n,i1,i2,m_nskip,0);
+	}
+	}
+	*/
 
 	// permute the problem so that *all* the unbounded variables are at the
 	// start, i.e. look for unbounded variables not included in `nub'. we can
@@ -1370,17 +1397,17 @@ btLCP::btLCP(int _n, int _nskip, int _nub, btScalar *_Adata, btScalar *_x, btSca
 
 	// print info about indexes
 	/*
-  {
-    const int n = m_n;
-    const int nub = m_nub;
-    for (int k=0; k<n; k++) {
-      if (k<nub) printf ("C");
-      else if (m_lo[k]==-BT_INFINITY && m_hi[k]==BT_INFINITY) printf ("c");
-      else printf (".");
-    }
-    printf ("\n");
-  }
-  */
+	{
+	const int n = m_n;
+	const int nub = m_nub;
+	for (int k=0; k<n; k++) {
+	  if (k<nub) printf ("C");
+	  else if (m_lo[k]==-BT_INFINITY && m_hi[k]==BT_INFINITY) printf ("c");
+	  else printf (".");
+	}
+	printf ("\n");
+	}
+	*/
 }
 
 void btLCP::transfer_i_to_C(int i)
@@ -1590,10 +1617,10 @@ inline size_t btEstimateLDLTAddTLTmpbufSize(int nskip)
 }
 
 void btLDLTRemove(btScalar **A, const int *p, btScalar *L, btScalar *d,
-				  int n1, int n2, int r, int nskip, btAlignedObjectArray<btScalar> &scratch)
+                  int n1, int n2, int r, int nskip, btAlignedObjectArray<btScalar> &scratch)
 {
 	btAssert(A && p && L && d && n1 > 0 && n2 > 0 && r >= 0 && r < n2 &&
-			 n1 >= n2 && nskip >= n1);
+	         n1 >= n2 && nskip >= n1);
 #ifdef BT_DEBUG
 	for (int i = 0; i < n2; ++i)
 		btAssert(p[i] >= 0 && p[i] < n1);
@@ -1836,7 +1863,7 @@ void btLCP::unpermute()
 // an optimized Dantzig LCP driver routine for the lo-hi LCP problem.
 
 bool btSolveDantzigLCP(int n, btScalar *A, btScalar *x, btScalar *b,
-					   btScalar *outer_w, int nub, btScalar *lo, btScalar *hi, int *findex, btDantzigScratchMemory &scratchMem)
+                       btScalar *outer_w, int nub, btScalar *lo, btScalar *hi, int *findex, btDantzigScratchMemory &scratchMem)
 {
 	s_error = false;
 
@@ -2112,34 +2139,34 @@ bool btSolveDantzigLCP(int n, btScalar *A, btScalar *x, btScalar *b,
 				// switch indexes between sets if necessary
 				switch (cmd)
 				{
-					case 1:  // done
-						w[i] = 0;
-						lcp.transfer_i_to_C(i);
-						break;
-					case 2:  // done
-						x[i] = lo[i];
-						scratchMem.state[i] = false;
-						lcp.transfer_i_to_N(i);
-						break;
-					case 3:  // done
-						x[i] = hi[i];
-						scratchMem.state[i] = true;
-						lcp.transfer_i_to_N(i);
-						break;
-					case 4:  // keep going
-						w[si] = 0;
-						lcp.transfer_i_from_N_to_C(si);
-						break;
-					case 5:  // keep going
-						x[si] = lo[si];
-						scratchMem.state[si] = false;
-						lcp.transfer_i_from_C_to_N(si, scratchMem.m_scratch);
-						break;
-					case 6:  // keep going
-						x[si] = hi[si];
-						scratchMem.state[si] = true;
-						lcp.transfer_i_from_C_to_N(si, scratchMem.m_scratch);
-						break;
+				case 1:  // done
+					w[i] = 0;
+					lcp.transfer_i_to_C(i);
+					break;
+				case 2:  // done
+					x[i] = lo[i];
+					scratchMem.state[i] = false;
+					lcp.transfer_i_to_N(i);
+					break;
+				case 3:  // done
+					x[i] = hi[i];
+					scratchMem.state[i] = true;
+					lcp.transfer_i_to_N(i);
+					break;
+				case 4:  // keep going
+					w[si] = 0;
+					lcp.transfer_i_from_N_to_C(si);
+					break;
+				case 5:  // keep going
+					x[si] = lo[si];
+					scratchMem.state[si] = false;
+					lcp.transfer_i_from_C_to_N(si, scratchMem.m_scratch);
+					break;
+				case 6:  // keep going
+					x[si] = hi[si];
+					scratchMem.state[si] = true;
+					lcp.transfer_i_from_C_to_N(si, scratchMem.m_scratch);
+					break;
 				}
 
 				if (cmd <= 3) break;

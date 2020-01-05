@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -42,17 +42,20 @@ public:
 
 	///solve a group of constraints
 	virtual btScalar solveGroup(btCollisionObject** bodies,
-								int numBodies,
-								btPersistentManifold** manifolds,
-								int numManifolds,
-								btTypedConstraint** constraints,
-								int numConstraints,
-								const btContactSolverInfo& info,
-								btIDebugDraw* debugDrawer,
-								btDispatcher* dispatcher) BT_OVERRIDE;
+	                            int numBodies,
+	                            btPersistentManifold** manifolds,
+	                            int numManifolds,
+	                            btTypedConstraint** constraints,
+	                            int numConstraints,
+	                            const btContactSolverInfo& info,
+	                            btIDebugDraw* debugDrawer,
+	                            btDispatcher* dispatcher) BT_OVERRIDE;
 
 	virtual void reset() BT_OVERRIDE;
-	virtual btConstraintSolverType getSolverType() const BT_OVERRIDE { return m_solverType; }
+	virtual btConstraintSolverType getSolverType() const BT_OVERRIDE
+	{
+		return m_solverType;
+	}
 
 private:
 	const static size_t kCacheLineSize = 128;
@@ -80,7 +83,8 @@ private:
 ///     - createPredictiveContacts
 ///
 ATTRIBUTE_ALIGNED16(class)
-btDiscreteDynamicsWorldMt : public btDiscreteDynamicsWorld
+btDiscreteDynamicsWorldMt :
+public btDiscreteDynamicsWorld
 {
 protected:
 	btConstraintSolver* m_constraintSolverMt;
@@ -119,10 +123,10 @@ public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	btDiscreteDynamicsWorldMt(btDispatcher * dispatcher,
-							  btBroadphaseInterface * pairCache,
-							  btConstraintSolverPoolMt * solverPool,        // Note this should be a solver-pool for multi-threading
-							  btConstraintSolver * constraintSolverMt,      // single multi-threaded solver for large islands (or NULL)
-							  btCollisionConfiguration * collisionConfiguration);
+	                          btBroadphaseInterface * pairCache,
+	                          btConstraintSolverPoolMt * solverPool,        // Note this should be a solver-pool for multi-threading
+	                          btConstraintSolver * constraintSolverMt,      // single multi-threaded solver for large islands (or NULL)
+	                          btCollisionConfiguration * collisionConfiguration);
 	virtual ~btDiscreteDynamicsWorldMt();
 
 	virtual int stepSimulation(btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep) BT_OVERRIDE;

@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -47,8 +47,14 @@ public:
 	{
 		//virtual bool	addRayResult(const btVector3& normal,btScalar	fraction) = 0;
 
-		virtual void DebugDraw(btScalar fraction) { (void)fraction; }
-		virtual void drawCoordSystem(const btTransform& trans) { (void)trans; }
+		virtual void DebugDraw(btScalar fraction)
+		{
+			(void)fraction;
+		}
+		virtual void drawCoordSystem(const btTransform& trans)
+		{
+			(void)trans;
+		}
 		virtual void reportFailure(int errNo, int numIterations)
 		{
 			(void)errNo;
@@ -63,7 +69,7 @@ public:
 		{
 		}
 
-		virtual ~CastResult(){};
+		virtual ~CastResult() {};
 
 		btTransform m_hitTransformA;
 		btTransform m_hitTransformB;
@@ -72,7 +78,7 @@ public:
 		btScalar m_fraction;  //input and output
 		btIDebugDraw* m_debugDrawer;
 		btScalar m_allowedPenetration;
-		
+
 		int m_subSimplexCastMaxIterations;
 		btScalar m_subSimplexCastEpsilon;
 
@@ -80,11 +86,11 @@ public:
 
 	/// cast a convex against another convex object
 	virtual bool calcTimeOfImpact(
-		const btTransform& fromA,
-		const btTransform& toA,
-		const btTransform& fromB,
-		const btTransform& toB,
-		CastResult& result) = 0;
+	    const btTransform& fromA,
+	    const btTransform& toA,
+	    const btTransform& fromB,
+	    const btTransform& toB,
+	    CastResult& result) = 0;
 };
 
 #endif  //BT_CONVEX_CAST_H

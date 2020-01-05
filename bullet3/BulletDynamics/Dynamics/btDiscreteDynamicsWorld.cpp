@@ -89,9 +89,9 @@ struct InplaceSolverIslandCallback : public btSimulationIslandManager::IslandCal
 	btAlignedObjectArray<btTypedConstraint*> m_constraints;
 
 	InplaceSolverIslandCallback(
-		btConstraintSolver* solver,
-		btStackAlloc* stackAlloc,
-		btDispatcher* dispatcher)
+	    btConstraintSolver* solver,
+	    btStackAlloc* stackAlloc,
+	    btDispatcher* dispatcher)
 		: m_solverInfo(NULL),
 		  m_solver(solver),
 		  m_sortedConstraints(NULL),
@@ -345,9 +345,9 @@ void btDiscreteDynamicsWorld::synchronizeSingleMotionState(btRigidBody* body)
 		{
 			btTransform interpolatedTransform;
 			btTransformUtil::integrateTransform(body->getInterpolationWorldTransform(),
-												body->getInterpolationLinearVelocity(), body->getInterpolationAngularVelocity(),
-												(m_latencyMotionStateInterpolation && m_fixedTimeStep) ? m_localTime - m_fixedTimeStep : m_localTime * body->getHitFraction(),
-												interpolatedTransform);
+			                                    body->getInterpolationLinearVelocity(), body->getInterpolationAngularVelocity(),
+			                                    (m_latencyMotionStateInterpolation && m_fixedTimeStep) ? m_localTime - m_fixedTimeStep : m_localTime * body->getHitFraction(),
+			                                    interpolatedTransform);
 			body->getMotionState()->setWorldTransform(interpolatedTransform);
 		}
 	}
@@ -722,7 +722,7 @@ void btDiscreteDynamicsWorld::calculateSimulationIslands()
 			const btCollisionObject* colObj1 = manifold->getBody1();
 
 			if (((colObj0) && (!(colObj0)->isStaticOrKinematicObject())) &&
-				((colObj1) && (!(colObj1)->isStaticOrKinematicObject())))
+			        ((colObj1) && (!(colObj1)->isStaticOrKinematicObject())))
 			{
 				getSimulationIslandManager()->getUnionFind().unite((colObj0)->getIslandTag(), (colObj1)->getIslandTag());
 			}
@@ -741,7 +741,7 @@ void btDiscreteDynamicsWorld::calculateSimulationIslands()
 				const btRigidBody* colObj1 = &constraint->getRigidBodyB();
 
 				if (((colObj0) && (!(colObj0)->isStaticOrKinematicObject())) &&
-					((colObj1) && (!(colObj1)->isStaticOrKinematicObject())))
+				        ((colObj1) && (!(colObj1)->isStaticOrKinematicObject())))
 				{
 					getSimulationIslandManager()->getUnionFind().unite((colObj0)->getIslandTag(), (colObj1)->getIslandTag());
 				}
@@ -763,10 +763,10 @@ public:
 
 public:
 	btClosestNotMeConvexResultCallback(btCollisionObject* me, const btVector3& fromA, const btVector3& toA, btOverlappingPairCache* pairCache, btDispatcher* dispatcher) : btCollisionWorld::ClosestConvexResultCallback(fromA, toA),
-																																										   m_me(me),
-																																										   m_allowedPenetration(0.0f),
-																																										   m_pairCache(pairCache),
-																																										   m_dispatcher(dispatcher)
+		m_me(me),
+		m_allowedPenetration(0.0f),
+		m_pairCache(pairCache),
+		m_dispatcher(dispatcher)
 	{
 	}
 
@@ -819,7 +819,7 @@ public:
 				{
 					manifoldArray.resize(0);
 					collisionPair->m_algorithm->getAllContactManifolds(manifoldArray);
-					for (int j=0;j<manifoldArray.size();j++)
+					for (int j=0; j<manifoldArray.size(); j++)
 					{
 						btPersistentManifold* manifold = manifoldArray[j];
 						if (manifold->getNumContacts()>0)
@@ -1060,7 +1060,7 @@ void btDiscreteDynamicsWorld::integrateTransforms(btScalar timeStep)
 				btScalar combinedRestitution = gCalculateCombinedRestitutionCallback(body0, body1);
 
 				if (combinedRestitution > 0 && pt.m_appliedImpulse != 0.f)
-				//if (pt.getDistance()>0 && combinedRestitution>0 && pt.m_appliedImpulse != 0.f)
+					//if (pt.getDistance()>0 && combinedRestitution>0 && pt.m_appliedImpulse != 0.f)
 				{
 					btVector3 imp = -pt.m_normalWorldOnB * pt.m_appliedImpulse * combinedRestitution;
 
@@ -1118,100 +1118,150 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 
 	switch (constraint->getConstraintType())
 	{
-		case POINT2POINT_CONSTRAINT_TYPE:
+	case POINT2POINT_CONSTRAINT_TYPE:
+	{
+		btPoint2PointConstraint* p2pC = (btPoint2PointConstraint*)constraint;
+		btTransform tr;
+		tr.setIdentity();
+		btVector3 pivot = p2pC->getPivotInA();
+		pivot = p2pC->getRigidBodyA().getCenterOfMassTransform() * pivot;
+		tr.setOrigin(pivot);
+		getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		// that ideally should draw the same frame
+		pivot = p2pC->getPivotInB();
+		pivot = p2pC->getRigidBodyB().getCenterOfMassTransform() * pivot;
+		tr.setOrigin(pivot);
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+	}
+	break;
+	case HINGE_CONSTRAINT_TYPE:
+	{
+		btHingeConstraint* pHinge = (btHingeConstraint*)constraint;
+		btTransform tr = pHinge->getRigidBodyA().getCenterOfMassTransform() * pHinge->getAFrame();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		tr = pHinge->getRigidBodyB().getCenterOfMassTransform() * pHinge->getBFrame();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		btScalar minAng = pHinge->getLowerLimit();
+		btScalar maxAng = pHinge->getUpperLimit();
+		if (minAng == maxAng)
 		{
-			btPoint2PointConstraint* p2pC = (btPoint2PointConstraint*)constraint;
-			btTransform tr;
-			tr.setIdentity();
-			btVector3 pivot = p2pC->getPivotInA();
-			pivot = p2pC->getRigidBodyA().getCenterOfMassTransform() * pivot;
-			tr.setOrigin(pivot);
-			getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			// that ideally should draw the same frame
-			pivot = p2pC->getPivotInB();
-			pivot = p2pC->getRigidBodyB().getCenterOfMassTransform() * pivot;
-			tr.setOrigin(pivot);
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+			break;
 		}
-		break;
-		case HINGE_CONSTRAINT_TYPE:
+		bool drawSect = true;
+		if (!pHinge->hasLimit())
 		{
-			btHingeConstraint* pHinge = (btHingeConstraint*)constraint;
-			btTransform tr = pHinge->getRigidBodyA().getCenterOfMassTransform() * pHinge->getAFrame();
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			tr = pHinge->getRigidBodyB().getCenterOfMassTransform() * pHinge->getBFrame();
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			btScalar minAng = pHinge->getLowerLimit();
-			btScalar maxAng = pHinge->getUpperLimit();
-			if (minAng == maxAng)
-			{
-				break;
-			}
-			bool drawSect = true;
-			if (!pHinge->hasLimit())
-			{
-				minAng = btScalar(0.f);
-				maxAng = SIMD_2_PI;
-				drawSect = false;
-			}
-			if (drawLimits)
-			{
-				btVector3& center = tr.getOrigin();
-				btVector3 normal = tr.getBasis().getColumn(2);
-				btVector3 axis = tr.getBasis().getColumn(0);
-				getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, minAng, maxAng, btVector3(0, 0, 0), drawSect);
-			}
+			minAng = btScalar(0.f);
+			maxAng = SIMD_2_PI;
+			drawSect = false;
 		}
-		break;
-		case CONETWIST_CONSTRAINT_TYPE:
+		if (drawLimits)
 		{
-			btConeTwistConstraint* pCT = (btConeTwistConstraint*)constraint;
-			btTransform tr = pCT->getRigidBodyA().getCenterOfMassTransform() * pCT->getAFrame();
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			tr = pCT->getRigidBodyB().getCenterOfMassTransform() * pCT->getBFrame();
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			if (drawLimits)
+			btVector3& center = tr.getOrigin();
+			btVector3 normal = tr.getBasis().getColumn(2);
+			btVector3 axis = tr.getBasis().getColumn(0);
+			getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, minAng, maxAng, btVector3(0, 0, 0), drawSect);
+		}
+	}
+	break;
+	case CONETWIST_CONSTRAINT_TYPE:
+	{
+		btConeTwistConstraint* pCT = (btConeTwistConstraint*)constraint;
+		btTransform tr = pCT->getRigidBodyA().getCenterOfMassTransform() * pCT->getAFrame();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		tr = pCT->getRigidBodyB().getCenterOfMassTransform() * pCT->getBFrame();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		if (drawLimits)
+		{
+			//const btScalar length = btScalar(5);
+			const btScalar length = dbgDrawSize;
+			static int nSegments = 8 * 4;
+			btScalar fAngleInRadians = btScalar(2. * 3.1415926) * (btScalar)(nSegments - 1) / btScalar(nSegments);
+			btVector3 pPrev = pCT->GetPointForAngle(fAngleInRadians, length);
+			pPrev = tr * pPrev;
+			for (int i = 0; i < nSegments; i++)
 			{
-				//const btScalar length = btScalar(5);
-				const btScalar length = dbgDrawSize;
-				static int nSegments = 8 * 4;
-				btScalar fAngleInRadians = btScalar(2. * 3.1415926) * (btScalar)(nSegments - 1) / btScalar(nSegments);
-				btVector3 pPrev = pCT->GetPointForAngle(fAngleInRadians, length);
-				pPrev = tr * pPrev;
-				for (int i = 0; i < nSegments; i++)
-				{
-					fAngleInRadians = btScalar(2. * 3.1415926) * (btScalar)i / btScalar(nSegments);
-					btVector3 pCur = pCT->GetPointForAngle(fAngleInRadians, length);
-					pCur = tr * pCur;
-					getDebugDrawer()->drawLine(pPrev, pCur, btVector3(0, 0, 0));
+				fAngleInRadians = btScalar(2. * 3.1415926) * (btScalar)i / btScalar(nSegments);
+				btVector3 pCur = pCT->GetPointForAngle(fAngleInRadians, length);
+				pCur = tr * pCur;
+				getDebugDrawer()->drawLine(pPrev, pCur, btVector3(0, 0, 0));
 
-					if (i % (nSegments / 8) == 0)
-						getDebugDrawer()->drawLine(tr.getOrigin(), pCur, btVector3(0, 0, 0));
+				if (i % (nSegments / 8) == 0)
+					getDebugDrawer()->drawLine(tr.getOrigin(), pCur, btVector3(0, 0, 0));
 
-					pPrev = pCur;
-				}
-				btScalar tws = pCT->getTwistSpan();
-				btScalar twa = pCT->getTwistAngle();
-				bool useFrameB = (pCT->getRigidBodyB().getInvMass() > btScalar(0.f));
-				if (useFrameB)
-				{
-					tr = pCT->getRigidBodyB().getCenterOfMassTransform() * pCT->getBFrame();
-				}
-				else
-				{
-					tr = pCT->getRigidBodyA().getCenterOfMassTransform() * pCT->getAFrame();
-				}
-				btVector3 pivot = tr.getOrigin();
-				btVector3 normal = tr.getBasis().getColumn(0);
-				btVector3 axis1 = tr.getBasis().getColumn(1);
-				getDebugDrawer()->drawArc(pivot, normal, axis1, dbgDrawSize, dbgDrawSize, -twa - tws, -twa + tws, btVector3(0, 0, 0), true);
+				pPrev = pCur;
 			}
+			btScalar tws = pCT->getTwistSpan();
+			btScalar twa = pCT->getTwistAngle();
+			bool useFrameB = (pCT->getRigidBodyB().getInvMass() > btScalar(0.f));
+			if (useFrameB)
+			{
+				tr = pCT->getRigidBodyB().getCenterOfMassTransform() * pCT->getBFrame();
+			}
+			else
+			{
+				tr = pCT->getRigidBodyA().getCenterOfMassTransform() * pCT->getAFrame();
+			}
+			btVector3 pivot = tr.getOrigin();
+			btVector3 normal = tr.getBasis().getColumn(0);
+			btVector3 axis1 = tr.getBasis().getColumn(1);
+			getDebugDrawer()->drawArc(pivot, normal, axis1, dbgDrawSize, dbgDrawSize, -twa - tws, -twa + tws, btVector3(0, 0, 0), true);
 		}
-		break;
-		case D6_SPRING_CONSTRAINT_TYPE:
-		case D6_CONSTRAINT_TYPE:
+	}
+	break;
+	case D6_SPRING_CONSTRAINT_TYPE:
+	case D6_CONSTRAINT_TYPE:
+	{
+		btGeneric6DofConstraint* p6DOF = (btGeneric6DofConstraint*)constraint;
+		btTransform tr = p6DOF->getCalculatedTransformA();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		tr = p6DOF->getCalculatedTransformB();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		if (drawLimits)
 		{
-			btGeneric6DofConstraint* p6DOF = (btGeneric6DofConstraint*)constraint;
+			tr = p6DOF->getCalculatedTransformA();
+			const btVector3& center = p6DOF->getCalculatedTransformB().getOrigin();
+			btVector3 up = tr.getBasis().getColumn(2);
+			btVector3 axis = tr.getBasis().getColumn(0);
+			btScalar minTh = p6DOF->getRotationalLimitMotor(1)->m_loLimit;
+			btScalar maxTh = p6DOF->getRotationalLimitMotor(1)->m_hiLimit;
+			btScalar minPs = p6DOF->getRotationalLimitMotor(2)->m_loLimit;
+			btScalar maxPs = p6DOF->getRotationalLimitMotor(2)->m_hiLimit;
+			getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, btVector3(0, 0, 0));
+			axis = tr.getBasis().getColumn(1);
+			btScalar ay = p6DOF->getAngle(1);
+			btScalar az = p6DOF->getAngle(2);
+			btScalar cy = btCos(ay);
+			btScalar sy = btSin(ay);
+			btScalar cz = btCos(az);
+			btScalar sz = btSin(az);
+			btVector3 ref;
+			ref[0] = cy * cz * axis[0] + cy * sz * axis[1] - sy * axis[2];
+			ref[1] = -sz * axis[0] + cz * axis[1];
+			ref[2] = cz * sy * axis[0] + sz * sy * axis[1] + cy * axis[2];
+			tr = p6DOF->getCalculatedTransformB();
+			btVector3 normal = -tr.getBasis().getColumn(0);
+			btScalar minFi = p6DOF->getRotationalLimitMotor(0)->m_loLimit;
+			btScalar maxFi = p6DOF->getRotationalLimitMotor(0)->m_hiLimit;
+			if (minFi > maxFi)
+			{
+				getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, -SIMD_PI, SIMD_PI, btVector3(0, 0, 0), false);
+			}
+			else if (minFi < maxFi)
+			{
+				getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, minFi, maxFi, btVector3(0, 0, 0), true);
+			}
+			tr = p6DOF->getCalculatedTransformA();
+			btVector3 bbMin = p6DOF->getTranslationalLimitMotor()->m_lowerLimit;
+			btVector3 bbMax = p6DOF->getTranslationalLimitMotor()->m_upperLimit;
+			getDebugDrawer()->drawBox(bbMin, bbMax, tr, btVector3(0, 0, 0));
+		}
+	}
+	break;
+	///note: the code for D6_SPRING_2_CONSTRAINT_TYPE is identical to D6_CONSTRAINT_TYPE, the D6_CONSTRAINT_TYPE+D6_SPRING_CONSTRAINT_TYPE will likely become obsolete/deprecated at some stage
+	case D6_SPRING_2_CONSTRAINT_TYPE:
+	{
+		{
+			btGeneric6DofSpring2Constraint* p6DOF = (btGeneric6DofSpring2Constraint*)constraint;
 			btTransform tr = p6DOF->getCalculatedTransformA();
 			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
 			tr = p6DOF->getCalculatedTransformB();
@@ -1224,9 +1274,12 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 				btVector3 axis = tr.getBasis().getColumn(0);
 				btScalar minTh = p6DOF->getRotationalLimitMotor(1)->m_loLimit;
 				btScalar maxTh = p6DOF->getRotationalLimitMotor(1)->m_hiLimit;
-				btScalar minPs = p6DOF->getRotationalLimitMotor(2)->m_loLimit;
-				btScalar maxPs = p6DOF->getRotationalLimitMotor(2)->m_hiLimit;
-				getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, btVector3(0, 0, 0));
+				if (minTh <= maxTh)
+				{
+					btScalar minPs = p6DOF->getRotationalLimitMotor(2)->m_loLimit;
+					btScalar maxPs = p6DOF->getRotationalLimitMotor(2)->m_hiLimit;
+					getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, btVector3(0, 0, 0));
+				}
 				axis = tr.getBasis().getColumn(1);
 				btScalar ay = p6DOF->getAngle(1);
 				btScalar az = p6DOF->getAngle(2);
@@ -1257,84 +1310,31 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 			}
 		}
 		break;
-		///note: the code for D6_SPRING_2_CONSTRAINT_TYPE is identical to D6_CONSTRAINT_TYPE, the D6_CONSTRAINT_TYPE+D6_SPRING_CONSTRAINT_TYPE will likely become obsolete/deprecated at some stage
-		case D6_SPRING_2_CONSTRAINT_TYPE:
+	}
+	case SLIDER_CONSTRAINT_TYPE:
+	{
+		btSliderConstraint* pSlider = (btSliderConstraint*)constraint;
+		btTransform tr = pSlider->getCalculatedTransformA();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		tr = pSlider->getCalculatedTransformB();
+		if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
+		if (drawLimits)
 		{
-			{
-				btGeneric6DofSpring2Constraint* p6DOF = (btGeneric6DofSpring2Constraint*)constraint;
-				btTransform tr = p6DOF->getCalculatedTransformA();
-				if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-				tr = p6DOF->getCalculatedTransformB();
-				if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-				if (drawLimits)
-				{
-					tr = p6DOF->getCalculatedTransformA();
-					const btVector3& center = p6DOF->getCalculatedTransformB().getOrigin();
-					btVector3 up = tr.getBasis().getColumn(2);
-					btVector3 axis = tr.getBasis().getColumn(0);
-					btScalar minTh = p6DOF->getRotationalLimitMotor(1)->m_loLimit;
-					btScalar maxTh = p6DOF->getRotationalLimitMotor(1)->m_hiLimit;
-					if (minTh <= maxTh)
-					{
-						btScalar minPs = p6DOF->getRotationalLimitMotor(2)->m_loLimit;
-						btScalar maxPs = p6DOF->getRotationalLimitMotor(2)->m_hiLimit;
-						getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, btVector3(0, 0, 0));
-					}
-					axis = tr.getBasis().getColumn(1);
-					btScalar ay = p6DOF->getAngle(1);
-					btScalar az = p6DOF->getAngle(2);
-					btScalar cy = btCos(ay);
-					btScalar sy = btSin(ay);
-					btScalar cz = btCos(az);
-					btScalar sz = btSin(az);
-					btVector3 ref;
-					ref[0] = cy * cz * axis[0] + cy * sz * axis[1] - sy * axis[2];
-					ref[1] = -sz * axis[0] + cz * axis[1];
-					ref[2] = cz * sy * axis[0] + sz * sy * axis[1] + cy * axis[2];
-					tr = p6DOF->getCalculatedTransformB();
-					btVector3 normal = -tr.getBasis().getColumn(0);
-					btScalar minFi = p6DOF->getRotationalLimitMotor(0)->m_loLimit;
-					btScalar maxFi = p6DOF->getRotationalLimitMotor(0)->m_hiLimit;
-					if (minFi > maxFi)
-					{
-						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, -SIMD_PI, SIMD_PI, btVector3(0, 0, 0), false);
-					}
-					else if (minFi < maxFi)
-					{
-						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, minFi, maxFi, btVector3(0, 0, 0), true);
-					}
-					tr = p6DOF->getCalculatedTransformA();
-					btVector3 bbMin = p6DOF->getTranslationalLimitMotor()->m_lowerLimit;
-					btVector3 bbMax = p6DOF->getTranslationalLimitMotor()->m_upperLimit;
-					getDebugDrawer()->drawBox(bbMin, bbMax, tr, btVector3(0, 0, 0));
-				}
-			}
-			break;
+			btTransform tr = pSlider->getUseLinearReferenceFrameA() ? pSlider->getCalculatedTransformA() : pSlider->getCalculatedTransformB();
+			btVector3 li_min = tr * btVector3(pSlider->getLowerLinLimit(), 0.f, 0.f);
+			btVector3 li_max = tr * btVector3(pSlider->getUpperLinLimit(), 0.f, 0.f);
+			getDebugDrawer()->drawLine(li_min, li_max, btVector3(0, 0, 0));
+			btVector3 normal = tr.getBasis().getColumn(0);
+			btVector3 axis = tr.getBasis().getColumn(1);
+			btScalar a_min = pSlider->getLowerAngLimit();
+			btScalar a_max = pSlider->getUpperAngLimit();
+			const btVector3& center = pSlider->getCalculatedTransformB().getOrigin();
+			getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, a_min, a_max, btVector3(0, 0, 0), true);
 		}
-		case SLIDER_CONSTRAINT_TYPE:
-		{
-			btSliderConstraint* pSlider = (btSliderConstraint*)constraint;
-			btTransform tr = pSlider->getCalculatedTransformA();
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			tr = pSlider->getCalculatedTransformB();
-			if (drawFrames) getDebugDrawer()->drawTransform(tr, dbgDrawSize);
-			if (drawLimits)
-			{
-				btTransform tr = pSlider->getUseLinearReferenceFrameA() ? pSlider->getCalculatedTransformA() : pSlider->getCalculatedTransformB();
-				btVector3 li_min = tr * btVector3(pSlider->getLowerLinLimit(), 0.f, 0.f);
-				btVector3 li_max = tr * btVector3(pSlider->getUpperLinLimit(), 0.f, 0.f);
-				getDebugDrawer()->drawLine(li_min, li_max, btVector3(0, 0, 0));
-				btVector3 normal = tr.getBasis().getColumn(0);
-				btVector3 axis = tr.getBasis().getColumn(1);
-				btScalar a_min = pSlider->getLowerAngLimit();
-				btScalar a_max = pSlider->getUpperAngLimit();
-				const btVector3& center = pSlider->getCalculatedTransformB().getOrigin();
-				getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, a_min, a_max, btVector3(0, 0, 0), true);
-			}
-		}
+	}
+	break;
+	default:
 		break;
-		default:
-			break;
 	}
 	return;
 }
@@ -1436,7 +1436,7 @@ void btDiscreteDynamicsWorld::serializeDynamicsWorldInfo(btSerializer* serialize
 
 	worldInfo->m_solverInfo.m_splitImpulse = getSolverInfo().m_splitImpulse;
 
-	
+
 #ifdef BT_USE_DOUBLE_PRECISION
 	const char* structType = "btDynamicsWorldDoubleData";
 #else   //BT_USE_DOUBLE_PRECISION

@@ -23,7 +23,8 @@ subject to the following restrictions:
 //#define BTMBP2PCONSTRAINT_BLOCK_ANGULAR_MOTION_TEST
 
 ATTRIBUTE_ALIGNED16(class)
-btMultiBodyPoint2Point : public btMultiBodyConstraint
+btMultiBodyPoint2Point :
+public btMultiBodyConstraint
 {
 protected:
 	btRigidBody* m_rigidBodyA;
@@ -45,8 +46,8 @@ public:
 	virtual int getIslandIdB() const;
 
 	virtual void createConstraintRows(btMultiBodyConstraintArray & constraintRows,
-									  btMultiBodyJacobianData & data,
-									  const btContactSolverInfo& infoGlobal);
+	                                  btMultiBodyJacobianData & data,
+	                                  const btContactSolverInfo& infoGlobal);
 
 	const btVector3& getPivotInB() const
 	{

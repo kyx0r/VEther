@@ -24,7 +24,7 @@ subject to the following restrictions:
 #include "btTriangleShapeEx.h"
 
 void GIM_TRIANGLE_CONTACT::merge_points(const btVector4& plane,
-										btScalar margin, const btVector3* points, int point_count)
+                                        btScalar margin, const btVector3* points, int point_count)
 {
 	m_point_count = 0;
 	m_penetration_depth = -1000.0f;
@@ -95,7 +95,7 @@ int btPrimitiveTriangle::clip_triangle(btPrimitiveTriangle& other, btVector3* cl
 	get_edge_plane(0, edgeplane);
 
 	int clipped_count = bt_plane_clip_triangle(
-		edgeplane, other.m_vertices[0], other.m_vertices[1], other.m_vertices[2], temp_points);
+	                        edgeplane, other.m_vertices[0], other.m_vertices[1], other.m_vertices[2], temp_points);
 
 	if (clipped_count == 0) return 0;
 
@@ -112,7 +112,7 @@ int btPrimitiveTriangle::clip_triangle(btPrimitiveTriangle& other, btVector3* cl
 	get_edge_plane(2, edgeplane);
 
 	clipped_count = bt_plane_clip_polygon(
-		edgeplane, temp_points1, clipped_count, clipped_points);
+	                    edgeplane, temp_points1, clipped_count, clipped_points);
 
 	return clipped_count;
 }

@@ -159,7 +159,10 @@ public:
 		return m_data[i];
 	}
 
-	inline T* pointer() { return m_data; }
+	inline T* pointer()
+	{
+		return m_data;
+	}
 	inline const T* pointer() const
 	{
 		return m_data;

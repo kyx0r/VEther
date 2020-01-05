@@ -28,7 +28,7 @@ subject to the following restrictions:
 #include <vector>
 
 static void drawVertex(btIDebugDraw* idraw,
-					   const btVector3& x, btScalar s, const btVector3& c)
+                       const btVector3& x, btScalar s, const btVector3& c)
 {
 	idraw->drawLine(x - btVector3(s, 0, 0), x + btVector3(s, 0, 0), c);
 	idraw->drawLine(x - btVector3(0, s, 0), x + btVector3(0, s, 0), c);
@@ -37,18 +37,19 @@ static void drawVertex(btIDebugDraw* idraw,
 
 //
 static void drawBox(btIDebugDraw* idraw,
-					const btVector3& mins,
-					const btVector3& maxs,
-					const btVector3& color)
+                    const btVector3& mins,
+                    const btVector3& maxs,
+                    const btVector3& color)
 {
 	const btVector3 c[] = {btVector3(mins.x(), mins.y(), mins.z()),
-						   btVector3(maxs.x(), mins.y(), mins.z()),
-						   btVector3(maxs.x(), maxs.y(), mins.z()),
-						   btVector3(mins.x(), maxs.y(), mins.z()),
-						   btVector3(mins.x(), mins.y(), maxs.z()),
-						   btVector3(maxs.x(), mins.y(), maxs.z()),
-						   btVector3(maxs.x(), maxs.y(), maxs.z()),
-						   btVector3(mins.x(), maxs.y(), maxs.z())};
+	                       btVector3(maxs.x(), mins.y(), mins.z()),
+	                       btVector3(maxs.x(), maxs.y(), mins.z()),
+	                       btVector3(mins.x(), maxs.y(), mins.z()),
+	                       btVector3(mins.x(), mins.y(), maxs.z()),
+	                       btVector3(maxs.x(), mins.y(), maxs.z()),
+	                       btVector3(maxs.x(), maxs.y(), maxs.z()),
+	                       btVector3(mins.x(), maxs.y(), maxs.z())
+	                      };
 	idraw->drawLine(c[0], c[1], color);
 	idraw->drawLine(c[1], c[2], color);
 	idraw->drawLine(c[2], c[3], color);
@@ -65,12 +66,12 @@ static void drawBox(btIDebugDraw* idraw,
 
 //
 static void drawTree(btIDebugDraw* idraw,
-					 const btDbvtNode* node,
-					 int depth,
-					 const btVector3& ncolor,
-					 const btVector3& lcolor,
-					 int mindepth,
-					 int maxdepth)
+                     const btDbvtNode* node,
+                     int depth,
+                     const btVector3& ncolor,
+                     const btVector3& lcolor,
+                     int mindepth,
+                     int maxdepth)
 {
 	if (node)
 	{
@@ -135,10 +136,10 @@ static inline T average(const btAlignedObjectArray<T>& items)
 
 #if 0
 //
- inline static btScalar		tetravolume(const btVector3& x0,
-										const btVector3& x1,
-										const btVector3& x2,
-										const btVector3& x3)
+inline static btScalar		tetravolume(const btVector3& x0,
+                                        const btVector3& x1,
+                                        const btVector3& x2,
+                                        const btVector3& x3)
 {
 	const btVector3	a=x1-x0;
 	const btVector3	b=x2-x0;
@@ -152,12 +153,13 @@ static inline T average(const btAlignedObjectArray<T>& items)
 static btVector3		stresscolor(btScalar stress)
 {
 	static const btVector3	spectrum[]=	{	btVector3(1,0,1),
-		btVector3(0,0,1),
-		btVector3(0,1,1),
-		btVector3(0,1,0),
-		btVector3(1,1,0),
-		btVector3(1,0,0),
-		btVector3(1,0,0)};
+	                                        btVector3(0,0,1),
+	                                        btVector3(0,1,1),
+	                                        btVector3(0,1,0),
+	                                        btVector3(1,1,0),
+	                                        btVector3(1,0,0),
+	                                        btVector3(1,0,0)
+	                                   };
 	static const int		ncolors=sizeof(spectrum)/sizeof(spectrum[0])-1;
 	static const btScalar	one=1;
 	stress=btMax<btScalar>(0,btMin<btScalar>(1,stress))*ncolors;
@@ -169,8 +171,8 @@ static btVector3		stresscolor(btScalar stress)
 
 //
 void btSoftBodyHelpers::Draw(btSoftBody* psb,
-							 btIDebugDraw* idraw,
-							 int drawflags)
+                             btIDebugDraw* idraw,
+                             int drawflags)
 {
 	const btScalar scl = (btScalar)0.1;
 	const btScalar nscl = scl * 5;
@@ -188,8 +190,8 @@ void btSoftBodyHelpers::Draw(btSoftBody* psb,
 			if (psb->m_clusters[i]->m_collide)
 			{
 				btVector3 color(rand() / (btScalar)RAND_MAX,
-								rand() / (btScalar)RAND_MAX,
-								rand() / (btScalar)RAND_MAX);
+				                rand() / (btScalar)RAND_MAX,
+				                rand() / (btScalar)RAND_MAX);
 				color = color.normalized() * 0.75;
 				btAlignedObjectArray<btVector3> vertices;
 				vertices.resize(psb->m_clusters[i]->m_nodes.size());
@@ -238,16 +240,16 @@ void btSoftBodyHelpers::Draw(btSoftBody* psb,
 				{
 					const int idx[] = {hres.m_Indices[j * 3 + 0], hres.m_Indices[j * 3 + 1], hres.m_Indices[j * 3 + 2]};
 					idraw->drawTriangle(hres.m_OutputVertices[idx[0]],
-										hres.m_OutputVertices[idx[1]],
-										hres.m_OutputVertices[idx[2]],
-										color, 1);
+					                    hres.m_OutputVertices[idx[1]],
+					                    hres.m_OutputVertices[idx[2]],
+					                    color, 1);
 				}
 				hlib.ReleaseResult(hres);
 #endif
 			}
 			/* Velocities	*/
 #if 0
-			for(int j=0;j<psb->m_clusters[i].m_nodes.size();++j)
+			for(int j=0; j<psb->m_clusters[i].m_nodes.size(); ++j)
 			{
 				const btSoftBody::Cluster&	c=psb->m_clusters[i];
 				const btVector3				r=c.m_nodes[j]->m_x-c.m_com;
@@ -302,13 +304,14 @@ void btSoftBodyHelpers::Draw(btSoftBody* psb,
 		if (0 != (drawflags & fDrawFlags::Contacts))
 		{
 			static const btVector3 axis[] = {btVector3(1, 0, 0),
-											 btVector3(0, 1, 0),
-											 btVector3(0, 0, 1)};
+			                                 btVector3(0, 1, 0),
+			                                 btVector3(0, 0, 1)
+			                                };
 			for (i = 0; i < psb->m_rcontacts.size(); ++i)
 			{
 				const btSoftBody::RContact& c = psb->m_rcontacts[i];
 				const btVector3 o = c.m_node->m_x - c.m_cti.m_normal *
-														(btDot(c.m_node->m_x, c.m_cti.m_normal) + c.m_cti.m_offset);
+				                    (btDot(c.m_node->m_x, c.m_cti.m_normal) + c.m_cti.m_offset);
 				const btVector3 x = btCross(c.m_cti.m_normal, axis[c.m_cti.m_normal.minAxis()]).normalized();
 				const btVector3 y = btCross(x, c.m_cti.m_normal).normalized();
 				idraw->drawLine(o - x * nscl, o + x * nscl, ccolor);
@@ -329,9 +332,9 @@ void btSoftBodyHelpers::Draw(btSoftBody* psb,
 				const btVector3 x[] = {f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x};
 				const btVector3 c = (x[0] + x[1] + x[2]) / 3;
 				idraw->drawTriangle((x[0] - c) * scl + c,
-									(x[1] - c) * scl + c,
-									(x[2] - c) * scl + c,
-									col, alp);
+				                    (x[1] - c) * scl + c,
+				                    (x[2] - c) * scl + c,
+				                    col, alp);
 			}
 		}
 		/* Tetras	*/
@@ -403,33 +406,33 @@ void btSoftBodyHelpers::Draw(btSoftBody* psb,
 			const btSoftBody::Joint* pj = psb->m_joints[i];
 			switch (pj->Type())
 			{
-				case btSoftBody::Joint::eType::Linear:
-				{
-					const btSoftBody::LJoint* pjl = (const btSoftBody::LJoint*)pj;
-					const btVector3 a0 = pj->m_bodies[0].xform() * pjl->m_refs[0];
-					const btVector3 a1 = pj->m_bodies[1].xform() * pjl->m_refs[1];
-					idraw->drawLine(pj->m_bodies[0].xform().getOrigin(), a0, btVector3(1, 1, 0));
-					idraw->drawLine(pj->m_bodies[1].xform().getOrigin(), a1, btVector3(0, 1, 1));
-					drawVertex(idraw, a0, 0.25, btVector3(1, 1, 0));
-					drawVertex(idraw, a1, 0.25, btVector3(0, 1, 1));
-				}
+			case btSoftBody::Joint::eType::Linear:
+			{
+				const btSoftBody::LJoint* pjl = (const btSoftBody::LJoint*)pj;
+				const btVector3 a0 = pj->m_bodies[0].xform() * pjl->m_refs[0];
+				const btVector3 a1 = pj->m_bodies[1].xform() * pjl->m_refs[1];
+				idraw->drawLine(pj->m_bodies[0].xform().getOrigin(), a0, btVector3(1, 1, 0));
+				idraw->drawLine(pj->m_bodies[1].xform().getOrigin(), a1, btVector3(0, 1, 1));
+				drawVertex(idraw, a0, 0.25, btVector3(1, 1, 0));
+				drawVertex(idraw, a1, 0.25, btVector3(0, 1, 1));
+			}
+			break;
+			case btSoftBody::Joint::eType::Angular:
+			{
+				//const btSoftBody::AJoint*	pja=(const btSoftBody::AJoint*)pj;
+				const btVector3 o0 = pj->m_bodies[0].xform().getOrigin();
+				const btVector3 o1 = pj->m_bodies[1].xform().getOrigin();
+				const btVector3 a0 = pj->m_bodies[0].xform().getBasis() * pj->m_refs[0];
+				const btVector3 a1 = pj->m_bodies[1].xform().getBasis() * pj->m_refs[1];
+				idraw->drawLine(o0, o0 + a0 * 10, btVector3(1, 1, 0));
+				idraw->drawLine(o0, o0 + a1 * 10, btVector3(1, 1, 0));
+				idraw->drawLine(o1, o1 + a0 * 10, btVector3(0, 1, 1));
+				idraw->drawLine(o1, o1 + a1 * 10, btVector3(0, 1, 1));
 				break;
-				case btSoftBody::Joint::eType::Angular:
-				{
-					//const btSoftBody::AJoint*	pja=(const btSoftBody::AJoint*)pj;
-					const btVector3 o0 = pj->m_bodies[0].xform().getOrigin();
-					const btVector3 o1 = pj->m_bodies[1].xform().getOrigin();
-					const btVector3 a0 = pj->m_bodies[0].xform().getBasis() * pj->m_refs[0];
-					const btVector3 a1 = pj->m_bodies[1].xform().getBasis() * pj->m_refs[1];
-					idraw->drawLine(o0, o0 + a0 * 10, btVector3(1, 1, 0));
-					idraw->drawLine(o0, o0 + a1 * 10, btVector3(1, 1, 0));
-					idraw->drawLine(o1, o1 + a0 * 10, btVector3(0, 1, 1));
-					idraw->drawLine(o1, o1 + a1 * 10, btVector3(0, 1, 1));
-					break;
-				}
-				default:
-				{
-				}
+			}
+			default:
+			{
+			}
 			}
 		}
 	}
@@ -437,10 +440,10 @@ void btSoftBodyHelpers::Draw(btSoftBody* psb,
 
 //
 void btSoftBodyHelpers::DrawInfos(btSoftBody* psb,
-								  btIDebugDraw* idraw,
-								  bool masses,
-								  bool areas,
-								  bool /*stress*/)
+                                  btIDebugDraw* idraw,
+                                  bool masses,
+                                  bool areas,
+                                  bool /*stress*/)
 {
 	for (int i = 0; i < psb->m_nodes.size(); ++i)
 	{
@@ -463,27 +466,27 @@ void btSoftBodyHelpers::DrawInfos(btSoftBody* psb,
 
 //
 void btSoftBodyHelpers::DrawNodeTree(btSoftBody* psb,
-									 btIDebugDraw* idraw,
-									 int mindepth,
-									 int maxdepth)
+                                     btIDebugDraw* idraw,
+                                     int mindepth,
+                                     int maxdepth)
 {
 	drawTree(idraw, psb->m_ndbvt.m_root, 0, btVector3(1, 0, 1), btVector3(1, 1, 1), mindepth, maxdepth);
 }
 
 //
 void btSoftBodyHelpers::DrawFaceTree(btSoftBody* psb,
-									 btIDebugDraw* idraw,
-									 int mindepth,
-									 int maxdepth)
+                                     btIDebugDraw* idraw,
+                                     int mindepth,
+                                     int maxdepth)
 {
 	drawTree(idraw, psb->m_fdbvt.m_root, 0, btVector3(0, 1, 0), btVector3(1, 0, 0), mindepth, maxdepth);
 }
 
 //
 void btSoftBodyHelpers::DrawClusterTree(btSoftBody* psb,
-										btIDebugDraw* idraw,
-										int mindepth,
-										int maxdepth)
+                                        btIDebugDraw* idraw,
+                                        int mindepth,
+                                        int maxdepth)
 {
 	drawTree(idraw, psb->m_cdbvt.m_root, 0, btVector3(0, 1, 1), btVector3(1, 0, 0), mindepth, maxdepth);
 }
@@ -530,7 +533,7 @@ class LinkDeps_t
 {
 public:
 	int value;         // A link calculation that is dependent on this one
-					   // Positive values = "input A" while negative values = "input B"
+	// Positive values = "input A" while negative values = "input B"
 	LinkDeps_t* next;  // Next dependence in the list
 };
 typedef LinkDeps_t* LinkDepsPtr_t;
@@ -664,7 +667,7 @@ void btSoftBodyHelpers::ReoptimizeLinkOrder(btSoftBody* psb /* This can be repla
 
 //
 void btSoftBodyHelpers::DrawFrame(btSoftBody* psb,
-								  btIDebugDraw* idraw)
+                                  btIDebugDraw* idraw)
 {
 	if (psb->m_pose.m_bframe)
 	{
@@ -688,9 +691,9 @@ void btSoftBodyHelpers::DrawFrame(btSoftBody* psb,
 
 //
 btSoftBody* btSoftBodyHelpers::CreateRope(btSoftBodyWorldInfo& worldInfo, const btVector3& from,
-										  const btVector3& to,
-										  int res,
-										  int fixeds)
+        const btVector3& to,
+        int res,
+        int fixeds)
 {
 	/* Create nodes	*/
 	const int r = res + 2;
@@ -720,14 +723,14 @@ btSoftBody* btSoftBodyHelpers::CreateRope(btSoftBodyWorldInfo& worldInfo, const 
 
 //
 btSoftBody* btSoftBodyHelpers::CreatePatch(btSoftBodyWorldInfo& worldInfo, const btVector3& corner00,
-										   const btVector3& corner10,
-										   const btVector3& corner01,
-										   const btVector3& corner11,
-										   int resx,
-										   int resy,
-										   int fixeds,
-										   bool gendiags,
-                                           btScalar perturbation)
+        const btVector3& corner10,
+        const btVector3& corner01,
+        const btVector3& corner11,
+        int resx,
+        int resy,
+        int fixeds,
+        bool gendiags,
+        btScalar perturbation)
 {
 #define IDX(_x_, _y_) ((_y_)*rx + (_x_))
 	/* Create nodes	*/
@@ -747,12 +750,12 @@ btSoftBody* btSoftBodyHelpers::CreatePatch(btSoftBodyWorldInfo& worldInfo, const
 		for (int ix = 0; ix < rx; ++ix)
 		{
 			const btScalar tx = ix / (btScalar)(rx - 1);
-            btScalar pert = perturbation * btScalar(rand())/RAND_MAX;
-            btVector3 temp1 = py1;
-            temp1.setY(py1.getY() + pert);
-            btVector3 temp = py0;
-            pert = perturbation * btScalar(rand())/RAND_MAX;
-            temp.setY(py0.getY() + pert);
+			btScalar pert = perturbation * btScalar(rand())/RAND_MAX;
+			btVector3 temp1 = py1;
+			temp1.setY(py1.getY() + pert);
+			btVector3 temp = py0;
+			pert = perturbation * btScalar(rand())/RAND_MAX;
+			temp.setY(py0.getY() + pert);
 			x[IDX(ix, iy)] = lerp(temp, temp1, tx);
 			m[IDX(ix, iy)] = 1;
 		}
@@ -804,15 +807,15 @@ btSoftBody* btSoftBodyHelpers::CreatePatch(btSoftBodyWorldInfo& worldInfo, const
 
 //
 btSoftBody* btSoftBodyHelpers::CreatePatchUV(btSoftBodyWorldInfo& worldInfo,
-											 const btVector3& corner00,
-											 const btVector3& corner10,
-											 const btVector3& corner01,
-											 const btVector3& corner11,
-											 int resx,
-											 int resy,
-											 int fixeds,
-											 bool gendiags,
-											 float* tex_coords)
+        const btVector3& corner00,
+        const btVector3& corner10,
+        const btVector3& corner01,
+        const btVector3& corner11,
+        int resx,
+        int resy,
+        int fixeds,
+        bool gendiags,
+        float* tex_coords)
 {
 	/*
 	*
@@ -852,11 +855,11 @@ btSoftBody* btSoftBodyHelpers::CreatePatchUV(btSoftBodyWorldInfo& worldInfo,
 	*
 	*
 	*    node00 ------ node01
-	*      | .              
-	*      |   .            
-	*      |     .          
-	*      |       .        
-	*      |         .      
+	*      | .
+	*      |   .
+	*      |     .
+	*      |       .
+	*      |         .
 	*    node10        node11
 	*
 	*
@@ -864,7 +867,7 @@ btSoftBody* btSoftBodyHelpers::CreatePatchUV(btSoftBodyWorldInfo& worldInfo,
 	*   2) Faces:
 	*      two triangles,
 	*      UV Coordinates (hier example for single quad)
-	*      
+	*
 	*     (0,1)          (0,1)  (1,1)
 	*     1 |\            3 \-----| 2
 	*       | \              \    |
@@ -1013,8 +1016,8 @@ float btSoftBodyHelpers::CalculateUV(int resx, int resy, int ix, int iy, int id)
 }
 //
 btSoftBody* btSoftBodyHelpers::CreateEllipsoid(btSoftBodyWorldInfo& worldInfo, const btVector3& center,
-											   const btVector3& radius,
-											   int res)
+        const btVector3& radius,
+        int res)
 {
 	struct Hammersley
 	{
@@ -1044,8 +1047,8 @@ btSoftBody* btSoftBodyHelpers::CreateEllipsoid(btSoftBodyWorldInfo& worldInfo, c
 
 //
 btSoftBody* btSoftBodyHelpers::CreateFromTriMesh(btSoftBodyWorldInfo& worldInfo, const btScalar* vertices,
-												 const int* triangles,
-												 int ntriangles, bool randomizeConstraints)
+        const int* triangles,
+        int ntriangles, bool randomizeConstraints)
 {
 	int maxidx = 0;
 	int i, j, ni;
@@ -1091,7 +1094,7 @@ btSoftBody* btSoftBodyHelpers::CreateFromTriMesh(btSoftBodyWorldInfo& worldInfo,
 
 //
 btSoftBody* btSoftBodyHelpers::CreateFromConvexHull(btSoftBodyWorldInfo& worldInfo, const btVector3* vertices,
-													int nvertices, bool randomizeConstraints)
+        int nvertices, bool randomizeConstraints)
 {
 	HullDesc hdsc(QF_TRIANGLES, nvertices, vertices);
 	HullResult hres;
@@ -1099,12 +1102,13 @@ btSoftBody* btSoftBodyHelpers::CreateFromConvexHull(btSoftBodyWorldInfo& worldIn
 	hdsc.mMaxVertices = nvertices;
 	hlib.CreateConvexHull(hdsc, hres);
 	btSoftBody* psb = new btSoftBody(&worldInfo, (int)hres.mNumOutputVertices,
-									 &hres.m_OutputVertices[0], 0);
+	                                 &hres.m_OutputVertices[0], 0);
 	for (int i = 0; i < (int)hres.mNumFaces; ++i)
 	{
 		const int idx[] = {static_cast<int>(hres.m_Indices[i * 3 + 0]),
-						   static_cast<int>(hres.m_Indices[i * 3 + 1]),
-						   static_cast<int>(hres.m_Indices[i * 3 + 2])};
+		                   static_cast<int>(hres.m_Indices[i * 3 + 1]),
+		                   static_cast<int>(hres.m_Indices[i * 3 + 2])
+		                  };
 		if (idx[0] < idx[1]) psb->appendLink(idx[0], idx[1]);
 		if (idx[1] < idx[2]) psb->appendLink(idx[1], idx[2]);
 		if (idx[2] < idx[0]) psb->appendLink(idx[2], idx[0]);
@@ -1138,12 +1142,12 @@ static int nextLine(const char* buffer)
 
 /* Create from TetGen .ele, .face, .node data							*/
 btSoftBody* btSoftBodyHelpers::CreateFromTetGenData(btSoftBodyWorldInfo& worldInfo,
-													const char* ele,
-													const char* face,
-													const char* node,
-													bool bfacelinks,
-													bool btetralinks,
-													bool bfacesfromtetras)
+        const char* ele,
+        const char* face,
+        const char* node,
+        bool bfacelinks,
+        bool btetralinks,
+        bool bfacesfromtetras)
 {
 	btAlignedObjectArray<btVector3> pos;
 	int nnode = 0;
@@ -1178,24 +1182,27 @@ btSoftBody* btSoftBodyHelpers::CreateFromTetGenData(btSoftBodyWorldInfo& worldIn
 	}
 	btSoftBody* psb = new btSoftBody(&worldInfo, nnode, &pos[0], 0);
 #if 0
-if(face&&face[0])
+	if(face&&face[0])
 	{
-	int								nface=0;
-	sf>>nface;sf>>hasbounds;
-	for(int i=0;i<nface;++i)
+		int								nface=0;
+		sf>>nface;
+		sf>>hasbounds;
+		for(int i=0; i<nface; ++i)
 		{
-		int			index=0;
-		int			bound=0;
-		int			ni[3];
-		sf>>index;
-		sf>>ni[0];sf>>ni[1];sf>>ni[2];
-		sf>>bound;
-		psb->appendFace(ni[0],ni[1],ni[2]);	
-		if(btetralinks)
+			int			index=0;
+			int			bound=0;
+			int			ni[3];
+			sf>>index;
+			sf>>ni[0];
+			sf>>ni[1];
+			sf>>ni[2];
+			sf>>bound;
+			psb->appendFace(ni[0],ni[1],ni[2]);
+			if(btetralinks)
 			{
-			psb->appendLink(ni[0],ni[1],0,true);
-			psb->appendLink(ni[1],ni[2],0,true);
-			psb->appendLink(ni[2],ni[0],0,true);
+				psb->appendLink(ni[0],ni[1],0,true);
+				psb->appendLink(ni[1],ni[2],0,true);
+				psb->appendLink(ni[2],ni[0],0,true);
 			}
 		}
 	}
@@ -1233,9 +1240,9 @@ if(face&&face[0])
 			}
 		}
 	}
-    psb->initializeDmInverse();
-    psb->m_tetraScratches.resize(psb->m_tetras.size());
-    psb->m_tetraScratchesTn.resize(psb->m_tetras.size());
+	psb->initializeDmInverse();
+	psb->m_tetraScratches.resize(psb->m_tetras.size());
+	psb->m_tetraScratchesTn.resize(psb->m_tetras.size());
 	printf("Nodes:  %u\r\n", psb->m_nodes.size());
 	printf("Links:  %u\r\n", psb->m_links.size());
 	printf("Faces:  %u\r\n", psb->m_faces.size());
@@ -1245,302 +1252,302 @@ if(face&&face[0])
 
 btSoftBody* btSoftBodyHelpers::CreateFromVtkFile(btSoftBodyWorldInfo& worldInfo, const char* vtk_file)
 {
-    std::ifstream fs;
-    fs.open(vtk_file);
-    btAssert(fs);
-    
-    typedef btAlignedObjectArray<int> Index;
-    std::string line;
-    btAlignedObjectArray<btVector3> X;
-    btVector3 position;
-    btAlignedObjectArray<Index> indices;
-    bool reading_points = false;
-    bool reading_tets = false;
-    size_t n_points = 0;
-    size_t n_tets = 0;
-    size_t x_count = 0;
-    size_t indices_count = 0;
-    while (std::getline(fs, line))
-    {
-        std::stringstream ss(line);
-        if (line.size() == (size_t)(0))
-        {
-        }
-        else if (line.substr(0, 6) == "POINTS")
-        {
-            reading_points = true;
-            reading_tets = false;
-            ss.ignore(128, ' '); // ignore "POINTS"
-            ss >> n_points;
-            X.resize(n_points);
-        }
-        else if (line.substr(0, 5) == "CELLS")
-        {
-            reading_points = false;
-            reading_tets = true;
-            ss.ignore(128, ' '); // ignore "CELLS"
-            ss >> n_tets;
-            indices.resize(n_tets);
-        }
-        else if (line.substr(0, 10) == "CELL_TYPES")
-        {
-            reading_points = false;
-            reading_tets = false;
-        }
-        else if (reading_points)
-        {
-            btScalar p;
-            ss >> p;
-            position.setX(p);
-            ss >> p;
-            position.setY(p);
-            ss >> p;
-            position.setZ(p);
-            X[x_count++] = position;
-        }
-        else if (reading_tets)
-        {
-            ss.ignore(128, ' '); // ignore "4"
-            Index tet;
-            tet.resize(4);
-            for (size_t i = 0; i < 4; i++)
-            {
-                ss >> tet[i];
-            }
-            indices[indices_count++] = tet;
-        }
-    }
-    btSoftBody* psb = new btSoftBody(&worldInfo, n_points, &X[0], 0);
-    
-    for (int i = 0; i < n_tets; ++i)
-    {
-        const Index& ni = indices[i];
-        psb->appendTetra(ni[0], ni[1], ni[2], ni[3]);
-        {
-            psb->appendLink(ni[0], ni[1], 0, true);
-            psb->appendLink(ni[1], ni[2], 0, true);
-            psb->appendLink(ni[2], ni[0], 0, true);
-            psb->appendLink(ni[0], ni[3], 0, true);
-            psb->appendLink(ni[1], ni[3], 0, true);
-            psb->appendLink(ni[2], ni[3], 0, true);
-        }
-    }
-    
-    
-    generateBoundaryFaces(psb);
-    psb->initializeDmInverse();
-    psb->m_tetraScratches.resize(psb->m_tetras.size());
-    psb->m_tetraScratchesTn.resize(psb->m_tetras.size());
-    printf("Nodes:  %u\r\n", psb->m_nodes.size());
-    printf("Links:  %u\r\n", psb->m_links.size());
-    printf("Faces:  %u\r\n", psb->m_faces.size());
-    printf("Tetras: %u\r\n", psb->m_tetras.size());
+	std::ifstream fs;
+	fs.open(vtk_file);
+	btAssert(fs);
 
-    fs.close();
-    return psb;
+	typedef btAlignedObjectArray<int> Index;
+	std::string line;
+	btAlignedObjectArray<btVector3> X;
+	btVector3 position;
+	btAlignedObjectArray<Index> indices;
+	bool reading_points = false;
+	bool reading_tets = false;
+	size_t n_points = 0;
+	size_t n_tets = 0;
+	size_t x_count = 0;
+	size_t indices_count = 0;
+	while (std::getline(fs, line))
+	{
+		std::stringstream ss(line);
+		if (line.size() == (size_t)(0))
+		{
+		}
+		else if (line.substr(0, 6) == "POINTS")
+		{
+			reading_points = true;
+			reading_tets = false;
+			ss.ignore(128, ' '); // ignore "POINTS"
+			ss >> n_points;
+			X.resize(n_points);
+		}
+		else if (line.substr(0, 5) == "CELLS")
+		{
+			reading_points = false;
+			reading_tets = true;
+			ss.ignore(128, ' '); // ignore "CELLS"
+			ss >> n_tets;
+			indices.resize(n_tets);
+		}
+		else if (line.substr(0, 10) == "CELL_TYPES")
+		{
+			reading_points = false;
+			reading_tets = false;
+		}
+		else if (reading_points)
+		{
+			btScalar p;
+			ss >> p;
+			position.setX(p);
+			ss >> p;
+			position.setY(p);
+			ss >> p;
+			position.setZ(p);
+			X[x_count++] = position;
+		}
+		else if (reading_tets)
+		{
+			ss.ignore(128, ' '); // ignore "4"
+			Index tet;
+			tet.resize(4);
+			for (size_t i = 0; i < 4; i++)
+			{
+				ss >> tet[i];
+			}
+			indices[indices_count++] = tet;
+		}
+	}
+	btSoftBody* psb = new btSoftBody(&worldInfo, n_points, &X[0], 0);
+
+	for (int i = 0; i < n_tets; ++i)
+	{
+		const Index& ni = indices[i];
+		psb->appendTetra(ni[0], ni[1], ni[2], ni[3]);
+		{
+			psb->appendLink(ni[0], ni[1], 0, true);
+			psb->appendLink(ni[1], ni[2], 0, true);
+			psb->appendLink(ni[2], ni[0], 0, true);
+			psb->appendLink(ni[0], ni[3], 0, true);
+			psb->appendLink(ni[1], ni[3], 0, true);
+			psb->appendLink(ni[2], ni[3], 0, true);
+		}
+	}
+
+
+	generateBoundaryFaces(psb);
+	psb->initializeDmInverse();
+	psb->m_tetraScratches.resize(psb->m_tetras.size());
+	psb->m_tetraScratchesTn.resize(psb->m_tetras.size());
+	printf("Nodes:  %u\r\n", psb->m_nodes.size());
+	printf("Links:  %u\r\n", psb->m_links.size());
+	printf("Faces:  %u\r\n", psb->m_faces.size());
+	printf("Tetras: %u\r\n", psb->m_tetras.size());
+
+	fs.close();
+	return psb;
 }
 
 void btSoftBodyHelpers::generateBoundaryFaces(btSoftBody* psb)
 {
-    int counter = 0;
-    for (int i = 0; i < psb->m_nodes.size(); ++i)
-    {
-        psb->m_nodes[i].index = counter++;
-    }
-    typedef btAlignedObjectArray<int> Index;
-    btAlignedObjectArray<Index> indices;
-    indices.resize(psb->m_tetras.size());
-    for (int i = 0; i < indices.size(); ++i)
-    {
-        Index index;
-        index.push_back(psb->m_tetras[i].m_n[0]->index);
-        index.push_back(psb->m_tetras[i].m_n[1]->index);
-        index.push_back(psb->m_tetras[i].m_n[2]->index);
-        index.push_back(psb->m_tetras[i].m_n[3]->index);
-        indices[i] = index;
-    }
-    
-    std::map<std::vector<int>, std::vector<int> > dict;
-    for (int i = 0; i < indices.size(); ++i)
-    {
-        for (int j = 0; j < 4; ++j)
-        {
-            std::vector<int> f;
-            if (j == 0)
-            {
-                f.push_back(indices[i][1]);
-                f.push_back(indices[i][0]);
-                f.push_back(indices[i][2]);
-            }
-            if (j == 1)
-            {
-                f.push_back(indices[i][3]);
-                f.push_back(indices[i][0]);
-                f.push_back(indices[i][1]);
-            }
-            if (j == 2)
-            {
-                f.push_back(indices[i][3]);
-                f.push_back(indices[i][1]);
-                f.push_back(indices[i][2]);
-            }
-            if (j == 3)
-            {
-                f.push_back(indices[i][2]);
-                f.push_back(indices[i][0]);
-                f.push_back(indices[i][3]);
-            }
-            std::vector<int> f_sorted = f;
-            std::sort(f_sorted.begin(), f_sorted.end());
-            if (dict.find(f_sorted) != dict.end())
-            {
-                dict.erase(f_sorted);
-            }
-            else
-            {
-                dict.insert(std::make_pair(f_sorted, f));
-            }
-        }
-    }
-    
-    for (std::map<std::vector<int>, std::vector<int> >::iterator it = dict.begin(); it != dict.end(); ++it)
-    {
-        std::vector<int> f = it->second;
-        psb->appendFace(f[0], f[1], f[2]);
-    }
+	int counter = 0;
+	for (int i = 0; i < psb->m_nodes.size(); ++i)
+	{
+		psb->m_nodes[i].index = counter++;
+	}
+	typedef btAlignedObjectArray<int> Index;
+	btAlignedObjectArray<Index> indices;
+	indices.resize(psb->m_tetras.size());
+	for (int i = 0; i < indices.size(); ++i)
+	{
+		Index index;
+		index.push_back(psb->m_tetras[i].m_n[0]->index);
+		index.push_back(psb->m_tetras[i].m_n[1]->index);
+		index.push_back(psb->m_tetras[i].m_n[2]->index);
+		index.push_back(psb->m_tetras[i].m_n[3]->index);
+		indices[i] = index;
+	}
+
+	std::map<std::vector<int>, std::vector<int> > dict;
+	for (int i = 0; i < indices.size(); ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			std::vector<int> f;
+			if (j == 0)
+			{
+				f.push_back(indices[i][1]);
+				f.push_back(indices[i][0]);
+				f.push_back(indices[i][2]);
+			}
+			if (j == 1)
+			{
+				f.push_back(indices[i][3]);
+				f.push_back(indices[i][0]);
+				f.push_back(indices[i][1]);
+			}
+			if (j == 2)
+			{
+				f.push_back(indices[i][3]);
+				f.push_back(indices[i][1]);
+				f.push_back(indices[i][2]);
+			}
+			if (j == 3)
+			{
+				f.push_back(indices[i][2]);
+				f.push_back(indices[i][0]);
+				f.push_back(indices[i][3]);
+			}
+			std::vector<int> f_sorted = f;
+			std::sort(f_sorted.begin(), f_sorted.end());
+			if (dict.find(f_sorted) != dict.end())
+			{
+				dict.erase(f_sorted);
+			}
+			else
+			{
+				dict.insert(std::make_pair(f_sorted, f));
+			}
+		}
+	}
+
+	for (std::map<std::vector<int>, std::vector<int> >::iterator it = dict.begin(); it != dict.end(); ++it)
+	{
+		std::vector<int> f = it->second;
+		psb->appendFace(f[0], f[1], f[2]);
+	}
 }
 
 void btSoftBodyHelpers::writeObj(const char* filename, const btSoftBody* psb)
 {
-    std::ofstream fs;
-    fs.open(filename);
-    btAssert(fs);
-    for (int i = 0; i < psb->m_nodes.size(); ++i)
-    {
-        fs << "v";
-        for (int d = 0; d < 3; d++)
-        {
-             fs << " " << psb->m_nodes[i].m_x[d];
-        }
-        fs << "\n";
-    }
-    
-    for (int i = 0; i < psb->m_faces.size(); ++i)
-    {
-        fs << "f";
-        for (int n = 0; n < 3; n++)
-        {
-            fs << " " << psb->m_faces[i].m_n[n]->index + 1;
-        }
-        fs << "\n";
-    }
-    fs.close();
+	std::ofstream fs;
+	fs.open(filename);
+	btAssert(fs);
+	for (int i = 0; i < psb->m_nodes.size(); ++i)
+	{
+		fs << "v";
+		for (int d = 0; d < 3; d++)
+		{
+			fs << " " << psb->m_nodes[i].m_x[d];
+		}
+		fs << "\n";
+	}
+
+	for (int i = 0; i < psb->m_faces.size(); ++i)
+	{
+		fs << "f";
+		for (int n = 0; n < 3; n++)
+		{
+			fs << " " << psb->m_faces[i].m_n[n]->index + 1;
+		}
+		fs << "\n";
+	}
+	fs.close();
 }
 
 void btSoftBodyHelpers::duplicateFaces(const char* filename, const btSoftBody* psb)
 {
-    std::ifstream fs_read;
-    fs_read.open(filename);
-    std::string line;
-    btVector3 pos;
-    btAlignedObjectArray<btAlignedObjectArray<int> > additional_faces;
-    while (std::getline(fs_read, line))
-    {
-        std::stringstream ss(line);
-        if (line[0] == 'v')
-        {
-        }
-        else if (line[0] == 'f')
-        {
-            ss.ignore();
-            int id0, id1, id2;
-            ss >> id0;
-            ss >> id1;
-            ss >> id2;
-            btAlignedObjectArray<int> new_face;
-            new_face.push_back(id1);
-            new_face.push_back(id0);
-            new_face.push_back(id2);
-            additional_faces.push_back(new_face);
-        }
-    }
-    fs_read.close();
+	std::ifstream fs_read;
+	fs_read.open(filename);
+	std::string line;
+	btVector3 pos;
+	btAlignedObjectArray<btAlignedObjectArray<int> > additional_faces;
+	while (std::getline(fs_read, line))
+	{
+		std::stringstream ss(line);
+		if (line[0] == 'v')
+		{
+		}
+		else if (line[0] == 'f')
+		{
+			ss.ignore();
+			int id0, id1, id2;
+			ss >> id0;
+			ss >> id1;
+			ss >> id2;
+			btAlignedObjectArray<int> new_face;
+			new_face.push_back(id1);
+			new_face.push_back(id0);
+			new_face.push_back(id2);
+			additional_faces.push_back(new_face);
+		}
+	}
+	fs_read.close();
 
-    std::ofstream fs_write;
-    fs_write.open(filename, std::ios_base::app);
-    for (int i = 0; i < additional_faces.size(); ++i)
-    {
-        fs_write << "f";
-        for (int n = 0; n < 3; n++)
-        {
-            fs_write << " " << additional_faces[i][n];
-        }
-        fs_write << "\n";
-    }
-    fs_write.close();
+	std::ofstream fs_write;
+	fs_write.open(filename, std::ios_base::app);
+	for (int i = 0; i < additional_faces.size(); ++i)
+	{
+		fs_write << "f";
+		for (int n = 0; n < 3; n++)
+		{
+			fs_write << " " << additional_faces[i][n];
+		}
+		fs_write << "\n";
+	}
+	fs_write.close();
 }
 
 // Given a simplex with vertices a,b,c,d, find the barycentric weights of p in this simplex
 void btSoftBodyHelpers::getBarycentricWeights(const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d, const btVector3& p, btVector4& bary)
 {
-    btVector3 vap = p - a;
-    btVector3 vbp = p - b;
-    
-    btVector3 vab = b - a;
-    btVector3 vac = c - a;
-    btVector3 vad = d - a;
-    
-    btVector3 vbc = c - b;
-    btVector3 vbd = d - b;
-    btScalar va6 = (vbp.cross(vbd)).dot(vbc);
-    btScalar vb6 = (vap.cross(vac)).dot(vad);
-    btScalar vc6 = (vap.cross(vad)).dot(vab);
-    btScalar vd6 = (vap.cross(vab)).dot(vac);
-    btScalar v6 = btScalar(1) / (vab.cross(vac).dot(vad));
-    bary = btVector4(va6*v6, vb6*v6, vc6*v6, vd6*v6);
+	btVector3 vap = p - a;
+	btVector3 vbp = p - b;
+
+	btVector3 vab = b - a;
+	btVector3 vac = c - a;
+	btVector3 vad = d - a;
+
+	btVector3 vbc = c - b;
+	btVector3 vbd = d - b;
+	btScalar va6 = (vbp.cross(vbd)).dot(vbc);
+	btScalar vb6 = (vap.cross(vac)).dot(vad);
+	btScalar vc6 = (vap.cross(vad)).dot(vab);
+	btScalar vd6 = (vap.cross(vab)).dot(vac);
+	btScalar v6 = btScalar(1) / (vab.cross(vac).dot(vad));
+	bary = btVector4(va6*v6, vb6*v6, vc6*v6, vd6*v6);
 }
 
 // Iterate through all render nodes to find the simulation tetrahedron that contains the render node and record the barycentric weights
 // If the node is not inside any tetrahedron, assign it to the tetrahedron in which the node has the least negative barycentric weight
 void btSoftBodyHelpers::interpolateBarycentricWeights(btSoftBody* psb)
 {
-    psb->m_renderNodesInterpolationWeights.resize(psb->m_renderNodes.size());
-    psb->m_renderNodesParents.resize(psb->m_renderNodes.size());
-    for (int i = 0; i < psb->m_renderNodes.size(); ++i)
-    {
-        const btVector3& p = psb->m_renderNodes[i].m_x;
-        btVector4 bary;
-        btVector4 optimal_bary;
-        btScalar min_bary_weight = -1e3;
-        btAlignedObjectArray<const btSoftBody::Node*> optimal_parents;
-        bool found = false;
-        for (int j = 0; j < psb->m_tetras.size(); ++j)
-        {
-            const btSoftBody::Tetra& t = psb->m_tetras[j];
-            getBarycentricWeights(t.m_n[0]->m_x, t.m_n[1]->m_x, t.m_n[2]->m_x, t.m_n[3]->m_x, p, bary);
-            btScalar new_min_bary_weight = bary[0];
-            for (int k = 1; k < 4; ++k)
-            {
-                new_min_bary_weight = btMin(new_min_bary_weight, bary[k]);
-            }
-            if (new_min_bary_weight > min_bary_weight)
-            {
-                btAlignedObjectArray<const btSoftBody::Node*> parents;
-                parents.push_back(t.m_n[0]);
-                parents.push_back(t.m_n[1]);
-                parents.push_back(t.m_n[2]);
-                parents.push_back(t.m_n[3]);
-                optimal_parents = parents;
-                optimal_bary = bary;
-                min_bary_weight = new_min_bary_weight;
-                // stop searching if p is inside the tetrahedron at hand
-                if (bary[0]>=0. && bary[1]>=0. && bary[2]>=0. && bary[3]>=0.)
-                {
-                    break;
-                }
-            }
-        }
-        psb->m_renderNodesInterpolationWeights[i] = optimal_bary;
-        psb->m_renderNodesParents[i] = optimal_parents;
-    }
+	psb->m_renderNodesInterpolationWeights.resize(psb->m_renderNodes.size());
+	psb->m_renderNodesParents.resize(psb->m_renderNodes.size());
+	for (int i = 0; i < psb->m_renderNodes.size(); ++i)
+	{
+		const btVector3& p = psb->m_renderNodes[i].m_x;
+		btVector4 bary;
+		btVector4 optimal_bary;
+		btScalar min_bary_weight = -1e3;
+		btAlignedObjectArray<const btSoftBody::Node*> optimal_parents;
+		bool found = false;
+		for (int j = 0; j < psb->m_tetras.size(); ++j)
+		{
+			const btSoftBody::Tetra& t = psb->m_tetras[j];
+			getBarycentricWeights(t.m_n[0]->m_x, t.m_n[1]->m_x, t.m_n[2]->m_x, t.m_n[3]->m_x, p, bary);
+			btScalar new_min_bary_weight = bary[0];
+			for (int k = 1; k < 4; ++k)
+			{
+				new_min_bary_weight = btMin(new_min_bary_weight, bary[k]);
+			}
+			if (new_min_bary_weight > min_bary_weight)
+			{
+				btAlignedObjectArray<const btSoftBody::Node*> parents;
+				parents.push_back(t.m_n[0]);
+				parents.push_back(t.m_n[1]);
+				parents.push_back(t.m_n[2]);
+				parents.push_back(t.m_n[3]);
+				optimal_parents = parents;
+				optimal_bary = bary;
+				min_bary_weight = new_min_bary_weight;
+				// stop searching if p is inside the tetrahedron at hand
+				if (bary[0]>=0. && bary[1]>=0. && bary[2]>=0. && bary[3]>=0.)
+				{
+					break;
+				}
+			}
+		}
+		psb->m_renderNodesInterpolationWeights[i] = optimal_bary;
+		psb->m_renderNodesParents[i] = optimal_parents;
+	}
 }

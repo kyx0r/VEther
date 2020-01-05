@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -136,8 +136,8 @@ void btMultiSphereShape::calculateLocalInertia(btScalar mass, btVector3& inertia
 	btScalar lz = btScalar(2.) * (halfExtents.z());
 
 	inertia.setValue(mass / (btScalar(12.0)) * (ly * ly + lz * lz),
-					 mass / (btScalar(12.0)) * (lx * lx + lz * lz),
-					 mass / (btScalar(12.0)) * (lx * lx + ly * ly));
+	                 mass / (btScalar(12.0)) * (lx * lx + lz * lz),
+	                 mass / (btScalar(12.0)) * (lx * lx + ly * ly));
 }
 
 ///fills the dataBuffer and returns the struct name (and 0 on failure)

@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -63,7 +63,8 @@ typedef btAlignedObjectArray<btIndexedMesh> IndexedMeshArray;
 ///No duplicate is made of the vertex/index data, it only indexes into external vertex/index arrays.
 ///So keep those arrays around during the lifetime of this btTriangleIndexVertexArray.
 ATTRIBUTE_ALIGNED16(class)
-btTriangleIndexVertexArray : public btStridingMeshInterface
+btTriangleIndexVertexArray :
+public btStridingMeshInterface
 {
 protected:
 	IndexedMeshArray m_indexedMeshes;
@@ -96,7 +97,10 @@ public:
 
 	/// unLockVertexBase finishes the access to a subpart of the triangle mesh
 	/// make a call to unLockVertexBase when the read and write access (using getLockedVertexIndexBase) is finished
-	virtual void unLockVertexBase(int subpart) { (void)subpart; }
+	virtual void unLockVertexBase(int subpart)
+	{
+		(void)subpart;
+	}
 
 	virtual void unLockReadOnlyVertexBase(int subpart) const { (void)subpart; }
 
@@ -117,8 +121,14 @@ public:
 		return m_indexedMeshes;
 	}
 
-	virtual void preallocateVertices(int numverts) { (void)numverts; }
-	virtual void preallocateIndices(int numindices) { (void)numindices; }
+	virtual void preallocateVertices(int numverts)
+	{
+		(void)numverts;
+	}
+	virtual void preallocateIndices(int numindices)
+	{
+		(void)numindices;
+	}
 
 	virtual bool hasPremadeAabb() const;
 	virtual void setPremadeAabb(const btVector3& aabbMin, const btVector3& aabbMax) const;

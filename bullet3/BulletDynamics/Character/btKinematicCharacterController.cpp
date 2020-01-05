@@ -4,8 +4,8 @@ Copyright (c) 2003-2008 Erwin Coumans  http://bulletphysics.com
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -187,9 +187,9 @@ bool btKinematicCharacterController::recoverFromPenetration(btCollisionWorld* co
 	btVector3 minAabb, maxAabb;
 	m_convexShape->getAabb(m_ghostObject->getWorldTransform(), minAabb, maxAabb);
 	collisionWorld->getBroadphase()->setAabb(m_ghostObject->getBroadphaseHandle(),
-											 minAabb,
-											 maxAabb,
-											 collisionWorld->getDispatcher());
+	        minAabb,
+	        maxAabb,
+	        collisionWorld->getDispatcher());
 
 	bool penetration = false;
 
@@ -472,7 +472,7 @@ void btKinematicCharacterController::stepDown(btCollisionWorld* collisionWorld, 
 	/*btScalar additionalDownStep = (m_wasOnGround && !onGround()) ? m_stepHeight : 0.0;
 	btVector3 step_drop = m_up * (m_currentStepOffset + additionalDownStep);
 	btScalar downVelocity = (additionalDownStep == 0.0 && m_verticalVelocity<0.0?-m_verticalVelocity:0.0) * dt;
-	btVector3 gravity_drop = m_up * downVelocity; 
+	btVector3 gravity_drop = m_up * downVelocity;
 	m_targetPosition -= (step_drop + gravity_drop);*/
 
 	btVector3 orig_position = m_targetPosition;
@@ -608,7 +608,7 @@ void btKinematicCharacterController::stepDown(btCollisionWorld* collisionWorld, 
 }
 
 void btKinematicCharacterController::setWalkDirection(
-	const btVector3& walkDirection)
+    const btVector3& walkDirection)
 {
 	m_useWalkDirection = true;
 	m_walkDirection = walkDirection;
@@ -616,8 +616,8 @@ void btKinematicCharacterController::setWalkDirection(
 }
 
 void btKinematicCharacterController::setVelocityForTimeInterval(
-	const btVector3& velocity,
-	btScalar timeInterval)
+    const btVector3& velocity,
+    btScalar timeInterval)
 {
 	//	printf("setVelocity!\n");
 	//	printf("  interval: %f\n", timeInterval);
@@ -737,7 +737,7 @@ void btKinematicCharacterController::playerStep(btCollisionWorld* collisionWorld
 	}
 
 	// quick check...
-	if (!m_useWalkDirection && (m_velocityTimeInterval <= 0.0 || m_walkDirection.fuzzyZero())) 
+	if (!m_useWalkDirection && (m_velocityTimeInterval <= 0.0 || m_walkDirection.fuzzyZero()))
 	{
 		//		printf("\n");
 		return;  // no motion
@@ -802,7 +802,7 @@ void btKinematicCharacterController::playerStep(btCollisionWorld* collisionWorld
 		//printf("  time: %f", m_velocityTimeInterval);
 		// still have some time left for moving!
 		btScalar dtMoving =
-			(dt < m_velocityTimeInterval) ? dt : m_velocityTimeInterval;
+		    (dt < m_velocityTimeInterval) ? dt : m_velocityTimeInterval;
 		m_velocityTimeInterval -= dt;
 
 		// how far will we move while we are moving?

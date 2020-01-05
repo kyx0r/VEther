@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -27,7 +27,8 @@ class btDispatcher;
 
 ///For each triangle in the concave mesh that overlaps with the AABB of a convex (m_convexProxy), processTriangle is called.
 ATTRIBUTE_ALIGNED16(class)
-btConvexTriangleCallback : public btTriangleCallback
+btConvexTriangleCallback :
+public btTriangleCallback
 {
 	btVector3 m_aabbMin;
 	btVector3 m_aabbMax;
@@ -74,7 +75,8 @@ public:
 
 /// btConvexConcaveCollisionAlgorithm  supports collision between convex shapes and (concave) trianges meshes.
 ATTRIBUTE_ALIGNED16(class)
-btConvexConcaveCollisionAlgorithm : public btActivatingCollisionAlgorithm
+btConvexConcaveCollisionAlgorithm :
+public btActivatingCollisionAlgorithm
 {
 	btConvexTriangleCallback m_btConvexTriangleCallback;
 

@@ -50,17 +50,17 @@ void btMultiBodyConstraint::applyDeltaVee(btMultiBodyJacobianData& data, btScala
 }
 
 btScalar btMultiBodyConstraint::fillMultiBodyConstraint(btMultiBodySolverConstraint& solverConstraint,
-														btMultiBodyJacobianData& data,
-														btScalar* jacOrgA, btScalar* jacOrgB,
-														const btVector3& constraintNormalAng,
-														const btVector3& constraintNormalLin,
-														const btVector3& posAworld, const btVector3& posBworld,
-														btScalar posError,
-														const btContactSolverInfo& infoGlobal,
-														btScalar lowerLimit, btScalar upperLimit,
-														bool angConstraint,
-														btScalar relaxation,
-														bool isFriction, btScalar desiredVelocity, btScalar cfmSlip)
+        btMultiBodyJacobianData& data,
+        btScalar* jacOrgA, btScalar* jacOrgB,
+        const btVector3& constraintNormalAng,
+        const btVector3& constraintNormalLin,
+        const btVector3& posAworld, const btVector3& posBworld,
+        btScalar posError,
+        const btContactSolverInfo& infoGlobal,
+        btScalar lowerLimit, btScalar upperLimit,
+        bool angConstraint,
+        btScalar relaxation,
+        bool isFriction, btScalar desiredVelocity, btScalar cfmSlip)
 {
 	solverConstraint.m_multiBodyA = m_bodyA;
 	solverConstraint.m_multiBodyB = m_bodyB;
@@ -371,12 +371,12 @@ btScalar btMultiBodyConstraint::fillMultiBodyConstraint(btMultiBodySolverConstra
 			solverConstraint.m_rhsPenetration = 0.f;
 		}
 		/*else
-        {
-            //split position and velocity into rhs and m_rhsPenetration
-            solverConstraint.m_rhs = velocityImpulse;
-            solverConstraint.m_rhsPenetration = penetrationImpulse;
-        }
-        */
+		{
+		    //split position and velocity into rhs and m_rhsPenetration
+		    solverConstraint.m_rhs = velocityImpulse;
+		    solverConstraint.m_rhsPenetration = penetrationImpulse;
+		}
+		*/
 
 		solverConstraint.m_cfm = 0.f;
 		solverConstraint.m_lowerLimit = lowerLimit;

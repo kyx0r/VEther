@@ -89,8 +89,8 @@ void btSoftBody::initDefaults()
 	m_cfg.piterations = 1;
 	m_cfg.diterations = 0;
 	m_cfg.citerations = 4;
-    m_cfg.drag = 0;
-    m_cfg.m_maxStress = 0;
+	m_cfg.drag = 0;
+	m_cfg.m_maxStress = 0;
 	m_cfg.collisions = fCollision::Default;
 	m_pose.m_bvolume = false;
 	m_pose.m_bframe = false;
@@ -115,11 +115,11 @@ void btSoftBody::initDefaults()
 
 	m_windVelocity = btVector3(0, 0, 0);
 	m_restLengthScale = btScalar(1.0);
-    m_dampingCoefficient = 1;
-    m_sleepingThreshold = 0.1;
-    m_useFaceContact = true;
+	m_dampingCoefficient = 1;
+	m_sleepingThreshold = 0.1;
+	m_useFaceContact = true;
 	m_useSelfCollision = false;
-    m_collisionFlags = 0;
+	m_collisionFlags = 0;
 }
 
 //
@@ -150,7 +150,7 @@ bool btSoftBody::checkLink(const Node* node0, const Node* node1) const
 	{
 		const Link& l = m_links[i];
 		if ((l.m_n[0] == n[0] && l.m_n[1] == n[1]) ||
-			(l.m_n[0] == n[1] && l.m_n[1] == n[0]))
+		        (l.m_n[0] == n[1] && l.m_n[1] == n[0]))
 		{
 			return (true);
 		}
@@ -162,8 +162,9 @@ bool btSoftBody::checkLink(const Node* node0, const Node* node1) const
 bool btSoftBody::checkFace(int node0, int node1, int node2) const
 {
 	const Node* n[] = {&m_nodes[node0],
-					   &m_nodes[node1],
-					   &m_nodes[node2]};
+	                   &m_nodes[node1],
+	                   &m_nodes[node2]
+	                  };
 	for (int i = 0, ni = m_faces.size(); i < ni; ++i)
 	{
 		const Face& f = m_faces[i];
@@ -171,8 +172,8 @@ bool btSoftBody::checkFace(int node0, int node1, int node2) const
 		for (int j = 0; j < 3; ++j)
 		{
 			if ((f.m_n[j] == n[0]) ||
-				(f.m_n[j] == n[1]) ||
-				(f.m_n[j] == n[2]))
+			        (f.m_n[j] == n[1]) ||
+			        (f.m_n[j] == n[2]))
 				c |= 1 << j;
 			else
 				break;
@@ -196,12 +197,12 @@ btSoftBody::Material* btSoftBody::appendMaterial()
 
 //
 void btSoftBody::appendNote(const char* text,
-							const btVector3& o,
-							const btVector4& c,
-							Node* n0,
-							Node* n1,
-							Node* n2,
-							Node* n3)
+                            const btVector3& o,
+                            const btVector4& c,
+                            Node* n0,
+                            Node* n1,
+                            Node* n2,
+                            Node* n3)
 {
 	Note n;
 	ZeroInitialize(n);
@@ -225,31 +226,31 @@ void btSoftBody::appendNote(const char* text,
 
 //
 void btSoftBody::appendNote(const char* text,
-							const btVector3& o,
-							Node* feature)
+                            const btVector3& o,
+                            Node* feature)
 {
 	appendNote(text, o, btVector4(1, 0, 0, 0), feature);
 }
 
 //
 void btSoftBody::appendNote(const char* text,
-							const btVector3& o,
-							Link* feature)
+                            const btVector3& o,
+                            Link* feature)
 {
 	static const btScalar w = 1 / (btScalar)2;
 	appendNote(text, o, btVector4(w, w, 0, 0), feature->m_n[0],
-			   feature->m_n[1]);
+	           feature->m_n[1]);
 }
 
 //
 void btSoftBody::appendNote(const char* text,
-							const btVector3& o,
-							Face* feature)
+                            const btVector3& o,
+                            Face* feature)
 {
 	static const btScalar w = 1 / (btScalar)3;
 	appendNote(text, o, btVector4(w, w, w, 0), feature->m_n[0],
-			   feature->m_n[1],
-			   feature->m_n[2]);
+	           feature->m_n[1],
+	           feature->m_n[2]);
 }
 
 //
@@ -288,18 +289,18 @@ void btSoftBody::appendLink(int model, Material* mat)
 
 //
 void btSoftBody::appendLink(int node0,
-							int node1,
-							Material* mat,
-							bool bcheckexist)
+                            int node1,
+                            Material* mat,
+                            bool bcheckexist)
 {
 	appendLink(&m_nodes[node0], &m_nodes[node1], mat, bcheckexist);
 }
 
 //
 void btSoftBody::appendLink(Node* node0,
-							Node* node1,
-							Material* mat,
-							bool bcheckexist)
+                            Node* node1,
+                            Material* mat,
+                            bool bcheckexist)
 {
 	if ((!bcheckexist) || (!checkLink(node0, node1)))
 	{
@@ -325,7 +326,7 @@ void btSoftBody::appendFace(int model, Material* mat)
 		ZeroInitialize(f);
 		f.m_material = mat ? mat : m_materials[0];
 	}
-    m_faces.push_back(f);
+	m_faces.push_back(f);
 }
 
 //
@@ -347,8 +348,8 @@ void btSoftBody::appendFace(int node0, int node1, int node2, Material* mat)
 	f.m_n[1] = &m_nodes[node1];
 	f.m_n[2] = &m_nodes[node2];
 	f.m_ra = AreaOf(f.m_n[0]->m_x,
-					f.m_n[1]->m_x,
-					f.m_n[2]->m_x);
+	                f.m_n[1]->m_x,
+	                f.m_n[2]->m_x);
 	m_bUpdateRtCst = true;
 }
 
@@ -368,10 +369,10 @@ void btSoftBody::appendTetra(int model, Material* mat)
 
 //
 void btSoftBody::appendTetra(int node0,
-							 int node1,
-							 int node2,
-							 int node3,
-							 Material* mat)
+                             int node1,
+                             int node2,
+                             int node3,
+                             Material* mat)
 {
 	appendTetra(-1, mat);
 	Tetra& t = m_tetras[m_tetras.size() - 1];
@@ -414,94 +415,94 @@ void btSoftBody::appendAnchor(int node, btRigidBody* body, const btVector3& loca
 //
 void btSoftBody::appendDeformableAnchor(int node, btRigidBody* body)
 {
-    DeformableNodeRigidAnchor c;
-    btSoftBody::Node& n = m_nodes[node];
-    const btScalar ima = n.m_im;
-    const btScalar imb = body->getInvMass();
-    btVector3 nrm;
-    const btCollisionShape* shp = body->getCollisionShape();
-    const btTransform& wtr = body->getWorldTransform();
-    btScalar dst =
-    m_worldInfo->m_sparsesdf.Evaluate(
-                                      wtr.invXform(m_nodes[node].m_x),
-                                      shp,
-                                      nrm,
-                                      0);
+	DeformableNodeRigidAnchor c;
+	btSoftBody::Node& n = m_nodes[node];
+	const btScalar ima = n.m_im;
+	const btScalar imb = body->getInvMass();
+	btVector3 nrm;
+	const btCollisionShape* shp = body->getCollisionShape();
+	const btTransform& wtr = body->getWorldTransform();
+	btScalar dst =
+	    m_worldInfo->m_sparsesdf.Evaluate(
+	        wtr.invXform(m_nodes[node].m_x),
+	        shp,
+	        nrm,
+	        0);
 
-    c.m_cti.m_colObj = body;
-    c.m_cti.m_normal = wtr.getBasis() * nrm;
-    c.m_cti.m_offset = dst;
-    c.m_node = &m_nodes[node];
-    const btScalar fc = m_cfg.kDF * body->getFriction();
-    c.m_c2 = ima;
-    c.m_c3 = fc;
-    c.m_c4 = body->isStaticOrKinematicObject() ? m_cfg.kKHR : m_cfg.kCHR;
-    static const btMatrix3x3 iwiStatic(0, 0, 0, 0, 0, 0, 0, 0, 0);
-    const btMatrix3x3& iwi = body->getInvInertiaTensorWorld();
-    const btVector3 ra = n.m_x - wtr.getOrigin();
+	c.m_cti.m_colObj = body;
+	c.m_cti.m_normal = wtr.getBasis() * nrm;
+	c.m_cti.m_offset = dst;
+	c.m_node = &m_nodes[node];
+	const btScalar fc = m_cfg.kDF * body->getFriction();
+	c.m_c2 = ima;
+	c.m_c3 = fc;
+	c.m_c4 = body->isStaticOrKinematicObject() ? m_cfg.kKHR : m_cfg.kCHR;
+	static const btMatrix3x3 iwiStatic(0, 0, 0, 0, 0, 0, 0, 0, 0);
+	const btMatrix3x3& iwi = body->getInvInertiaTensorWorld();
+	const btVector3 ra = n.m_x - wtr.getOrigin();
 
-    c.m_c0 = ImpulseMatrix(1, ima, imb, iwi, ra);
-    c.m_c1 = ra;
-    c.m_local = body->getWorldTransform().inverse() * m_nodes[node].m_x;
-    c.m_node->m_battach = 1;
-    m_deformableAnchors.push_back(c);
+	c.m_c0 = ImpulseMatrix(1, ima, imb, iwi, ra);
+	c.m_c1 = ra;
+	c.m_local = body->getWorldTransform().inverse() * m_nodes[node].m_x;
+	c.m_node->m_battach = 1;
+	m_deformableAnchors.push_back(c);
 }
 
 //
 void btSoftBody::appendDeformableAnchor(int node, btMultiBodyLinkCollider* link)
 {
-    DeformableNodeRigidAnchor c;
-    btSoftBody::Node& n = m_nodes[node];
-    const btScalar ima = n.m_im;
-    btVector3 nrm;
-    const btCollisionShape* shp = link->getCollisionShape();
-    const btTransform& wtr = link->getWorldTransform();
-    btScalar dst =
-    m_worldInfo->m_sparsesdf.Evaluate(
-                                      wtr.invXform(m_nodes[node].m_x),
-                                      shp,
-                                      nrm,
-                                      0);
-    c.m_cti.m_colObj = link;
-    c.m_cti.m_normal = wtr.getBasis() * nrm;
-    c.m_cti.m_offset = dst;
-    c.m_node = &m_nodes[node];
-    const btScalar fc = m_cfg.kDF * link->getFriction();
-    c.m_c2 = ima;
-    c.m_c3 = fc;
-    c.m_c4 = link->isStaticOrKinematicObject() ? m_cfg.kKHR : m_cfg.kCHR;
-    btVector3 normal = c.m_cti.m_normal;
-    btVector3 t1 = generateUnitOrthogonalVector(normal);
-    btVector3 t2 = btCross(normal, t1);
-    btMultiBodyJacobianData jacobianData_normal, jacobianData_t1, jacobianData_t2;
-    findJacobian(link, jacobianData_normal, c.m_node->m_x, normal);
-    findJacobian(link, jacobianData_t1, c.m_node->m_x, t1);
-    findJacobian(link, jacobianData_t2, c.m_node->m_x, t2);
-    
-    btScalar* J_n = &jacobianData_normal.m_jacobians[0];
-    btScalar* J_t1 = &jacobianData_t1.m_jacobians[0];
-    btScalar* J_t2 = &jacobianData_t2.m_jacobians[0];
-    
-    btScalar* u_n = &jacobianData_normal.m_deltaVelocitiesUnitImpulse[0];
-    btScalar* u_t1 = &jacobianData_t1.m_deltaVelocitiesUnitImpulse[0];
-    btScalar* u_t2 = &jacobianData_t2.m_deltaVelocitiesUnitImpulse[0];
-    
-    btMatrix3x3 rot(normal.getX(), normal.getY(), normal.getZ(),
-                    t1.getX(), t1.getY(), t1.getZ(),
-                    t2.getX(), t2.getY(), t2.getZ()); // world frame to local frame
-    const int ndof = link->m_multiBody->getNumDofs() + 6;
-    btMatrix3x3 local_impulse_matrix = (Diagonal(n.m_im) + OuterProduct(J_n, J_t1, J_t2, u_n, u_t1, u_t2, ndof)).inverse();
-    c.m_c0 =  rot.transpose() * local_impulse_matrix * rot;
-    c.jacobianData_normal = jacobianData_normal;
-    c.jacobianData_t1 = jacobianData_t1;
-    c.jacobianData_t2 = jacobianData_t2;
-    c.t1 = t1;
-    c.t2 = t2;
-    const btVector3 ra = n.m_x - wtr.getOrigin();
-    c.m_c1 = ra;
-    c.m_local = link->getWorldTransform().inverse() * m_nodes[node].m_x;
-    c.m_node->m_battach = 1;
-    m_deformableAnchors.push_back(c);
+	DeformableNodeRigidAnchor c;
+	btSoftBody::Node& n = m_nodes[node];
+	const btScalar ima = n.m_im;
+	btVector3 nrm;
+	const btCollisionShape* shp = link->getCollisionShape();
+	const btTransform& wtr = link->getWorldTransform();
+	btScalar dst =
+	    m_worldInfo->m_sparsesdf.Evaluate(
+	        wtr.invXform(m_nodes[node].m_x),
+	        shp,
+	        nrm,
+	        0);
+	c.m_cti.m_colObj = link;
+	c.m_cti.m_normal = wtr.getBasis() * nrm;
+	c.m_cti.m_offset = dst;
+	c.m_node = &m_nodes[node];
+	const btScalar fc = m_cfg.kDF * link->getFriction();
+	c.m_c2 = ima;
+	c.m_c3 = fc;
+	c.m_c4 = link->isStaticOrKinematicObject() ? m_cfg.kKHR : m_cfg.kCHR;
+	btVector3 normal = c.m_cti.m_normal;
+	btVector3 t1 = generateUnitOrthogonalVector(normal);
+	btVector3 t2 = btCross(normal, t1);
+	btMultiBodyJacobianData jacobianData_normal, jacobianData_t1, jacobianData_t2;
+	findJacobian(link, jacobianData_normal, c.m_node->m_x, normal);
+	findJacobian(link, jacobianData_t1, c.m_node->m_x, t1);
+	findJacobian(link, jacobianData_t2, c.m_node->m_x, t2);
+
+	btScalar* J_n = &jacobianData_normal.m_jacobians[0];
+	btScalar* J_t1 = &jacobianData_t1.m_jacobians[0];
+	btScalar* J_t2 = &jacobianData_t2.m_jacobians[0];
+
+	btScalar* u_n = &jacobianData_normal.m_deltaVelocitiesUnitImpulse[0];
+	btScalar* u_t1 = &jacobianData_t1.m_deltaVelocitiesUnitImpulse[0];
+	btScalar* u_t2 = &jacobianData_t2.m_deltaVelocitiesUnitImpulse[0];
+
+	btMatrix3x3 rot(normal.getX(), normal.getY(), normal.getZ(),
+	                t1.getX(), t1.getY(), t1.getZ(),
+	                t2.getX(), t2.getY(), t2.getZ()); // world frame to local frame
+	const int ndof = link->m_multiBody->getNumDofs() + 6;
+	btMatrix3x3 local_impulse_matrix = (Diagonal(n.m_im) + OuterProduct(J_n, J_t1, J_t2, u_n, u_t1, u_t2, ndof)).inverse();
+	c.m_c0 =  rot.transpose() * local_impulse_matrix * rot;
+	c.jacobianData_normal = jacobianData_normal;
+	c.jacobianData_t1 = jacobianData_t1;
+	c.jacobianData_t2 = jacobianData_t2;
+	c.t1 = t1;
+	c.t2 = t2;
+	const btVector3 ra = n.m_x - wtr.getOrigin();
+	c.m_c1 = ra;
+	c.m_local = link->getWorldTransform().inverse() * m_nodes[node].m_x;
+	c.m_node->m_battach = 1;
+	m_deformableAnchors.push_back(c);
 }
 //
 void btSoftBody::appendLinearJoint(const LJoint::Specs& specs, Cluster* body0, Body body1)
@@ -824,8 +825,8 @@ void btSoftBody::setTotalMass(btScalar mass, bool fromfaces)
 		{
 			const Face& f = m_faces[i];
 			const btScalar twicearea = AreaOf(f.m_n[0]->m_x,
-											  f.m_n[1]->m_x,
-											  f.m_n[2]->m_x);
+			                                  f.m_n[1]->m_x,
+			                                  f.m_n[2]->m_x);
 			for (int j = 0; j < 3; ++j)
 			{
 				f.m_n[j]->m_im += twicearea;
@@ -955,7 +956,7 @@ void btSoftBody::scale(const btVector3& scl)
 	updateNormals();
 	updateBounds();
 	updateConstants();
-    initializeDmInverse();
+	initializeDmInverse();
 }
 
 //
@@ -1013,8 +1014,8 @@ void btSoftBody::setPose(bool bvolume, bool bframe)
 	m_pose.m_scl.setIdentity();
 	/* Aqq		*/
 	m_pose.m_aqq[0] =
-		m_pose.m_aqq[1] =
-			m_pose.m_aqq[2] = btVector3(0, 0, 0);
+	    m_pose.m_aqq[1] =
+	        m_pose.m_aqq[2] = btVector3(0, 0, 0);
 	for (i = 0, ni = m_nodes.size(); i < ni; ++i)
 	{
 		const btVector3& q = m_pose.m_pos[i];
@@ -1368,7 +1369,8 @@ int btSoftBody::generateClusters(int k, int maxiterations)
 				}
 				m_clusters[kbest]->m_nodes.push_back(&m_nodes[i]);
 			}
-		} while (changed && (iterations < maxiterations));
+		}
+		while (changed && (iterations < maxiterations));
 		/* Merge		*/
 		btAlignedObjectArray<int> cids;
 		cids.resize(m_nodes.size(), -1);
@@ -1382,8 +1384,9 @@ int btSoftBody::generateClusters(int k, int maxiterations)
 		for (i = 0; i < m_faces.size(); ++i)
 		{
 			const int idx[] = {int(m_faces[i].m_n[0] - &m_nodes[0]),
-							   int(m_faces[i].m_n[1] - &m_nodes[0]),
-							   int(m_faces[i].m_n[2] - &m_nodes[0])};
+			                   int(m_faces[i].m_n[1] - &m_nodes[0]),
+			                   int(m_faces[i].m_n[2] - &m_nodes[0])
+			                  };
 			for (int j = 0; j < 3; ++j)
 			{
 				const int cid = cids[idx[j]];
@@ -1586,7 +1589,8 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 	{
 		Link& feat = m_links[i];
 		const int idx[] = {int(feat.m_n[0] - nbase),
-						   int(feat.m_n[1] - nbase)};
+		                   int(feat.m_n[1] - nbase)
+		                  };
 		if ((idx[0] < ncount) && (idx[1] < ncount))
 		{
 			const int ni = edges(idx[0], idx[1]);
@@ -1594,7 +1598,8 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 			{
 				appendLink(i);
 				Link* pft[] = {&m_links[i],
-							   &m_links[m_links.size() - 1]};
+				               &m_links[m_links.size() - 1]
+				              };
 				pft[0]->m_n[0] = &m_nodes[idx[0]];
 				pft[0]->m_n[1] = &m_nodes[ni];
 				pft[1]->m_n[0] = &m_nodes[ni];
@@ -1607,8 +1612,9 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 	{
 		const Face& feat = m_faces[i];
 		const int idx[] = {int(feat.m_n[0] - nbase),
-						   int(feat.m_n[1] - nbase),
-						   int(feat.m_n[2] - nbase)};
+		                   int(feat.m_n[1] - nbase),
+		                   int(feat.m_n[2] - nbase)
+		                  };
 		for (j = 2, k = 0; k < 3; j = k++)
 		{
 			if ((idx[j] < ncount) && (idx[k] < ncount))
@@ -1619,7 +1625,8 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 					appendFace(i);
 					const int l = (k + 1) % 3;
 					Face* pft[] = {&m_faces[i],
-								   &m_faces[m_faces.size() - 1]};
+					               &m_faces[m_faces.size() - 1]
+					              };
 					pft[0]->m_n[0] = &m_nodes[idx[l]];
 					pft[0]->m_n[1] = &m_nodes[idx[j]];
 					pft[0]->m_n[2] = &m_nodes[ni];
@@ -1664,7 +1671,8 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 		for (i = 0, ni = m_links.size(); i < ni; ++i)
 		{
 			const int id[] = {int(m_links[i].m_n[0] - nbase),
-							  int(m_links[i].m_n[1] - nbase)};
+			                  int(m_links[i].m_n[1] - nbase)
+			                 };
 			int todetach = 0;
 			if (cnodes[id[0]] && cnodes[id[1]])
 			{
@@ -1674,7 +1682,7 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 			else
 			{
 				if (((ifn->Eval(m_nodes[id[0]].m_x) < accurary) &&
-					 (ifn->Eval(m_nodes[id[1]].m_x) < accurary)))
+				        (ifn->Eval(m_nodes[id[1]].m_x) < accurary)))
 					todetach = i;
 			}
 			if (todetach)
@@ -1692,8 +1700,8 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 		{
 			Node** n = m_faces[i].m_n;
 			if ((ifn->Eval(n[0]->m_x) < accurary) &&
-				(ifn->Eval(n[1]->m_x) < accurary) &&
-				(ifn->Eval(n[2]->m_x) < accurary))
+			        (ifn->Eval(n[1]->m_x) < accurary) &&
+			        (ifn->Eval(n[2]->m_x) < accurary))
 			{
 				for (int j = 0; j < 3; ++j)
 				{
@@ -1718,9 +1726,11 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 		for (i = 0; i < m_links.size(); ++i)
 		{
 			const int id[] = {int(m_links[i].m_n[0] - nbase),
-							  int(m_links[i].m_n[1] - nbase)};
+			                  int(m_links[i].m_n[1] - nbase)
+			                 };
 			const bool sg[] = {ranks[id[0]] == 1,
-							   ranks[id[1]] == 1};
+			                   ranks[id[1]] == 1
+			                  };
 			if (sg[0] || sg[1])
 			{
 				--ranks[id[0]];
@@ -1730,24 +1740,27 @@ void btSoftBody::refine(ImplicitFn* ifn, btScalar accurary, bool cut)
 				--i;
 			}
 		}
-#if 0	
-		for(i=nnodes-1;i>=0;--i)
+#if 0
+		for(i=nnodes-1; i>=0; --i)
 		{
 			if(!ranks[i]) todelete.push_back(i);
-		}	
+		}
 		if(todelete.size())
-		{		
+		{
 			btAlignedObjectArray<int>&	map=ranks;
-			for(int i=0;i<nnodes;++i) map[i]=i;
+			for(int i=0; i<nnodes; ++i) map[i]=i;
 			PointersToIndices(this);
-			for(int i=0,ni=todelete.size();i<ni;++i)
+			for(int i=0,ni=todelete.size(); i<ni; ++i)
 			{
 				int		j=todelete[i];
 				int&	a=map[j];
 				int&	b=map[--nnodes];
-				m_ndbvt.remove(m_nodes[a].m_leaf);m_nodes[a].m_leaf=0;
+				m_ndbvt.remove(m_nodes[a].m_leaf);
+				m_nodes[a].m_leaf=0;
 				btSwap(m_nodes[a],m_nodes[b]);
-				j=a;a=b;b=j;			
+				j=a;
+				a=b;
+				b=j;
 			}
 			IndicesToPointers(this,&map[0]);
 			m_nodes.resize(nnodes);
@@ -1777,7 +1790,8 @@ bool btSoftBody::cutLink(int node0, int node1, btScalar position)
 	Node* pa = &m_nodes[node0];
 	Node* pb = &m_nodes[node1];
 	Node* pn[2] = {&m_nodes[m_nodes.size() - 2],
-				   &m_nodes[m_nodes.size() - 1]};
+	               &m_nodes[m_nodes.size() - 1]
+	              };
 	pn[0]->m_v = v;
 	pn[1]->m_v = v;
 	for (i = 0, ni = m_links.size(); i < ni; ++i)
@@ -1820,8 +1834,8 @@ bool btSoftBody::cutLink(int node0, int node1, btScalar position)
 
 //
 bool btSoftBody::rayTest(const btVector3& rayFrom,
-						 const btVector3& rayTo,
-						 sRayCast& results)
+                         const btVector3& rayTo,
+                         sRayCast& results)
 {
 	if (m_faces.size() && m_fdbvt.empty())
 		initializeFaceTree();
@@ -1842,130 +1856,130 @@ void btSoftBody::setSolver(eSolverPresets::_ preset)
 	m_cfg.m_dsequence.clear();
 	switch (preset)
 	{
-		case eSolverPresets::Positions:
-			m_cfg.m_psequence.push_back(ePSolver::Anchors);
-			m_cfg.m_psequence.push_back(ePSolver::RContacts);
-			m_cfg.m_psequence.push_back(ePSolver::SContacts);
-			m_cfg.m_psequence.push_back(ePSolver::Linear);
-			break;
-		case eSolverPresets::Velocities:
-			m_cfg.m_vsequence.push_back(eVSolver::Linear);
+	case eSolverPresets::Positions:
+		m_cfg.m_psequence.push_back(ePSolver::Anchors);
+		m_cfg.m_psequence.push_back(ePSolver::RContacts);
+		m_cfg.m_psequence.push_back(ePSolver::SContacts);
+		m_cfg.m_psequence.push_back(ePSolver::Linear);
+		break;
+	case eSolverPresets::Velocities:
+		m_cfg.m_vsequence.push_back(eVSolver::Linear);
 
-			m_cfg.m_psequence.push_back(ePSolver::Anchors);
-			m_cfg.m_psequence.push_back(ePSolver::RContacts);
-			m_cfg.m_psequence.push_back(ePSolver::SContacts);
+		m_cfg.m_psequence.push_back(ePSolver::Anchors);
+		m_cfg.m_psequence.push_back(ePSolver::RContacts);
+		m_cfg.m_psequence.push_back(ePSolver::SContacts);
 
-			m_cfg.m_dsequence.push_back(ePSolver::Linear);
-			break;
+		m_cfg.m_dsequence.push_back(ePSolver::Linear);
+		break;
 	}
 }
 
 void btSoftBody::predictMotion(btScalar dt)
 {
-    int i, ni;
-    
-    /* Update                */
-    if (m_bUpdateRtCst)
-    {
-        m_bUpdateRtCst = false;
-        updateConstants();
-        m_fdbvt.clear();
-        if (m_cfg.collisions & fCollision::VF_SS)
-        {
-            initializeFaceTree();
-        }
-    }
-    
-    /* Prepare                */
-    m_sst.sdt = dt * m_cfg.timescale;
-    m_sst.isdt = 1 / m_sst.sdt;
-    m_sst.velmrg = m_sst.sdt * 3;
-    m_sst.radmrg = getCollisionShape()->getMargin();
-    m_sst.updmrg = m_sst.radmrg * (btScalar)0.25;
-    /* Forces                */
-    addVelocity(m_worldInfo->m_gravity * m_sst.sdt);
-    applyForces();
-    /* Integrate            */
-    for (i = 0, ni = m_nodes.size(); i < ni; ++i)
-    {
-        Node& n = m_nodes[i];
-        n.m_q = n.m_x;
-        btVector3 deltaV = n.m_f * n.m_im * m_sst.sdt;
-        {
-            btScalar maxDisplacement = m_worldInfo->m_maxDisplacement;
-            btScalar clampDeltaV = maxDisplacement / m_sst.sdt;
-            for (int c = 0; c < 3; c++)
-            {
-                if (deltaV[c] > clampDeltaV)
-                {
-                    deltaV[c] = clampDeltaV;
-                }
-                if (deltaV[c] < -clampDeltaV)
-                {
-                    deltaV[c] = -clampDeltaV;
-                }
-            }
-        }
-        n.m_v += deltaV;
-        n.m_x += n.m_v * m_sst.sdt;
-        n.m_f = btVector3(0, 0, 0);
-    }
-    /* Clusters                */
-    updateClusters();
-    /* Bounds                */
-    updateBounds();
-    /* Nodes                */
-    ATTRIBUTE_ALIGNED16(btDbvtVolume)
-    vol;
-    for (i = 0, ni = m_nodes.size(); i < ni; ++i)
-    {
-        Node& n = m_nodes[i];
-        vol = btDbvtVolume::FromCR(n.m_x, m_sst.radmrg);
-        m_ndbvt.update(n.m_leaf,
-                       vol,
-                       n.m_v * m_sst.velmrg,
-                       m_sst.updmrg);
-    }
-    /* Faces                */
-    if (!m_fdbvt.empty())
-    {
-        for (int i = 0; i < m_faces.size(); ++i)
-        {
-            Face& f = m_faces[i];
-            const btVector3 v = (f.m_n[0]->m_v +
-                                 f.m_n[1]->m_v +
-                                 f.m_n[2]->m_v) /
-            3;
-            vol = VolumeOf(f, m_sst.radmrg);
-            m_fdbvt.update(f.m_leaf,
-                           vol,
-                           v * m_sst.velmrg,
-                           m_sst.updmrg);
-        }
-    }
-    /* Pose                    */
-    updatePose();
-    /* Match                */
-    if (m_pose.m_bframe && (m_cfg.kMT > 0))
-    {
-        const btMatrix3x3 posetrs = m_pose.m_rot;
-        for (int i = 0, ni = m_nodes.size(); i < ni; ++i)
-        {
-            Node& n = m_nodes[i];
-            if (n.m_im > 0)
-            {
-                const btVector3 x = posetrs * m_pose.m_pos[i] + m_pose.m_com;
-                n.m_x = Lerp(n.m_x, x, m_cfg.kMT);
-            }
-        }
-    }
-    /* Clear contacts        */
-    m_rcontacts.resize(0);
-    m_scontacts.resize(0);
-    /* Optimize dbvt's        */
-    m_ndbvt.optimizeIncremental(1);
-    m_fdbvt.optimizeIncremental(1);
-    m_cdbvt.optimizeIncremental(1);
+	int i, ni;
+
+	/* Update                */
+	if (m_bUpdateRtCst)
+	{
+		m_bUpdateRtCst = false;
+		updateConstants();
+		m_fdbvt.clear();
+		if (m_cfg.collisions & fCollision::VF_SS)
+		{
+			initializeFaceTree();
+		}
+	}
+
+	/* Prepare                */
+	m_sst.sdt = dt * m_cfg.timescale;
+	m_sst.isdt = 1 / m_sst.sdt;
+	m_sst.velmrg = m_sst.sdt * 3;
+	m_sst.radmrg = getCollisionShape()->getMargin();
+	m_sst.updmrg = m_sst.radmrg * (btScalar)0.25;
+	/* Forces                */
+	addVelocity(m_worldInfo->m_gravity * m_sst.sdt);
+	applyForces();
+	/* Integrate            */
+	for (i = 0, ni = m_nodes.size(); i < ni; ++i)
+	{
+		Node& n = m_nodes[i];
+		n.m_q = n.m_x;
+		btVector3 deltaV = n.m_f * n.m_im * m_sst.sdt;
+		{
+			btScalar maxDisplacement = m_worldInfo->m_maxDisplacement;
+			btScalar clampDeltaV = maxDisplacement / m_sst.sdt;
+			for (int c = 0; c < 3; c++)
+			{
+				if (deltaV[c] > clampDeltaV)
+				{
+					deltaV[c] = clampDeltaV;
+				}
+				if (deltaV[c] < -clampDeltaV)
+				{
+					deltaV[c] = -clampDeltaV;
+				}
+			}
+		}
+		n.m_v += deltaV;
+		n.m_x += n.m_v * m_sst.sdt;
+		n.m_f = btVector3(0, 0, 0);
+	}
+	/* Clusters                */
+	updateClusters();
+	/* Bounds                */
+	updateBounds();
+	/* Nodes                */
+	ATTRIBUTE_ALIGNED16(btDbvtVolume)
+	vol;
+	for (i = 0, ni = m_nodes.size(); i < ni; ++i)
+	{
+		Node& n = m_nodes[i];
+		vol = btDbvtVolume::FromCR(n.m_x, m_sst.radmrg);
+		m_ndbvt.update(n.m_leaf,
+		               vol,
+		               n.m_v * m_sst.velmrg,
+		               m_sst.updmrg);
+	}
+	/* Faces                */
+	if (!m_fdbvt.empty())
+	{
+		for (int i = 0; i < m_faces.size(); ++i)
+		{
+			Face& f = m_faces[i];
+			const btVector3 v = (f.m_n[0]->m_v +
+			                     f.m_n[1]->m_v +
+			                     f.m_n[2]->m_v) /
+			                    3;
+			vol = VolumeOf(f, m_sst.radmrg);
+			m_fdbvt.update(f.m_leaf,
+			               vol,
+			               v * m_sst.velmrg,
+			               m_sst.updmrg);
+		}
+	}
+	/* Pose                    */
+	updatePose();
+	/* Match                */
+	if (m_pose.m_bframe && (m_cfg.kMT > 0))
+	{
+		const btMatrix3x3 posetrs = m_pose.m_rot;
+		for (int i = 0, ni = m_nodes.size(); i < ni; ++i)
+		{
+			Node& n = m_nodes[i];
+			if (n.m_im > 0)
+			{
+				const btVector3 x = posetrs * m_pose.m_pos[i] + m_pose.m_com;
+				n.m_x = Lerp(n.m_x, x, m_cfg.kMT);
+			}
+		}
+	}
+	/* Clear contacts        */
+	m_rcontacts.resize(0);
+	m_scontacts.resize(0);
+	/* Optimize dbvt's        */
+	m_ndbvt.optimizeIncremental(1);
+	m_fdbvt.optimizeIncremental(1);
+	m_cdbvt.optimizeIncremental(1);
 }
 
 
@@ -1990,10 +2004,10 @@ void btSoftBody::solveConstraints()
 		Anchor& a = m_anchors[i];
 		const btVector3 ra = a.m_body->getWorldTransform().getBasis() * a.m_local;
 		a.m_c0 = ImpulseMatrix(m_sst.sdt,
-							   a.m_node->m_im,
-							   a.m_body->getInvMass(),
-							   a.m_body->getInvInertiaTensorWorld(),
-							   ra);
+		                       a.m_node->m_im,
+		                       a.m_body->getInvMass(),
+		                       a.m_body->getInvInertiaTensorWorld(),
+		                       ra);
 		a.m_c1 = ra;
 		a.m_c2 = m_sst.sdt * a.m_node->m_im;
 		a.m_body->activate();
@@ -2132,10 +2146,10 @@ void btSoftBody::RayFromToCaster::Process(const btDbvtNode* leaf)
 {
 	btSoftBody::Face& f = *(btSoftBody::Face*)leaf->data;
 	const btScalar t = rayFromToTriangle(m_rayFrom, m_rayTo, m_rayNormalizedDirection,
-										 f.m_n[0]->m_x,
-										 f.m_n[1]->m_x,
-										 f.m_n[2]->m_x,
-										 m_mint);
+	                                     f.m_n[0]->m_x,
+	                                     f.m_n[1]->m_x,
+	                                     f.m_n[2]->m_x,
+	                                     m_mint);
 	if ((t > 0) && (t < m_mint))
 	{
 		m_mint = t;
@@ -2146,12 +2160,12 @@ void btSoftBody::RayFromToCaster::Process(const btDbvtNode* leaf)
 
 //
 btScalar btSoftBody::RayFromToCaster::rayFromToTriangle(const btVector3& rayFrom,
-														const btVector3& rayTo,
-														const btVector3& rayNormalizedDirection,
-														const btVector3& a,
-														const btVector3& b,
-														const btVector3& c,
-														btScalar maxt)
+        const btVector3& rayTo,
+        const btVector3& rayNormalizedDirection,
+        const btVector3& a,
+        const btVector3& b,
+        const btVector3& c,
+        btScalar maxt)
 {
 	static const btScalar ceps = -SIMD_EPSILON * 10;
 	static const btScalar teps = SIMD_EPSILON * 10;
@@ -2167,8 +2181,8 @@ btScalar btSoftBody::RayFromToCaster::rayFromToTriangle(const btVector3& rayFrom
 		{
 			const btVector3 hit = rayFrom + rayNormalizedDirection * t;
 			if ((btDot(n, btCross(a - hit, b - hit)) > ceps) &&
-				(btDot(n, btCross(b - hit, c - hit)) > ceps) &&
-				(btDot(n, btCross(c - hit, a - hit)) > ceps))
+			        (btDot(n, btCross(b - hit, c - hit)) > ceps) &&
+			        (btDot(n, btCross(c - hit, a - hit)) > ceps))
 			{
 				return (t);
 			}
@@ -2265,23 +2279,24 @@ void btSoftBody::indicesToPointers(const int* map)
 
 //
 int btSoftBody::rayTest(const btVector3& rayFrom, const btVector3& rayTo,
-						btScalar& mint, eFeature::_& feature, int& index, bool bcountonly) const
+                        btScalar& mint, eFeature::_& feature, int& index, bool bcountonly) const
 {
 	int cnt = 0;
 	btVector3 dir = rayTo - rayFrom;
 
 	if (bcountonly || m_fdbvt.empty())
-	{ /* Full search	*/
+	{
+		/* Full search	*/
 
 		for (int i = 0, ni = m_faces.size(); i < ni; ++i)
 		{
 			const btSoftBody::Face& f = m_faces[i];
 
 			const btScalar t = RayFromToCaster::rayFromToTriangle(rayFrom, rayTo, dir,
-																  f.m_n[0]->m_x,
-																  f.m_n[1]->m_x,
-																  f.m_n[2]->m_x,
-																  mint);
+			                   f.m_n[0]->m_x,
+			                   f.m_n[1]->m_x,
+			                   f.m_n[2]->m_x,
+			                   mint);
 			if (t > 0)
 			{
 				++cnt;
@@ -2295,7 +2310,8 @@ int btSoftBody::rayTest(const btVector3& rayFrom, const btVector3& rayTo,
 		}
 	}
 	else
-	{ /* Use dbvt	*/
+	{
+		/* Use dbvt	*/
 		RayFromToCaster collider(rayFrom, rayTo, mint);
 
 		btDbvt::rayTest(m_fdbvt.m_root, rayFrom, rayTo, collider);
@@ -2322,8 +2338,8 @@ int btSoftBody::rayTest(const btVector3& rayFrom, const btVector3& rayTo,
 			btVector3 v2 = tet.m_n[index2]->m_x;
 
 			const btScalar t = RayFromToCaster::rayFromToTriangle(rayFrom, rayTo, dir,
-																  v0, v1, v2,
-																  mint);
+			                   v0, v1, v2,
+			                   mint);
 			if (t > 0)
 			{
 				++cnt;
@@ -2369,58 +2385,58 @@ bool btSoftBody::checkContact(const btCollisionObjectWrapper* colObjWrap,
                               btScalar margin,
                               btSoftBody::sCti& cti) const
 {
-    btVector3 nrm;
-    const btCollisionShape* shp = colObjWrap->getCollisionShape();
-    //    const btRigidBody *tmpRigid = btRigidBody::upcast(colObjWrap->getCollisionObject());
-    //const btTransform &wtr = tmpRigid ? tmpRigid->getWorldTransform() : colObjWrap->getWorldTransform();
-    const btTransform& wtr = colObjWrap->getWorldTransform();
-    //todo: check which transform is needed here
-    
-    btScalar dst =
-    m_worldInfo->m_sparsesdf.Evaluate(
-                                      wtr.invXform(x),
-                                      shp,
-                                      nrm,
-                                      margin);
-    if (dst < 0)
-    {
-        cti.m_colObj = colObjWrap->getCollisionObject();
-        cti.m_normal = wtr.getBasis() * nrm;
-        cti.m_offset = -btDot(cti.m_normal, x - cti.m_normal * dst);
-        return (true);
-    }
-    return (false);
+	btVector3 nrm;
+	const btCollisionShape* shp = colObjWrap->getCollisionShape();
+	//    const btRigidBody *tmpRigid = btRigidBody::upcast(colObjWrap->getCollisionObject());
+	//const btTransform &wtr = tmpRigid ? tmpRigid->getWorldTransform() : colObjWrap->getWorldTransform();
+	const btTransform& wtr = colObjWrap->getWorldTransform();
+	//todo: check which transform is needed here
+
+	btScalar dst =
+	    m_worldInfo->m_sparsesdf.Evaluate(
+	        wtr.invXform(x),
+	        shp,
+	        nrm,
+	        margin);
+	if (dst < 0)
+	{
+		cti.m_colObj = colObjWrap->getCollisionObject();
+		cti.m_normal = wtr.getBasis() * nrm;
+		cti.m_offset = -btDot(cti.m_normal, x - cti.m_normal * dst);
+		return (true);
+	}
+	return (false);
 }
 
 //
 bool btSoftBody::checkDeformableContact(const btCollisionObjectWrapper* colObjWrap,
-							  const btVector3& x,
-							  btScalar margin,
-							  btSoftBody::sCti& cti, bool predict) const
+                                        const btVector3& x,
+                                        btScalar margin,
+                                        btSoftBody::sCti& cti, bool predict) const
 {
 	btVector3 nrm;
 	const btCollisionShape* shp = colObjWrap->getCollisionShape();
-    const btCollisionObject* tmpCollisionObj = colObjWrap->getCollisionObject();
-    // use the position x_{n+1}^* = x_n + dt * v_{n+1}^* where v_{n+1}^* = v_n + dtg for collision detect
-    // but resolve contact at x_n
+	const btCollisionObject* tmpCollisionObj = colObjWrap->getCollisionObject();
+	// use the position x_{n+1}^* = x_n + dt * v_{n+1}^* where v_{n+1}^* = v_n + dtg for collision detect
+	// but resolve contact at x_n
 //    btTransform wtr = (predict) ?
 //    (colObjWrap->m_preTransform != NULL ? tmpCollisionObj->getInterpolationWorldTransform()*(*colObjWrap->m_preTransform) : tmpCollisionObj->getInterpolationWorldTransform())
 //                 : colObjWrap->getWorldTransform();
-    const btTransform& wtr = colObjWrap->getWorldTransform();
+	const btTransform& wtr = colObjWrap->getWorldTransform();
 	btScalar dst =
-		m_worldInfo->m_sparsesdf.Evaluate(
-			wtr.invXform(x),
-			shp,
-			nrm,
-			margin);
+	    m_worldInfo->m_sparsesdf.Evaluate(
+	        wtr.invXform(x),
+	        shp,
+	        nrm,
+	        margin);
 	if (!predict)
 	{
 		cti.m_colObj = colObjWrap->getCollisionObject();
 		cti.m_normal = wtr.getBasis() * nrm;
-        cti.m_offset = dst;
+		cti.m_offset = dst;
 	}
-    if (dst < 0)
-        return true;
+	if (dst < 0)
+		return true;
 	return (false);
 }
 
@@ -2429,127 +2445,127 @@ bool btSoftBody::checkDeformableContact(const btCollisionObjectWrapper* colObjWr
 // point p with respect to triangle (a, b, c)
 static void getBarycentric(const btVector3& p, btVector3& a, btVector3& b, btVector3& c, btVector3& bary)
 {
-    btVector3 v0 = b - a, v1 = c - a, v2 = p - a;
-    btScalar d00 = v0.dot(v0);
-    btScalar d01 = v0.dot(v1);
-    btScalar d11 = v1.dot(v1);
-    btScalar d20 = v2.dot(v0);
-    btScalar d21 = v2.dot(v1);
-    btScalar denom = d00 * d11 - d01 * d01;
-    bary.setY((d11 * d20 - d01 * d21) / denom);
-    bary.setZ((d00 * d21 - d01 * d20) / denom);
-    bary.setX(btScalar(1) - bary.getY() - bary.getZ());
+	btVector3 v0 = b - a, v1 = c - a, v2 = p - a;
+	btScalar d00 = v0.dot(v0);
+	btScalar d01 = v0.dot(v1);
+	btScalar d11 = v1.dot(v1);
+	btScalar d20 = v2.dot(v0);
+	btScalar d21 = v2.dot(v1);
+	btScalar denom = d00 * d11 - d01 * d01;
+	bary.setY((d11 * d20 - d01 * d21) / denom);
+	bary.setZ((d00 * d21 - d01 * d20) / denom);
+	bary.setX(btScalar(1) - bary.getY() - bary.getZ());
 }
 
 //
 bool btSoftBody::checkDeformableFaceContact(const btCollisionObjectWrapper* colObjWrap,
-                                        Face& f,
-                                        btVector3& contact_point,
-                                        btVector3& bary,
-                                        btScalar margin,
-                                        btSoftBody::sCti& cti, bool predict) const
+        Face& f,
+        btVector3& contact_point,
+        btVector3& bary,
+        btScalar margin,
+        btSoftBody::sCti& cti, bool predict) const
 {
-    btVector3 nrm;
-    const btCollisionShape* shp = colObjWrap->getCollisionShape();
-    const btCollisionObject* tmpCollisionObj = colObjWrap->getCollisionObject();
-    // use the position x_{n+1}^* = x_n + dt * v_{n+1}^* where v_{n+1}^* = v_n + dtg for collision detect
-    // but resolve contact at x_n
-    btTransform wtr = (predict) ?
-    (colObjWrap->m_preTransform != NULL ? tmpCollisionObj->getInterpolationWorldTransform()*(*colObjWrap->m_preTransform) : tmpCollisionObj->getInterpolationWorldTransform())
-    : colObjWrap->getWorldTransform();
+	btVector3 nrm;
+	const btCollisionShape* shp = colObjWrap->getCollisionShape();
+	const btCollisionObject* tmpCollisionObj = colObjWrap->getCollisionObject();
+	// use the position x_{n+1}^* = x_n + dt * v_{n+1}^* where v_{n+1}^* = v_n + dtg for collision detect
+	// but resolve contact at x_n
+	btTransform wtr = (predict) ?
+	                  (colObjWrap->m_preTransform != NULL ? tmpCollisionObj->getInterpolationWorldTransform()*(*colObjWrap->m_preTransform) : tmpCollisionObj->getInterpolationWorldTransform())
+	                  : colObjWrap->getWorldTransform();
 //    const btTransform& wtr = colObjWrap->getWorldTransform();
-    btScalar dst;
-    
+	btScalar dst;
+
 //#define USE_QUADRATURE 1
 //#define CACHE_PREV_COLLISION
-    
-    // use the contact position of the previous collision
+
+	// use the contact position of the previous collision
 #ifdef CACHE_PREV_COLLISION
-    if (f.m_pcontact[3] != 0)
-    {
-        for (int i = 0; i < 3; ++i)
-            bary[i] = f.m_pcontact[i];
-        contact_point = BaryEval(f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, bary);
-        dst = m_worldInfo->m_sparsesdf.Evaluate(
-                                          wtr.invXform(contact_point),
-                                          shp,
-                                          nrm,
-                                          margin);
-        nrm = wtr.getBasis() * nrm;
-        // use cached contact point
-    }
-    else
-    {
-        btGjkEpaSolver2::sResults results;
-        btTransform triangle_transform;
-        triangle_transform.setIdentity();
-        triangle_transform.setOrigin(f.m_n[0]->m_x);
-        btTriangleShape triangle(btVector3(0,0,0), f.m_n[1]->m_x-f.m_n[0]->m_x, f.m_n[2]->m_x-f.m_n[0]->m_x);
-        btVector3 guess(0,0,0);
-        const btConvexShape* csh = static_cast<const btConvexShape*>(shp);
-        btGjkEpaSolver2::SignedDistance(&triangle, triangle_transform, csh, wtr, guess, results);
-        dst = results.distance - margin;
-        contact_point = results.witnesses[0];
-        getBarycentric(contact_point, f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, bary);
-        nrm = results.normal;
-        for (int i = 0; i < 3; ++i)
-            f.m_pcontact[i] = bary[i];
-    }
+	if (f.m_pcontact[3] != 0)
+	{
+		for (int i = 0; i < 3; ++i)
+			bary[i] = f.m_pcontact[i];
+		contact_point = BaryEval(f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, bary);
+		dst = m_worldInfo->m_sparsesdf.Evaluate(
+		          wtr.invXform(contact_point),
+		          shp,
+		          nrm,
+		          margin);
+		nrm = wtr.getBasis() * nrm;
+		// use cached contact point
+	}
+	else
+	{
+		btGjkEpaSolver2::sResults results;
+		btTransform triangle_transform;
+		triangle_transform.setIdentity();
+		triangle_transform.setOrigin(f.m_n[0]->m_x);
+		btTriangleShape triangle(btVector3(0,0,0), f.m_n[1]->m_x-f.m_n[0]->m_x, f.m_n[2]->m_x-f.m_n[0]->m_x);
+		btVector3 guess(0,0,0);
+		const btConvexShape* csh = static_cast<const btConvexShape*>(shp);
+		btGjkEpaSolver2::SignedDistance(&triangle, triangle_transform, csh, wtr, guess, results);
+		dst = results.distance - margin;
+		contact_point = results.witnesses[0];
+		getBarycentric(contact_point, f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, bary);
+		nrm = results.normal;
+		for (int i = 0; i < 3; ++i)
+			f.m_pcontact[i] = bary[i];
+	}
 
 #endif
 
-    // use collision quadrature point
+	// use collision quadrature point
 #ifdef USE_QUADRATURE
-    {
-        dst = SIMD_INFINITY;
-        btVector3 local_nrm;
-        for (int q = 0; q < m_quads.size(); ++q)
-        {
-            btVector3 p = BaryEval(f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, m_quads[q]);
-            btScalar local_dst = m_worldInfo->m_sparsesdf.Evaluate(
-                                                    wtr.invXform(p),
-                                                    shp,
-                                                    local_nrm,
-                                                    margin);
-            if (local_dst < dst)
-            {
-                dst = local_dst;
-                contact_point = p;
-                bary = m_quads[q];
-                nrm = wtr.getBasis() * local_nrm;
-            }
-        }
-    }
+	{
+		dst = SIMD_INFINITY;
+		btVector3 local_nrm;
+		for (int q = 0; q < m_quads.size(); ++q)
+		{
+			btVector3 p = BaryEval(f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, m_quads[q]);
+			btScalar local_dst = m_worldInfo->m_sparsesdf.Evaluate(
+			                         wtr.invXform(p),
+			                         shp,
+			                         local_nrm,
+			                         margin);
+			if (local_dst < dst)
+			{
+				dst = local_dst;
+				contact_point = p;
+				bary = m_quads[q];
+				nrm = wtr.getBasis() * local_nrm;
+			}
+		}
+	}
 #endif
-    
-    // regular face contact
-    {
-        btGjkEpaSolver2::sResults results;
-        btTransform triangle_transform;
-        triangle_transform.setIdentity();
-        triangle_transform.setOrigin(f.m_n[0]->m_x);
-        btTriangleShape triangle(btVector3(0,0,0), f.m_n[1]->m_x-f.m_n[0]->m_x, f.m_n[2]->m_x-f.m_n[0]->m_x);
-        btVector3 guess(0,0,0);
-        const btConvexShape* csh = static_cast<const btConvexShape*>(shp);
-        btGjkEpaSolver2::SignedDistance(&triangle, triangle_transform, csh, wtr, guess, results);
-        dst = results.distance - margin;
-        contact_point = results.witnesses[0];
-        getBarycentric(contact_point, f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, bary);
-        nrm = results.normal;
-        for (int i = 0; i < 3; ++i)
-            f.m_pcontact[i] = bary[i];
-    }
-    
-    if (!predict)
-    {
-        cti.m_colObj = colObjWrap->getCollisionObject();
-        cti.m_normal = nrm;
-        cti.m_offset = dst;
-    }
-    
-    if (dst < 0)
-        return true;
-    return (false);
+
+	// regular face contact
+	{
+		btGjkEpaSolver2::sResults results;
+		btTransform triangle_transform;
+		triangle_transform.setIdentity();
+		triangle_transform.setOrigin(f.m_n[0]->m_x);
+		btTriangleShape triangle(btVector3(0,0,0), f.m_n[1]->m_x-f.m_n[0]->m_x, f.m_n[2]->m_x-f.m_n[0]->m_x);
+		btVector3 guess(0,0,0);
+		const btConvexShape* csh = static_cast<const btConvexShape*>(shp);
+		btGjkEpaSolver2::SignedDistance(&triangle, triangle_transform, csh, wtr, guess, results);
+		dst = results.distance - margin;
+		contact_point = results.witnesses[0];
+		getBarycentric(contact_point, f.m_n[0]->m_x, f.m_n[1]->m_x, f.m_n[2]->m_x, bary);
+		nrm = results.normal;
+		for (int i = 0; i < 3; ++i)
+			f.m_pcontact[i] = bary[i];
+	}
+
+	if (!predict)
+	{
+		cti.m_colObj = colObjWrap->getCollisionObject();
+		cti.m_normal = nrm;
+		cti.m_offset = dst;
+	}
+
+	if (dst < 0)
+		return true;
+	return (false);
 }
 
 //
@@ -2566,7 +2582,7 @@ void btSoftBody::updateNormals()
 	{
 		btSoftBody::Face& f = m_faces[i];
 		const btVector3 n = btCross(f.m_n[1]->m_x - f.m_n[0]->m_x,
-									f.m_n[2]->m_x - f.m_n[0]->m_x);
+		                            f.m_n[2]->m_x - f.m_n[0]->m_x);
 		f.m_normal = n;
 		f.m_normal.safeNormalize();
 		f.m_n[0]->m_n += n;
@@ -2620,39 +2636,39 @@ void btSoftBody::updateBounds()
 //        m_bounds[0] =
 //            m_bounds[1] = btVector3(0, 0, 0);
 //    }
-    if (m_nodes.size())
-    {
-        btVector3 mins = m_nodes[0].m_x;
-        btVector3 maxs = m_nodes[0].m_x;
-        for (int i = 1; i < m_nodes.size(); ++i)
-        {
-            for (int d = 0; d < 3; ++d)
-            {
-                if (m_nodes[i].m_x[d] > maxs[d])
-                    maxs[d] = m_nodes[i].m_x[d];
-                if (m_nodes[i].m_x[d] < mins[d])
-                    mins[d] = m_nodes[i].m_x[d];
-            }
-        }
-        const btScalar csm = getCollisionShape()->getMargin();
-        const btVector3 mrg = btVector3(csm,
-                                        csm,
-                                        csm);
-        m_bounds[0] = mins - mrg;
-        m_bounds[1] = maxs + mrg;
-        if (0 != getBroadphaseHandle())
-        {
-            m_worldInfo->m_broadphase->setAabb(getBroadphaseHandle(),
-                                               m_bounds[0],
-                                               m_bounds[1],
-                                               m_worldInfo->m_dispatcher);
-        }
-    }
-    else
-    {
-        m_bounds[0] =
-        m_bounds[1] = btVector3(0, 0, 0);
-    }
+	if (m_nodes.size())
+	{
+		btVector3 mins = m_nodes[0].m_x;
+		btVector3 maxs = m_nodes[0].m_x;
+		for (int i = 1; i < m_nodes.size(); ++i)
+		{
+			for (int d = 0; d < 3; ++d)
+			{
+				if (m_nodes[i].m_x[d] > maxs[d])
+					maxs[d] = m_nodes[i].m_x[d];
+				if (m_nodes[i].m_x[d] < mins[d])
+					mins[d] = m_nodes[i].m_x[d];
+			}
+		}
+		const btScalar csm = getCollisionShape()->getMargin();
+		const btVector3 mrg = btVector3(csm,
+		                                csm,
+		                                csm);
+		m_bounds[0] = mins - mrg;
+		m_bounds[1] = maxs + mrg;
+		if (0 != getBroadphaseHandle())
+		{
+			m_worldInfo->m_broadphase->setAabb(getBroadphaseHandle(),
+			                                   m_bounds[0],
+			                                   m_bounds[1],
+			                                   m_worldInfo->m_dispatcher);
+		}
+	}
+	else
+	{
+		m_bounds[0] =
+		    m_bounds[1] = btVector3(0, 0, 0);
+	}
 }
 
 //
@@ -2686,7 +2702,7 @@ void btSoftBody::updatePose()
 		if (m_cfg.maxvolume > 1)
 		{
 			const btScalar idet = Clamp<btScalar>(1 / pose.m_scl.determinant(),
-												  1, m_cfg.maxvolume);
+			                                      1, m_cfg.maxvolume);
 			pose.m_scl = Mul(pose.m_scl, idet);
 		}
 	}
@@ -2880,12 +2896,12 @@ void btSoftBody::updateClusters()
 #if 1 /* Constant	*/
 			c.m_invwi = c.m_framexform.getBasis() * c.m_locii * c.m_framexform.getBasis().transpose();
 #else
-#if 0 /* Sphere	*/ 
+#if 0 /* Sphere	*/
 			const btScalar	rk=(2*c.m_extents.length2())/(5*c.m_imass);
 			const btVector3	inertia(rk,rk,rk);
 			const btVector3	iin(btFabs(inertia[0])>SIMD_EPSILON?1/inertia[0]:0,
-				btFabs(inertia[1])>SIMD_EPSILON?1/inertia[1]:0,
-				btFabs(inertia[2])>SIMD_EPSILON?1/inertia[2]:0);
+			                    btFabs(inertia[1])>SIMD_EPSILON?1/inertia[1]:0,
+			                    btFabs(inertia[2])>SIMD_EPSILON?1/inertia[2]:0);
 
 			c.m_invwi=c.m_xform.getBasis().scaled(iin)*c.m_xform.getBasis().transpose();
 #else /* Actual	*/
@@ -2924,9 +2940,9 @@ void btSoftBody::updateClusters()
 			c.m_lv = c.m_imass * c.m_lv * (1 - c.m_ldamping);
 			c.m_av = c.m_invwi * c.m_av * (1 - c.m_adamping);
 			c.m_vimpulses[0] =
-				c.m_vimpulses[1] = btVector3(0, 0, 0);
+			    c.m_vimpulses[1] = btVector3(0, 0, 0);
 			c.m_dimpulses[0] =
-				c.m_dimpulses[1] = btVector3(0, 0, 0);
+			    c.m_dimpulses[1] = btVector3(0, 0, 0);
 			c.m_nvimpulses = 0;
 			c.m_ndimpulses = 0;
 			/* Matching				*/
@@ -3071,59 +3087,59 @@ void btSoftBody::dampClusters()
 
 void btSoftBody::setSpringStiffness(btScalar k)
 {
-    for (int i = 0; i < m_links.size(); ++i)
-    {
-        m_links[i].Feature::m_material->m_kLST = k;
-    }
+	for (int i = 0; i < m_links.size(); ++i)
+	{
+		m_links[i].Feature::m_material->m_kLST = k;
+	}
 }
 
 void btSoftBody::initializeDmInverse()
 {
-    btScalar unit_simplex_measure = 1./6.;
-    
-    for (int i = 0; i < m_tetras.size(); ++i)
-    {
-        Tetra &t = m_tetras[i];
-        btVector3 c1 = t.m_n[1]->m_x - t.m_n[0]->m_x;
-        btVector3 c2 = t.m_n[2]->m_x - t.m_n[0]->m_x;
-        btVector3 c3 = t.m_n[3]->m_x - t.m_n[0]->m_x;
-        btMatrix3x3 Dm(c1.getX(), c2.getX(), c3.getX(),
-                       c1.getY(), c2.getY(), c3.getY(),
-                       c1.getZ(), c2.getZ(), c3.getZ());
-        t.m_element_measure = Dm.determinant() * unit_simplex_measure;
-        t.m_Dm_inverse = Dm.inverse();
-    }
+	btScalar unit_simplex_measure = 1./6.;
+
+	for (int i = 0; i < m_tetras.size(); ++i)
+	{
+		Tetra &t = m_tetras[i];
+		btVector3 c1 = t.m_n[1]->m_x - t.m_n[0]->m_x;
+		btVector3 c2 = t.m_n[2]->m_x - t.m_n[0]->m_x;
+		btVector3 c3 = t.m_n[3]->m_x - t.m_n[0]->m_x;
+		btMatrix3x3 Dm(c1.getX(), c2.getX(), c3.getX(),
+		               c1.getY(), c2.getY(), c3.getY(),
+		               c1.getZ(), c2.getZ(), c3.getZ());
+		t.m_element_measure = Dm.determinant() * unit_simplex_measure;
+		t.m_Dm_inverse = Dm.inverse();
+	}
 }
 
 void btSoftBody::updateDeformation()
 {
-    for (int i = 0; i < m_tetras.size(); ++i)
-    {
-        btSoftBody::Tetra& t = m_tetras[i];
-        btVector3 c1 = t.m_n[1]->m_q - t.m_n[0]->m_q;
-        btVector3 c2 = t.m_n[2]->m_q - t.m_n[0]->m_q;
-        btVector3 c3 = t.m_n[3]->m_q - t.m_n[0]->m_q;
-        btMatrix3x3 Ds(c1.getX(), c2.getX(), c3.getX(),
-                       c1.getY(), c2.getY(), c3.getY(),
-                       c1.getZ(), c2.getZ(), c3.getZ());
-        t.m_F = Ds * t.m_Dm_inverse;
-        
-        btSoftBody::TetraScratch& s = m_tetraScratches[i];
-        s.m_F = t.m_F;
-        s.m_J = t.m_F.determinant();
-        btMatrix3x3 C = t.m_F.transpose()*t.m_F;
-        s.m_trace = C[0].getX() + C[1].getY() + C[2].getZ();
-        s.m_cofF = t.m_F.adjoint().transpose();
-    }
+	for (int i = 0; i < m_tetras.size(); ++i)
+	{
+		btSoftBody::Tetra& t = m_tetras[i];
+		btVector3 c1 = t.m_n[1]->m_q - t.m_n[0]->m_q;
+		btVector3 c2 = t.m_n[2]->m_q - t.m_n[0]->m_q;
+		btVector3 c3 = t.m_n[3]->m_q - t.m_n[0]->m_q;
+		btMatrix3x3 Ds(c1.getX(), c2.getX(), c3.getX(),
+		               c1.getY(), c2.getY(), c3.getY(),
+		               c1.getZ(), c2.getZ(), c3.getZ());
+		t.m_F = Ds * t.m_Dm_inverse;
+
+		btSoftBody::TetraScratch& s = m_tetraScratches[i];
+		s.m_F = t.m_F;
+		s.m_J = t.m_F.determinant();
+		btMatrix3x3 C = t.m_F.transpose()*t.m_F;
+		s.m_trace = C[0].getX() + C[1].getY() + C[2].getZ();
+		s.m_cofF = t.m_F.adjoint().transpose();
+	}
 }
 
 void btSoftBody::advanceDeformation()
 {
-    updateDeformation();
-    for (int i = 0; i < m_tetras.size(); ++i)
-    {
-        m_tetraScratchesTn[i] = m_tetraScratches[i];
-    }
+	updateDeformation();
+	for (int i = 0; i < m_tetras.size(); ++i)
+	{
+		m_tetraScratchesTn[i] = m_tetraScratches[i];
+	}
 }
 //
 void btSoftBody::Joint::Prepare(btScalar dt, int)
@@ -3143,7 +3159,7 @@ void btSoftBody::LJoint::Prepare(btScalar dt, int iterations)
 	m_rpos[0] -= m_bodies[0].xform().getOrigin();
 	m_rpos[1] -= m_bodies[1].xform().getOrigin();
 	m_massmatrix = ImpulseMatrix(m_bodies[0].invMass(), m_bodies[0].invWorldInertia(), m_rpos[0],
-								 m_bodies[1].invMass(), m_bodies[1].invWorldInertia(), m_rpos[1]);
+	                             m_bodies[1].invMass(), m_bodies[1].invWorldInertia(), m_rpos[1]);
 	if (m_split > 0)
 	{
 		m_sdrift = m_massmatrix * (m_drift * m_split);
@@ -3263,7 +3279,7 @@ void btSoftBody::CJoint::Solve(btScalar dt, btScalar sor)
 	if (m_bodies[0].m_soft == m_bodies[1].m_soft)
 	{
 		if ((impulse.m_velocity.getX() == impulse.m_velocity.getX()) && (impulse.m_velocity.getY() == impulse.m_velocity.getY()) &&
-			(impulse.m_velocity.getZ() == impulse.m_velocity.getZ()))
+		        (impulse.m_velocity.getZ() == impulse.m_velocity.getZ()))
 		{
 			if (impulse.m_asVelocity)
 			{
@@ -3309,14 +3325,14 @@ void btSoftBody::applyForces()
 	const bool as_pressure = kPR != 0;
 	const bool as_volume = kVC > 0;
 	const bool as_aero = as_lift ||
-						 as_drag;
+	                     as_drag;
 	//const bool						as_vaero =		as_aero	&&
 	//												(m_cfg.aeromodel < btSoftBody::eAeroModel::F_TwoSided);
 	//const bool						as_faero =		as_aero	&&
 	//												(m_cfg.aeromodel >= btSoftBody::eAeroModel::F_TwoSided);
 	const bool use_medium = as_aero;
 	const bool use_volume = as_pressure ||
-							as_volume;
+	                        as_volume;
 	btScalar volume = 0;
 	btScalar ivolumetp = 0;
 	btScalar dvolumetv = 0;
@@ -3366,35 +3382,35 @@ void btSoftBody::applyForces()
 //
 void btSoftBody::setMaxStress(btScalar maxStress)
 {
-    m_cfg.m_maxStress = maxStress;
+	m_cfg.m_maxStress = maxStress;
 }
 
 //
 void btSoftBody::interpolateRenderMesh()
 {
-    for (int i = 0; i < m_renderNodes.size(); ++i)
-    {
-        Node& n = m_renderNodes[i];
-        n.m_x.setZero();
-        for (int j = 0; j < 4; ++j)
-        {
+	for (int i = 0; i < m_renderNodes.size(); ++i)
+	{
+		Node& n = m_renderNodes[i];
+		n.m_x.setZero();
+		for (int j = 0; j < 4; ++j)
+		{
 			if (m_renderNodesParents[i].size())
 			{
 				n.m_x += m_renderNodesParents[i][j]->m_x * m_renderNodesInterpolationWeights[i][j];
 			}
-        }
-    }
+		}
+	}
 }
 
 void btSoftBody::setCollisionQuadrature(int N)
 {
-    for (int i = 0; i <= N; ++i)
-    {
-        for (int j = 0; i+j <= N; ++j)
-        {
-            m_quads.push_back(btVector3(btScalar(i)/btScalar(N), btScalar(j)/btScalar(N), btScalar(N-i-j)/btScalar(N)));
-        }
-    }
+	for (int i = 0; i <= N; ++i)
+	{
+		for (int j = 0; i+j <= N; ++j)
+		{
+			m_quads.push_back(btVector3(btScalar(i)/btScalar(N), btScalar(j)/btScalar(N), btScalar(N-i-j)/btScalar(N)));
+		}
+	}
 }
 
 //
@@ -3505,13 +3521,13 @@ void btSoftBody::PSolve_SContacts(btSoftBody* psb, btScalar, btScalar ti)
 		Node& n = *c.m_node;
 		Face& f = *c.m_face;
 		const btVector3 p = BaryEval(f.m_n[0]->m_x,
-									 f.m_n[1]->m_x,
-									 f.m_n[2]->m_x,
-									 c.m_weights);
+		                             f.m_n[1]->m_x,
+		                             f.m_n[2]->m_x,
+		                             c.m_weights);
 		const btVector3 q = BaryEval(f.m_n[0]->m_q,
-									 f.m_n[1]->m_q,
-									 f.m_n[2]->m_q,
-									 c.m_weights);
+		                             f.m_n[1]->m_q,
+		                             f.m_n[2]->m_q,
+		                             c.m_weights);
 		const btVector3 vr = (n.m_x - n.m_q) - (p - q);
 		btVector3 corr(0, 0, 0);
 		btScalar dot = btDot(vr, nr);
@@ -3570,17 +3586,17 @@ btSoftBody::psolver_t btSoftBody::getSolver(ePSolver::_ solver)
 {
 	switch (solver)
 	{
-		case ePSolver::Anchors:
-			return (&btSoftBody::PSolve_Anchors);
-		case ePSolver::Linear:
-			return (&btSoftBody::PSolve_Links);
-		case ePSolver::RContacts:
-			return (&btSoftBody::PSolve_RContacts);
-		case ePSolver::SContacts:
-			return (&btSoftBody::PSolve_SContacts);
-		default:
-		{
-		}
+	case ePSolver::Anchors:
+		return (&btSoftBody::PSolve_Anchors);
+	case ePSolver::Linear:
+		return (&btSoftBody::PSolve_Links);
+	case ePSolver::RContacts:
+		return (&btSoftBody::PSolve_RContacts);
+	case ePSolver::SContacts:
+		return (&btSoftBody::PSolve_SContacts);
+	default:
+	{
+	}
 	}
 	return (0);
 }
@@ -3590,23 +3606,23 @@ btSoftBody::vsolver_t btSoftBody::getSolver(eVSolver::_ solver)
 {
 	switch (solver)
 	{
-		case eVSolver::Linear:
-			return (&btSoftBody::VSolve_Links);
-		default:
-		{
-		}
+	case eVSolver::Linear:
+		return (&btSoftBody::VSolve_Links);
+	default:
+	{
+	}
 	}
 	return (0);
 }
 
 void btSoftBody::setSelfCollision(bool useSelfCollision)
 {
-    m_useSelfCollision = useSelfCollision;
+	m_useSelfCollision = useSelfCollision;
 }
 
 bool btSoftBody::useSelfCollision()
 {
-   return m_useSelfCollision;
+	return m_useSelfCollision;
 }
 
 //
@@ -3614,226 +3630,226 @@ void btSoftBody::defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap
 {
 	switch (m_cfg.collisions & fCollision::RVSmask)
 	{
-		case fCollision::SDF_RS:
-		{
-			btSoftColliders::CollideSDF_RS docollide;
-			btRigidBody* prb1 = (btRigidBody*)btRigidBody::upcast(pcoWrap->getCollisionObject());
-			btTransform wtr = pcoWrap->getWorldTransform();
+	case fCollision::SDF_RS:
+	{
+		btSoftColliders::CollideSDF_RS docollide;
+		btRigidBody* prb1 = (btRigidBody*)btRigidBody::upcast(pcoWrap->getCollisionObject());
+		btTransform wtr = pcoWrap->getWorldTransform();
 
-			const btTransform ctr = pcoWrap->getWorldTransform();
-			const btScalar timemargin = (wtr.getOrigin() - ctr.getOrigin()).length();
+		const btTransform ctr = pcoWrap->getWorldTransform();
+		const btScalar timemargin = (wtr.getOrigin() - ctr.getOrigin()).length();
+		const btScalar basemargin = getCollisionShape()->getMargin();
+		btVector3 mins;
+		btVector3 maxs;
+		ATTRIBUTE_ALIGNED16(btDbvtVolume)
+		volume;
+		pcoWrap->getCollisionShape()->getAabb(pcoWrap->getWorldTransform(),
+		                                      mins,
+		                                      maxs);
+		volume = btDbvtVolume::FromMM(mins, maxs);
+		volume.Expand(btVector3(basemargin, basemargin, basemargin));
+		docollide.psb = this;
+		docollide.m_colObj1Wrap = pcoWrap;
+		docollide.m_rigidBody = prb1;
+
+		docollide.dynmargin = basemargin + timemargin;
+		docollide.stamargin = basemargin;
+		m_ndbvt.collideTV(m_ndbvt.m_root, volume, docollide);
+	}
+	break;
+	case fCollision::CL_RS:
+	{
+		btSoftColliders::CollideCL_RS collider;
+		collider.ProcessColObj(this, pcoWrap);
+	}
+	break;
+	case fCollision::SDF_RD:
+	{
+
+		btRigidBody* prb1 = (btRigidBody*)btRigidBody::upcast(pcoWrap->getCollisionObject());
+		if (pcoWrap->getCollisionObject()->isActive() || this->isActive())
+		{
+			const btTransform wtr = pcoWrap->getWorldTransform();
+//                const btTransform ctr = pcoWrap->getWorldTransform();
+//                const btScalar timemargin = (wtr.getOrigin() - ctr.getOrigin()).length();
+			const btScalar timemargin = 0;
 			const btScalar basemargin = getCollisionShape()->getMargin();
 			btVector3 mins;
 			btVector3 maxs;
 			ATTRIBUTE_ALIGNED16(btDbvtVolume)
 			volume;
-			pcoWrap->getCollisionShape()->getAabb(pcoWrap->getWorldTransform(),
-												  mins,
-												  maxs);
+			pcoWrap->getCollisionShape()->getAabb(wtr,
+			                                      mins,
+			                                      maxs);
 			volume = btDbvtVolume::FromMM(mins, maxs);
 			volume.Expand(btVector3(basemargin, basemargin, basemargin));
-			docollide.psb = this;
-			docollide.m_colObj1Wrap = pcoWrap;
-			docollide.m_rigidBody = prb1;
+			btSoftColliders::CollideSDF_RD docollideNode;
+			docollideNode.psb = this;
+			docollideNode.m_colObj1Wrap = pcoWrap;
+			docollideNode.m_rigidBody = prb1;
+			docollideNode.dynmargin = basemargin + timemargin;
+			docollideNode.stamargin = basemargin;
+			m_ndbvt.collideTV(m_ndbvt.m_root, volume, docollideNode);
 
-			docollide.dynmargin = basemargin + timemargin;
-			docollide.stamargin = basemargin;
-			m_ndbvt.collideTV(m_ndbvt.m_root, volume, docollide);
+			if (this->m_useFaceContact)
+			{
+				btSoftColliders::CollideSDF_RDF docollideFace;
+				docollideFace.psb = this;
+				docollideFace.m_colObj1Wrap = pcoWrap;
+				docollideFace.m_rigidBody = prb1;
+				docollideFace.dynmargin = basemargin + timemargin;
+				docollideFace.stamargin = basemargin;
+				m_fdbvt.collideTV(m_fdbvt.m_root, volume, docollideFace);
+			}
 		}
-		break;
-		case fCollision::CL_RS:
-		{
-			btSoftColliders::CollideCL_RS collider;
-			collider.ProcessColObj(this, pcoWrap);
-		}
-		break;
-        case fCollision::SDF_RD:
-        {
-            
-            btRigidBody* prb1 = (btRigidBody*)btRigidBody::upcast(pcoWrap->getCollisionObject());
-            if (pcoWrap->getCollisionObject()->isActive() || this->isActive())
-            {
-                const btTransform wtr = pcoWrap->getWorldTransform();
-//                const btTransform ctr = pcoWrap->getWorldTransform();
-//                const btScalar timemargin = (wtr.getOrigin() - ctr.getOrigin()).length();
-                const btScalar timemargin = 0;
-                const btScalar basemargin = getCollisionShape()->getMargin();
-                btVector3 mins;
-                btVector3 maxs;
-                ATTRIBUTE_ALIGNED16(btDbvtVolume)
-                volume;
-                pcoWrap->getCollisionShape()->getAabb(wtr,
-                                                      mins,
-                                                      maxs);
-                volume = btDbvtVolume::FromMM(mins, maxs);
-                volume.Expand(btVector3(basemargin, basemargin, basemargin));
-                btSoftColliders::CollideSDF_RD docollideNode;
-                docollideNode.psb = this;
-                docollideNode.m_colObj1Wrap = pcoWrap;
-                docollideNode.m_rigidBody = prb1;
-                docollideNode.dynmargin = basemargin + timemargin;
-                docollideNode.stamargin = basemargin;
-                m_ndbvt.collideTV(m_ndbvt.m_root, volume, docollideNode);
-                
-                if (this->m_useFaceContact)
-                {
-                    btSoftColliders::CollideSDF_RDF docollideFace;
-                    docollideFace.psb = this;
-                    docollideFace.m_colObj1Wrap = pcoWrap;
-                    docollideFace.m_rigidBody = prb1;
-                    docollideFace.dynmargin = basemargin + timemargin;
-                    docollideFace.stamargin = basemargin;
-                    m_fdbvt.collideTV(m_fdbvt.m_root, volume, docollideFace);
-                }
-            }
-        }
-        break;
+	}
+	break;
 	}
 }
 
 static inline btDbvntNode* copyToDbvnt(const btDbvtNode* n)
 {
-    if (n == 0)
-        return 0;
-    btDbvntNode* root = new btDbvntNode(n);
-    if (n->isinternal())
-    {
-        btDbvntNode* c0 = copyToDbvnt(n->childs[0]);
-        root->childs[0] = c0;
-        btDbvntNode* c1 = copyToDbvnt(n->childs[1]);
-        root->childs[1] = c1;
-    }
-    return root;
+	if (n == 0)
+		return 0;
+	btDbvntNode* root = new btDbvntNode(n);
+	if (n->isinternal())
+	{
+		btDbvntNode* c0 = copyToDbvnt(n->childs[0]);
+		root->childs[0] = c0;
+		btDbvntNode* c1 = copyToDbvnt(n->childs[1]);
+		root->childs[1] = c1;
+	}
+	return root;
 }
 
 static inline void calculateNormalCone(btDbvntNode* root)
 {
-    if (!root)
-        return;
-    if (root->isleaf())
-    {
-        const btSoftBody::Face* face = (btSoftBody::Face*)root->data;
-        root->normal = face->m_normal;
-        root->angle = 0;
-    }
-    else
-    {
-        btVector3 n0(0,0,0), n1(0,0,0);
-        btScalar a0 = 0, a1 = 0;
-        if (root->childs[0])
-        {
-            calculateNormalCone(root->childs[0]);
-            n0 = root->childs[0]->normal;
-            a0 = root->childs[0]->angle;
-        }
-        if (root->childs[1])
-        {
-            calculateNormalCone(root->childs[1]);
-            n1 = root->childs[1]->normal;
-            a1 = root->childs[1]->angle;
-        }
-        root->normal = (n0+n1).safeNormalize();
-        root->angle = btMax(a0,a1) + btAngle(n0, n1)*0.5;
-    }
+	if (!root)
+		return;
+	if (root->isleaf())
+	{
+		const btSoftBody::Face* face = (btSoftBody::Face*)root->data;
+		root->normal = face->m_normal;
+		root->angle = 0;
+	}
+	else
+	{
+		btVector3 n0(0,0,0), n1(0,0,0);
+		btScalar a0 = 0, a1 = 0;
+		if (root->childs[0])
+		{
+			calculateNormalCone(root->childs[0]);
+			n0 = root->childs[0]->normal;
+			a0 = root->childs[0]->angle;
+		}
+		if (root->childs[1])
+		{
+			calculateNormalCone(root->childs[1]);
+			n1 = root->childs[1]->normal;
+			a1 = root->childs[1]->angle;
+		}
+		root->normal = (n0+n1).safeNormalize();
+		root->angle = btMax(a0,a1) + btAngle(n0, n1)*0.5;
+	}
 }
 //
 void btSoftBody::defaultCollisionHandler(btSoftBody* psb)
 {
-    BT_PROFILE("Deformable Collision");
+	BT_PROFILE("Deformable Collision");
 	const int cf = m_cfg.collisions & psb->m_cfg.collisions;
 	switch (cf & fCollision::SVSmask)
 	{
-		case fCollision::CL_SS:
+	case fCollision::CL_SS:
+	{
+		//support self-collision if CL_SELF flag set
+		if (this != psb || psb->m_cfg.collisions & fCollision::CL_SELF)
 		{
-			//support self-collision if CL_SELF flag set
-			if (this != psb || psb->m_cfg.collisions & fCollision::CL_SELF)
-			{
-				btSoftColliders::CollideCL_SS docollide;
-				docollide.ProcessSoftSoft(this, psb);
-			}
+			btSoftColliders::CollideCL_SS docollide;
+			docollide.ProcessSoftSoft(this, psb);
 		}
-		break;
-		case fCollision::VF_SS:
+	}
+	break;
+	case fCollision::VF_SS:
+	{
+		//only self-collision for Cluster, not Vertex-Face yet
+		if (this != psb)
 		{
-			//only self-collision for Cluster, not Vertex-Face yet
+			btSoftColliders::CollideVF_SS docollide;
+			/* common					*/
+			docollide.mrg = getCollisionShape()->getMargin() +
+			                psb->getCollisionShape()->getMargin();
+			/* psb0 nodes vs psb1 faces	*/
+			docollide.psb[0] = this;
+			docollide.psb[1] = psb;
+			docollide.psb[0]->m_ndbvt.collideTT(docollide.psb[0]->m_ndbvt.m_root,
+			                                    docollide.psb[1]->m_fdbvt.m_root,
+			                                    docollide);
+			/* psb1 nodes vs psb0 faces	*/
+			docollide.psb[0] = psb;
+			docollide.psb[1] = this;
+			docollide.psb[0]->m_ndbvt.collideTT(docollide.psb[0]->m_ndbvt.m_root,
+			                                    docollide.psb[1]->m_fdbvt.m_root,
+			                                    docollide);
+		}
+	}
+	break;
+	case fCollision::VF_DD:
+	{
+		if (psb->isActive() || this->isActive())
+		{
 			if (this != psb)
 			{
-				btSoftColliders::CollideVF_SS docollide;
-				/* common					*/
+				btSoftColliders::CollideVF_DD docollide;
+				/* common                    */
 				docollide.mrg = getCollisionShape()->getMargin() +
-								psb->getCollisionShape()->getMargin();
-				/* psb0 nodes vs psb1 faces	*/
+				                psb->getCollisionShape()->getMargin();
+				/* psb0 nodes vs psb1 faces    */
+				if (psb->m_tetras.size() > 0)
+					docollide.useFaceNormal = true;
+				else
+					docollide.useFaceNormal = false;
 				docollide.psb[0] = this;
 				docollide.psb[1] = psb;
 				docollide.psb[0]->m_ndbvt.collideTT(docollide.psb[0]->m_ndbvt.m_root,
-													docollide.psb[1]->m_fdbvt.m_root,
-													docollide);
-				/* psb1 nodes vs psb0 faces	*/
+				                                    docollide.psb[1]->m_fdbvt.m_root,
+				                                    docollide);
+				/* psb1 nodes vs psb0 faces    */
+				if (this->m_tetras.size() > 0)
+					docollide.useFaceNormal = true;
+				else
+					docollide.useFaceNormal = false;
 				docollide.psb[0] = psb;
 				docollide.psb[1] = this;
 				docollide.psb[0]->m_ndbvt.collideTT(docollide.psb[0]->m_ndbvt.m_root,
-													docollide.psb[1]->m_fdbvt.m_root,
-													docollide);
+				                                    docollide.psb[1]->m_fdbvt.m_root,
+				                                    docollide);
+			}
+			else
+			{
+				if (psb->useSelfCollision())
+				{
+					btSoftColliders::CollideFF_DD docollide;
+					docollide.mrg = getCollisionShape()->getMargin() +
+					                psb->getCollisionShape()->getMargin();
+					docollide.psb[0] = this;
+					docollide.psb[1] = psb;
+					if (this->m_tetras.size() > 0)
+						docollide.useFaceNormal = true;
+					else
+						docollide.useFaceNormal = false;
+					/* psb0 faces vs psb0 faces    */
+					btDbvntNode* root = copyToDbvnt(this->m_fdbvt.m_root);
+					calculateNormalCone(root);
+					this->m_fdbvt.selfCollideT(root,docollide);
+					delete root;
+				}
 			}
 		}
-		break;
-        case fCollision::VF_DD:
-        {
-            if (psb->isActive() || this->isActive())
-            {
-                if (this != psb)
-                {
-                    btSoftColliders::CollideVF_DD docollide;
-                    /* common                    */
-                    docollide.mrg = getCollisionShape()->getMargin() +
-                    psb->getCollisionShape()->getMargin();
-                    /* psb0 nodes vs psb1 faces    */
-                    if (psb->m_tetras.size() > 0)
-                        docollide.useFaceNormal = true;
-                    else
-                        docollide.useFaceNormal = false;
-                    docollide.psb[0] = this;
-                    docollide.psb[1] = psb;
-                    docollide.psb[0]->m_ndbvt.collideTT(docollide.psb[0]->m_ndbvt.m_root,
-                                                        docollide.psb[1]->m_fdbvt.m_root,
-                                                        docollide);
-                    /* psb1 nodes vs psb0 faces    */
-                    if (this->m_tetras.size() > 0)
-                        docollide.useFaceNormal = true;
-                    else
-                        docollide.useFaceNormal = false;
-                    docollide.psb[0] = psb;
-                    docollide.psb[1] = this;
-                    docollide.psb[0]->m_ndbvt.collideTT(docollide.psb[0]->m_ndbvt.m_root,
-                                                        docollide.psb[1]->m_fdbvt.m_root,
-                                                        docollide);
-                }
-                else
-                {
-                    if (psb->useSelfCollision())
-                    {
-                      btSoftColliders::CollideFF_DD docollide;
-                      docollide.mrg = getCollisionShape()->getMargin() +
-                      psb->getCollisionShape()->getMargin();
-                      docollide.psb[0] = this;
-                      docollide.psb[1] = psb;
-                      if (this->m_tetras.size() > 0)
-                          docollide.useFaceNormal = true;
-                      else
-                          docollide.useFaceNormal = false;
-                      /* psb0 faces vs psb0 faces    */
-                      btDbvntNode* root = copyToDbvnt(this->m_fdbvt.m_root);
-                      calculateNormalCone(root);
-                      this->m_fdbvt.selfCollideT(root,docollide);
-                      delete root;
-                    }
-                }
-            }
-        }
-        break;
-		default:
-		{
-		}
+	}
+	break;
+	default:
+	{
+	}
 	}
 }
 
@@ -4236,44 +4252,44 @@ const char* btSoftBody::serialize(void* dataBuffer, class btSerializer* serializ
 
 void btSoftBody::updateDeactivation(btScalar timeStep)
 {
-    if ((getActivationState() == ISLAND_SLEEPING) || (getActivationState() == DISABLE_DEACTIVATION))
-        return;
+	if ((getActivationState() == ISLAND_SLEEPING) || (getActivationState() == DISABLE_DEACTIVATION))
+		return;
 
-    if (m_maxSpeedSquared < m_sleepingThreshold * m_sleepingThreshold)
-    {
-        m_deactivationTime += timeStep;
-    }
-    else
-    {
-        m_deactivationTime = btScalar(0.);
-        setActivationState(0);
-    }
+	if (m_maxSpeedSquared < m_sleepingThreshold * m_sleepingThreshold)
+	{
+		m_deactivationTime += timeStep;
+	}
+	else
+	{
+		m_deactivationTime = btScalar(0.);
+		setActivationState(0);
+	}
 }
 
 
 void btSoftBody::setZeroVelocity()
 {
-    for (int i = 0; i < m_nodes.size(); ++i)
-    {
-        m_nodes[i].m_v.setZero();
-    }
+	for (int i = 0; i < m_nodes.size(); ++i)
+	{
+		m_nodes[i].m_v.setZero();
+	}
 }
 
 bool btSoftBody::wantsSleeping()
 {
-    if (getActivationState() == DISABLE_DEACTIVATION)
-        return false;
+	if (getActivationState() == DISABLE_DEACTIVATION)
+		return false;
 
-    //disable deactivation
-    if (gDisableDeactivation || (gDeactivationTime == btScalar(0.)))
-        return false;
+	//disable deactivation
+	if (gDisableDeactivation || (gDeactivationTime == btScalar(0.)))
+		return false;
 
-    if ((getActivationState() == ISLAND_SLEEPING) || (getActivationState() == WANTS_DEACTIVATION))
-        return true;
+	if ((getActivationState() == ISLAND_SLEEPING) || (getActivationState() == WANTS_DEACTIVATION))
+		return true;
 
-    if (m_deactivationTime > gDeactivationTime)
-    {
-        return true;
-    }
-    return false;
+	if (m_deactivationTime > gDeactivationTime)
+	{
+		return true;
+	}
+	return false;
 }

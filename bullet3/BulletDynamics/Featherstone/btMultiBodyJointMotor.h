@@ -41,8 +41,8 @@ public:
 	virtual int getIslandIdB() const;
 
 	virtual void createConstraintRows(btMultiBodyConstraintArray& constraintRows,
-									  btMultiBodyJacobianData& data,
-									  const btContactSolverInfo& infoGlobal);
+	                                  btMultiBodyJacobianData& data,
+	                                  const btContactSolverInfo& infoGlobal);
 
 	virtual void setVelocityTarget(btScalar velTarget, btScalar kd = 1.f)
 	{

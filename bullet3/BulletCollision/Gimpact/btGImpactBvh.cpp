@@ -63,7 +63,7 @@ float btGImpactBvh::getAverageTreeCollisionTime()
 /////////////////////// btBvhTree /////////////////////////////////
 
 int btBvhTree::_calc_splitting_axis(
-	GIM_BVH_DATA_ARRAY& primitive_boxes, int startIndex, int endIndex)
+    GIM_BVH_DATA_ARRAY& primitive_boxes, int startIndex, int endIndex)
 {
 	int i;
 
@@ -74,7 +74,7 @@ int btBvhTree::_calc_splitting_axis(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btVector3 center = btScalar(0.5) * (primitive_boxes[i].m_bound.m_max +
-											primitive_boxes[i].m_bound.m_min);
+		                                    primitive_boxes[i].m_bound.m_min);
 		means += center;
 	}
 	means *= (btScalar(1.) / (btScalar)numIndices);
@@ -82,7 +82,7 @@ int btBvhTree::_calc_splitting_axis(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btVector3 center = btScalar(0.5) * (primitive_boxes[i].m_bound.m_max +
-											primitive_boxes[i].m_bound.m_min);
+		                                    primitive_boxes[i].m_bound.m_min);
 		btVector3 diff2 = center - means;
 		diff2 = diff2 * diff2;
 		variance += diff2;
@@ -93,8 +93,8 @@ int btBvhTree::_calc_splitting_axis(
 }
 
 int btBvhTree::_sort_and_calc_splitting_index(
-	GIM_BVH_DATA_ARRAY& primitive_boxes, int startIndex,
-	int endIndex, int splitAxis)
+    GIM_BVH_DATA_ARRAY& primitive_boxes, int startIndex,
+    int endIndex, int splitAxis)
 {
 	int i;
 	int splitIndex = startIndex;
@@ -107,7 +107,7 @@ int btBvhTree::_sort_and_calc_splitting_index(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btVector3 center = btScalar(0.5) * (primitive_boxes[i].m_bound.m_max +
-											primitive_boxes[i].m_bound.m_min);
+		                                    primitive_boxes[i].m_bound.m_min);
 		means += center;
 	}
 	means *= (btScalar(1.) / (btScalar)numIndices);
@@ -118,7 +118,7 @@ int btBvhTree::_sort_and_calc_splitting_index(
 	for (i = startIndex; i < endIndex; i++)
 	{
 		btVector3 center = btScalar(0.5) * (primitive_boxes[i].m_bound.m_max +
-											primitive_boxes[i].m_bound.m_min);
+		                                    primitive_boxes[i].m_bound.m_min);
 		if (center[splitAxis] > splitValue)
 		{
 			//swap
@@ -171,9 +171,9 @@ void btBvhTree::_build_sub_tree(GIM_BVH_DATA_ARRAY& primitive_boxes, int startIn
 	int splitIndex = _calc_splitting_axis(primitive_boxes, startIndex, endIndex);
 
 	splitIndex = _sort_and_calc_splitting_index(
-		primitive_boxes, startIndex, endIndex,
-		splitIndex  //split axis
-	);
+	                 primitive_boxes, startIndex, endIndex,
+	                 splitIndex  //split axis
+	             );
 
 	//calc this node bounding box
 
@@ -198,7 +198,7 @@ void btBvhTree::_build_sub_tree(GIM_BVH_DATA_ARRAY& primitive_boxes, int startIn
 
 //! stackless build tree
 void btBvhTree::build_tree(
-	GIM_BVH_DATA_ARRAY& primitive_boxes)
+    GIM_BVH_DATA_ARRAY& primitive_boxes)
 {
 	// initialize node count to 0
 	m_num_nodes = 0;
@@ -303,8 +303,8 @@ bool btGImpactBvh::boxQuery(const btAABB& box, btAlignedObjectArray<int>& collid
 
 //! returns the indices of the primitives in the m_primitive_manager
 bool btGImpactBvh::rayQuery(
-	const btVector3& ray_dir, const btVector3& ray_origin,
-	btAlignedObjectArray<int>& collided_results) const
+    const btVector3& ray_dir, const btVector3& ray_origin,
+    btAlignedObjectArray<int>& collided_results) const
 {
 	int curIndex = 0;
 	int numNodes = getNodeCount();
@@ -340,9 +340,9 @@ bool btGImpactBvh::rayQuery(
 }
 
 SIMD_FORCE_INLINE bool _node_collision(
-	btGImpactBvh* boxset0, btGImpactBvh* boxset1,
-	const BT_BOX_BOX_TRANSFORM_CACHE& trans_cache_1to0,
-	int node0, int node1, bool complete_primitive_tests)
+    btGImpactBvh* boxset0, btGImpactBvh* boxset1,
+    const BT_BOX_BOX_TRANSFORM_CACHE& trans_cache_1to0,
+    int node0, int node1, bool complete_primitive_tests)
 {
 	btAABB box0;
 	boxset0->getNodeBound(node0, box0);
@@ -356,14 +356,14 @@ SIMD_FORCE_INLINE bool _node_collision(
 
 //stackless recursive collision routine
 static void _find_collision_pairs_recursive(
-	btGImpactBvh* boxset0, btGImpactBvh* boxset1,
-	btPairSet* collision_pairs,
-	const BT_BOX_BOX_TRANSFORM_CACHE& trans_cache_1to0,
-	int node0, int node1, bool complete_primitive_tests)
+    btGImpactBvh* boxset0, btGImpactBvh* boxset1,
+    btPairSet* collision_pairs,
+    const BT_BOX_BOX_TRANSFORM_CACHE& trans_cache_1to0,
+    int node0, int node1, bool complete_primitive_tests)
 {
 	if (_node_collision(
-			boxset0, boxset1, trans_cache_1to0,
-			node0, node1, complete_primitive_tests) == false) return;  //avoid colliding internal nodes
+	            boxset0, boxset1, trans_cache_1to0,
+	            node0, node1, complete_primitive_tests) == false) return;  //avoid colliding internal nodes
 
 	if (boxset0->isLeafNode(node0))
 	{
@@ -371,7 +371,7 @@ static void _find_collision_pairs_recursive(
 		{
 			// collision result
 			collision_pairs->push_pair(
-				boxset0->getNodeData(node0), boxset1->getNodeData(node1));
+			    boxset0->getNodeData(node0), boxset1->getNodeData(node1));
 			return;
 		}
 		else
@@ -379,15 +379,15 @@ static void _find_collision_pairs_recursive(
 			//collide left recursive
 
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				node0, boxset1->getLeftNode(node1), false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    node0, boxset1->getLeftNode(node1), false);
 
 			//collide right recursive
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				node0, boxset1->getRightNode(node1), false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    node0, boxset1->getRightNode(node1), false);
 		}
 	}
 	else
@@ -396,54 +396,54 @@ static void _find_collision_pairs_recursive(
 		{
 			//collide left recursive
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				boxset0->getLeftNode(node0), node1, false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    boxset0->getLeftNode(node0), node1, false);
 
 			//collide right recursive
 
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				boxset0->getRightNode(node0), node1, false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    boxset0->getRightNode(node0), node1, false);
 		}
 		else
 		{
 			//collide left0 left1
 
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				boxset0->getLeftNode(node0), boxset1->getLeftNode(node1), false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    boxset0->getLeftNode(node0), boxset1->getLeftNode(node1), false);
 
 			//collide left0 right1
 
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				boxset0->getLeftNode(node0), boxset1->getRightNode(node1), false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    boxset0->getLeftNode(node0), boxset1->getRightNode(node1), false);
 
 			//collide right0 left1
 
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				boxset0->getRightNode(node0), boxset1->getLeftNode(node1), false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    boxset0->getRightNode(node0), boxset1->getLeftNode(node1), false);
 
 			//collide right0 right1
 
 			_find_collision_pairs_recursive(
-				boxset0, boxset1,
-				collision_pairs, trans_cache_1to0,
-				boxset0->getRightNode(node0), boxset1->getRightNode(node1), false);
+			    boxset0, boxset1,
+			    collision_pairs, trans_cache_1to0,
+			    boxset0->getRightNode(node0), boxset1->getRightNode(node1), false);
 
 		}  // else if node1 is not a leaf
 	}      // else if node0 is not a leaf
 }
 
 void btGImpactBvh::find_collision(btGImpactBvh* boxset0, const btTransform& trans0,
-								  btGImpactBvh* boxset1, const btTransform& trans1,
-								  btPairSet& collision_pairs)
+                                  btGImpactBvh* boxset1, const btTransform& trans1,
+                                  btPairSet& collision_pairs)
 {
 	if (boxset0->getNodeCount() == 0 || boxset1->getNodeCount() == 0) return;
 
@@ -456,8 +456,8 @@ void btGImpactBvh::find_collision(btGImpactBvh* boxset0, const btTransform& tran
 #endif  //TRI_COLLISION_PROFILING
 
 	_find_collision_pairs_recursive(
-		boxset0, boxset1,
-		&collision_pairs, trans_cache_1to0, 0, 0, true);
+	    boxset0, boxset1,
+	    &collision_pairs, trans_cache_1to0, 0, 0, true);
 #ifdef TRI_COLLISION_PROFILING
 	bt_end_gim02_tree_time();
 #endif  //TRI_COLLISION_PROFILING

@@ -36,34 +36,38 @@
 
 #include <cstring>
 
-namespace glslang {
+namespace glslang
+{
 
 void TInfoSinkBase::append(const char* s)
 {
-    if (outputStream & EString) {
-        if (s == nullptr)
-            sink.append("(null)");
-        else {
-            checkMem(strlen(s));
-            sink.append(s);
-        }
-    }
+	if (outputStream & EString)
+	{
+		if (s == nullptr)
+			sink.append("(null)");
+		else
+		{
+			checkMem(strlen(s));
+			sink.append(s);
+		}
+	}
 
 //#ifdef _WIN32
 //    if (outputStream & EDebugger)
 //        OutputDebugString(s);
 //#endif
 
-    if (outputStream & EStdOut)
-        fprintf(stdout, "%s", s);
+	if (outputStream & EStdOut)
+		fprintf(stdout, "%s", s);
 }
 
 void TInfoSinkBase::append(int count, char c)
 {
-    if (outputStream & EString) {
-        checkMem(count);
-        sink.append(count, c);
-    }
+	if (outputStream & EString)
+	{
+		checkMem(count);
+		sink.append(count, c);
+	}
 
 //#ifdef _WIN32
 //    if (outputStream & EDebugger) {
@@ -74,40 +78,42 @@ void TInfoSinkBase::append(int count, char c)
 //    }
 //#endif
 
-    if (outputStream & EStdOut)
-        fprintf(stdout, "%c", c);
+	if (outputStream & EStdOut)
+		fprintf(stdout, "%c", c);
 }
 
 void TInfoSinkBase::append(const TPersistString& t)
 {
-    if (outputStream & EString) {
-        checkMem(t.size());
-        sink.append(t);
-    }
+	if (outputStream & EString)
+	{
+		checkMem(t.size());
+		sink.append(t);
+	}
 
 //#ifdef _WIN32
 //    if (outputStream & EDebugger)
 //        OutputDebugString(t.c_str());
 //#endif
 
-    if (outputStream & EStdOut)
-        fprintf(stdout, "%s", t.c_str());
+	if (outputStream & EStdOut)
+		fprintf(stdout, "%s", t.c_str());
 }
 
 void TInfoSinkBase::append(const TString& t)
 {
-    if (outputStream & EString) {
-        checkMem(t.size());
-        sink.append(t.c_str());
-    }
+	if (outputStream & EString)
+	{
+		checkMem(t.size());
+		sink.append(t.c_str());
+	}
 
 //#ifdef _WIN32
 //    if (outputStream & EDebugger)
 //        OutputDebugString(t.c_str());
 //#endif
 
-    if (outputStream & EStdOut)
-        fprintf(stdout, "%s", t.c_str());
+	if (outputStream & EStdOut)
+		fprintf(stdout, "%s", t.c_str());
 }
 
 } // end namespace glslang

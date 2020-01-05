@@ -44,22 +44,22 @@ void btSequentialImpulseConstraintSolverMt::setupBatchedContactConstraints()
 {
 	BT_PROFILE("setupBatchedContactConstraints");
 	m_batchedContactConstraints.setup(&m_tmpSolverContactConstraintPool,
-									  m_tmpSolverBodyPool,
-									  s_contactBatchingMethod,
-									  s_minBatchSize,
-									  s_maxBatchSize,
-									  &m_scratchMemory);
+	                                  m_tmpSolverBodyPool,
+	                                  s_contactBatchingMethod,
+	                                  s_minBatchSize,
+	                                  s_maxBatchSize,
+	                                  &m_scratchMemory);
 }
 
 void btSequentialImpulseConstraintSolverMt::setupBatchedJointConstraints()
 {
 	BT_PROFILE("setupBatchedJointConstraints");
 	m_batchedJointConstraints.setup(&m_tmpSolverNonContactConstraintPool,
-									m_tmpSolverBodyPool,
-									s_jointBatchingMethod,
-									s_minBatchSize,
-									s_maxBatchSize,
-									&m_scratchMemory);
+	                                m_tmpSolverBodyPool,
+	                                s_jointBatchingMethod,
+	                                s_minBatchSize,
+	                                s_maxBatchSize,
+	                                &m_scratchMemory);
 }
 
 void btSequentialImpulseConstraintSolverMt::internalSetupContactConstraints(int iContactConstraint, const btContactSolverInfo& infoGlobal)
@@ -105,18 +105,18 @@ void btSequentialImpulseConstraintSolverMt::internalSetupContactConstraints(int 
 		btSolverConstraint& spinningFrictionConstraint = m_tmpSolverContactRollingFrictionConstraintPool[rollingFrictionIndex];
 		btAssert(spinningFrictionConstraint.m_frictionIndex == iContactConstraint);
 		setupTorsionalFrictionConstraint(spinningFrictionConstraint,
-										 cp.m_normalWorldOnB,
-										 solverBodyIdA,
-										 solverBodyIdB,
-										 cp,
-										 cp.m_combinedSpinningFriction,
-										 rel_pos1,
-										 rel_pos2,
-										 colObj0,
-										 colObj1,
-										 relaxation,
-										 0.0f,
-										 0.0f);
+		                                 cp.m_normalWorldOnB,
+		                                 solverBodyIdA,
+		                                 solverBodyIdB,
+		                                 cp,
+		                                 cp.m_combinedSpinningFriction,
+		                                 rel_pos1,
+		                                 rel_pos2,
+		                                 colObj0,
+		                                 colObj1,
+		                                 relaxation,
+		                                 0.0f,
+		                                 0.0f);
 		btVector3 axis[2];
 		btPlaneSpace1(cp.m_normalWorldOnB, axis[0], axis[1]);
 		axis[0].normalize();
@@ -141,18 +141,18 @@ void btSequentialImpulseConstraintSolverMt::internalSetupContactConstraints(int 
 			if (dir.length() > kRollingFrictionThreshold)
 			{
 				setupTorsionalFrictionConstraint(rollingFrictionConstraint,
-												 dir,
-												 solverBodyIdA,
-												 solverBodyIdB,
-												 cp,
-												 cp.m_combinedRollingFriction,
-												 rel_pos1,
-												 rel_pos2,
-												 colObj0,
-												 colObj1,
-												 relaxation,
-												 0.0f,
-												 0.0f);
+				                                 dir,
+				                                 solverBodyIdA,
+				                                 solverBodyIdB,
+				                                 cp,
+				                                 cp.m_combinedRollingFriction,
+				                                 rel_pos1,
+				                                 rel_pos2,
+				                                 colObj0,
+				                                 colObj1,
+				                                 relaxation,
+				                                 0.0f,
+				                                 0.0f);
 			}
 			else
 			{
@@ -669,10 +669,10 @@ struct ConvertJointsLoop : public btIParallelForBody
 	const btContactSolverInfo& m_infoGlobal;
 
 	ConvertJointsLoop(btSequentialImpulseConstraintSolverMt* solver,
-					  const btAlignedObjectArray<btSequentialImpulseConstraintSolverMt::JointParams>& jointParamsArray,
-					  btTypedConstraint** srcConstraints,
-					  const btContactSolverInfo& infoGlobal) : m_jointParamsArray(jointParamsArray),
-															   m_infoGlobal(infoGlobal)
+	                  const btAlignedObjectArray<btSequentialImpulseConstraintSolverMt::JointParams>& jointParamsArray,
+	                  btTypedConstraint** srcConstraints,
+	                  const btContactSolverInfo& infoGlobal) : m_jointParamsArray(jointParamsArray),
+		m_infoGlobal(infoGlobal)
 	{
 		m_solver = solver;
 		m_srcConstraints = srcConstraints;
@@ -785,9 +785,9 @@ struct ConvertBodiesLoop : public btIParallelForBody
 	const btContactSolverInfo& m_infoGlobal;
 
 	ConvertBodiesLoop(btSequentialImpulseConstraintSolverMt* solver,
-					  btCollisionObject** bodies,
-					  int numBodies,
-					  const btContactSolverInfo& infoGlobal) : m_infoGlobal(infoGlobal)
+	                  btCollisionObject** bodies,
+	                  int numBodies,
+	                  const btContactSolverInfo& infoGlobal) : m_infoGlobal(infoGlobal)
 	{
 		m_solver = solver;
 		m_bodies = bodies;
@@ -826,32 +826,32 @@ void btSequentialImpulseConstraintSolverMt::convertBodies(btCollisionObject** bo
 }
 
 btScalar btSequentialImpulseConstraintSolverMt::solveGroupCacheFriendlySetup(
-	btCollisionObject** bodies,
-	int numBodies,
-	btPersistentManifold** manifoldPtr,
-	int numManifolds,
-	btTypedConstraint** constraints,
-	int numConstraints,
-	const btContactSolverInfo& infoGlobal,
-	btIDebugDraw* debugDrawer)
+    btCollisionObject** bodies,
+    int numBodies,
+    btPersistentManifold** manifoldPtr,
+    int numManifolds,
+    btTypedConstraint** constraints,
+    int numConstraints,
+    const btContactSolverInfo& infoGlobal,
+    btIDebugDraw* debugDrawer)
 {
 	m_numFrictionDirections = (infoGlobal.m_solverMode & SOLVER_USE_2_FRICTION_DIRECTIONS) ? 2 : 1;
 	m_useBatching = false;
 	if (numManifolds >= s_minimumContactManifoldsForBatching &&
-		(s_allowNestedParallelForLoops || !btThreadsAreRunning()))
+	        (s_allowNestedParallelForLoops || !btThreadsAreRunning()))
 	{
 		m_useBatching = true;
 		m_batchedContactConstraints.m_debugDrawer = debugDrawer;
 		m_batchedJointConstraints.m_debugDrawer = debugDrawer;
 	}
 	btSequentialImpulseConstraintSolver::solveGroupCacheFriendlySetup(bodies,
-																	  numBodies,
-																	  manifoldPtr,
-																	  numManifolds,
-																	  constraints,
-																	  numConstraints,
-																	  infoGlobal,
-																	  debugDrawer);
+	        numBodies,
+	        manifoldPtr,
+	        numManifolds,
+	        constraints,
+	        numConstraints,
+	        infoGlobal,
+	        debugDrawer);
 	return 0.0f;
 }
 
@@ -1097,8 +1097,8 @@ btScalar btSequentialImpulseConstraintSolverMt::resolveMultipleContactRollingFri
 }
 
 btScalar btSequentialImpulseConstraintSolverMt::resolveMultipleContactConstraintsInterleaved(const btAlignedObjectArray<int>& contactIndices,
-																							 int batchBegin,
-																							 int batchEnd)
+        int batchBegin,
+        int batchEnd)
 {
 	btScalar leastSquaresResidual = 0.f;
 	int numPoolConstraints = m_tmpSolverContactConstraintPool.size();

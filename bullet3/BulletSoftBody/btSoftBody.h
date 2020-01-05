@@ -161,14 +161,14 @@ public:
 			RVSmask = 0x000f,  ///Rigid versus soft mask
 			SDF_RS = 0x0001,   ///SDF based rigid vs soft
 			CL_RS = 0x0002,    ///Cluster vs convex rigid vs soft
-            SDF_RD = 0x0003,   ///DF based rigid vs deformable
-            SDF_RDF = 0x0004,   ///DF based rigid vs deformable faces
+			SDF_RD = 0x0003,   ///DF based rigid vs deformable
+			SDF_RDF = 0x0004,   ///DF based rigid vs deformable faces
 
 			SVSmask = 0x00F0,  ///Rigid versus soft mask
 			VF_SS = 0x0010,    ///Vertex vs face soft vs soft handling
 			CL_SS = 0x0020,    ///Cluster vs cluster soft vs soft handling
 			CL_SELF = 0x0040,  ///Cluster soft body self collision
-            VF_DD = 0x0050,    ///Vertex vs face soft vs soft handling
+			VF_DD = 0x0050,    ///Vertex vs face soft vs soft handling
 			/* presets	*/
 			Default = SDF_RS,
 			END
@@ -220,7 +220,7 @@ public:
 		const btCollisionObject* m_colObj; /* Rigid body			*/
 		btVector3 m_normal;                /* Outward normal		*/
 		btScalar m_offset;                 /* Offset from origin	*/
-        btVector3 m_bary;                  /* Barycentric weights for faces */
+		btVector3 m_bary;                  /* Barycentric weights for faces */
 	};
 
 	/* sMedium		*/
@@ -257,19 +257,20 @@ public:
 		btVector3 m_x;       // Position
 		btVector3 m_q;       // Previous step position/Test position
 		btVector3 m_v;       // Velocity
-        btVector3 m_vsplit;  // Temporary Velocity in addintion to velocity used in split impulse
-        btVector3 m_vn;      // Previous step velocity
+		btVector3 m_vsplit;  // Temporary Velocity in addintion to velocity used in split impulse
+		btVector3 m_vn;      // Previous step velocity
 		btVector3 m_f;       // Force accumulator
 		btVector3 m_n;       // Normal
 		btScalar m_im;       // 1/mass
 		btScalar m_area;     // Area
 		btDbvtNode* m_leaf;  // Leaf data
 		int m_battach : 1;   // Attached
-        int index;
+		int index;
 	};
 	/* Link			*/
 	ATTRIBUTE_ALIGNED16(struct)
-	Link : Feature
+Link :
+	Feature
 	{
 		btVector3 m_c3;      // gradient
 		Node* m_n[2];        // Node pointers
@@ -288,8 +289,8 @@ public:
 		btVector3 m_normal;  // Normal
 		btScalar m_ra;       // Rest area
 		btDbvtNode* m_leaf;  // Leaf data
-        btVector4 m_pcontact; // barycentric weights of the persistent contact
-        int m_index;
+		btVector4 m_pcontact; // barycentric weights of the persistent contact
+		int m_index;
 	};
 	/* Tetra		*/
 	struct Tetra : Feature
@@ -300,20 +301,20 @@ public:
 		btVector3 m_c0[4];   // gradients
 		btScalar m_c1;       // (4*kVST)/(im0+im1+im2+im3)
 		btScalar m_c2;       // m_c1/sum(|g0..3|^2)
-        btMatrix3x3 m_Dm_inverse; // rest Dm^-1
-        btMatrix3x3 m_F;
-        btScalar m_element_measure;
+		btMatrix3x3 m_Dm_inverse; // rest Dm^-1
+		btMatrix3x3 m_F;
+		btScalar m_element_measure;
 	};
-    
-    /*  TetraScratch  */
-    struct TetraScratch
-    {
-        btMatrix3x3 m_F;                // deformation gradient F
-        btScalar m_trace;               // trace of F^T * F
-        btScalar m_J;                   // det(F)
-        btMatrix3x3 m_cofF;             // cofactor of F
-    };
-    
+
+	/*  TetraScratch  */
+	struct TetraScratch
+	{
+		btMatrix3x3 m_F;                // deformation gradient F
+		btScalar m_trace;               // trace of F^T * F
+		btScalar m_J;                   // det(F)
+		btMatrix3x3 m_cofF;             // cofactor of F
+	};
+
 	/* RContact		*/
 	struct RContact
 	{
@@ -324,67 +325,67 @@ public:
 		btScalar m_c2;     // ima*dt
 		btScalar m_c3;     // Friction
 		btScalar m_c4;     // Hardness
-        
-        // jacobians and unit impulse responses for multibody
-        btMultiBodyJacobianData jacobianData_normal;
-        btMultiBodyJacobianData jacobianData_t1;
-        btMultiBodyJacobianData jacobianData_t2;
-        btVector3 t1;
-        btVector3 t2;
+
+		// jacobians and unit impulse responses for multibody
+		btMultiBodyJacobianData jacobianData_normal;
+		btMultiBodyJacobianData jacobianData_t1;
+		btMultiBodyJacobianData jacobianData_t2;
+		btVector3 t1;
+		btVector3 t2;
 	};
-    
-    class DeformableRigidContact
-    {
-    public:
-        sCti m_cti;        // Contact infos
-        btMatrix3x3 m_c0;  // Impulse matrix
-        btVector3 m_c1;    // Relative anchor
-        btScalar m_c2;     // inverse mass of node/face
-        btScalar m_c3;     // Friction
-        btScalar m_c4;     // Hardness
-        
-        // jacobians and unit impulse responses for multibody
-        btMultiBodyJacobianData jacobianData_normal;
-        btMultiBodyJacobianData jacobianData_t1;
-        btMultiBodyJacobianData jacobianData_t2;
-        btVector3 t1;
-        btVector3 t2;
-    };
-    
-    class DeformableNodeRigidContact : public DeformableRigidContact
-    {
-    public:
-        Node* m_node;      // Owner node
-    };
-    
-    class DeformableNodeRigidAnchor : public DeformableNodeRigidContact
-    {
-    public:
-        btVector3 m_local;    // Anchor position in body space
-    };
-    
-    class DeformableFaceRigidContact : public DeformableRigidContact
-    {
-    public:
-        Face* m_face;                   // Owner face
-        btVector3 m_contactPoint;       // Contact point
-        btVector3 m_bary;               // Barycentric weights
-        btVector3 m_weights;            // v_contactPoint * m_weights[i] = m_face->m_node[i]->m_v;
-    };
-    
-    struct DeformableFaceNodeContact
-    {
-        Node* m_node;         // Node
-        Face* m_face;         // Face
-        btVector3 m_bary;     // Barycentric weights
-        btVector3 m_weights;  // v_contactPoint * m_weights[i] = m_face->m_node[i]->m_v;
-        btVector3 m_normal;   // Normal
-        btScalar m_margin;    // Margin
-        btScalar m_friction;  // Friction
-        btScalar m_imf;       // inverse mass of the face at contact point
-        btScalar m_c0;        // scale of the impulse matrix;
-    };
-    
+
+	class DeformableRigidContact
+	{
+	public:
+		sCti m_cti;        // Contact infos
+		btMatrix3x3 m_c0;  // Impulse matrix
+		btVector3 m_c1;    // Relative anchor
+		btScalar m_c2;     // inverse mass of node/face
+		btScalar m_c3;     // Friction
+		btScalar m_c4;     // Hardness
+
+		// jacobians and unit impulse responses for multibody
+		btMultiBodyJacobianData jacobianData_normal;
+		btMultiBodyJacobianData jacobianData_t1;
+		btMultiBodyJacobianData jacobianData_t2;
+		btVector3 t1;
+		btVector3 t2;
+	};
+
+	class DeformableNodeRigidContact : public DeformableRigidContact
+	{
+	public:
+		Node* m_node;      // Owner node
+	};
+
+	class DeformableNodeRigidAnchor : public DeformableNodeRigidContact
+	{
+	public:
+		btVector3 m_local;    // Anchor position in body space
+	};
+
+	class DeformableFaceRigidContact : public DeformableRigidContact
+	{
+	public:
+		Face* m_face;                   // Owner face
+		btVector3 m_contactPoint;       // Contact point
+		btVector3 m_bary;               // Barycentric weights
+		btVector3 m_weights;            // v_contactPoint * m_weights[i] = m_face->m_node[i]->m_v;
+	};
+
+	struct DeformableFaceNodeContact
+	{
+		Node* m_node;         // Node
+		Face* m_face;         // Face
+		btVector3 m_bary;     // Barycentric weights
+		btVector3 m_weights;  // v_contactPoint * m_weights[i] = m_face->m_node[i]->m_v;
+		btVector3 m_normal;   // Normal
+		btScalar m_margin;    // Margin
+		btScalar m_friction;  // Friction
+		btScalar m_imf;       // inverse mass of the face at contact point
+		btScalar m_c0;        // scale of the impulse matrix;
+	};
+
 	/* SContact		*/
 	struct SContact
 	{
@@ -637,7 +638,10 @@ public:
 		void Prepare(btScalar dt, int iterations);
 		void Solve(btScalar dt, btScalar sor);
 		void Terminate(btScalar dt);
-		eType::_ Type() const { return (eType::Linear); }
+		eType::_ Type() const
+		{
+			return (eType::Linear);
+		}
 	};
 	/* AJoint		*/
 	struct AJoint : Joint
@@ -646,7 +650,10 @@ public:
 		{
 			virtual ~IControl() {}
 			virtual void Prepare(AJoint*) {}
-			virtual btScalar Speed(AJoint*, btScalar current) { return (current); }
+			virtual btScalar Speed(AJoint*, btScalar current)
+			{
+				return (current);
+			}
 			static IControl* Default()
 			{
 				static IControl def;
@@ -664,7 +671,10 @@ public:
 		void Prepare(btScalar dt, int iterations);
 		void Solve(btScalar dt, btScalar sor);
 		void Terminate(btScalar dt);
-		eType::_ Type() const { return (eType::Angular); }
+		eType::_ Type() const
+		{
+			return (eType::Angular);
+		}
 	};
 	/* CJoint		*/
 	struct CJoint : Joint
@@ -677,7 +687,10 @@ public:
 		void Prepare(btScalar dt, int iterations);
 		void Solve(btScalar dt, btScalar sor);
 		void Terminate(btScalar dt);
-		eType::_ Type() const { return (eType::Contact); }
+		eType::_ Type() const
+		{
+			return (eType::Contact);
+		}
 	};
 	/* Config		*/
 	struct Config
@@ -711,8 +724,8 @@ public:
 		tVSolverArray m_vsequence;  // Velocity solvers sequence
 		tPSolverArray m_psequence;  // Position solvers sequence
 		tPSolverArray m_dsequence;  // Drift solvers sequence
-        btScalar drag;           // deformable air drag
-        btScalar m_maxStress;       // Maximum principle first Piola stress
+		btScalar drag;           // deformable air drag
+		btScalar m_maxStress;       // Maximum principle first Piola stress
 	};
 	/* SolverState	*/
 	struct SolverState
@@ -736,12 +749,12 @@ public:
 		void Process(const btDbvtNode* leaf);
 
 		static /*inline*/ btScalar rayFromToTriangle(const btVector3& rayFrom,
-													 const btVector3& rayTo,
-													 const btVector3& rayNormalizedDirection,
-													 const btVector3& a,
-													 const btVector3& b,
-													 const btVector3& c,
-													 btScalar maxt = SIMD_INFINITY);
+		        const btVector3& rayTo,
+		        const btVector3& rayNormalizedDirection,
+		        const btVector3& a,
+		        const btVector3& b,
+		        const btVector3& c,
+		        btScalar maxt = SIMD_INFINITY);
 	};
 
 	//
@@ -775,19 +788,19 @@ public:
 	btSoftBodyWorldInfo* m_worldInfo;  // World info
 	tNoteArray m_notes;                // Notes
 	tNodeArray m_nodes;                // Nodes
-    tNodeArray m_renderNodes;                // Nodes
+	tNodeArray m_renderNodes;                // Nodes
 	tLinkArray m_links;                // Links
 	tFaceArray m_faces;                // Faces
-    tFaceArray m_renderFaces;                // Faces
+	tFaceArray m_renderFaces;                // Faces
 	tTetraArray m_tetras;              // Tetras
-    btAlignedObjectArray<TetraScratch> m_tetraScratches;
-    btAlignedObjectArray<TetraScratch> m_tetraScratchesTn;
+	btAlignedObjectArray<TetraScratch> m_tetraScratches;
+	btAlignedObjectArray<TetraScratch> m_tetraScratchesTn;
 	tAnchorArray m_anchors;            // Anchors
-    btAlignedObjectArray<DeformableNodeRigidAnchor> m_deformableAnchors;
+	btAlignedObjectArray<DeformableNodeRigidAnchor> m_deformableAnchors;
 	tRContactArray m_rcontacts;        // Rigid contacts
-    btAlignedObjectArray<DeformableNodeRigidContact> m_nodeRigidContacts;
-    btAlignedObjectArray<DeformableFaceNodeContact> m_faceNodeContacts;
-    btAlignedObjectArray<DeformableFaceRigidContact> m_faceRigidContacts;
+	btAlignedObjectArray<DeformableNodeRigidContact> m_nodeRigidContacts;
+	btAlignedObjectArray<DeformableFaceNodeContact> m_faceNodeContacts;
+	btAlignedObjectArray<DeformableFaceRigidContact> m_faceRigidContacts;
 	tSContactArray m_scontacts;        // Soft contacts
 	tJointArray m_joints;              // Joints
 	tMaterialArray m_materials;        // Materials
@@ -798,15 +811,15 @@ public:
 	btDbvt m_fdbvt;                    // Faces tree
 	btDbvt m_cdbvt;                    // Clusters tree
 	tClusterArray m_clusters;          // Clusters
-    btScalar m_dampingCoefficient;     // Damping Coefficient
-    btScalar m_sleepingThreshold;
-    btScalar m_maxSpeedSquared;
-    bool m_useFaceContact;
-    btAlignedObjectArray<btVector3> m_quads; // quadrature points for collision detection
-    
-    btAlignedObjectArray<btVector4> m_renderNodesInterpolationWeights;
-    btAlignedObjectArray<btAlignedObjectArray<const btSoftBody::Node*> > m_renderNodesParents;
-    bool m_useSelfCollision;
+	btScalar m_dampingCoefficient;     // Damping Coefficient
+	btScalar m_sleepingThreshold;
+	btScalar m_maxSpeedSquared;
+	bool m_useFaceContact;
+	btAlignedObjectArray<btVector3> m_quads; // quadrature points for collision detection
+
+	btAlignedObjectArray<btVector4> m_renderNodesInterpolationWeights;
+	btAlignedObjectArray<btAlignedObjectArray<const btSoftBody::Node*> > m_renderNodesParents;
+	bool m_useSelfCollision;
 
 	btAlignedObjectArray<bool> m_clusterConnectivity;  //cluster connectivity, for self-collision
 
@@ -838,16 +851,16 @@ public:
 	{
 		return m_worldInfo;
 	}
-    
-    void setDampingCoefficient(btScalar damping_coeff)
-    {
-        m_dampingCoefficient = damping_coeff;
-    }
-    
-    void setUseFaceContact(bool useFaceContact)
-    {
-        m_useFaceContact = false;
-    }
+
+	void setDampingCoefficient(btScalar damping_coeff)
+	{
+		m_dampingCoefficient = damping_coeff;
+	}
+
+	void setUseFaceContact(bool useFaceContact)
+	{
+		m_useFaceContact = false;
+	}
 
 	///@todo: avoid internal softbody shape hack and move collision code to collision library
 	virtual void setCollisionShape(btCollisionShape* collisionShape)
@@ -855,63 +868,63 @@ public:
 	}
 
 	bool checkLink(int node0,
-				   int node1) const;
+	               int node1) const;
 	bool checkLink(const Node* node0,
-				   const Node* node1) const;
+	               const Node* node1) const;
 	/* Check for existring face												*/
 	bool checkFace(int node0,
-				   int node1,
-				   int node2) const;
+	               int node1,
+	               int node2) const;
 	/* Append material														*/
 	Material* appendMaterial();
 	/* Append note															*/
 	void appendNote(const char* text,
-					const btVector3& o,
-					const btVector4& c = btVector4(1, 0, 0, 0),
-					Node* n0 = 0,
-					Node* n1 = 0,
-					Node* n2 = 0,
-					Node* n3 = 0);
+	                const btVector3& o,
+	                const btVector4& c = btVector4(1, 0, 0, 0),
+	                Node* n0 = 0,
+	                Node* n1 = 0,
+	                Node* n2 = 0,
+	                Node* n3 = 0);
 	void appendNote(const char* text,
-					const btVector3& o,
-					Node* feature);
+	                const btVector3& o,
+	                Node* feature);
 	void appendNote(const char* text,
-					const btVector3& o,
-					Link* feature);
+	                const btVector3& o,
+	                Link* feature);
 	void appendNote(const char* text,
-					const btVector3& o,
-					Face* feature);
+	                const btVector3& o,
+	                Face* feature);
 	/* Append node															*/
 	void appendNode(const btVector3& x, btScalar m);
 	/* Append link															*/
 	void appendLink(int model = -1, Material* mat = 0);
 	void appendLink(int node0,
-					int node1,
-					Material* mat = 0,
-					bool bcheckexist = false);
+	                int node1,
+	                Material* mat = 0,
+	                bool bcheckexist = false);
 	void appendLink(Node* node0,
-					Node* node1,
-					Material* mat = 0,
-					bool bcheckexist = false);
+	                Node* node1,
+	                Material* mat = 0,
+	                bool bcheckexist = false);
 	/* Append face															*/
 	void appendFace(int model = -1, Material* mat = 0);
 	void appendFace(int node0,
-					int node1,
-					int node2,
-					Material* mat = 0);
+	                int node1,
+	                int node2,
+	                Material* mat = 0);
 	void appendTetra(int model, Material* mat);
 	//
 	void appendTetra(int node0,
-					 int node1,
-					 int node2,
-					 int node3,
-					 Material* mat = 0);
+	                 int node1,
+	                 int node2,
+	                 int node3,
+	                 Material* mat = 0);
 
 	/* Append anchor														*/
-    void appendDeformableAnchor(int node, btRigidBody* body);
-    void appendDeformableAnchor(int node, btMultiBodyLinkCollider* link);
-    void appendAnchor(int node,
-					  btRigidBody* body, bool disableCollisionBetweenLinkedBodies = false, btScalar influence = 1);
+	void appendDeformableAnchor(int node, btRigidBody* body);
+	void appendDeformableAnchor(int node, btMultiBodyLinkCollider* link);
+	void appendAnchor(int node,
+	                  btRigidBody* body, bool disableCollisionBetweenLinkedBodies = false, btScalar influence = 1);
 	void appendAnchor(int node, btRigidBody* body, const btVector3& localPivot, bool disableCollisionBetweenLinkedBodies = false, btScalar influence = 1);
 	/* Append linear joint													*/
 	void appendLinearJoint(const LJoint::Specs& specs, Cluster* body0, Body body1);
@@ -925,7 +938,7 @@ public:
 	void addForce(const btVector3& force);
 	/* Add force (or gravity) to a node of the body							*/
 	void addForce(const btVector3& force,
-				  int node);
+	              int node);
 	/* Add aero force to a node of the body */
 	void addAeroForceToNode(const btVector3& windVelocity, int nodeIndex);
 
@@ -940,17 +953,17 @@ public:
 
 	/* Add velocity to a node of the body									*/
 	void addVelocity(const btVector3& velocity,
-					 int node);
+	                 int node);
 	/* Set mass																*/
 	void setMass(int node,
-				 btScalar mass);
+	             btScalar mass);
 	/* Get mass																*/
 	btScalar getMass(int node) const;
 	/* Get total mass														*/
 	btScalar getTotalMass() const;
 	/* Set total mass (weighted by previous masses)							*/
 	void setTotalMass(btScalar mass,
-					  bool fromfaces = false);
+	                  bool fromfaces = false);
 	/* Set total density													*/
 	void setTotalDensity(btScalar density);
 	/* Set volume mass (using tetrahedrons)									*/
@@ -971,7 +984,7 @@ public:
 	void setRestLengthScale(btScalar restLength);
 	/* Set current state as pose											*/
 	void setPose(bool bvolume,
-				 bool bframe);
+	             bool bframe);
 	/* Set current link lengths as resting lengths							*/
 	void resetLinkRestLengths();
 	/* Return the volume													*/
@@ -1003,7 +1016,7 @@ public:
 	static void clusterDCImpulse(Cluster* cluster, const btVector3& impulse);
 	/* Generate bending constraints based on distance in the adjency graph	*/
 	int generateBendingConstraints(int distance,
-								   Material* mat = 0);
+	                               Material* mat = 0);
 	/* Randomize constraints to reduce solver bias							*/
 	void randomizeConstraints();
 	/* Release clusters														*/
@@ -1021,8 +1034,8 @@ public:
 
 	///Ray casting using rayFrom and rayTo in worldspace, (not direction!)
 	bool rayTest(const btVector3& rayFrom,
-				 const btVector3& rayTo,
-				 sRayCast& results);
+	             const btVector3& rayTo,
+	             sRayCast& results);
 	/* Solver presets														*/
 	void setSolver(eSolverPresets::_ preset);
 	/* predictMotion														*/
@@ -1040,11 +1053,11 @@ public:
 	/* defaultCollisionHandlers												*/
 	void defaultCollisionHandler(const btCollisionObjectWrapper* pcoWrap);
 	void defaultCollisionHandler(btSoftBody* psb);
-    void setSelfCollision(bool useSelfCollision);
-    bool useSelfCollision();
-    void updateDeactivation(btScalar timeStep);
-    void setZeroVelocity();
-    bool wantsSleeping();
+	void setSelfCollision(bool useSelfCollision);
+	bool useSelfCollision();
+	void updateDeactivation(btScalar timeStep);
+	void setZeroVelocity();
+	bool wantsSleeping();
 
 	//
 	// Functionality to deal with new accelerated solvers.
@@ -1118,12 +1131,12 @@ public:
 	void indicesToPointers(const int* map = 0);
 
 	int rayTest(const btVector3& rayFrom, const btVector3& rayTo,
-				btScalar& mint, eFeature::_& feature, int& index, bool bcountonly) const;
+	            btScalar& mint, eFeature::_& feature, int& index, bool bcountonly) const;
 	void initializeFaceTree();
 	btVector3 evaluateCom() const;
 	bool checkDeformableContact(const btCollisionObjectWrapper* colObjWrap, const btVector3& x, btScalar margin, btSoftBody::sCti& cti, bool predict = false) const;
-    bool checkDeformableFaceContact(const btCollisionObjectWrapper* colObjWrap, Face& f, btVector3& contact_point, btVector3& bary, btScalar margin, btSoftBody::sCti& cti, bool predict = false) const;
-    bool checkContact(const btCollisionObjectWrapper* colObjWrap, const btVector3& x, btScalar margin, btSoftBody::sCti& cti) const;
+	bool checkDeformableFaceContact(const btCollisionObjectWrapper* colObjWrap, Face& f, btVector3& contact_point, btVector3& bary, btScalar margin, btSoftBody::sCti& cti, bool predict = false) const;
+	bool checkContact(const btCollisionObjectWrapper* colObjWrap, const btVector3& x, btScalar margin, btSoftBody::sCti& cti) const;
 	void updateNormals();
 	void updateBounds();
 	void updatePose();
@@ -1137,14 +1150,14 @@ public:
 	void solveClusters(btScalar sor);
 	void applyClusters(bool drift);
 	void dampClusters();
-    void setSpringStiffness(btScalar k);
-    void initializeDmInverse();
-    void updateDeformation();
-    void advanceDeformation();
+	void setSpringStiffness(btScalar k);
+	void initializeDmInverse();
+	void updateDeformation();
+	void advanceDeformation();
 	void applyForces();
-    void setMaxStress(btScalar maxStress);
-    void interpolateRenderMesh();
-    void setCollisionQuadrature(int N);
+	void setMaxStress(btScalar maxStress);
+	void interpolateRenderMesh();
+	void setCollisionQuadrature(int N);
 	static void PSolve_Anchors(btSoftBody* psb, btScalar kst, btScalar ti);
 	static void PSolve_RContacts(btSoftBody* psb, btScalar kst, btScalar ti);
 	static void PSolve_SContacts(btSoftBody* psb, btScalar, btScalar ti);
@@ -1154,7 +1167,7 @@ public:
 	static vsolver_t getSolver(eVSolver::_ solver);
 
 	virtual int calculateSerializeBufferSize() const;
-  
+
 	///fills the dataBuffer and returns the struct name (and 0 on failure)
 	virtual const char* serialize(void* dataBuffer, class btSerializer* serializer) const;
 };

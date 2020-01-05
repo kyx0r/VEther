@@ -58,8 +58,8 @@ public:
 	}
 
 	SIMD_FORCE_INLINE void setVertices(
-		const btVector3& v0, const btVector3& v1,
-		const btVector3& v2, const btVector3& v3)
+	    const btVector3& v0, const btVector3& v1,
+	    const btVector3& v2, const btVector3& v3)
 	{
 		m_vertices[0] = v0;
 		m_vertices[1] = v1;
@@ -121,8 +121,8 @@ public:
 
 	//! If the Bounding box is not updated, then this class attemps to calculate it.
 	/*!
-    \post Calls updateBound() for update the box set.
-    */
+	\post Calls updateBound() for update the box set.
+	*/
 	void getAabb(const btTransform& t, btVector3& aabbMin, btVector3& aabbMax) const
 	{
 		btAABB transformedbox = m_localAABB;
@@ -230,7 +230,7 @@ public:
 
 	//! Retrieves the bound from a child
 	/*!
-    */
+	*/
 	virtual void getChildAabb(int child_index, const btTransform& t, btVector3& aabbMin, btVector3& aabbMax) const
 	{
 		btAABB child_aabb;
@@ -421,7 +421,7 @@ public:
 
 	//! Retrieves the bound from a child
 	/*!
-    */
+	*/
 	virtual void getChildAabb(int child_index, const btTransform& t, btVector3& aabbMin, btVector3& aabbMax) const
 	{
 		if (childrenHasTransform())
@@ -555,7 +555,7 @@ public:
 		}
 
 		TrimeshPrimitiveManager(
-			btStridingMeshInterface* meshInterface, int part)
+		    btStridingMeshInterface* meshInterface, int part)
 		{
 			m_meshInterface = meshInterface;
 			m_part = part;
@@ -580,8 +580,8 @@ public:
 				return;
 			}
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
-				&vertexbase, numverts,
-				type, stride, &indexbase, indexstride, numfaces, indicestype, m_part);
+			    &vertexbase, numverts,
+			    type, stride, &indexbase, indexstride, numfaces, indicestype, m_part);
 
 			m_lock_count = 1;
 		}
@@ -655,8 +655,8 @@ public:
 			btPrimitiveTriangle triangle;
 			get_primitive_triangle(prim_index, triangle);
 			primbox.calc_from_triangle_margin(
-				triangle.m_vertices[0],
-				triangle.m_vertices[1], triangle.m_vertices[2], triangle.m_margin);
+			    triangle.m_vertices[0],
+			    triangle.m_vertices[1], triangle.m_vertices[2], triangle.m_margin);
 		}
 
 		virtual void get_primitive_triangle(int prim_index, btPrimitiveTriangle& triangle) const
@@ -1014,7 +1014,7 @@ public:
 
 	//! Retrieves the bound from a child
 	/*!
-    */
+	*/
 	virtual void getChildAabb(int child_index, const btTransform& t, btVector3& aabbMin, btVector3& aabbMax) const
 	{
 		(void)child_index;

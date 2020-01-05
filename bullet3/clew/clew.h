@@ -73,7 +73,7 @@ extern "C"
 #define CL_API_CALL
 #define CL_CALLBACK
 #endif
-	//disabled the APPLE thing, don't know why it is there, is just causes tons of warnings
+//disabled the APPLE thing, don't know why it is there, is just causes tons of warnings
 
 #ifdef __APPLE1__
 #define CL_EXTENSION_WEAK_LINK __attribute__((weak_import))
@@ -93,19 +93,19 @@ extern "C"
 
 #if (defined(_WIN32) && defined(_MSC_VER))
 
-	/* scalar types  */
-	typedef signed __int8 cl_char;
-	typedef unsigned __int8 cl_uchar;
-	typedef signed __int16 cl_short;
-	typedef unsigned __int16 cl_ushort;
-	typedef signed __int32 cl_int;
-	typedef unsigned __int32 cl_uint;
-	typedef signed __int64 cl_long;
-	typedef unsigned __int64 cl_ulong;
+/* scalar types  */
+typedef signed __int8 cl_char;
+typedef unsigned __int8 cl_uchar;
+typedef signed __int16 cl_short;
+typedef unsigned __int16 cl_ushort;
+typedef signed __int32 cl_int;
+typedef unsigned __int32 cl_uint;
+typedef signed __int64 cl_long;
+typedef unsigned __int64 cl_ulong;
 
-	typedef unsigned __int16 cl_half;
-	typedef float cl_float;
-	typedef double cl_double;
+typedef unsigned __int16 cl_half;
+typedef float cl_float;
+typedef double cl_double;
 
 /* Macro names and corresponding values defined by OpenCL */
 #define CL_CHAR_BIT 8
@@ -282,26 +282,26 @@ float nanf(const char *);
 
 #include <stddef.h>
 
-	/* Mirror types to GL types. Mirror types allow us to avoid deciding which headers to load based on whether we are using GL or GLES here. */
-	typedef unsigned int cl_GLuint;
-	typedef int cl_GLint;
-	typedef unsigned int cl_GLenum;
+/* Mirror types to GL types. Mirror types allow us to avoid deciding which headers to load based on whether we are using GL or GLES here. */
+typedef unsigned int cl_GLuint;
+typedef int cl_GLint;
+typedef unsigned int cl_GLenum;
 
-	/*
- * Vector types 
- *
- *  Note:   OpenCL requires that all types be naturally aligned. 
- *          This means that vector types must be naturally aligned.
- *          For example, a vector of four floats must be aligned to
- *          a 16 byte boundary (calculated as 4 * the natural 4-byte 
- *          alignment of the float).  The alignment qualifiers here
- *          will only function properly if your compiler supports them
- *          and if you don't actively work to defeat them.  For example,
- *          in order for a cl_float4 to be 16 byte aligned in a struct,
- *          the start of the struct must itself be 16-byte aligned. 
- *
- *          Maintaining proper alignment is the user's responsibility.
- */
+/*
+* Vector types
+*
+*  Note:   OpenCL requires that all types be naturally aligned.
+*          This means that vector types must be naturally aligned.
+*          For example, a vector of four floats must be aligned to
+*          a 16 byte boundary (calculated as 4 * the natural 4-byte
+*          alignment of the float).  The alignment qualifiers here
+*          will only function properly if your compiler supports them
+*          and if you don't actively work to defeat them.  For example,
+*          in order for a cl_float4 to be 16 byte aligned in a struct,
+*          the start of the struct must itself be 16-byte aligned.
+*
+*          Maintaining proper alignment is the user's responsibility.
+*/
 
 #ifdef _MSC_VER
 #if defined(_M_IX86)
@@ -320,13 +320,13 @@ float nanf(const char *);
 /* Define basic vector types */
 #if defined(__VEC__)
 #include <altivec.h> /* may be omitted depending on compiler. AltiVec spec provides no way to detect whether the header is required. */
-	typedef vector unsigned char __cl_uchar16;
-	typedef vector signed char __cl_char16;
-	typedef vector unsigned short __cl_ushort8;
-	typedef vector signed short __cl_short8;
-	typedef vector unsigned int __cl_uint4;
-	typedef vector signed int __cl_int4;
-	typedef vector float __cl_float4;
+typedef vector unsigned char __cl_uchar16;
+typedef vector signed char __cl_char16;
+typedef vector unsigned short __cl_ushort8;
+typedef vector signed short __cl_short8;
+typedef vector unsigned int __cl_uint4;
+typedef vector signed int __cl_int4;
+typedef vector float __cl_float4;
 #define __CL_UCHAR16__ 1
 #define __CL_CHAR16__ 1
 #define __CL_USHORT8__ 1
@@ -343,9 +343,9 @@ float nanf(const char *);
 #include <xmmintrin.h>
 #endif
 #if defined(__GNUC__) && !defined(__ICC)
-	typedef float __cl_float4 __attribute__((vector_size(16)));
+typedef float __cl_float4 __attribute__((vector_size(16)));
 #else
-	typedef __m128 __cl_float4;
+typedef __m128 __cl_float4;
 #endif
 #define __CL_FLOAT4__ 1
 #endif
@@ -357,25 +357,25 @@ float nanf(const char *);
 #include <emmintrin.h>
 #endif
 #if defined(__GNUC__) && !defined(__ICC)
-	typedef cl_uchar __cl_uchar16 __attribute__((vector_size(16)));
-	typedef cl_char __cl_char16 __attribute__((vector_size(16)));
-	typedef cl_ushort __cl_ushort8 __attribute__((vector_size(16)));
-	typedef cl_short __cl_short8 __attribute__((vector_size(16)));
-	typedef cl_uint __cl_uint4 __attribute__((vector_size(16)));
-	typedef cl_int __cl_int4 __attribute__((vector_size(16)));
-	typedef cl_ulong __cl_ulong2 __attribute__((vector_size(16)));
-	typedef cl_long __cl_long2 __attribute__((vector_size(16)));
-	typedef cl_double __cl_double2 __attribute__((vector_size(16)));
+typedef cl_uchar __cl_uchar16 __attribute__((vector_size(16)));
+typedef cl_char __cl_char16 __attribute__((vector_size(16)));
+typedef cl_ushort __cl_ushort8 __attribute__((vector_size(16)));
+typedef cl_short __cl_short8 __attribute__((vector_size(16)));
+typedef cl_uint __cl_uint4 __attribute__((vector_size(16)));
+typedef cl_int __cl_int4 __attribute__((vector_size(16)));
+typedef cl_ulong __cl_ulong2 __attribute__((vector_size(16)));
+typedef cl_long __cl_long2 __attribute__((vector_size(16)));
+typedef cl_double __cl_double2 __attribute__((vector_size(16)));
 #else
-	typedef __m128i __cl_uchar16;
-	typedef __m128i __cl_char16;
-	typedef __m128i __cl_ushort8;
-	typedef __m128i __cl_short8;
-	typedef __m128i __cl_uint4;
-	typedef __m128i __cl_int4;
-	typedef __m128i __cl_ulong2;
-	typedef __m128i __cl_long2;
-	typedef __m128d __cl_double2;
+typedef __m128i __cl_uchar16;
+typedef __m128i __cl_char16;
+typedef __m128i __cl_ushort8;
+typedef __m128i __cl_short8;
+typedef __m128i __cl_uint4;
+typedef __m128i __cl_int4;
+typedef __m128i __cl_ulong2;
+typedef __m128i __cl_long2;
+typedef __m128d __cl_double2;
 #endif
 #define __CL_UCHAR16__ 1
 #define __CL_CHAR16__ 1
@@ -391,25 +391,25 @@ float nanf(const char *);
 #if defined(__MMX__)
 #include <mmintrin.h>
 #if defined(__GNUC__) && !defined(__ICC)
-	typedef cl_uchar __cl_uchar8 __attribute__((vector_size(8)));
-	typedef cl_char __cl_char8 __attribute__((vector_size(8)));
-	typedef cl_ushort __cl_ushort4 __attribute__((vector_size(8)));
-	typedef cl_short __cl_short4 __attribute__((vector_size(8)));
-	typedef cl_uint __cl_uint2 __attribute__((vector_size(8)));
-	typedef cl_int __cl_int2 __attribute__((vector_size(8)));
-	typedef cl_ulong __cl_ulong1 __attribute__((vector_size(8)));
-	typedef cl_long __cl_long1 __attribute__((vector_size(8)));
-	typedef cl_float __cl_float2 __attribute__((vector_size(8)));
+typedef cl_uchar __cl_uchar8 __attribute__((vector_size(8)));
+typedef cl_char __cl_char8 __attribute__((vector_size(8)));
+typedef cl_ushort __cl_ushort4 __attribute__((vector_size(8)));
+typedef cl_short __cl_short4 __attribute__((vector_size(8)));
+typedef cl_uint __cl_uint2 __attribute__((vector_size(8)));
+typedef cl_int __cl_int2 __attribute__((vector_size(8)));
+typedef cl_ulong __cl_ulong1 __attribute__((vector_size(8)));
+typedef cl_long __cl_long1 __attribute__((vector_size(8)));
+typedef cl_float __cl_float2 __attribute__((vector_size(8)));
 #else
-	typedef __m64 __cl_uchar8;
-	typedef __m64 __cl_char8;
-	typedef __m64 __cl_ushort4;
-	typedef __m64 __cl_short4;
-	typedef __m64 __cl_uint2;
-	typedef __m64 __cl_int2;
-	typedef __m64 __cl_ulong1;
-	typedef __m64 __cl_long1;
-	typedef __m64 __cl_float2;
+typedef __m64 __cl_uchar8;
+typedef __m64 __cl_char8;
+typedef __m64 __cl_ushort4;
+typedef __m64 __cl_short4;
+typedef __m64 __cl_uint2;
+typedef __m64 __cl_int2;
+typedef __m64 __cl_ulong1;
+typedef __m64 __cl_long1;
+typedef __m64 __cl_float2;
 #endif
 #define __CL_UCHAR8__ 1
 #define __CL_CHAR8__ 1
@@ -429,11 +429,11 @@ float nanf(const char *);
 #include <immintrin.h>
 #endif
 #if defined(__GNUC__) && !defined(__ICC)
-	typedef cl_float __cl_float8 __attribute__((vector_size(32)));
-	typedef cl_double __cl_double4 __attribute__((vector_size(32)));
+typedef cl_float __cl_float8 __attribute__((vector_size(32)));
+typedef cl_double __cl_double4 __attribute__((vector_size(32)));
 #else
-	typedef __m256 __cl_float8;
-	typedef __m256d __cl_double4;
+typedef __m256 __cl_float8;
+typedef __m256d __cl_double4;
 #endif
 #define __CL_FLOAT8__ 1
 #define __CL_DOUBLE4__ 1
@@ -467,1073 +467,1113 @@ float nanf(const char *);
 #define __extension__ __pragma(warning(suppress : 4201))
 #endif
 
-	/* Define cl_vector types */
+/* Define cl_vector types */
 
-	/* ---- cl_charn ---- */
-	typedef union {
-		cl_char CL_ALIGNED(2) s[2];
+/* ---- cl_charn ---- */
+typedef union
+{
+	cl_char CL_ALIGNED(2) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_char x, y;
-		};
-		__extension__ struct
-		{
-			cl_char s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_char lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_char x, y;
+	};
+	__extension__ struct
+	{
+		cl_char s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_char lo, hi;
+	};
 #endif
 #if defined(__CL_CHAR2__)
-		__cl_char2 v2;
+	__cl_char2 v2;
 #endif
-	} cl_char2;
+} cl_char2;
 
-	typedef union {
-		cl_char CL_ALIGNED(4) s[4];
+typedef union
+{
+	cl_char CL_ALIGNED(4) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_char x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_char s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_char2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_char x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_char s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_char2 lo, hi;
+	};
 #endif
 #if defined(__CL_CHAR2__)
-		__cl_char2 v2[2];
+	__cl_char2 v2[2];
 #endif
 #if defined(__CL_CHAR4__)
-		__cl_char4 v4;
+	__cl_char4 v4;
 #endif
-	} cl_char4;
+} cl_char4;
 
-	/* cl_char3 is identical in size, alignment and behavior to cl_char4. See section 6.1.5. */
-	typedef cl_char4 cl_char3;
+/* cl_char3 is identical in size, alignment and behavior to cl_char4. See section 6.1.5. */
+typedef cl_char4 cl_char3;
 
-	typedef union {
-		cl_char CL_ALIGNED(8) s[8];
+typedef union
+{
+	cl_char CL_ALIGNED(8) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_char x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_char s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_char4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_char x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_char s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_char4 lo, hi;
+	};
 #endif
 #if defined(__CL_CHAR2__)
-		__cl_char2 v2[4];
+	__cl_char2 v2[4];
 #endif
 #if defined(__CL_CHAR4__)
-		__cl_char4 v4[2];
+	__cl_char4 v4[2];
 #endif
 #if defined(__CL_CHAR8__)
-		__cl_char8 v8;
+	__cl_char8 v8;
 #endif
-	} cl_char8;
+} cl_char8;
 
-	typedef union {
-		cl_char CL_ALIGNED(16) s[16];
+typedef union
+{
+	cl_char CL_ALIGNED(16) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_char x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_char s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_char8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_char x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_char s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_char8 lo, hi;
+	};
 #endif
 #if defined(__CL_CHAR2__)
-		__cl_char2 v2[8];
+	__cl_char2 v2[8];
 #endif
 #if defined(__CL_CHAR4__)
-		__cl_char4 v4[4];
+	__cl_char4 v4[4];
 #endif
 #if defined(__CL_CHAR8__)
-		__cl_char8 v8[2];
+	__cl_char8 v8[2];
 #endif
 #if defined(__CL_CHAR16__)
-		__cl_char16 v16;
+	__cl_char16 v16;
 #endif
-	} cl_char16;
+} cl_char16;
 
-	/* ---- cl_ucharn ---- */
-	typedef union {
-		cl_uchar CL_ALIGNED(2) s[2];
+/* ---- cl_ucharn ---- */
+typedef union
+{
+	cl_uchar CL_ALIGNED(2) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uchar x, y;
-		};
-		__extension__ struct
-		{
-			cl_uchar s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_uchar lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uchar x, y;
+	};
+	__extension__ struct
+	{
+		cl_uchar s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_uchar lo, hi;
+	};
 #endif
 #if defined(__cl_uchar2__)
-		__cl_uchar2 v2;
+	__cl_uchar2 v2;
 #endif
-	} cl_uchar2;
+} cl_uchar2;
 
-	typedef union {
-		cl_uchar CL_ALIGNED(4) s[4];
+typedef union
+{
+	cl_uchar CL_ALIGNED(4) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uchar x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_uchar s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_uchar2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uchar x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_uchar s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_uchar2 lo, hi;
+	};
 #endif
 #if defined(__CL_UCHAR2__)
-		__cl_uchar2 v2[2];
+	__cl_uchar2 v2[2];
 #endif
 #if defined(__CL_UCHAR4__)
-		__cl_uchar4 v4;
+	__cl_uchar4 v4;
 #endif
-	} cl_uchar4;
+} cl_uchar4;
 
-	/* cl_uchar3 is identical in size, alignment and behavior to cl_uchar4. See section 6.1.5. */
-	typedef cl_uchar4 cl_uchar3;
+/* cl_uchar3 is identical in size, alignment and behavior to cl_uchar4. See section 6.1.5. */
+typedef cl_uchar4 cl_uchar3;
 
-	typedef union {
-		cl_uchar CL_ALIGNED(8) s[8];
+typedef union
+{
+	cl_uchar CL_ALIGNED(8) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uchar x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_uchar s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_uchar4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uchar x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_uchar s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_uchar4 lo, hi;
+	};
 #endif
 #if defined(__CL_UCHAR2__)
-		__cl_uchar2 v2[4];
+	__cl_uchar2 v2[4];
 #endif
 #if defined(__CL_UCHAR4__)
-		__cl_uchar4 v4[2];
+	__cl_uchar4 v4[2];
 #endif
 #if defined(__CL_UCHAR8__)
-		__cl_uchar8 v8;
+	__cl_uchar8 v8;
 #endif
-	} cl_uchar8;
+} cl_uchar8;
 
-	typedef union {
-		cl_uchar CL_ALIGNED(16) s[16];
+typedef union
+{
+	cl_uchar CL_ALIGNED(16) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uchar x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_uchar s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_uchar8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uchar x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_uchar s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_uchar8 lo, hi;
+	};
 #endif
 #if defined(__CL_UCHAR2__)
-		__cl_uchar2 v2[8];
+	__cl_uchar2 v2[8];
 #endif
 #if defined(__CL_UCHAR4__)
-		__cl_uchar4 v4[4];
+	__cl_uchar4 v4[4];
 #endif
 #if defined(__CL_UCHAR8__)
-		__cl_uchar8 v8[2];
+	__cl_uchar8 v8[2];
 #endif
 #if defined(__CL_UCHAR16__)
-		__cl_uchar16 v16;
+	__cl_uchar16 v16;
 #endif
-	} cl_uchar16;
+} cl_uchar16;
 
-	/* ---- cl_shortn ---- */
-	typedef union {
-		cl_short CL_ALIGNED(4) s[2];
+/* ---- cl_shortn ---- */
+typedef union
+{
+	cl_short CL_ALIGNED(4) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_short x, y;
-		};
-		__extension__ struct
-		{
-			cl_short s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_short lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_short x, y;
+	};
+	__extension__ struct
+	{
+		cl_short s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_short lo, hi;
+	};
 #endif
 #if defined(__CL_SHORT2__)
-		__cl_short2 v2;
+	__cl_short2 v2;
 #endif
-	} cl_short2;
+} cl_short2;
 
-	typedef union {
-		cl_short CL_ALIGNED(8) s[4];
+typedef union
+{
+	cl_short CL_ALIGNED(8) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_short x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_short s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_short2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_short x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_short s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_short2 lo, hi;
+	};
 #endif
 #if defined(__CL_SHORT2__)
-		__cl_short2 v2[2];
+	__cl_short2 v2[2];
 #endif
 #if defined(__CL_SHORT4__)
-		__cl_short4 v4;
+	__cl_short4 v4;
 #endif
-	} cl_short4;
+} cl_short4;
 
-	/* cl_short3 is identical in size, alignment and behavior to cl_short4. See section 6.1.5. */
-	typedef cl_short4 cl_short3;
+/* cl_short3 is identical in size, alignment and behavior to cl_short4. See section 6.1.5. */
+typedef cl_short4 cl_short3;
 
-	typedef union {
-		cl_short CL_ALIGNED(16) s[8];
+typedef union
+{
+	cl_short CL_ALIGNED(16) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_short x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_short s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_short4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_short x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_short s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_short4 lo, hi;
+	};
 #endif
 #if defined(__CL_SHORT2__)
-		__cl_short2 v2[4];
+	__cl_short2 v2[4];
 #endif
 #if defined(__CL_SHORT4__)
-		__cl_short4 v4[2];
+	__cl_short4 v4[2];
 #endif
 #if defined(__CL_SHORT8__)
-		__cl_short8 v8;
+	__cl_short8 v8;
 #endif
-	} cl_short8;
+} cl_short8;
 
-	typedef union {
-		cl_short CL_ALIGNED(32) s[16];
+typedef union
+{
+	cl_short CL_ALIGNED(32) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_short x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_short s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_short8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_short x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_short s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_short8 lo, hi;
+	};
 #endif
 #if defined(__CL_SHORT2__)
-		__cl_short2 v2[8];
+	__cl_short2 v2[8];
 #endif
 #if defined(__CL_SHORT4__)
-		__cl_short4 v4[4];
+	__cl_short4 v4[4];
 #endif
 #if defined(__CL_SHORT8__)
-		__cl_short8 v8[2];
+	__cl_short8 v8[2];
 #endif
 #if defined(__CL_SHORT16__)
-		__cl_short16 v16;
+	__cl_short16 v16;
 #endif
-	} cl_short16;
+} cl_short16;
 
-	/* ---- cl_ushortn ---- */
-	typedef union {
-		cl_ushort CL_ALIGNED(4) s[2];
+/* ---- cl_ushortn ---- */
+typedef union
+{
+	cl_ushort CL_ALIGNED(4) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ushort x, y;
-		};
-		__extension__ struct
-		{
-			cl_ushort s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_ushort lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ushort x, y;
+	};
+	__extension__ struct
+	{
+		cl_ushort s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_ushort lo, hi;
+	};
 #endif
 #if defined(__CL_USHORT2__)
-		__cl_ushort2 v2;
+	__cl_ushort2 v2;
 #endif
-	} cl_ushort2;
+} cl_ushort2;
 
-	typedef union {
-		cl_ushort CL_ALIGNED(8) s[4];
+typedef union
+{
+	cl_ushort CL_ALIGNED(8) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ushort x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_ushort s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_ushort2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ushort x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_ushort s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_ushort2 lo, hi;
+	};
 #endif
 #if defined(__CL_USHORT2__)
-		__cl_ushort2 v2[2];
+	__cl_ushort2 v2[2];
 #endif
 #if defined(__CL_USHORT4__)
-		__cl_ushort4 v4;
+	__cl_ushort4 v4;
 #endif
-	} cl_ushort4;
+} cl_ushort4;
 
-	/* cl_ushort3 is identical in size, alignment and behavior to cl_ushort4. See section 6.1.5. */
-	typedef cl_ushort4 cl_ushort3;
+/* cl_ushort3 is identical in size, alignment and behavior to cl_ushort4. See section 6.1.5. */
+typedef cl_ushort4 cl_ushort3;
 
-	typedef union {
-		cl_ushort CL_ALIGNED(16) s[8];
+typedef union
+{
+	cl_ushort CL_ALIGNED(16) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ushort x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_ushort s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_ushort4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ushort x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_ushort s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_ushort4 lo, hi;
+	};
 #endif
 #if defined(__CL_USHORT2__)
-		__cl_ushort2 v2[4];
+	__cl_ushort2 v2[4];
 #endif
 #if defined(__CL_USHORT4__)
-		__cl_ushort4 v4[2];
+	__cl_ushort4 v4[2];
 #endif
 #if defined(__CL_USHORT8__)
-		__cl_ushort8 v8;
+	__cl_ushort8 v8;
 #endif
-	} cl_ushort8;
+} cl_ushort8;
 
-	typedef union {
-		cl_ushort CL_ALIGNED(32) s[16];
+typedef union
+{
+	cl_ushort CL_ALIGNED(32) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ushort x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_ushort s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_ushort8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ushort x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_ushort s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_ushort8 lo, hi;
+	};
 #endif
 #if defined(__CL_USHORT2__)
-		__cl_ushort2 v2[8];
+	__cl_ushort2 v2[8];
 #endif
 #if defined(__CL_USHORT4__)
-		__cl_ushort4 v4[4];
+	__cl_ushort4 v4[4];
 #endif
 #if defined(__CL_USHORT8__)
-		__cl_ushort8 v8[2];
+	__cl_ushort8 v8[2];
 #endif
 #if defined(__CL_USHORT16__)
-		__cl_ushort16 v16;
+	__cl_ushort16 v16;
 #endif
-	} cl_ushort16;
+} cl_ushort16;
 
-	/* ---- cl_intn ---- */
-	typedef union {
-		cl_int CL_ALIGNED(8) s[2];
+/* ---- cl_intn ---- */
+typedef union
+{
+	cl_int CL_ALIGNED(8) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_int x, y;
-		};
-		__extension__ struct
-		{
-			cl_int s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_int lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_int x, y;
+	};
+	__extension__ struct
+	{
+		cl_int s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_int lo, hi;
+	};
 #endif
 #if defined(__CL_INT2__)
-		__cl_int2 v2;
+	__cl_int2 v2;
 #endif
-	} cl_int2;
+} cl_int2;
 
-	typedef union {
-		cl_int CL_ALIGNED(16) s[4];
+typedef union
+{
+	cl_int CL_ALIGNED(16) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_int x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_int s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_int2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_int x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_int s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_int2 lo, hi;
+	};
 #endif
 #if defined(__CL_INT2__)
-		__cl_int2 v2[2];
+	__cl_int2 v2[2];
 #endif
 #if defined(__CL_INT4__)
-		__cl_int4 v4;
+	__cl_int4 v4;
 #endif
-	} cl_int4;
+} cl_int4;
 
-	/* cl_int3 is identical in size, alignment and behavior to cl_int4. See section 6.1.5. */
-	typedef cl_int4 cl_int3;
+/* cl_int3 is identical in size, alignment and behavior to cl_int4. See section 6.1.5. */
+typedef cl_int4 cl_int3;
 
-	typedef union {
-		cl_int CL_ALIGNED(32) s[8];
+typedef union
+{
+	cl_int CL_ALIGNED(32) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_int x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_int s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_int4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_int x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_int s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_int4 lo, hi;
+	};
 #endif
 #if defined(__CL_INT2__)
-		__cl_int2 v2[4];
+	__cl_int2 v2[4];
 #endif
 #if defined(__CL_INT4__)
-		__cl_int4 v4[2];
+	__cl_int4 v4[2];
 #endif
 #if defined(__CL_INT8__)
-		__cl_int8 v8;
+	__cl_int8 v8;
 #endif
-	} cl_int8;
+} cl_int8;
 
-	typedef union {
-		cl_int CL_ALIGNED(64) s[16];
+typedef union
+{
+	cl_int CL_ALIGNED(64) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_int x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_int s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_int8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_int x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_int s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_int8 lo, hi;
+	};
 #endif
 #if defined(__CL_INT2__)
-		__cl_int2 v2[8];
+	__cl_int2 v2[8];
 #endif
 #if defined(__CL_INT4__)
-		__cl_int4 v4[4];
+	__cl_int4 v4[4];
 #endif
 #if defined(__CL_INT8__)
-		__cl_int8 v8[2];
+	__cl_int8 v8[2];
 #endif
 #if defined(__CL_INT16__)
-		__cl_int16 v16;
+	__cl_int16 v16;
 #endif
-	} cl_int16;
+} cl_int16;
 
-	/* ---- cl_uintn ---- */
-	typedef union {
-		cl_uint CL_ALIGNED(8) s[2];
+/* ---- cl_uintn ---- */
+typedef union
+{
+	cl_uint CL_ALIGNED(8) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uint x, y;
-		};
-		__extension__ struct
-		{
-			cl_uint s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_uint lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uint x, y;
+	};
+	__extension__ struct
+	{
+		cl_uint s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_uint lo, hi;
+	};
 #endif
 #if defined(__CL_UINT2__)
-		__cl_uint2 v2;
+	__cl_uint2 v2;
 #endif
-	} cl_uint2;
+} cl_uint2;
 
-	typedef union {
-		cl_uint CL_ALIGNED(16) s[4];
+typedef union
+{
+	cl_uint CL_ALIGNED(16) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uint x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_uint s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_uint2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uint x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_uint s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_uint2 lo, hi;
+	};
 #endif
 #if defined(__CL_UINT2__)
-		__cl_uint2 v2[2];
+	__cl_uint2 v2[2];
 #endif
 #if defined(__CL_UINT4__)
-		__cl_uint4 v4;
+	__cl_uint4 v4;
 #endif
-	} cl_uint4;
+} cl_uint4;
 
-	/* cl_uint3 is identical in size, alignment and behavior to cl_uint4. See section 6.1.5. */
-	typedef cl_uint4 cl_uint3;
+/* cl_uint3 is identical in size, alignment and behavior to cl_uint4. See section 6.1.5. */
+typedef cl_uint4 cl_uint3;
 
-	typedef union {
-		cl_uint CL_ALIGNED(32) s[8];
+typedef union
+{
+	cl_uint CL_ALIGNED(32) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uint x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_uint s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_uint4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uint x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_uint s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_uint4 lo, hi;
+	};
 #endif
 #if defined(__CL_UINT2__)
-		__cl_uint2 v2[4];
+	__cl_uint2 v2[4];
 #endif
 #if defined(__CL_UINT4__)
-		__cl_uint4 v4[2];
+	__cl_uint4 v4[2];
 #endif
 #if defined(__CL_UINT8__)
-		__cl_uint8 v8;
+	__cl_uint8 v8;
 #endif
-	} cl_uint8;
+} cl_uint8;
 
-	typedef union {
-		cl_uint CL_ALIGNED(64) s[16];
+typedef union
+{
+	cl_uint CL_ALIGNED(64) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_uint x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_uint s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_uint8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_uint x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_uint s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_uint8 lo, hi;
+	};
 #endif
 #if defined(__CL_UINT2__)
-		__cl_uint2 v2[8];
+	__cl_uint2 v2[8];
 #endif
 #if defined(__CL_UINT4__)
-		__cl_uint4 v4[4];
+	__cl_uint4 v4[4];
 #endif
 #if defined(__CL_UINT8__)
-		__cl_uint8 v8[2];
+	__cl_uint8 v8[2];
 #endif
 #if defined(__CL_UINT16__)
-		__cl_uint16 v16;
+	__cl_uint16 v16;
 #endif
-	} cl_uint16;
+} cl_uint16;
 
-	/* ---- cl_longn ---- */
-	typedef union {
-		cl_long CL_ALIGNED(16) s[2];
+/* ---- cl_longn ---- */
+typedef union
+{
+	cl_long CL_ALIGNED(16) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_long x, y;
-		};
-		__extension__ struct
-		{
-			cl_long s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_long lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_long x, y;
+	};
+	__extension__ struct
+	{
+		cl_long s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_long lo, hi;
+	};
 #endif
 #if defined(__CL_LONG2__)
-		__cl_long2 v2;
+	__cl_long2 v2;
 #endif
-	} cl_long2;
+} cl_long2;
 
-	typedef union {
-		cl_long CL_ALIGNED(32) s[4];
+typedef union
+{
+	cl_long CL_ALIGNED(32) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_long x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_long s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_long2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_long x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_long s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_long2 lo, hi;
+	};
 #endif
 #if defined(__CL_LONG2__)
-		__cl_long2 v2[2];
+	__cl_long2 v2[2];
 #endif
 #if defined(__CL_LONG4__)
-		__cl_long4 v4;
+	__cl_long4 v4;
 #endif
-	} cl_long4;
+} cl_long4;
 
-	/* cl_long3 is identical in size, alignment and behavior to cl_long4. See section 6.1.5. */
-	typedef cl_long4 cl_long3;
+/* cl_long3 is identical in size, alignment and behavior to cl_long4. See section 6.1.5. */
+typedef cl_long4 cl_long3;
 
-	typedef union {
-		cl_long CL_ALIGNED(64) s[8];
+typedef union
+{
+	cl_long CL_ALIGNED(64) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_long x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_long s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_long4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_long x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_long s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_long4 lo, hi;
+	};
 #endif
 #if defined(__CL_LONG2__)
-		__cl_long2 v2[4];
+	__cl_long2 v2[4];
 #endif
 #if defined(__CL_LONG4__)
-		__cl_long4 v4[2];
+	__cl_long4 v4[2];
 #endif
 #if defined(__CL_LONG8__)
-		__cl_long8 v8;
+	__cl_long8 v8;
 #endif
-	} cl_long8;
+} cl_long8;
 
-	typedef union {
-		cl_long CL_ALIGNED(128) s[16];
+typedef union
+{
+	cl_long CL_ALIGNED(128) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_long x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_long s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_long8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_long x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_long s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_long8 lo, hi;
+	};
 #endif
 #if defined(__CL_LONG2__)
-		__cl_long2 v2[8];
+	__cl_long2 v2[8];
 #endif
 #if defined(__CL_LONG4__)
-		__cl_long4 v4[4];
+	__cl_long4 v4[4];
 #endif
 #if defined(__CL_LONG8__)
-		__cl_long8 v8[2];
+	__cl_long8 v8[2];
 #endif
 #if defined(__CL_LONG16__)
-		__cl_long16 v16;
+	__cl_long16 v16;
 #endif
-	} cl_long16;
+} cl_long16;
 
-	/* ---- cl_ulongn ---- */
-	typedef union {
-		cl_ulong CL_ALIGNED(16) s[2];
+/* ---- cl_ulongn ---- */
+typedef union
+{
+	cl_ulong CL_ALIGNED(16) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ulong x, y;
-		};
-		__extension__ struct
-		{
-			cl_ulong s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_ulong lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ulong x, y;
+	};
+	__extension__ struct
+	{
+		cl_ulong s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_ulong lo, hi;
+	};
 #endif
 #if defined(__CL_ULONG2__)
-		__cl_ulong2 v2;
+	__cl_ulong2 v2;
 #endif
-	} cl_ulong2;
+} cl_ulong2;
 
-	typedef union {
-		cl_ulong CL_ALIGNED(32) s[4];
+typedef union
+{
+	cl_ulong CL_ALIGNED(32) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ulong x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_ulong s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_ulong2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ulong x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_ulong s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_ulong2 lo, hi;
+	};
 #endif
 #if defined(__CL_ULONG2__)
-		__cl_ulong2 v2[2];
+	__cl_ulong2 v2[2];
 #endif
 #if defined(__CL_ULONG4__)
-		__cl_ulong4 v4;
+	__cl_ulong4 v4;
 #endif
-	} cl_ulong4;
+} cl_ulong4;
 
-	/* cl_ulong3 is identical in size, alignment and behavior to cl_ulong4. See section 6.1.5. */
-	typedef cl_ulong4 cl_ulong3;
+/* cl_ulong3 is identical in size, alignment and behavior to cl_ulong4. See section 6.1.5. */
+typedef cl_ulong4 cl_ulong3;
 
-	typedef union {
-		cl_ulong CL_ALIGNED(64) s[8];
+typedef union
+{
+	cl_ulong CL_ALIGNED(64) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ulong x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_ulong s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_ulong4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ulong x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_ulong s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_ulong4 lo, hi;
+	};
 #endif
 #if defined(__CL_ULONG2__)
-		__cl_ulong2 v2[4];
+	__cl_ulong2 v2[4];
 #endif
 #if defined(__CL_ULONG4__)
-		__cl_ulong4 v4[2];
+	__cl_ulong4 v4[2];
 #endif
 #if defined(__CL_ULONG8__)
-		__cl_ulong8 v8;
+	__cl_ulong8 v8;
 #endif
-	} cl_ulong8;
+} cl_ulong8;
 
-	typedef union {
-		cl_ulong CL_ALIGNED(128) s[16];
+typedef union
+{
+	cl_ulong CL_ALIGNED(128) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_ulong x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_ulong s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_ulong8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_ulong x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_ulong s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_ulong8 lo, hi;
+	};
 #endif
 #if defined(__CL_ULONG2__)
-		__cl_ulong2 v2[8];
+	__cl_ulong2 v2[8];
 #endif
 #if defined(__CL_ULONG4__)
-		__cl_ulong4 v4[4];
+	__cl_ulong4 v4[4];
 #endif
 #if defined(__CL_ULONG8__)
-		__cl_ulong8 v8[2];
+	__cl_ulong8 v8[2];
 #endif
 #if defined(__CL_ULONG16__)
-		__cl_ulong16 v16;
+	__cl_ulong16 v16;
 #endif
-	} cl_ulong16;
+} cl_ulong16;
 
-	/* --- cl_floatn ---- */
+/* --- cl_floatn ---- */
 
-	typedef union {
-		cl_float CL_ALIGNED(8) s[2];
+typedef union
+{
+	cl_float CL_ALIGNED(8) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_float x, y;
-		};
-		__extension__ struct
-		{
-			cl_float s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_float lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_float x, y;
+	};
+	__extension__ struct
+	{
+		cl_float s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_float lo, hi;
+	};
 #endif
 #if defined(__CL_FLOAT2__)
-		__cl_float2 v2;
+	__cl_float2 v2;
 #endif
-	} cl_float2;
+} cl_float2;
 
-	typedef union {
-		cl_float CL_ALIGNED(16) s[4];
+typedef union
+{
+	cl_float CL_ALIGNED(16) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_float x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_float s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_float2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_float x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_float s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_float2 lo, hi;
+	};
 #endif
 #if defined(__CL_FLOAT2__)
-		__cl_float2 v2[2];
+	__cl_float2 v2[2];
 #endif
 #if defined(__CL_FLOAT4__)
-		__cl_float4 v4;
+	__cl_float4 v4;
 #endif
-	} cl_float4;
+} cl_float4;
 
-	/* cl_float3 is identical in size, alignment and behavior to cl_float4. See section 6.1.5. */
-	typedef cl_float4 cl_float3;
+/* cl_float3 is identical in size, alignment and behavior to cl_float4. See section 6.1.5. */
+typedef cl_float4 cl_float3;
 
-	typedef union {
-		cl_float CL_ALIGNED(32) s[8];
+typedef union
+{
+	cl_float CL_ALIGNED(32) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_float x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_float s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_float4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_float x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_float s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_float4 lo, hi;
+	};
 #endif
 #if defined(__CL_FLOAT2__)
-		__cl_float2 v2[4];
+	__cl_float2 v2[4];
 #endif
 #if defined(__CL_FLOAT4__)
-		__cl_float4 v4[2];
+	__cl_float4 v4[2];
 #endif
 #if defined(__CL_FLOAT8__)
-		__cl_float8 v8;
+	__cl_float8 v8;
 #endif
-	} cl_float8;
+} cl_float8;
 
-	typedef union {
-		cl_float CL_ALIGNED(64) s[16];
+typedef union
+{
+	cl_float CL_ALIGNED(64) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_float x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_float s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_float8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_float x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_float s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_float8 lo, hi;
+	};
 #endif
 #if defined(__CL_FLOAT2__)
-		__cl_float2 v2[8];
+	__cl_float2 v2[8];
 #endif
 #if defined(__CL_FLOAT4__)
-		__cl_float4 v4[4];
+	__cl_float4 v4[4];
 #endif
 #if defined(__CL_FLOAT8__)
-		__cl_float8 v8[2];
+	__cl_float8 v8[2];
 #endif
 #if defined(__CL_FLOAT16__)
-		__cl_float16 v16;
+	__cl_float16 v16;
 #endif
-	} cl_float16;
+} cl_float16;
 
-	/* --- cl_doublen ---- */
+/* --- cl_doublen ---- */
 
-	typedef union {
-		cl_double CL_ALIGNED(16) s[2];
+typedef union
+{
+	cl_double CL_ALIGNED(16) s[2];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_double x, y;
-		};
-		__extension__ struct
-		{
-			cl_double s0, s1;
-		};
-		__extension__ struct
-		{
-			cl_double lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_double x, y;
+	};
+	__extension__ struct
+	{
+		cl_double s0, s1;
+	};
+	__extension__ struct
+	{
+		cl_double lo, hi;
+	};
 #endif
 #if defined(__CL_DOUBLE2__)
-		__cl_double2 v2;
+	__cl_double2 v2;
 #endif
-	} cl_double2;
+} cl_double2;
 
-	typedef union {
-		cl_double CL_ALIGNED(32) s[4];
+typedef union
+{
+	cl_double CL_ALIGNED(32) s[4];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_double x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_double s0, s1, s2, s3;
-		};
-		__extension__ struct
-		{
-			cl_double2 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_double x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_double s0, s1, s2, s3;
+	};
+	__extension__ struct
+	{
+		cl_double2 lo, hi;
+	};
 #endif
 #if defined(__CL_DOUBLE2__)
-		__cl_double2 v2[2];
+	__cl_double2 v2[2];
 #endif
 #if defined(__CL_DOUBLE4__)
-		__cl_double4 v4;
+	__cl_double4 v4;
 #endif
-	} cl_double4;
+} cl_double4;
 
-	/* cl_double3 is identical in size, alignment and behavior to cl_double4. See section 6.1.5. */
-	typedef cl_double4 cl_double3;
+/* cl_double3 is identical in size, alignment and behavior to cl_double4. See section 6.1.5. */
+typedef cl_double4 cl_double3;
 
-	typedef union {
-		cl_double CL_ALIGNED(64) s[8];
+typedef union
+{
+	cl_double CL_ALIGNED(64) s[8];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_double x, y, z, w;
-		};
-		__extension__ struct
-		{
-			cl_double s0, s1, s2, s3, s4, s5, s6, s7;
-		};
-		__extension__ struct
-		{
-			cl_double4 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_double x, y, z, w;
+	};
+	__extension__ struct
+	{
+		cl_double s0, s1, s2, s3, s4, s5, s6, s7;
+	};
+	__extension__ struct
+	{
+		cl_double4 lo, hi;
+	};
 #endif
 #if defined(__CL_DOUBLE2__)
-		__cl_double2 v2[4];
+	__cl_double2 v2[4];
 #endif
 #if defined(__CL_DOUBLE4__)
-		__cl_double4 v4[2];
+	__cl_double4 v4[2];
 #endif
 #if defined(__CL_DOUBLE8__)
-		__cl_double8 v8;
+	__cl_double8 v8;
 #endif
-	} cl_double8;
+} cl_double8;
 
-	typedef union {
-		cl_double CL_ALIGNED(128) s[16];
+typedef union
+{
+	cl_double CL_ALIGNED(128) s[16];
 #if defined(CL_NAMED_STRUCT_SUPPORTED)
-		__extension__ struct
-		{
-			cl_double x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
-		};
-		__extension__ struct
-		{
-			cl_double s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
-		};
-		__extension__ struct
-		{
-			cl_double8 lo, hi;
-		};
+	__extension__ struct
+	{
+		cl_double x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf;
+	};
+	__extension__ struct
+	{
+		cl_double s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF;
+	};
+	__extension__ struct
+	{
+		cl_double8 lo, hi;
+	};
 #endif
 #if defined(__CL_DOUBLE2__)
-		__cl_double2 v2[8];
+	__cl_double2 v2[8];
 #endif
 #if defined(__CL_DOUBLE4__)
-		__cl_double4 v4[4];
+	__cl_double4 v4[4];
 #endif
 #if defined(__CL_DOUBLE8__)
-		__cl_double8 v8[2];
+	__cl_double8 v8[2];
 #endif
 #if defined(__CL_DOUBLE16__)
-		__cl_double16 v16;
+	__cl_double16 v16;
 #endif
-	} cl_double16;
+} cl_double16;
 
-/* Macro to facilitate debugging 
+/* Macro to facilitate debugging
  * Usage:
- *   Place CL_PROGRAM_STRING_DEBUG_INFO on the line before the first line of your source. 
+ *   Place CL_PROGRAM_STRING_DEBUG_INFO on the line before the first line of your source.
  *   The first line ends with:   CL_PROGRAM_STRING_BEGIN \"
  *   Each line thereafter of OpenCL C source must end with: \n\
  *   The last line ends in ";
@@ -1548,71 +1588,71 @@ float nanf(const char *);
  *   }                                               \n\
  *   ";
  *
- * This should correctly set up the line, (column) and file information for your source 
+ * This should correctly set up the line, (column) and file information for your source
  * string so you can do source level debugging.
  */
 #define __CL_STRINGIFY(_x) #_x
 #define _CL_STRINGIFY(_x) __CL_STRINGIFY(_x)
 #define CL_PROGRAM_STRING_DEBUG_INFO "#line " _CL_STRINGIFY(__LINE__) " \"" __FILE__ "\" \n\n"
 
-	//  CL.h contents
-	/******************************************************************************/
+//  CL.h contents
+/******************************************************************************/
 
-	typedef struct _cl_platform_id *cl_platform_id;
-	typedef struct _cl_device_id *cl_device_id;
-	typedef struct _cl_context *cl_context;
-	typedef struct _cl_command_queue *cl_command_queue;
-	typedef struct _cl_mem *cl_mem;
-	typedef struct _cl_program *cl_program;
-	typedef struct _cl_kernel *cl_kernel;
-	typedef struct _cl_event *cl_event;
-	typedef struct _cl_sampler *cl_sampler;
+typedef struct _cl_platform_id *cl_platform_id;
+typedef struct _cl_device_id *cl_device_id;
+typedef struct _cl_context *cl_context;
+typedef struct _cl_command_queue *cl_command_queue;
+typedef struct _cl_mem *cl_mem;
+typedef struct _cl_program *cl_program;
+typedef struct _cl_kernel *cl_kernel;
+typedef struct _cl_event *cl_event;
+typedef struct _cl_sampler *cl_sampler;
 
-	typedef cl_uint cl_bool; /* WARNING!  Unlike cl_ types in cl_platform.h, cl_bool is not guaranteed to be the same size as the bool in kernels. */
-	typedef cl_ulong cl_bitfield;
-	typedef cl_bitfield cl_device_type;
-	typedef cl_uint cl_platform_info;
-	typedef cl_uint cl_device_info;
-	typedef cl_bitfield cl_device_fp_config;
-	typedef cl_uint cl_device_mem_cache_type;
-	typedef cl_uint cl_device_local_mem_type;
-	typedef cl_bitfield cl_device_exec_capabilities;
-	typedef cl_bitfield cl_command_queue_properties;
+typedef cl_uint cl_bool; /* WARNING!  Unlike cl_ types in cl_platform.h, cl_bool is not guaranteed to be the same size as the bool in kernels. */
+typedef cl_ulong cl_bitfield;
+typedef cl_bitfield cl_device_type;
+typedef cl_uint cl_platform_info;
+typedef cl_uint cl_device_info;
+typedef cl_bitfield cl_device_fp_config;
+typedef cl_uint cl_device_mem_cache_type;
+typedef cl_uint cl_device_local_mem_type;
+typedef cl_bitfield cl_device_exec_capabilities;
+typedef cl_bitfield cl_command_queue_properties;
 
-	typedef intptr_t cl_context_properties;
-	typedef cl_uint cl_context_info;
-	typedef cl_uint cl_command_queue_info;
-	typedef cl_uint cl_channel_order;
-	typedef cl_uint cl_channel_type;
-	typedef cl_bitfield cl_mem_flags;
-	typedef cl_uint cl_mem_object_type;
-	typedef cl_uint cl_mem_info;
-	typedef cl_uint cl_image_info;
-	typedef cl_uint cl_buffer_create_type;
-	typedef cl_uint cl_addressing_mode;
-	typedef cl_uint cl_filter_mode;
-	typedef cl_uint cl_sampler_info;
-	typedef cl_bitfield cl_map_flags;
-	typedef cl_uint cl_program_info;
-	typedef cl_uint cl_program_build_info;
-	typedef cl_int cl_build_status;
-	typedef cl_uint cl_kernel_info;
-	typedef cl_uint cl_kernel_work_group_info;
-	typedef cl_uint cl_event_info;
-	typedef cl_uint cl_command_type;
-	typedef cl_uint cl_profiling_info;
+typedef intptr_t cl_context_properties;
+typedef cl_uint cl_context_info;
+typedef cl_uint cl_command_queue_info;
+typedef cl_uint cl_channel_order;
+typedef cl_uint cl_channel_type;
+typedef cl_bitfield cl_mem_flags;
+typedef cl_uint cl_mem_object_type;
+typedef cl_uint cl_mem_info;
+typedef cl_uint cl_image_info;
+typedef cl_uint cl_buffer_create_type;
+typedef cl_uint cl_addressing_mode;
+typedef cl_uint cl_filter_mode;
+typedef cl_uint cl_sampler_info;
+typedef cl_bitfield cl_map_flags;
+typedef cl_uint cl_program_info;
+typedef cl_uint cl_program_build_info;
+typedef cl_int cl_build_status;
+typedef cl_uint cl_kernel_info;
+typedef cl_uint cl_kernel_work_group_info;
+typedef cl_uint cl_event_info;
+typedef cl_uint cl_command_type;
+typedef cl_uint cl_profiling_info;
 
-	typedef struct _cl_image_format
-	{
-		cl_channel_order image_channel_order;
-		cl_channel_type image_channel_data_type;
-	} cl_image_format;
+typedef struct _cl_image_format
+{
+	cl_channel_order image_channel_order;
+	cl_channel_type image_channel_data_type;
+} cl_image_format;
 
-	typedef struct _cl_buffer_region
-	{
-		size_t origin;
-		size_t size;
-	} cl_buffer_region;
+typedef struct _cl_buffer_region
+{
+	size_t origin;
+	size_t size;
+} cl_buffer_region;
 
 /******************************************************************************/
 
@@ -1962,545 +2002,545 @@ float nanf(const char *);
 #define CL_PROFILING_COMMAND_START 0x1282
 #define CL_PROFILING_COMMAND_END 0x1283
 
-	/********************************************************************************************************/
-
-	/********************************************************************************************************/
-
-	/*  Function signature typedef's */
-
-	/* Platform API */
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETPLATFORMIDS)(cl_uint /* num_entries */,
-														 cl_platform_id * /* platforms */,
-														 cl_uint * /* num_platforms */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETPLATFORMINFO)(cl_platform_id /* platform */,
-														  cl_platform_info /* param_name */,
-														  size_t /* param_value_size */,
-														  void * /* param_value */,
-														  size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	/* Device APIs */
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETDEVICEIDS)(cl_platform_id /* platform */,
-													   cl_device_type /* device_type */,
-													   cl_uint /* num_entries */,
-													   cl_device_id * /* devices */,
-													   cl_uint * /* num_devices */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETDEVICEINFO)(cl_device_id /* device */,
-														cl_device_info /* param_name */,
-														size_t /* param_value_size */,
-														void * /* param_value */,
-														size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	// Context APIs
-	typedef CL_API_ENTRY cl_context(CL_API_CALL *
-										PFNCLCREATECONTEXT)(const cl_context_properties * /* properties */,
-															cl_uint /* num_devices */,
-															const cl_device_id * /* devices */,
-															void(CL_CALLBACK * /* pfn_notify */)(const char *, const void *, size_t, void *),
-															void * /* user_data */,
-															cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_context(CL_API_CALL *
-										PFNCLCREATECONTEXTFROMTYPE)(const cl_context_properties * /* properties */,
-																	cl_device_type /* device_type */,
-																	void(CL_CALLBACK * /* pfn_notify*/)(const char *, const void *, size_t, void *),
-																	void * /* user_data */,
-																	cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINCONTEXT)(cl_context /* context */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASECONTEXT)(cl_context /* context */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETCONTEXTINFO)(cl_context /* context */,
-														 cl_context_info /* param_name */,
-														 size_t /* param_value_size */,
-														 void * /* param_value */,
-														 size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	/* Command Queue APIs */
-	typedef CL_API_ENTRY cl_command_queue(CL_API_CALL *
-											  PFNCLCREATECOMMANDQUEUE)(cl_context /* context */,
-																	   cl_device_id /* device */,
-																	   cl_command_queue_properties /* properties */,
-																	   cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINCOMMANDQUEUE)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASECOMMANDQUEUE)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETCOMMANDQUEUEINFO)(cl_command_queue /* command_queue */,
-															  cl_command_queue_info /* param_name */,
-															  size_t /* param_value_size */,
-															  void * /* param_value */,
-															  size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLSETCOMMANDQUEUEPROPERTY)(cl_command_queue /* command_queue */,
-																  cl_command_queue_properties /* properties */,
-																  cl_bool /* enable */,
-																  cl_command_queue_properties * /* old_properties */) CL_API_SUFFIX__VERSION_1_0;
-
-	/* Memory Object APIs */
-	typedef CL_API_ENTRY cl_mem(CL_API_CALL *
-									PFNCLCREATEBUFFER)(cl_context /* context */,
-													   cl_mem_flags /* flags */,
-													   size_t /* size */,
-													   void * /* host_ptr */,
-													   cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_mem(CL_API_CALL *
-									PFNCLCREATESUBBUFFER)(cl_mem /* buffer */,
-														  cl_mem_flags /* flags */,
-														  cl_buffer_create_type /* buffer_create_type */,
-														  const void * /* buffer_create_info */,
-														  cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_1;
-
-	typedef CL_API_ENTRY cl_mem(CL_API_CALL *
-									PFNCLCREATEIMAGE2D)(cl_context /* context */,
-														cl_mem_flags /* flags */,
-														const cl_image_format * /* image_format */,
-														size_t /* image_width */,
-														size_t /* image_height */,
-														size_t /* image_row_pitch */,
-														void * /* host_ptr */,
-														cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_mem(CL_API_CALL *
-									PFNCLCREATEIMAGE3D)(cl_context /* context */,
-														cl_mem_flags /* flags */,
-														const cl_image_format * /* image_format */,
-														size_t /* image_width */,
-														size_t /* image_height */,
-														size_t /* image_depth */,
-														size_t /* image_row_pitch */,
-														size_t /* image_slice_pitch */,
-														void * /* host_ptr */,
-														cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINMEMOBJECT)(cl_mem /* memobj */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASEMEMOBJECT)(cl_mem /* memobj */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETSUPPORTEDIMAGEFORMATS)(cl_context /* context */,
-																   cl_mem_flags /* flags */,
-																   cl_mem_object_type /* image_type */,
-																   cl_uint /* num_entries */,
-																   cl_image_format * /* image_formats */,
-																   cl_uint * /* num_image_formats */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETMEMOBJECTINFO)(cl_mem /* memobj */,
-														   cl_mem_info /* param_name */,
-														   size_t /* param_value_size */,
-														   void * /* param_value */,
-														   size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETIMAGEINFO)(cl_mem /* image */,
-													   cl_image_info /* param_name */,
-													   size_t /* param_value_size */,
-													   void * /* param_value */,
-													   size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLSETMEMOBJECTDESTRUCTORCALLBACK)(cl_mem /* memobj */,
-																		 void(CL_CALLBACK * /*pfn_notify*/)(cl_mem /* memobj */, void * /*user_data*/),
-																		 void * /*user_data */) CL_API_SUFFIX__VERSION_1_1;
-
-	/* Sampler APIs  */
-	typedef CL_API_ENTRY cl_sampler(CL_API_CALL *
-										PFNCLCREATESAMPLER)(cl_context /* context */,
-															cl_bool /* normalized_coords */,
-															cl_addressing_mode /* addressing_mode */,
-															cl_filter_mode /* filter_mode */,
-															cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINSAMPLER)(cl_sampler /* sampler */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASESAMPLER)(cl_sampler /* sampler */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETSAMPLERINFO)(cl_sampler /* sampler */,
-														 cl_sampler_info /* param_name */,
-														 size_t /* param_value_size */,
-														 void * /* param_value */,
-														 size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	/* Program Object APIs  */
-	typedef CL_API_ENTRY cl_program(CL_API_CALL *
-										PFNCLCREATEPROGRAMWITHSOURCE)(cl_context /* context */,
-																	  cl_uint /* count */,
-																	  const char ** /* strings */,
-																	  const size_t * /* lengths */,
-																	  cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_program(CL_API_CALL *
-										PFNCLCREATEPROGRAMWITHBINARY)(cl_context /* context */,
-																	  cl_uint /* num_devices */,
-																	  const cl_device_id * /* device_list */,
-																	  const size_t * /* lengths */,
-																	  const unsigned char ** /* binaries */,
-																	  cl_int * /* binary_status */,
-																	  cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINPROGRAM)(cl_program /* program */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASEPROGRAM)(cl_program /* program */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLBUILDPROGRAM)(cl_program /* program */,
-													   cl_uint /* num_devices */,
-													   const cl_device_id * /* device_list */,
-													   const char * /* options */,
-													   void(CL_CALLBACK * /* pfn_notify */)(cl_program /* program */, void * /* user_data */),
-													   void * /* user_data */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLUNLOADCOMPILER)(void) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETPROGRAMINFO)(cl_program /* program */,
-														 cl_program_info /* param_name */,
-														 size_t /* param_value_size */,
-														 void * /* param_value */,
-														 size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETPROGRAMBUILDINFO)(cl_program /* program */,
-															  cl_device_id /* device */,
-															  cl_program_build_info /* param_name */,
-															  size_t /* param_value_size */,
-															  void * /* param_value */,
-															  size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	/* Kernel Object APIs */
-	typedef CL_API_ENTRY cl_kernel(CL_API_CALL *
-									   PFNCLCREATEKERNEL)(cl_program /* program */,
-														  const char * /* kernel_name */,
-														  cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLCREATEKERNELSINPROGRAM)(cl_program /* program */,
-																 cl_uint /* num_kernels */,
-																 cl_kernel * /* kernels */,
-																 cl_uint * /* num_kernels_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINKERNEL)(cl_kernel /* kernel */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASEKERNEL)(cl_kernel /* kernel */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLSETKERNELARG)(cl_kernel /* kernel */,
-													   cl_uint /* arg_index */,
-													   size_t /* arg_size */,
-													   const void * /* arg_value */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETKERNELINFO)(cl_kernel /* kernel */,
-														cl_kernel_info /* param_name */,
-														size_t /* param_value_size */,
-														void * /* param_value */,
-														size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETKERNELWORKGROUPINFO)(cl_kernel /* kernel */,
-																 cl_device_id /* device */,
-																 cl_kernel_work_group_info /* param_name */,
-																 size_t /* param_value_size */,
-																 void * /* param_value */,
-																 size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	// Event Object APIs
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLWAITFOREVENTS)(cl_uint /* num_events */,
-														const cl_event * /* event_list */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETEVENTINFO)(cl_event /* event */,
-													   cl_event_info /* param_name */,
-													   size_t /* param_value_size */,
-													   void * /* param_value */,
-													   size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_event(CL_API_CALL *
-									  PFNCLCREATEUSEREVENT)(cl_context /* context */,
-															cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_1;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRETAINEVENT)(cl_event /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLRELEASEEVENT)(cl_event /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLSETUSEREVENTSTATUS)(cl_event /* event */,
-															 cl_int /* execution_status */) CL_API_SUFFIX__VERSION_1_1;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLSETEVENTCALLBACK)(cl_event /* event */,
-														   cl_int /* command_exec_callback_type */,
-														   void(CL_CALLBACK * /* pfn_notify */)(cl_event, cl_int, void *),
-														   void * /* user_data */) CL_API_SUFFIX__VERSION_1_1;
-
-	/* Profiling APIs  */
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLGETEVENTPROFILINGINFO)(cl_event /* event */,
-																cl_profiling_info /* param_name */,
-																size_t /* param_value_size */,
-																void * /* param_value */,
-																size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
-
-	// Flush and Finish APIs
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLFLUSH)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLFINISH)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
-
-	/* Enqueued Commands APIs */
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEREADBUFFER)(cl_command_queue /* command_queue */,
-															cl_mem /* buffer */,
-															cl_bool /* blocking_read */,
-															size_t /* offset */,
-															size_t /* cb */,
-															void * /* ptr */,
-															cl_uint /* num_events_in_wait_list */,
-															const cl_event * /* event_wait_list */,
-															cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEREADBUFFERRECT)(cl_command_queue /* command_queue */,
-																cl_mem /* buffer */,
-																cl_bool /* blocking_read */,
-																const size_t * /* buffer_origin */,
-																const size_t * /* host_origin */,
-																const size_t * /* region */,
-																size_t /* buffer_row_pitch */,
-																size_t /* buffer_slice_pitch */,
-																size_t /* host_row_pitch */,
-																size_t /* host_slice_pitch */,
-																void * /* ptr */,
-																cl_uint /* num_events_in_wait_list */,
-																const cl_event * /* event_wait_list */,
-																cl_event * /* event */) CL_API_SUFFIX__VERSION_1_1;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEWRITEBUFFER)(cl_command_queue /* command_queue */,
-															 cl_mem /* buffer */,
-															 cl_bool /* blocking_write */,
-															 size_t /* offset */,
-															 size_t /* cb */,
-															 const void * /* ptr */,
-															 cl_uint /* num_events_in_wait_list */,
-															 const cl_event * /* event_wait_list */,
-															 cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEWRITEBUFFERRECT)(cl_command_queue /* command_queue */,
-																 cl_mem /* buffer */,
-																 cl_bool /* blocking_write */,
-																 const size_t * /* buffer_origin */,
-																 const size_t * /* host_origin */,
-																 const size_t * /* region */,
-																 size_t /* buffer_row_pitch */,
-																 size_t /* buffer_slice_pitch */,
-																 size_t /* host_row_pitch */,
-																 size_t /* host_slice_pitch */,
-																 const void * /* ptr */,
-																 cl_uint /* num_events_in_wait_list */,
-																 const cl_event * /* event_wait_list */,
-																 cl_event * /* event */) CL_API_SUFFIX__VERSION_1_1;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUECOPYBUFFER)(cl_command_queue /* command_queue */,
-															cl_mem /* src_buffer */,
-															cl_mem /* dst_buffer */,
-															size_t /* src_offset */,
-															size_t /* dst_offset */,
-															size_t /* cb */,
-															cl_uint /* num_events_in_wait_list */,
-															const cl_event * /* event_wait_list */,
-															cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUECOPYBUFFERRECT)(cl_command_queue /* command_queue */,
-																cl_mem /* src_buffer */,
-																cl_mem /* dst_buffer */,
-																const size_t * /* src_origin */,
-																const size_t * /* dst_origin */,
-																const size_t * /* region */,
-																size_t /* src_row_pitch */,
-																size_t /* src_slice_pitch */,
-																size_t /* dst_row_pitch */,
-																size_t /* dst_slice_pitch */,
-																cl_uint /* num_events_in_wait_list */,
-																const cl_event * /* event_wait_list */,
-																cl_event * /* event */) CL_API_SUFFIX__VERSION_1_1;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEREADIMAGE)(cl_command_queue /* command_queue */,
-														   cl_mem /* image */,
-														   cl_bool /* blocking_read */,
-														   const size_t * /* origin[3] */,
-														   const size_t * /* region[3] */,
-														   size_t /* row_pitch */,
-														   size_t /* slice_pitch */,
-														   void * /* ptr */,
-														   cl_uint /* num_events_in_wait_list */,
-														   const cl_event * /* event_wait_list */,
-														   cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEWRITEIMAGE)(cl_command_queue /* command_queue */,
-															cl_mem /* image */,
-															cl_bool /* blocking_write */,
-															const size_t * /* origin[3] */,
-															const size_t * /* region[3] */,
-															size_t /* input_row_pitch */,
-															size_t /* input_slice_pitch */,
-															const void * /* ptr */,
-															cl_uint /* num_events_in_wait_list */,
-															const cl_event * /* event_wait_list */,
-															cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUECOPYIMAGE)(cl_command_queue /* command_queue */,
-														   cl_mem /* src_image */,
-														   cl_mem /* dst_image */,
-														   const size_t * /* src_origin[3] */,
-														   const size_t * /* dst_origin[3] */,
-														   const size_t * /* region[3] */,
-														   cl_uint /* num_events_in_wait_list */,
-														   const cl_event * /* event_wait_list */,
-														   cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUECOPYIMAGETOBUFFER)(cl_command_queue /* command_queue */,
-																   cl_mem /* src_image */,
-																   cl_mem /* dst_buffer */,
-																   const size_t * /* src_origin[3] */,
-																   const size_t * /* region[3] */,
-																   size_t /* dst_offset */,
-																   cl_uint /* num_events_in_wait_list */,
-																   const cl_event * /* event_wait_list */,
-																   cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUECOPYBUFFERTOIMAGE)(cl_command_queue /* command_queue */,
-																   cl_mem /* src_buffer */,
-																   cl_mem /* dst_image */,
-																   size_t /* src_offset */,
-																   const size_t * /* dst_origin[3] */,
-																   const size_t * /* region[3] */,
-																   cl_uint /* num_events_in_wait_list */,
-																   const cl_event * /* event_wait_list */,
-																   cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY void *(CL_API_CALL *
-									PFNCLENQUEUEMAPBUFFER)(cl_command_queue /* command_queue */,
-														   cl_mem /* buffer */,
-														   cl_bool /* blocking_map */,
-														   cl_map_flags /* map_flags */,
-														   size_t /* offset */,
-														   size_t /* cb */,
-														   cl_uint /* num_events_in_wait_list */,
-														   const cl_event * /* event_wait_list */,
-														   cl_event * /* event */,
-														   cl_int * /* errcode_ret */)CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY void *(CL_API_CALL *
-									PFNCLENQUEUEMAPIMAGE)(cl_command_queue /* command_queue */,
-														  cl_mem /* image */,
-														  cl_bool /* blocking_map */,
-														  cl_map_flags /* map_flags */,
-														  const size_t * /* origin[3] */,
-														  const size_t * /* region[3] */,
-														  size_t * /* image_row_pitch */,
-														  size_t * /* image_slice_pitch */,
-														  cl_uint /* num_events_in_wait_list */,
-														  const cl_event * /* event_wait_list */,
-														  cl_event * /* event */,
-														  cl_int * /* errcode_ret */)CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEUNMAPMEMOBJECT)(cl_command_queue /* command_queue */,
-																cl_mem /* memobj */,
-																void * /* mapped_ptr */,
-																cl_uint /* num_events_in_wait_list */,
-																const cl_event * /* event_wait_list */,
-																cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUENDRANGEKERNEL)(cl_command_queue /* command_queue */,
-															   cl_kernel /* kernel */,
-															   cl_uint /* work_dim */,
-															   const size_t * /* global_work_offset */,
-															   const size_t * /* global_work_size */,
-															   const size_t * /* local_work_size */,
-															   cl_uint /* num_events_in_wait_list */,
-															   const cl_event * /* event_wait_list */,
-															   cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUETASK)(cl_command_queue /* command_queue */,
-													  cl_kernel /* kernel */,
-													  cl_uint /* num_events_in_wait_list */,
-													  const cl_event * /* event_wait_list */,
-													  cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUENATIVEKERNEL)(cl_command_queue /* command_queue */,
-															  void (*user_func)(void *),
-															  void * /* args */,
-															  size_t /* cb_args */,
-															  cl_uint /* num_mem_objects */,
-															  const cl_mem * /* mem_list */,
-															  const void ** /* args_mem_loc */,
-															  cl_uint /* num_events_in_wait_list */,
-															  const cl_event * /* event_wait_list */,
-															  cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEMARKER)(cl_command_queue /* command_queue */,
-														cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEWAITFOREVENTS)(cl_command_queue /* command_queue */,
-															   cl_uint /* num_events */,
-															   const cl_event * /* event_list */) CL_API_SUFFIX__VERSION_1_0;
-
-	typedef CL_API_ENTRY cl_int(CL_API_CALL *
-									PFNCLENQUEUEBARRIER)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
-
-	// Extension function access
-	//
-	// Returns the extension function address for the given function name,
-	// or NULL if a valid function can not be found.  The client must
-	// check to make sure the address is not NULL, before using or
-	// calling the returned function address.
-	//
-	typedef CL_API_ENTRY void *(CL_API_CALL *PFNCLGETEXTENSIONFUNCTIONADDRESS)(const char * /* func_name */)CL_API_SUFFIX__VERSION_1_0;
+/********************************************************************************************************/
+
+/********************************************************************************************************/
+
+/*  Function signature typedef's */
+
+/* Platform API */
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETPLATFORMIDS)(cl_uint /* num_entries */,
+                                    cl_platform_id * /* platforms */,
+                                    cl_uint * /* num_platforms */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETPLATFORMINFO)(cl_platform_id /* platform */,
+                                    cl_platform_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+/* Device APIs */
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETDEVICEIDS)(cl_platform_id /* platform */,
+                                    cl_device_type /* device_type */,
+                                    cl_uint /* num_entries */,
+                                    cl_device_id * /* devices */,
+                                    cl_uint * /* num_devices */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETDEVICEINFO)(cl_device_id /* device */,
+                                    cl_device_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+// Context APIs
+typedef CL_API_ENTRY cl_context(CL_API_CALL *
+                                PFNCLCREATECONTEXT)(const cl_context_properties * /* properties */,
+                                        cl_uint /* num_devices */,
+                                        const cl_device_id * /* devices */,
+                                        void(CL_CALLBACK * /* pfn_notify */)(const char *, const void *, size_t, void *),
+                                        void * /* user_data */,
+                                        cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_context(CL_API_CALL *
+                                PFNCLCREATECONTEXTFROMTYPE)(const cl_context_properties * /* properties */,
+                                        cl_device_type /* device_type */,
+                                        void(CL_CALLBACK * /* pfn_notify*/)(const char *, const void *, size_t, void *),
+                                        void * /* user_data */,
+                                        cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINCONTEXT)(cl_context /* context */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASECONTEXT)(cl_context /* context */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETCONTEXTINFO)(cl_context /* context */,
+                                    cl_context_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+/* Command Queue APIs */
+typedef CL_API_ENTRY cl_command_queue(CL_API_CALL *
+                                      PFNCLCREATECOMMANDQUEUE)(cl_context /* context */,
+                                              cl_device_id /* device */,
+                                              cl_command_queue_properties /* properties */,
+                                              cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINCOMMANDQUEUE)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASECOMMANDQUEUE)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETCOMMANDQUEUEINFO)(cl_command_queue /* command_queue */,
+                                    cl_command_queue_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLSETCOMMANDQUEUEPROPERTY)(cl_command_queue /* command_queue */,
+                                    cl_command_queue_properties /* properties */,
+                                    cl_bool /* enable */,
+                                    cl_command_queue_properties * /* old_properties */) CL_API_SUFFIX__VERSION_1_0;
+
+/* Memory Object APIs */
+typedef CL_API_ENTRY cl_mem(CL_API_CALL *
+                            PFNCLCREATEBUFFER)(cl_context /* context */,
+                                    cl_mem_flags /* flags */,
+                                    size_t /* size */,
+                                    void * /* host_ptr */,
+                                    cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_mem(CL_API_CALL *
+                            PFNCLCREATESUBBUFFER)(cl_mem /* buffer */,
+                                    cl_mem_flags /* flags */,
+                                    cl_buffer_create_type /* buffer_create_type */,
+                                    const void * /* buffer_create_info */,
+                                    cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_1;
+
+typedef CL_API_ENTRY cl_mem(CL_API_CALL *
+                            PFNCLCREATEIMAGE2D)(cl_context /* context */,
+                                    cl_mem_flags /* flags */,
+                                    const cl_image_format * /* image_format */,
+                                    size_t /* image_width */,
+                                    size_t /* image_height */,
+                                    size_t /* image_row_pitch */,
+                                    void * /* host_ptr */,
+                                    cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_mem(CL_API_CALL *
+                            PFNCLCREATEIMAGE3D)(cl_context /* context */,
+                                    cl_mem_flags /* flags */,
+                                    const cl_image_format * /* image_format */,
+                                    size_t /* image_width */,
+                                    size_t /* image_height */,
+                                    size_t /* image_depth */,
+                                    size_t /* image_row_pitch */,
+                                    size_t /* image_slice_pitch */,
+                                    void * /* host_ptr */,
+                                    cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINMEMOBJECT)(cl_mem /* memobj */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASEMEMOBJECT)(cl_mem /* memobj */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETSUPPORTEDIMAGEFORMATS)(cl_context /* context */,
+                                    cl_mem_flags /* flags */,
+                                    cl_mem_object_type /* image_type */,
+                                    cl_uint /* num_entries */,
+                                    cl_image_format * /* image_formats */,
+                                    cl_uint * /* num_image_formats */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETMEMOBJECTINFO)(cl_mem /* memobj */,
+                                    cl_mem_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETIMAGEINFO)(cl_mem /* image */,
+                                    cl_image_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLSETMEMOBJECTDESTRUCTORCALLBACK)(cl_mem /* memobj */,
+                                    void(CL_CALLBACK * /*pfn_notify*/)(cl_mem /* memobj */, void * /*user_data*/),
+                                    void * /*user_data */) CL_API_SUFFIX__VERSION_1_1;
+
+/* Sampler APIs  */
+typedef CL_API_ENTRY cl_sampler(CL_API_CALL *
+                                PFNCLCREATESAMPLER)(cl_context /* context */,
+                                        cl_bool /* normalized_coords */,
+                                        cl_addressing_mode /* addressing_mode */,
+                                        cl_filter_mode /* filter_mode */,
+                                        cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINSAMPLER)(cl_sampler /* sampler */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASESAMPLER)(cl_sampler /* sampler */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETSAMPLERINFO)(cl_sampler /* sampler */,
+                                    cl_sampler_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+/* Program Object APIs  */
+typedef CL_API_ENTRY cl_program(CL_API_CALL *
+                                PFNCLCREATEPROGRAMWITHSOURCE)(cl_context /* context */,
+                                        cl_uint /* count */,
+                                        const char ** /* strings */,
+                                        const size_t * /* lengths */,
+                                        cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_program(CL_API_CALL *
+                                PFNCLCREATEPROGRAMWITHBINARY)(cl_context /* context */,
+                                        cl_uint /* num_devices */,
+                                        const cl_device_id * /* device_list */,
+                                        const size_t * /* lengths */,
+                                        const unsigned char ** /* binaries */,
+                                        cl_int * /* binary_status */,
+                                        cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINPROGRAM)(cl_program /* program */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASEPROGRAM)(cl_program /* program */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLBUILDPROGRAM)(cl_program /* program */,
+                                    cl_uint /* num_devices */,
+                                    const cl_device_id * /* device_list */,
+                                    const char * /* options */,
+                                    void(CL_CALLBACK * /* pfn_notify */)(cl_program /* program */, void * /* user_data */),
+                                    void * /* user_data */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLUNLOADCOMPILER)(void) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETPROGRAMINFO)(cl_program /* program */,
+                                    cl_program_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETPROGRAMBUILDINFO)(cl_program /* program */,
+                                    cl_device_id /* device */,
+                                    cl_program_build_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+/* Kernel Object APIs */
+typedef CL_API_ENTRY cl_kernel(CL_API_CALL *
+                               PFNCLCREATEKERNEL)(cl_program /* program */,
+                                       const char * /* kernel_name */,
+                                       cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLCREATEKERNELSINPROGRAM)(cl_program /* program */,
+                                    cl_uint /* num_kernels */,
+                                    cl_kernel * /* kernels */,
+                                    cl_uint * /* num_kernels_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINKERNEL)(cl_kernel /* kernel */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASEKERNEL)(cl_kernel /* kernel */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLSETKERNELARG)(cl_kernel /* kernel */,
+                                    cl_uint /* arg_index */,
+                                    size_t /* arg_size */,
+                                    const void * /* arg_value */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETKERNELINFO)(cl_kernel /* kernel */,
+                                    cl_kernel_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETKERNELWORKGROUPINFO)(cl_kernel /* kernel */,
+                                    cl_device_id /* device */,
+                                    cl_kernel_work_group_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+// Event Object APIs
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLWAITFOREVENTS)(cl_uint /* num_events */,
+                                    const cl_event * /* event_list */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETEVENTINFO)(cl_event /* event */,
+                                    cl_event_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_event(CL_API_CALL *
+                              PFNCLCREATEUSEREVENT)(cl_context /* context */,
+                                      cl_int * /* errcode_ret */) CL_API_SUFFIX__VERSION_1_1;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRETAINEVENT)(cl_event /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLRELEASEEVENT)(cl_event /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLSETUSEREVENTSTATUS)(cl_event /* event */,
+                                    cl_int /* execution_status */) CL_API_SUFFIX__VERSION_1_1;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLSETEVENTCALLBACK)(cl_event /* event */,
+                                    cl_int /* command_exec_callback_type */,
+                                    void(CL_CALLBACK * /* pfn_notify */)(cl_event, cl_int, void *),
+                                    void * /* user_data */) CL_API_SUFFIX__VERSION_1_1;
+
+/* Profiling APIs  */
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLGETEVENTPROFILINGINFO)(cl_event /* event */,
+                                    cl_profiling_info /* param_name */,
+                                    size_t /* param_value_size */,
+                                    void * /* param_value */,
+                                    size_t * /* param_value_size_ret */) CL_API_SUFFIX__VERSION_1_0;
+
+// Flush and Finish APIs
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLFLUSH)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLFINISH)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
+
+/* Enqueued Commands APIs */
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEREADBUFFER)(cl_command_queue /* command_queue */,
+                                    cl_mem /* buffer */,
+                                    cl_bool /* blocking_read */,
+                                    size_t /* offset */,
+                                    size_t /* cb */,
+                                    void * /* ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEREADBUFFERRECT)(cl_command_queue /* command_queue */,
+                                    cl_mem /* buffer */,
+                                    cl_bool /* blocking_read */,
+                                    const size_t * /* buffer_origin */,
+                                    const size_t * /* host_origin */,
+                                    const size_t * /* region */,
+                                    size_t /* buffer_row_pitch */,
+                                    size_t /* buffer_slice_pitch */,
+                                    size_t /* host_row_pitch */,
+                                    size_t /* host_slice_pitch */,
+                                    void * /* ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_1;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEWRITEBUFFER)(cl_command_queue /* command_queue */,
+                                    cl_mem /* buffer */,
+                                    cl_bool /* blocking_write */,
+                                    size_t /* offset */,
+                                    size_t /* cb */,
+                                    const void * /* ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEWRITEBUFFERRECT)(cl_command_queue /* command_queue */,
+                                    cl_mem /* buffer */,
+                                    cl_bool /* blocking_write */,
+                                    const size_t * /* buffer_origin */,
+                                    const size_t * /* host_origin */,
+                                    const size_t * /* region */,
+                                    size_t /* buffer_row_pitch */,
+                                    size_t /* buffer_slice_pitch */,
+                                    size_t /* host_row_pitch */,
+                                    size_t /* host_slice_pitch */,
+                                    const void * /* ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_1;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUECOPYBUFFER)(cl_command_queue /* command_queue */,
+                                    cl_mem /* src_buffer */,
+                                    cl_mem /* dst_buffer */,
+                                    size_t /* src_offset */,
+                                    size_t /* dst_offset */,
+                                    size_t /* cb */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUECOPYBUFFERRECT)(cl_command_queue /* command_queue */,
+                                    cl_mem /* src_buffer */,
+                                    cl_mem /* dst_buffer */,
+                                    const size_t * /* src_origin */,
+                                    const size_t * /* dst_origin */,
+                                    const size_t * /* region */,
+                                    size_t /* src_row_pitch */,
+                                    size_t /* src_slice_pitch */,
+                                    size_t /* dst_row_pitch */,
+                                    size_t /* dst_slice_pitch */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_1;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEREADIMAGE)(cl_command_queue /* command_queue */,
+                                    cl_mem /* image */,
+                                    cl_bool /* blocking_read */,
+                                    const size_t * /* origin[3] */,
+                                    const size_t * /* region[3] */,
+                                    size_t /* row_pitch */,
+                                    size_t /* slice_pitch */,
+                                    void * /* ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEWRITEIMAGE)(cl_command_queue /* command_queue */,
+                                    cl_mem /* image */,
+                                    cl_bool /* blocking_write */,
+                                    const size_t * /* origin[3] */,
+                                    const size_t * /* region[3] */,
+                                    size_t /* input_row_pitch */,
+                                    size_t /* input_slice_pitch */,
+                                    const void * /* ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUECOPYIMAGE)(cl_command_queue /* command_queue */,
+                                    cl_mem /* src_image */,
+                                    cl_mem /* dst_image */,
+                                    const size_t * /* src_origin[3] */,
+                                    const size_t * /* dst_origin[3] */,
+                                    const size_t * /* region[3] */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUECOPYIMAGETOBUFFER)(cl_command_queue /* command_queue */,
+                                    cl_mem /* src_image */,
+                                    cl_mem /* dst_buffer */,
+                                    const size_t * /* src_origin[3] */,
+                                    const size_t * /* region[3] */,
+                                    size_t /* dst_offset */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUECOPYBUFFERTOIMAGE)(cl_command_queue /* command_queue */,
+                                    cl_mem /* src_buffer */,
+                                    cl_mem /* dst_image */,
+                                    size_t /* src_offset */,
+                                    const size_t * /* dst_origin[3] */,
+                                    const size_t * /* region[3] */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY void *(CL_API_CALL *
+                            PFNCLENQUEUEMAPBUFFER)(cl_command_queue /* command_queue */,
+                                    cl_mem /* buffer */,
+                                    cl_bool /* blocking_map */,
+                                    cl_map_flags /* map_flags */,
+                                    size_t /* offset */,
+                                    size_t /* cb */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */,
+                                    cl_int * /* errcode_ret */)CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY void *(CL_API_CALL *
+                            PFNCLENQUEUEMAPIMAGE)(cl_command_queue /* command_queue */,
+                                    cl_mem /* image */,
+                                    cl_bool /* blocking_map */,
+                                    cl_map_flags /* map_flags */,
+                                    const size_t * /* origin[3] */,
+                                    const size_t * /* region[3] */,
+                                    size_t * /* image_row_pitch */,
+                                    size_t * /* image_slice_pitch */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */,
+                                    cl_int * /* errcode_ret */)CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEUNMAPMEMOBJECT)(cl_command_queue /* command_queue */,
+                                    cl_mem /* memobj */,
+                                    void * /* mapped_ptr */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUENDRANGEKERNEL)(cl_command_queue /* command_queue */,
+                                    cl_kernel /* kernel */,
+                                    cl_uint /* work_dim */,
+                                    const size_t * /* global_work_offset */,
+                                    const size_t * /* global_work_size */,
+                                    const size_t * /* local_work_size */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUETASK)(cl_command_queue /* command_queue */,
+                                    cl_kernel /* kernel */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUENATIVEKERNEL)(cl_command_queue /* command_queue */,
+                                    void (*user_func)(void *),
+                                    void * /* args */,
+                                    size_t /* cb_args */,
+                                    cl_uint /* num_mem_objects */,
+                                    const cl_mem * /* mem_list */,
+                                    const void ** /* args_mem_loc */,
+                                    cl_uint /* num_events_in_wait_list */,
+                                    const cl_event * /* event_wait_list */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEMARKER)(cl_command_queue /* command_queue */,
+                                    cl_event * /* event */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEWAITFOREVENTS)(cl_command_queue /* command_queue */,
+                                    cl_uint /* num_events */,
+                                    const cl_event * /* event_list */) CL_API_SUFFIX__VERSION_1_0;
+
+typedef CL_API_ENTRY cl_int(CL_API_CALL *
+                            PFNCLENQUEUEBARRIER)(cl_command_queue /* command_queue */) CL_API_SUFFIX__VERSION_1_0;
+
+// Extension function access
+//
+// Returns the extension function address for the given function name,
+// or NULL if a valid function can not be found.  The client must
+// check to make sure the address is not NULL, before using or
+// calling the returned function address.
+//
+typedef CL_API_ENTRY void *(CL_API_CALL *PFNCLGETEXTENSIONFUNCTIONADDRESS)(const char * /* func_name */)CL_API_SUFFIX__VERSION_1_0;
 
 #define CLEW_STATIC
 
@@ -2522,83 +2562,83 @@ float nanf(const char *);
 
 #define CLEW_GET_FUN(x) x
 
-	//  Variables holding function entry points
-	CLEW_FUN_EXPORT PFNCLGETPLATFORMIDS __clewGetPlatformIDs;
-	CLEW_FUN_EXPORT PFNCLGETPLATFORMINFO __clewGetPlatformInfo;
-	CLEW_FUN_EXPORT PFNCLGETDEVICEIDS __clewGetDeviceIDs;
-	CLEW_FUN_EXPORT PFNCLGETDEVICEINFO __clewGetDeviceInfo;
-	CLEW_FUN_EXPORT PFNCLCREATECONTEXT __clewCreateContext;
-	CLEW_FUN_EXPORT PFNCLCREATECONTEXTFROMTYPE __clewCreateContextFromType;
-	CLEW_FUN_EXPORT PFNCLRETAINCONTEXT __clewRetainContext;
-	CLEW_FUN_EXPORT PFNCLRELEASECONTEXT __clewReleaseContext;
-	CLEW_FUN_EXPORT PFNCLGETCONTEXTINFO __clewGetContextInfo;
-	CLEW_FUN_EXPORT PFNCLCREATECOMMANDQUEUE __clewCreateCommandQueue;
-	CLEW_FUN_EXPORT PFNCLRETAINCOMMANDQUEUE __clewRetainCommandQueue;
-	CLEW_FUN_EXPORT PFNCLRELEASECOMMANDQUEUE __clewReleaseCommandQueue;
-	CLEW_FUN_EXPORT PFNCLGETCOMMANDQUEUEINFO __clewGetCommandQueueInfo;
+//  Variables holding function entry points
+CLEW_FUN_EXPORT PFNCLGETPLATFORMIDS __clewGetPlatformIDs;
+CLEW_FUN_EXPORT PFNCLGETPLATFORMINFO __clewGetPlatformInfo;
+CLEW_FUN_EXPORT PFNCLGETDEVICEIDS __clewGetDeviceIDs;
+CLEW_FUN_EXPORT PFNCLGETDEVICEINFO __clewGetDeviceInfo;
+CLEW_FUN_EXPORT PFNCLCREATECONTEXT __clewCreateContext;
+CLEW_FUN_EXPORT PFNCLCREATECONTEXTFROMTYPE __clewCreateContextFromType;
+CLEW_FUN_EXPORT PFNCLRETAINCONTEXT __clewRetainContext;
+CLEW_FUN_EXPORT PFNCLRELEASECONTEXT __clewReleaseContext;
+CLEW_FUN_EXPORT PFNCLGETCONTEXTINFO __clewGetContextInfo;
+CLEW_FUN_EXPORT PFNCLCREATECOMMANDQUEUE __clewCreateCommandQueue;
+CLEW_FUN_EXPORT PFNCLRETAINCOMMANDQUEUE __clewRetainCommandQueue;
+CLEW_FUN_EXPORT PFNCLRELEASECOMMANDQUEUE __clewReleaseCommandQueue;
+CLEW_FUN_EXPORT PFNCLGETCOMMANDQUEUEINFO __clewGetCommandQueueInfo;
 #ifdef CL_USE_DEPRECATED_OPENCL_1_0_APIS
-	CLEW_FUN_EXPORT PFNCLSETCOMMANDQUEUEPROPERTY __clewSetCommandQueueProperty;
+CLEW_FUN_EXPORT PFNCLSETCOMMANDQUEUEPROPERTY __clewSetCommandQueueProperty;
 #endif
-	CLEW_FUN_EXPORT PFNCLCREATEBUFFER __clewCreateBuffer;
-	CLEW_FUN_EXPORT PFNCLCREATESUBBUFFER __clewCreateSubBuffer;
-	CLEW_FUN_EXPORT PFNCLCREATEIMAGE2D __clewCreateImage2D;
-	CLEW_FUN_EXPORT PFNCLCREATEIMAGE3D __clewCreateImage3D;
-	CLEW_FUN_EXPORT PFNCLRETAINMEMOBJECT __clewRetainMemObject;
-	CLEW_FUN_EXPORT PFNCLRELEASEMEMOBJECT __clewReleaseMemObject;
-	CLEW_FUN_EXPORT PFNCLGETSUPPORTEDIMAGEFORMATS __clewGetSupportedImageFormats;
-	CLEW_FUN_EXPORT PFNCLGETMEMOBJECTINFO __clewGetMemObjectInfo;
-	CLEW_FUN_EXPORT PFNCLGETIMAGEINFO __clewGetImageInfo;
-	CLEW_FUN_EXPORT PFNCLSETMEMOBJECTDESTRUCTORCALLBACK __clewSetMemObjectDestructorCallback;
-	CLEW_FUN_EXPORT PFNCLCREATESAMPLER __clewCreateSampler;
-	CLEW_FUN_EXPORT PFNCLRETAINSAMPLER __clewRetainSampler;
-	CLEW_FUN_EXPORT PFNCLRELEASESAMPLER __clewReleaseSampler;
-	CLEW_FUN_EXPORT PFNCLGETSAMPLERINFO __clewGetSamplerInfo;
-	CLEW_FUN_EXPORT PFNCLCREATEPROGRAMWITHSOURCE __clewCreateProgramWithSource;
-	CLEW_FUN_EXPORT PFNCLCREATEPROGRAMWITHBINARY __clewCreateProgramWithBinary;
-	CLEW_FUN_EXPORT PFNCLRETAINPROGRAM __clewRetainProgram;
-	CLEW_FUN_EXPORT PFNCLRELEASEPROGRAM __clewReleaseProgram;
-	CLEW_FUN_EXPORT PFNCLBUILDPROGRAM __clewBuildProgram;
-	CLEW_FUN_EXPORT PFNCLUNLOADCOMPILER __clewUnloadCompiler;
-	CLEW_FUN_EXPORT PFNCLGETPROGRAMINFO __clewGetProgramInfo;
-	CLEW_FUN_EXPORT PFNCLGETPROGRAMBUILDINFO __clewGetProgramBuildInfo;
-	CLEW_FUN_EXPORT PFNCLCREATEKERNEL __clewCreateKernel;
-	CLEW_FUN_EXPORT PFNCLCREATEKERNELSINPROGRAM __clewCreateKernelsInProgram;
-	CLEW_FUN_EXPORT PFNCLRETAINKERNEL __clewRetainKernel;
-	CLEW_FUN_EXPORT PFNCLRELEASEKERNEL __clewReleaseKernel;
-	CLEW_FUN_EXPORT PFNCLSETKERNELARG __clewSetKernelArg;
-	CLEW_FUN_EXPORT PFNCLGETKERNELINFO __clewGetKernelInfo;
-	CLEW_FUN_EXPORT PFNCLGETKERNELWORKGROUPINFO __clewGetKernelWorkGroupInfo;
-	CLEW_FUN_EXPORT PFNCLWAITFOREVENTS __clewWaitForEvents;
-	CLEW_FUN_EXPORT PFNCLGETEVENTINFO __clewGetEventInfo;
-	CLEW_FUN_EXPORT PFNCLCREATEUSEREVENT __clewCreateUserEvent;
-	CLEW_FUN_EXPORT PFNCLRETAINEVENT __clewRetainEvent;
-	CLEW_FUN_EXPORT PFNCLRELEASEEVENT __clewReleaseEvent;
-	CLEW_FUN_EXPORT PFNCLSETUSEREVENTSTATUS __clewSetUserEventStatus;
-	CLEW_FUN_EXPORT PFNCLSETEVENTCALLBACK __clewSetEventCallback;
-	CLEW_FUN_EXPORT PFNCLGETEVENTPROFILINGINFO __clewGetEventProfilingInfo;
-	CLEW_FUN_EXPORT PFNCLFLUSH __clewFlush;
-	CLEW_FUN_EXPORT PFNCLFINISH __clewFinish;
-	CLEW_FUN_EXPORT PFNCLENQUEUEREADBUFFER __clewEnqueueReadBuffer;
-	CLEW_FUN_EXPORT PFNCLENQUEUEREADBUFFERRECT __clewEnqueueReadBufferRect;
-	CLEW_FUN_EXPORT PFNCLENQUEUEWRITEBUFFER __clewEnqueueWriteBuffer;
-	CLEW_FUN_EXPORT PFNCLENQUEUEWRITEBUFFERRECT __clewEnqueueWriteBufferRect;
-	CLEW_FUN_EXPORT PFNCLENQUEUECOPYBUFFER __clewEnqueueCopyBuffer;
-	CLEW_FUN_EXPORT PFNCLENQUEUECOPYBUFFERRECT __clewEnqueueCopyBufferRect;
-	CLEW_FUN_EXPORT PFNCLENQUEUEREADIMAGE __clewEnqueueReadImage;
-	CLEW_FUN_EXPORT PFNCLENQUEUEWRITEIMAGE __clewEnqueueWriteImage;
-	CLEW_FUN_EXPORT PFNCLENQUEUECOPYIMAGE __clewEnqueueCopyImage;
-	CLEW_FUN_EXPORT PFNCLENQUEUECOPYIMAGETOBUFFER __clewEnqueueCopyImageToBuffer;
-	CLEW_FUN_EXPORT PFNCLENQUEUECOPYBUFFERTOIMAGE __clewEnqueueCopyBufferToImage;
-	CLEW_FUN_EXPORT PFNCLENQUEUEMAPBUFFER __clewEnqueueMapBuffer;
-	CLEW_FUN_EXPORT PFNCLENQUEUEMAPIMAGE __clewEnqueueMapImage;
-	CLEW_FUN_EXPORT PFNCLENQUEUEUNMAPMEMOBJECT __clewEnqueueUnmapMemObject;
-	CLEW_FUN_EXPORT PFNCLENQUEUENDRANGEKERNEL __clewEnqueueNDRangeKernel;
-	CLEW_FUN_EXPORT PFNCLENQUEUETASK __clewEnqueueTask;
-	CLEW_FUN_EXPORT PFNCLENQUEUENATIVEKERNEL __clewEnqueueNativeKernel;
-	CLEW_FUN_EXPORT PFNCLENQUEUEMARKER __clewEnqueueMarker;
-	CLEW_FUN_EXPORT PFNCLENQUEUEWAITFOREVENTS __clewEnqueueWaitForEvents;
-	CLEW_FUN_EXPORT PFNCLENQUEUEBARRIER __clewEnqueueBarrier;
-	CLEW_FUN_EXPORT PFNCLGETEXTENSIONFUNCTIONADDRESS __clewGetExtensionFunctionAddress;
+CLEW_FUN_EXPORT PFNCLCREATEBUFFER __clewCreateBuffer;
+CLEW_FUN_EXPORT PFNCLCREATESUBBUFFER __clewCreateSubBuffer;
+CLEW_FUN_EXPORT PFNCLCREATEIMAGE2D __clewCreateImage2D;
+CLEW_FUN_EXPORT PFNCLCREATEIMAGE3D __clewCreateImage3D;
+CLEW_FUN_EXPORT PFNCLRETAINMEMOBJECT __clewRetainMemObject;
+CLEW_FUN_EXPORT PFNCLRELEASEMEMOBJECT __clewReleaseMemObject;
+CLEW_FUN_EXPORT PFNCLGETSUPPORTEDIMAGEFORMATS __clewGetSupportedImageFormats;
+CLEW_FUN_EXPORT PFNCLGETMEMOBJECTINFO __clewGetMemObjectInfo;
+CLEW_FUN_EXPORT PFNCLGETIMAGEINFO __clewGetImageInfo;
+CLEW_FUN_EXPORT PFNCLSETMEMOBJECTDESTRUCTORCALLBACK __clewSetMemObjectDestructorCallback;
+CLEW_FUN_EXPORT PFNCLCREATESAMPLER __clewCreateSampler;
+CLEW_FUN_EXPORT PFNCLRETAINSAMPLER __clewRetainSampler;
+CLEW_FUN_EXPORT PFNCLRELEASESAMPLER __clewReleaseSampler;
+CLEW_FUN_EXPORT PFNCLGETSAMPLERINFO __clewGetSamplerInfo;
+CLEW_FUN_EXPORT PFNCLCREATEPROGRAMWITHSOURCE __clewCreateProgramWithSource;
+CLEW_FUN_EXPORT PFNCLCREATEPROGRAMWITHBINARY __clewCreateProgramWithBinary;
+CLEW_FUN_EXPORT PFNCLRETAINPROGRAM __clewRetainProgram;
+CLEW_FUN_EXPORT PFNCLRELEASEPROGRAM __clewReleaseProgram;
+CLEW_FUN_EXPORT PFNCLBUILDPROGRAM __clewBuildProgram;
+CLEW_FUN_EXPORT PFNCLUNLOADCOMPILER __clewUnloadCompiler;
+CLEW_FUN_EXPORT PFNCLGETPROGRAMINFO __clewGetProgramInfo;
+CLEW_FUN_EXPORT PFNCLGETPROGRAMBUILDINFO __clewGetProgramBuildInfo;
+CLEW_FUN_EXPORT PFNCLCREATEKERNEL __clewCreateKernel;
+CLEW_FUN_EXPORT PFNCLCREATEKERNELSINPROGRAM __clewCreateKernelsInProgram;
+CLEW_FUN_EXPORT PFNCLRETAINKERNEL __clewRetainKernel;
+CLEW_FUN_EXPORT PFNCLRELEASEKERNEL __clewReleaseKernel;
+CLEW_FUN_EXPORT PFNCLSETKERNELARG __clewSetKernelArg;
+CLEW_FUN_EXPORT PFNCLGETKERNELINFO __clewGetKernelInfo;
+CLEW_FUN_EXPORT PFNCLGETKERNELWORKGROUPINFO __clewGetKernelWorkGroupInfo;
+CLEW_FUN_EXPORT PFNCLWAITFOREVENTS __clewWaitForEvents;
+CLEW_FUN_EXPORT PFNCLGETEVENTINFO __clewGetEventInfo;
+CLEW_FUN_EXPORT PFNCLCREATEUSEREVENT __clewCreateUserEvent;
+CLEW_FUN_EXPORT PFNCLRETAINEVENT __clewRetainEvent;
+CLEW_FUN_EXPORT PFNCLRELEASEEVENT __clewReleaseEvent;
+CLEW_FUN_EXPORT PFNCLSETUSEREVENTSTATUS __clewSetUserEventStatus;
+CLEW_FUN_EXPORT PFNCLSETEVENTCALLBACK __clewSetEventCallback;
+CLEW_FUN_EXPORT PFNCLGETEVENTPROFILINGINFO __clewGetEventProfilingInfo;
+CLEW_FUN_EXPORT PFNCLFLUSH __clewFlush;
+CLEW_FUN_EXPORT PFNCLFINISH __clewFinish;
+CLEW_FUN_EXPORT PFNCLENQUEUEREADBUFFER __clewEnqueueReadBuffer;
+CLEW_FUN_EXPORT PFNCLENQUEUEREADBUFFERRECT __clewEnqueueReadBufferRect;
+CLEW_FUN_EXPORT PFNCLENQUEUEWRITEBUFFER __clewEnqueueWriteBuffer;
+CLEW_FUN_EXPORT PFNCLENQUEUEWRITEBUFFERRECT __clewEnqueueWriteBufferRect;
+CLEW_FUN_EXPORT PFNCLENQUEUECOPYBUFFER __clewEnqueueCopyBuffer;
+CLEW_FUN_EXPORT PFNCLENQUEUECOPYBUFFERRECT __clewEnqueueCopyBufferRect;
+CLEW_FUN_EXPORT PFNCLENQUEUEREADIMAGE __clewEnqueueReadImage;
+CLEW_FUN_EXPORT PFNCLENQUEUEWRITEIMAGE __clewEnqueueWriteImage;
+CLEW_FUN_EXPORT PFNCLENQUEUECOPYIMAGE __clewEnqueueCopyImage;
+CLEW_FUN_EXPORT PFNCLENQUEUECOPYIMAGETOBUFFER __clewEnqueueCopyImageToBuffer;
+CLEW_FUN_EXPORT PFNCLENQUEUECOPYBUFFERTOIMAGE __clewEnqueueCopyBufferToImage;
+CLEW_FUN_EXPORT PFNCLENQUEUEMAPBUFFER __clewEnqueueMapBuffer;
+CLEW_FUN_EXPORT PFNCLENQUEUEMAPIMAGE __clewEnqueueMapImage;
+CLEW_FUN_EXPORT PFNCLENQUEUEUNMAPMEMOBJECT __clewEnqueueUnmapMemObject;
+CLEW_FUN_EXPORT PFNCLENQUEUENDRANGEKERNEL __clewEnqueueNDRangeKernel;
+CLEW_FUN_EXPORT PFNCLENQUEUETASK __clewEnqueueTask;
+CLEW_FUN_EXPORT PFNCLENQUEUENATIVEKERNEL __clewEnqueueNativeKernel;
+CLEW_FUN_EXPORT PFNCLENQUEUEMARKER __clewEnqueueMarker;
+CLEW_FUN_EXPORT PFNCLENQUEUEWAITFOREVENTS __clewEnqueueWaitForEvents;
+CLEW_FUN_EXPORT PFNCLENQUEUEBARRIER __clewEnqueueBarrier;
+CLEW_FUN_EXPORT PFNCLGETEXTENSIONFUNCTIONADDRESS __clewGetExtensionFunctionAddress;
 
 #define clGetPlatformIDs CLEW_GET_FUN(__clewGetPlatformIDs)
 #define clGetPlatformInfo CLEW_GET_FUN(__clewGetPlatformInfo)
@@ -2615,15 +2655,15 @@ float nanf(const char *);
 #define clGetCommandQueueInfo CLEW_GET_FUN(__clewGetCommandQueueInfo)
 #ifdef CL_USE_DEPRECATED_OPENCL_1_0_APIS
 #warning CL_USE_DEPRECATED_OPENCL_1_0_APIS is defined. These APIs are unsupported and untested in OpenCL 1.1!
-/* 
+/*
  *  WARNING:
  *     This API introduces mutable state into the OpenCL implementation. It has been REMOVED
  *  to better facilitate thread safety.  The 1.0 API is not thread safe. It is not tested by the
  *  OpenCL 1.1 conformance test, and consequently may not work or may not work dependably.
  *  It is likely to be non-performant. Use of this API is not advised. Use at your own risk.
  *
- *  Software developers previously relying on this API are instructed to set the command queue 
- *  properties when creating the queue, instead. 
+ *  Software developers previously relying on this API are instructed to set the command queue
+ *  properties when creating the queue, instead.
  */
 #define clSetCommandQueueProperty CLEW_GET_FUN(__clewSetCommandQueueProperty)
 #endif /* CL_USE_DEPRECATED_OPENCL_1_0_APIS */
@@ -2692,14 +2732,14 @@ float nanf(const char *);
 #define CLEW_ERROR_OPEN_FAILED -1    //!<    Error code for failing to open the dynamic library
 #define CLEW_ERROR_ATEXIT_FAILED -2  //!<    Error code for failing to queue the closing of the dynamic library to atexit()
 
-	//! \brief Load OpenCL dynamic library and set function entry points
-	int clewInit(const char *);
+//! \brief Load OpenCL dynamic library and set function entry points
+int clewInit(const char *);
 
-	//! \brief Exit clew and unload OpenCL dynamic library
-	void clewExit();
+//! \brief Exit clew and unload OpenCL dynamic library
+void clewExit();
 
-	//! \brief Convert an OpenCL error code to its string equivalent
-	const char *clewErrorString(cl_int error);
+//! \brief Convert an OpenCL error code to its string equivalent
+const char *clewErrorString(cl_int error);
 
 #ifdef __cplusplus
 }

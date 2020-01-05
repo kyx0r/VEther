@@ -3,8 +3,8 @@ Copyright (c) 2011 Ole Kniemeyer, MAXON, www.maxon.net
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -174,11 +174,11 @@ public:
 #ifdef USE_X86_64_ASM
 			Int128 result;
 			__asm__(
-				"addq %[bl], %[rl]\n\t"
-				"adcq %[bh], %[rh]\n\t"
-				: [rl] "=r"(result.low), [rh] "=r"(result.high)
-				: "0"(low), "1"(high), [bl] "g"(b.low), [bh] "g"(b.high)
-				: "cc");
+			    "addq %[bl], %[rl]\n\t"
+			    "adcq %[bh], %[rh]\n\t"
+			    : [rl] "=r"(result.low), [rh] "=r"(result.high)
+			    : "0"(low), "1"(high), [bl] "g"(b.low), [bh] "g"(b.high)
+			    : "cc");
 			return result;
 #else
 			btUint64_t lo = low + b.low;
@@ -191,11 +191,11 @@ public:
 #ifdef USE_X86_64_ASM
 			Int128 result;
 			__asm__(
-				"subq %[bl], %[rl]\n\t"
-				"sbbq %[bh], %[rh]\n\t"
-				: [rl] "=r"(result.low), [rh] "=r"(result.high)
-				: "0"(low), "1"(high), [bl] "g"(b.low), [bh] "g"(b.high)
-				: "cc");
+			    "subq %[bl], %[rl]\n\t"
+			    "sbbq %[bh], %[rh]\n\t"
+			    : [rl] "=r"(result.low), [rh] "=r"(result.high)
+			    : "0"(low), "1"(high), [bl] "g"(b.low), [bh] "g"(b.high)
+			    : "cc");
 			return result;
 #else
 			return *this + -b;
@@ -206,11 +206,11 @@ public:
 		{
 #ifdef USE_X86_64_ASM
 			__asm__(
-				"addq %[bl], %[rl]\n\t"
-				"adcq %[bh], %[rh]\n\t"
-				: [rl] "=r"(low), [rh] "=r"(high)
-				: "0"(low), "1"(high), [bl] "g"(b.low), [bh] "g"(b.high)
-				: "cc");
+			    "addq %[bl], %[rl]\n\t"
+			    "adcq %[bh], %[rh]\n\t"
+			    : [rl] "=r"(low), [rh] "=r"(high)
+			    : "0"(low), "1"(high), [bl] "g"(b.low), [bh] "g"(b.high)
+			    : "cc");
 #else
 			btUint64_t lo = low + b.low;
 			if (lo < low)
@@ -237,7 +237,7 @@ public:
 		b3Scalar toScalar() const
 		{
 			return ((btInt64_t)high >= 0) ? b3Scalar(high) * (b3Scalar(0x100000000LL) * b3Scalar(0x100000000LL)) + b3Scalar(low)
-										  : -(-*this).toScalar();
+			       : -(-*this).toScalar();
 		}
 
 		int getSign() const
@@ -462,7 +462,7 @@ public:
 		Rational128 dot(const Point64& b) const
 		{
 			return (point.index >= 0) ? Rational128(point.dot(b))
-									  : Rational128(point128.x * b.x + point128.y * b.y + point128.z * b.z, point128.denominator);
+			       : Rational128(point128.x * b.x + point128.y * b.y + point128.z * b.z, point128.denominator);
 		}
 
 		b3Scalar xvalue() const
@@ -534,7 +534,7 @@ public:
 		void print()
 		{
 			b3Printf("E%p : %d -> %d,  n=%p p=%p   (0 %d\t%d\t%d) -> (%d %d %d)", this, reverse->target->point.index, target->point.index, next, prev,
-					 reverse->target->point.x, reverse->target->point.y, reverse->target->point.z, target->point.x, target->point.y, target->point.z);
+			         reverse->target->point.x, reverse->target->point.y, reverse->target->point.z, target->point.x, target->point.y, target->point.z);
 		}
 #endif
 	};
@@ -860,9 +860,9 @@ b3ConvexHullInternal::Int128 b3ConvexHullInternal::Int128::mul(btInt64_t a, btIn
 
 #ifdef USE_X86_64_ASM
 	__asm__("imulq %[b]"
-			: "=a"(result.low), "=d"(result.high)
-			: "0"(a), [b] "r"(b)
-			: "cc");
+	        : "=a"(result.low), "=d"(result.high)
+	        : "0"(a), [b] "r"(b)
+	        : "cc");
 	return result;
 
 #else
@@ -887,9 +887,9 @@ b3ConvexHullInternal::Int128 b3ConvexHullInternal::Int128::mul(btUint64_t a, btU
 
 #ifdef USE_X86_64_ASM
 	__asm__("mulq %[b]"
-			: "=a"(result.low), "=d"(result.high)
-			: "0"(a), [b] "r"(b)
-			: "cc");
+	        : "=a"(result.low), "=d"(result.high)
+	        : "0"(a), [b] "r"(b)
+	        : "cc");
 
 #else
 	DMul<btUint64_t, btUint32_t>::mul(a, b, result.low, result.high);
@@ -917,24 +917,24 @@ int b3ConvexHullInternal::Rational64::compare(const Rational64& b) const
 	btInt64_t tmp;
 	btInt64_t dummy;
 	__asm__(
-		"mulq %[bn]\n\t"
-		"movq %%rax, %[tmp]\n\t"
-		"movq %%rdx, %%rbx\n\t"
-		"movq %[tn], %%rax\n\t"
-		"mulq %[bd]\n\t"
-		"subq %[tmp], %%rax\n\t"
-		"sbbq %%rbx, %%rdx\n\t"  // rdx:rax contains 128-bit-difference "numerator*b.denominator - b.numerator*denominator"
-		"setnsb %%bh\n\t"        // bh=1 if difference is non-negative, bh=0 otherwise
-		"orq %%rdx, %%rax\n\t"
-		"setnzb %%bl\n\t"      // bl=1 if difference if non-zero, bl=0 if it is zero
-		"decb %%bh\n\t"        // now bx=0x0000 if difference is zero, 0xff01 if it is negative, 0x0001 if it is positive (i.e., same sign as difference)
-		"shll $16, %%ebx\n\t"  // ebx has same sign as difference
-		: "=&b"(result), [tmp] "=&r"(tmp), "=a"(dummy)
-		: "a"(denominator), [bn] "g"(b.numerator), [tn] "g"(numerator), [bd] "g"(b.denominator)
-		: "%rdx", "cc");
+	    "mulq %[bn]\n\t"
+	    "movq %%rax, %[tmp]\n\t"
+	    "movq %%rdx, %%rbx\n\t"
+	    "movq %[tn], %%rax\n\t"
+	    "mulq %[bd]\n\t"
+	    "subq %[tmp], %%rax\n\t"
+	    "sbbq %%rbx, %%rdx\n\t"  // rdx:rax contains 128-bit-difference "numerator*b.denominator - b.numerator*denominator"
+	    "setnsb %%bh\n\t"        // bh=1 if difference is non-negative, bh=0 otherwise
+	    "orq %%rdx, %%rax\n\t"
+	    "setnzb %%bl\n\t"      // bl=1 if difference if non-zero, bl=0 if it is zero
+	    "decb %%bh\n\t"        // now bx=0x0000 if difference is zero, 0xff01 if it is negative, 0x0001 if it is positive (i.e., same sign as difference)
+	    "shll $16, %%ebx\n\t"  // ebx has same sign as difference
+	    : "=&b"(result), [tmp] "=&r"(tmp), "=a"(dummy)
+	    : "a"(denominator), [bn] "g"(b.numerator), [tn] "g"(numerator), [bd] "g"(b.denominator)
+	    : "%rdx", "cc");
 	return result ? result ^ sign  // if sign is +1, only bit 0 of result is inverted, which does not change the sign of result (and cannot result in zero)
-								   // if sign is -1, all bits of result are inverted, which changes the sign of result (and again cannot result in zero)
-				  : 0;
+	       // if sign is -1, all bits of result are inverted, which changes the sign of result (and again cannot result in zero)
+	       : 0;
 
 #else
 
@@ -1211,93 +1211,93 @@ void b3ConvexHullInternal::computeInternal(int start, int end, IntermediateHull&
 	int n = end - start;
 	switch (n)
 	{
-		case 0:
-			result.minXy = NULL;
-			result.maxXy = NULL;
-			result.minYx = NULL;
-			result.maxYx = NULL;
-			return;
-		case 2:
+	case 0:
+		result.minXy = NULL;
+		result.maxXy = NULL;
+		result.minYx = NULL;
+		result.maxYx = NULL;
+		return;
+	case 2:
+	{
+		Vertex* v = originalVertices[start];
+		Vertex* w = v + 1;
+		if (v->point != w->point)
 		{
-			Vertex* v = originalVertices[start];
-			Vertex* w = v + 1;
-			if (v->point != w->point)
-			{
-				btInt32_t dx = v->point.x - w->point.x;
-				btInt32_t dy = v->point.y - w->point.y;
+			btInt32_t dx = v->point.x - w->point.x;
+			btInt32_t dy = v->point.y - w->point.y;
 
-				if ((dx == 0) && (dy == 0))
+			if ((dx == 0) && (dy == 0))
+			{
+				if (v->point.z > w->point.z)
 				{
-					if (v->point.z > w->point.z)
-					{
-						Vertex* t = w;
-						w = v;
-						v = t;
-					}
-					b3Assert(v->point.z < w->point.z);
-					v->next = v;
-					v->prev = v;
+					Vertex* t = w;
+					w = v;
+					v = t;
+				}
+				b3Assert(v->point.z < w->point.z);
+				v->next = v;
+				v->prev = v;
+				result.minXy = v;
+				result.maxXy = v;
+				result.minYx = v;
+				result.maxYx = v;
+			}
+			else
+			{
+				v->next = w;
+				v->prev = w;
+				w->next = v;
+				w->prev = v;
+
+				if ((dx < 0) || ((dx == 0) && (dy < 0)))
+				{
 					result.minXy = v;
-					result.maxXy = v;
-					result.minYx = v;
-					result.maxYx = v;
+					result.maxXy = w;
 				}
 				else
 				{
-					v->next = w;
-					v->prev = w;
-					w->next = v;
-					w->prev = v;
-
-					if ((dx < 0) || ((dx == 0) && (dy < 0)))
-					{
-						result.minXy = v;
-						result.maxXy = w;
-					}
-					else
-					{
-						result.minXy = w;
-						result.maxXy = v;
-					}
-
-					if ((dy < 0) || ((dy == 0) && (dx < 0)))
-					{
-						result.minYx = v;
-						result.maxYx = w;
-					}
-					else
-					{
-						result.minYx = w;
-						result.maxYx = v;
-					}
+					result.minXy = w;
+					result.maxXy = v;
 				}
 
-				Edge* e = newEdgePair(v, w);
-				e->link(e);
-				v->edges = e;
-
-				e = e->reverse;
-				e->link(e);
-				w->edges = e;
-
-				return;
+				if ((dy < 0) || ((dy == 0) && (dx < 0)))
+				{
+					result.minYx = v;
+					result.maxYx = w;
+				}
+				else
+				{
+					result.minYx = w;
+					result.maxYx = v;
+				}
 			}
-		}
-		// lint -fallthrough
-		case 1:
-		{
-			Vertex* v = originalVertices[start];
-			v->edges = NULL;
-			v->next = v;
-			v->prev = v;
 
-			result.minXy = v;
-			result.maxXy = v;
-			result.minYx = v;
-			result.maxYx = v;
+			Edge* e = newEdgePair(v, w);
+			e->link(e);
+			v->edges = e;
+
+			e = e->reverse;
+			e->link(e);
+			w->edges = e;
 
 			return;
 		}
+	}
+	// lint -fallthrough
+	case 1:
+	{
+		Vertex* v = originalVertices[start];
+		v->edges = NULL;
+		v->next = v;
+		v->prev = v;
+
+		result.minXy = v;
+		result.maxXy = v;
+		result.minYx = v;
+		result.maxYx = v;
+
+		return;
+	}
 	}
 
 	int split0 = start + n / 2;
@@ -1372,7 +1372,8 @@ void b3ConvexHullInternal::Vertex::printGraph()
 			e->print();
 			b3Printf("\n");
 			e = e->next;
-		} while (e != edges);
+		}
+		while (e != edges);
 		do
 		{
 			Vertex* v = e->target;
@@ -1382,7 +1383,8 @@ void b3ConvexHullInternal::Vertex::printGraph()
 				v->printGraph();
 			}
 			e = e->next;
-		} while (e != edges);
+		}
+		while (e != edges);
 	}
 }
 #endif
@@ -1460,7 +1462,8 @@ b3ConvexHullInternal::Edge* b3ConvexHullInternal::findMaxAngle(bool ccw, const V
 #endif
 			}
 			e = e->next;
-		} while (e != start->edges);
+		}
+		while (e != start->edges);
 	}
 	return minEdge;
 }
@@ -1697,7 +1700,8 @@ void b3ConvexHullInternal::merge(IntermediateHull& h0, IntermediateHull& h1)
 					}
 				}
 				e = e->next;
-			} while (e != c0->edges);
+			}
+			while (e != c0->edges);
 		}
 
 		e = c1->edges;
@@ -1716,7 +1720,8 @@ void b3ConvexHullInternal::merge(IntermediateHull& h0, IntermediateHull& h1)
 					}
 				}
 				e = e->next;
-			} while (e != c1->edges);
+			}
+			while (e != c1->edges);
 		}
 
 		if (start0 || start1)
@@ -2146,10 +2151,12 @@ b3Scalar b3ConvexHullInternal::shrink(b3Scalar amount, b3Scalar clampAmount)
 						b = f->target;
 
 						f = f->reverse->prev;
-					} while (f != e);
+					}
+					while (f != e);
 				}
 				e = e->next;
-			} while (e != v->edges);
+			}
+			while (e != v->edges);
 		}
 	}
 
@@ -2228,7 +2235,7 @@ bool b3ConvexHullInternal::shiftFace(Face* face, b3Scalar amount, b3AlignedObjec
 	Point64 normal = face->getNormal();
 #ifdef DEBUG_CONVEX_HULL
 	b3Printf("\nShrinking face (%d %d %d) (%d %d %d) (%d %d %d) by (%d %d %d)\n",
-			 face->origin.x, face->origin.y, face->origin.z, face->dir0.x, face->dir0.y, face->dir0.z, face->dir1.x, face->dir1.y, face->dir1.z, shift.x, shift.y, shift.z);
+	         face->origin.x, face->origin.y, face->origin.z, face->dir0.x, face->dir0.y, face->dir0.z, face->dir1.x, face->dir1.y, face->dir1.z, shift.x, shift.y, shift.z);
 #endif
 	btInt64_t origDot = face->origin.dot(normal);
 	Point32 shiftedOrigin = face->origin + shift;
@@ -2281,7 +2288,8 @@ bool b3ConvexHullInternal::shiftFace(Face* face, b3Scalar amount, b3AlignedObjec
 				cmp = c;
 			}
 			e = e->prev;
-		} while (e != startEdge);
+		}
+		while (e != startEdge);
 
 		if (!intersection)
 		{
@@ -2316,7 +2324,8 @@ bool b3ConvexHullInternal::shiftFace(Face* face, b3Scalar amount, b3AlignedObjec
 				startEdge = e;
 			}
 			e = e->prev;
-		} while (e != startEdge);
+		}
+		while (e != startEdge);
 
 		if (!intersection)
 		{
@@ -2478,9 +2487,9 @@ bool b3ConvexHullInternal::shiftFace(Face* face, b3Scalar amount, b3AlignedObjec
 			v->point.index = -1;
 			v->copy = -1;
 			v->point128 = PointR128(Int128::mul(face->dir0.x * r0, m11) - Int128::mul(face->dir0.x * r1, m01) + Int128::mul(face->dir1.x * r1, m00) - Int128::mul(face->dir1.x * r0, m10) + det * shiftedOrigin.x,
-									Int128::mul(face->dir0.y * r0, m11) - Int128::mul(face->dir0.y * r1, m01) + Int128::mul(face->dir1.y * r1, m00) - Int128::mul(face->dir1.y * r0, m10) + det * shiftedOrigin.y,
-									Int128::mul(face->dir0.z * r0, m11) - Int128::mul(face->dir0.z * r1, m01) + Int128::mul(face->dir1.z * r1, m00) - Int128::mul(face->dir1.z * r0, m10) + det * shiftedOrigin.z,
-									det);
+			                        Int128::mul(face->dir0.y * r0, m11) - Int128::mul(face->dir0.y * r1, m01) + Int128::mul(face->dir1.y * r1, m00) - Int128::mul(face->dir1.y * r0, m10) + det * shiftedOrigin.y,
+			                        Int128::mul(face->dir0.z * r0, m11) - Int128::mul(face->dir0.z * r1, m01) + Int128::mul(face->dir1.z * r1, m00) - Int128::mul(face->dir1.z * r0, m10) + det * shiftedOrigin.z,
+			                        det);
 			v->point.x = (btInt32_t)v->point128.xvalue();
 			v->point.y = (btInt32_t)v->point128.yvalue();
 			v->point.z = (btInt32_t)v->point128.zvalue();
@@ -2705,7 +2714,8 @@ b3Scalar b3ConvexHullComputer::compute(const void* coords, bool doubleCoords, in
 				}
 				prevCopy = e->copy;
 				e = e->next;
-			} while (e != firstEdge);
+			}
+			while (e != firstEdge);
 			edges[firstCopy].next = prevCopy - firstCopy;
 		}
 		copied++;
@@ -2734,10 +2744,12 @@ b3Scalar b3ConvexHullComputer::compute(const void* coords, bool doubleCoords, in
 #endif
 						f->copy = -1;
 						f = f->reverse->prev;
-					} while (f != e);
+					}
+					while (f != e);
 				}
 				e = e->next;
-			} while (e != firstEdge);
+			}
+			while (e != firstEdge);
 		}
 	}
 

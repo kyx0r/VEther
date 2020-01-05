@@ -97,36 +97,39 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PpContext.h"
 #include "PpTokens.h"
 
-namespace glslang {
+namespace glslang
+{
 
 // Add a token (including backing string) to the end of a macro
 // token stream, for later playback.
 void TPpContext::TokenStream::putToken(int atom, TPpToken* ppToken)
 {
-    TokenStream::Token streamToken(atom, *ppToken);
-    stream.push_back(streamToken);
+	TokenStream::Token streamToken(atom, *ppToken);
+	stream.push_back(streamToken);
 }
 
 // Read the next token from a macro token stream.
 int TPpContext::TokenStream::getToken(TParseContextBase& parseContext, TPpToken *ppToken)
 {
-    if (atEnd())
-        return EndOfInput;
+	if (atEnd())
+		return EndOfInput;
 
-    int atom = stream[currentPos++].get(*ppToken);
-    ppToken->loc = parseContext.getCurrentLoc();
+	int atom = stream[currentPos++].get(*ppToken);
+	ppToken->loc = parseContext.getCurrentLoc();
 
-    // Check for ##, unless the current # is the last character
-    if (atom == '#') {
-        if (peekToken('#')) {
-            parseContext.requireProfile(ppToken->loc, ~EEsProfile, "token pasting (##)");
-            parseContext.profileRequires(ppToken->loc, ~EEsProfile, 130, 0, "token pasting (##)");
-            currentPos++;
-            atom = PpAtomPaste;
-        }
-    }
+	// Check for ##, unless the current # is the last character
+	if (atom == '#')
+	{
+		if (peekToken('#'))
+		{
+			parseContext.requireProfile(ppToken->loc, ~EEsProfile, "token pasting (##)");
+			parseContext.profileRequires(ppToken->loc, ~EEsProfile, 130, 0, "token pasting (##)");
+			currentPos++;
+			atom = PpAtomPaste;
+		}
+	}
 
-    return atom;
+	return atom;
 }
 
 // We are pasting if
@@ -136,84 +139,89 @@ int TPpContext::TokenStream::getToken(TParseContextBase& parseContext, TPpToken 
 //      and we are also on the last token
 bool TPpContext::TokenStream::peekTokenizedPasting(bool lastTokenPastes)
 {
-    // 1. preceding ##?
+	// 1. preceding ##?
 
-    size_t savePos = currentPos;
-    // skip white space
-    while (peekToken(' '))
-        ++currentPos;
-    if (peekToken(PpAtomPaste)) {
-        currentPos = savePos;
-        return true;
-    }
+	size_t savePos = currentPos;
+	// skip white space
+	while (peekToken(' '))
+		++currentPos;
+	if (peekToken(PpAtomPaste))
+	{
+		currentPos = savePos;
+		return true;
+	}
 
-    // 2. last token and we've been told after this there will be a ##
+	// 2. last token and we've been told after this there will be a ##
 
-    if (! lastTokenPastes)
-        return false;
-    // Getting here means the last token will be pasted, after this
+	if (! lastTokenPastes)
+		return false;
+	// Getting here means the last token will be pasted, after this
 
-    // Are we at the last non-whitespace token?
-    savePos = currentPos;
-    bool moreTokens = false;
-    do {
-        if (atEnd())
-            break;
-        if (!peekToken(' ')) {
-            moreTokens = true;
-            break;
-        }
-        ++currentPos;
-    } while (true);
-    currentPos = savePos;
+	// Are we at the last non-whitespace token?
+	savePos = currentPos;
+	bool moreTokens = false;
+	do
+	{
+		if (atEnd())
+			break;
+		if (!peekToken(' '))
+		{
+			moreTokens = true;
+			break;
+		}
+		++currentPos;
+	}
+	while (true);
+	currentPos = savePos;
 
-    return !moreTokens;
+	return !moreTokens;
 }
 
 // See if the next non-white-space tokens are two consecutive #
 bool TPpContext::TokenStream::peekUntokenizedPasting()
 {
-    // don't return early, have to restore this
-    size_t savePos = currentPos;
+	// don't return early, have to restore this
+	size_t savePos = currentPos;
 
-    // skip white-space
-    while (peekToken(' '))
-        ++currentPos;
+	// skip white-space
+	while (peekToken(' '))
+		++currentPos;
 
-    // check for ##
-    bool pasting = false;
-    if (peekToken('#')) {
-        ++currentPos;
-        if (peekToken('#'))
-            pasting = true;
-    }
+	// check for ##
+	bool pasting = false;
+	if (peekToken('#'))
+	{
+		++currentPos;
+		if (peekToken('#'))
+			pasting = true;
+	}
 
-    currentPos = savePos;
+	currentPos = savePos;
 
-    return pasting;
+	return pasting;
 }
 
 void TPpContext::pushTokenStreamInput(TokenStream& ts, bool prepasting)
 {
-    pushInput(new tTokenInput(this, &ts, prepasting));
-    ts.reset();
+	pushInput(new tTokenInput(this, &ts, prepasting));
+	ts.reset();
 }
 
 int TPpContext::tUngotTokenInput::scan(TPpToken* ppToken)
 {
-    if (done)
-        return EndOfInput;
+	if (done)
+		return EndOfInput;
 
-    int ret = token;
-    *ppToken = lval;
-    done = true;
+	int ret = token;
+	*ppToken = lval;
+	done = true;
 
-    return ret;
+	return ret;
 }
 
 void TPpContext::UngetToken(int token, TPpToken* ppToken)
 {
-    pushInput(new tUngotTokenInput(this, token, ppToken));
+	pushInput(new tUngotTokenInput(this, token, ppToken));
 }
 
 } // end namespace glslang

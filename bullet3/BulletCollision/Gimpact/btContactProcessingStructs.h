@@ -52,29 +52,31 @@ public:
 	}
 
 	GIM_CONTACT(const GIM_CONTACT &contact) : m_point(contact.m_point),
-											  m_normal(contact.m_normal),
-											  m_depth(contact.m_depth),
-											  m_feature1(contact.m_feature1),
-											  m_feature2(contact.m_feature2)
+		m_normal(contact.m_normal),
+		m_depth(contact.m_depth),
+		m_feature1(contact.m_feature1),
+		m_feature2(contact.m_feature2)
 	{
 	}
 
 	GIM_CONTACT(const btVector3 &point, const btVector3 &normal,
-				btScalar depth, int feature1, int feature2) : m_point(point),
-															  m_normal(normal),
-															  m_depth(depth),
-															  m_feature1(feature1),
-															  m_feature2(feature2)
+	            btScalar depth, int feature1, int feature2) : m_point(point),
+		m_normal(normal),
+		m_depth(depth),
+		m_feature1(feature1),
+		m_feature2(feature2)
 	{
 	}
 
 	//! Calcs key for coord classification
 	SIMD_FORCE_INLINE unsigned int calc_key_contact() const
 	{
-		int _coords[] = {
+		int _coords[] =
+		{
 			(int)(m_point[0] * 1000.0f + 1.0f),
 			(int)(m_point[1] * 1333.0f),
-			(int)(m_point[2] * 2133.0f + 3.0f)};
+			(int)(m_point[2] * 2133.0f + 3.0f)
+		};
 		unsigned int _hash = 0;
 		unsigned int *_uitmp = (unsigned int *)(&_coords[0]);
 		_hash = *_uitmp;

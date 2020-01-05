@@ -4,8 +4,8 @@ Copyright (c) 2003-2013 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -26,18 +26,18 @@ subject to the following restrictions:
  * @section install_sec Installation
  *
  * @subsection step1 Step 1: Download
- * You can download the Bullet Physics Library from the github repository: https://github.com/bulletphysics/bullet3/releases 
+ * You can download the Bullet Physics Library from the github repository: https://github.com/bulletphysics/bullet3/releases
  *
  * @subsection step2 Step 2: Building
  * Bullet has multiple build systems, including premake, cmake and autotools. Premake and cmake support all platforms.
- * Premake is included in the Bullet/build folder for Windows, Mac OSX and Linux. 
- * Under Windows you can click on Bullet/build/vs2010.bat to create Microsoft Visual Studio projects. 
+ * Premake is included in the Bullet/build folder for Windows, Mac OSX and Linux.
+ * Under Windows you can click on Bullet/build/vs2010.bat to create Microsoft Visual Studio projects.
  * On Mac OSX and Linux you can open a terminal and generate Makefile, codeblocks or Xcode4 projects:
  * cd Bullet/build
  * ./premake4_osx gmake or ./premake4_linux gmake or ./premake4_linux64 gmake or (for Mac) ./premake4_osx xcode4
  * cd Bullet/build/gmake
  * make
- * 
+ *
  * An alternative to premake is cmake. You can download cmake from http://www.cmake.org
  * cmake can autogenerate projectfiles for Microsoft Visual Studio, Apple Xcode, KDevelop and Unix Makefiles.
  * The easiest is to run the CMake cmake-gui graphical user interface and choose the options and generate projectfiles.
@@ -46,12 +46,12 @@ subject to the following restrictions:
  * cmake . -G Xcode
  * cmake . -G "Unix Makefiles"
  * Although cmake is recommended, you can also use autotools for UNIX: ./autogen.sh ./configure to create a Makefile and then run make.
- * 
+ *
  * @subsection step3 Step 3: Testing demos
  * Try to run and experiment with BasicDemo executable as a starting point.
  * Bullet can be used in several ways, as Full Rigid Body simulation, as Collision Detector Library or Low Level / Snippets like the GJK Closest Point calculation.
  * The Dependencies can be seen in this documentation under Directories
- * 
+ *
  * @subsection step4 Step 4: Integrating in your application, full Rigid Body and Soft Body simulation
  * Check out BasicDemo how to create a btDynamicsWorld, btRigidBody and btCollisionShape, Stepping the simulation and synchronizing your graphics object transform.
  * Check out SoftDemo how to use soft body dynamics, using btSoftRigidDynamicsWorld.
@@ -63,7 +63,7 @@ subject to the following restrictions:
  *
  * @section copyright Copyright
  * For up-to-data information and copyright and contributors list check out the Bullet_User_Manual.pdf
- * 
+ *
  */
 
 #ifndef BT_COLLISION_WORLD_H
@@ -175,9 +175,9 @@ public:
 	struct LocalRayResult
 	{
 		LocalRayResult(const btCollisionObject* collisionObject,
-					   LocalShapeInfo* localShapeInfo,
-					   const btVector3& hitNormalLocal,
-					   btScalar hitFraction)
+		               LocalShapeInfo* localShapeInfo,
+		               const btVector3& hitNormalLocal,
+		               btScalar hitFraction)
 			: m_collisionObject(collisionObject),
 			  m_localShapeInfo(localShapeInfo),
 			  m_hitNormalLocal(hitNormalLocal),
@@ -307,10 +307,10 @@ public:
 	struct LocalConvexResult
 	{
 		LocalConvexResult(const btCollisionObject* hitCollisionObject,
-						  LocalShapeInfo* localShapeInfo,
-						  const btVector3& hitNormalLocal,
-						  const btVector3& hitPointLocal,
-						  btScalar hitFraction)
+		                  LocalShapeInfo* localShapeInfo,
+		                  const btVector3& hitNormalLocal,
+		                  const btVector3& hitPointLocal,
+		                  btScalar hitFraction)
 			: m_hitCollisionObject(hitCollisionObject),
 			  m_localShapeInfo(localShapeInfo),
 			  m_hitNormalLocal(hitNormalLocal),
@@ -449,25 +449,25 @@ public:
 	/// In a future implementation, we consider moving the ray test as a virtual method in btCollisionShape.
 	/// This allows more customization.
 	static void rayTestSingle(const btTransform& rayFromTrans, const btTransform& rayToTrans,
-							  btCollisionObject* collisionObject,
-							  const btCollisionShape* collisionShape,
-							  const btTransform& colObjWorldTransform,
-							  RayResultCallback& resultCallback);
+	                          btCollisionObject* collisionObject,
+	                          const btCollisionShape* collisionShape,
+	                          const btTransform& colObjWorldTransform,
+	                          RayResultCallback& resultCallback);
 
 	static void rayTestSingleInternal(const btTransform& rayFromTrans, const btTransform& rayToTrans,
-									  const btCollisionObjectWrapper* collisionObjectWrap,
-									  RayResultCallback& resultCallback);
+	                                  const btCollisionObjectWrapper* collisionObjectWrap,
+	                                  RayResultCallback& resultCallback);
 
 	/// objectQuerySingle performs a collision detection query and calls the resultCallback. It is used internally by rayTest.
 	static void objectQuerySingle(const btConvexShape* castShape, const btTransform& rayFromTrans, const btTransform& rayToTrans,
-								  btCollisionObject* collisionObject,
-								  const btCollisionShape* collisionShape,
-								  const btTransform& colObjWorldTransform,
-								  ConvexResultCallback& resultCallback, btScalar allowedPenetration);
+	                              btCollisionObject* collisionObject,
+	                              const btCollisionShape* collisionShape,
+	                              const btTransform& colObjWorldTransform,
+	                              ConvexResultCallback& resultCallback, btScalar allowedPenetration);
 
 	static void objectQuerySingleInternal(const btConvexShape* castShape, const btTransform& convexFromTrans, const btTransform& convexToTrans,
-										  const btCollisionObjectWrapper* colObjWrap,
-										  ConvexResultCallback& resultCallback, btScalar allowedPenetration);
+	                                      const btCollisionObjectWrapper* colObjWrap,
+	                                      ConvexResultCallback& resultCallback, btScalar allowedPenetration);
 
 	virtual void addCollisionObject(btCollisionObject* collisionObject, int collisionFilterGroup = btBroadphaseProxy::DefaultFilter, int collisionFilterMask = btBroadphaseProxy::AllFilter);
 

@@ -112,8 +112,8 @@ protected:
 
 protected:
 	GUINT _sort_and_calc_splitting_index(
-		gim_array<GIM_AABB_DATA>& primitive_boxes,
-		GUINT startIndex, GUINT endIndex, GUINT splitAxis);
+	    gim_array<GIM_AABB_DATA>& primitive_boxes,
+	    GUINT startIndex, GUINT endIndex, GUINT splitAxis);
 
 	GUINT _calc_splitting_axis(gim_array<GIM_AABB_DATA>& primitive_boxes, GUINT startIndex, GUINT endIndex);
 
@@ -313,7 +313,7 @@ public:
 
 	//! returns the indices of the primitives in the m_primitive_manager
 	SIMD_FORCE_INLINE bool boxQueryTrans(const GIM_AABB& box,
-										 const btTransform& transform, gim_array<GUINT>& collided_results) const
+	                                     const btTransform& transform, gim_array<GUINT>& collided_results) const
 	{
 		GIM_AABB transbox = box;
 		transbox.appy_transform(transform);
@@ -322,8 +322,8 @@ public:
 
 	//! returns the indices of the primitives in the m_primitive_manager
 	SIMD_FORCE_INLINE bool rayQuery(
-		const btVector3& ray_dir, const btVector3& ray_origin,
-		gim_array<GUINT>& collided_results) const
+	    const btVector3& ray_dir, const btVector3& ray_origin,
+	    gim_array<GUINT>& collided_results) const
 	{
 		GUINT curIndex = 0;
 		GUINT numNodes = getNodeCount();
@@ -520,7 +520,7 @@ protected:
 			m_box1.increment_margin(m_tri0.m_margin);
 
 			result = m_box1.collide_triangle_exact(
-				m_tri0.m_vertices[0], m_tri0.m_vertices[1], m_tri0.m_vertices[2], m_tri0_plane);
+			             m_tri0.m_vertices[0], m_tri0.m_vertices[1], m_tri0.m_vertices[2], m_tri0_plane);
 
 			m_box1.increment_margin(-m_tri0.m_margin);
 
@@ -535,7 +535,7 @@ protected:
 			m_box0.increment_margin(m_tri1.m_margin);
 
 			result = m_box0.collide_triangle_exact(
-				m_tri1.m_vertices[0], m_tri1.m_vertices[1], m_tri1.m_vertices[2], m_tri1_plane);
+			             m_tri1.m_vertices[0], m_tri1.m_vertices[1], m_tri1.m_vertices[2], m_tri1_plane);
 
 			m_box0.increment_margin(-m_tri1.m_margin);
 
@@ -610,8 +610,8 @@ protected:
 
 public:
 	void find_collision(BOX_SET_CLASS0* boxset1, const btTransform& trans1,
-						BOX_SET_CLASS1* boxset2, const btTransform& trans2,
-						gim_pair_set& collision_pairs, bool complete_primitive_tests = true)
+	                    BOX_SET_CLASS1* boxset2, const btTransform& trans2,
+	                    gim_pair_set& collision_pairs, bool complete_primitive_tests = true)
 	{
 		m_collision_pairs = &collision_pairs;
 		m_boxset0 = boxset1;

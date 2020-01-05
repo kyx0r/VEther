@@ -21,9 +21,18 @@ class mat3x;
 class vec3
 {
 public:
-	idScalar& operator()(int i) { return m_data[i]; }
-	const idScalar& operator()(int i) const { return m_data[i]; }
-	const int size() const { return 3; }
+	idScalar& operator()(int i)
+	{
+		return m_data[i];
+	}
+	const idScalar& operator()(int i) const
+	{
+		return m_data[i];
+	}
+	const int size() const
+	{
+		return 3;
+	}
 	const vec3& operator=(const vec3& rhs);
 	const vec3& operator+=(const vec3& b);
 	const vec3& operator-=(const vec3& b);
@@ -45,8 +54,14 @@ private:
 class mat33
 {
 public:
-	idScalar& operator()(int i, int j) { return m_data[3 * i + j]; }
-	const idScalar& operator()(int i, int j) const { return m_data[3 * i + j]; }
+	idScalar& operator()(int i, int j)
+	{
+		return m_data[3 * i + j];
+	}
+	const idScalar& operator()(int i, int j) const
+	{
+		return m_data[3 * i + j];
+	}
 	const mat33& operator=(const mat33& rhs);
 	mat33 transpose() const;
 	const mat33& operator+=(const mat33& b);
@@ -72,11 +87,23 @@ public:
 	{
 		m_data = static_cast<idScalar*>(idMalloc(sizeof(idScalar) * size));
 	}
-	~vecx() { idFree(m_data); }
+	~vecx()
+	{
+		idFree(m_data);
+	}
 	const vecx& operator=(const vecx& rhs);
-	idScalar& operator()(int i) { return m_data[i]; }
-	const idScalar& operator()(int i) const { return m_data[i]; }
-	const int& size() const { return m_size; }
+	idScalar& operator()(int i)
+	{
+		return m_data[i];
+	}
+	const idScalar& operator()(int i) const
+	{
+		return m_data[i];
+	}
+	const int& size() const
+	{
+		return m_size;
+	}
 
 	friend vecx operator*(const vecx& a, const idScalar& s);
 	friend vecx operator*(const idScalar& s, const vecx& a);
@@ -103,11 +130,26 @@ public:
 	{
 		m_data = static_cast<idScalar*>(idMalloc(sizeof(idScalar) * rows * cols));
 	}
-	~matxx() { idFree(m_data); }
-	idScalar& operator()(int row, int col) { return m_data[row * m_cols + col]; }
-	const idScalar& operator()(int row, int col) const { return m_data[row * m_cols + col]; }
-	const int& rows() const { return m_rows; }
-	const int& cols() const { return m_cols; }
+	~matxx()
+	{
+		idFree(m_data);
+	}
+	idScalar& operator()(int row, int col)
+	{
+		return m_data[row * m_cols + col];
+	}
+	const idScalar& operator()(int row, int col) const
+	{
+		return m_data[row * m_cols + col];
+	}
+	const int& rows() const
+	{
+		return m_rows;
+	}
+	const int& cols() const
+	{
+		return m_cols;
+	}
 
 private:
 	int m_rows;
@@ -150,10 +192,22 @@ public:
 	{
 		free();
 	}
-	idScalar& operator()(int row, int col) { return m_data[row * m_cols + col]; }
-	const idScalar& operator()(int row, int col) const { return m_data[row * m_cols + col]; }
-	int rows() const { return m_rows; }
-	const int& cols() const { return m_cols; }
+	idScalar& operator()(int row, int col)
+	{
+		return m_data[row * m_cols + col];
+	}
+	const idScalar& operator()(int row, int col) const
+	{
+		return m_data[row * m_cols + col];
+	}
+	int rows() const
+	{
+		return m_rows;
+	}
+	const int& cols() const
+	{
+		return m_cols;
+	}
 	void resize(int rows, int cols)
 	{
 		m_cols = cols;
@@ -166,8 +220,14 @@ public:
 	}
 	// avoid operators that would allocate -- use functions sub/add/mul in IDMath.hpp instead
 private:
-	void allocate() { m_data = static_cast<idScalar*>(idMalloc(sizeof(idScalar) * m_rows * m_cols)); }
-	void free() { idFree(m_data); }
+	void allocate()
+	{
+		m_data = static_cast<idScalar*>(idMalloc(sizeof(idScalar) * m_rows * m_cols));
+	}
+	void free()
+	{
+		idFree(m_data);
+	}
 	enum
 	{
 		m_rows = 3
@@ -236,23 +296,23 @@ inline mat33 operator*(const mat33& a, const mat33& b)
 {
 	mat33 result;
 	result.m_data[0] =
-		a.m_data[0] * b.m_data[0] + a.m_data[1] * b.m_data[3] + a.m_data[2] * b.m_data[6];
+	    a.m_data[0] * b.m_data[0] + a.m_data[1] * b.m_data[3] + a.m_data[2] * b.m_data[6];
 	result.m_data[1] =
-		a.m_data[0] * b.m_data[1] + a.m_data[1] * b.m_data[4] + a.m_data[2] * b.m_data[7];
+	    a.m_data[0] * b.m_data[1] + a.m_data[1] * b.m_data[4] + a.m_data[2] * b.m_data[7];
 	result.m_data[2] =
-		a.m_data[0] * b.m_data[2] + a.m_data[1] * b.m_data[5] + a.m_data[2] * b.m_data[8];
+	    a.m_data[0] * b.m_data[2] + a.m_data[1] * b.m_data[5] + a.m_data[2] * b.m_data[8];
 	result.m_data[3] =
-		a.m_data[3] * b.m_data[0] + a.m_data[4] * b.m_data[3] + a.m_data[5] * b.m_data[6];
+	    a.m_data[3] * b.m_data[0] + a.m_data[4] * b.m_data[3] + a.m_data[5] * b.m_data[6];
 	result.m_data[4] =
-		a.m_data[3] * b.m_data[1] + a.m_data[4] * b.m_data[4] + a.m_data[5] * b.m_data[7];
+	    a.m_data[3] * b.m_data[1] + a.m_data[4] * b.m_data[4] + a.m_data[5] * b.m_data[7];
 	result.m_data[5] =
-		a.m_data[3] * b.m_data[2] + a.m_data[4] * b.m_data[5] + a.m_data[5] * b.m_data[8];
+	    a.m_data[3] * b.m_data[2] + a.m_data[4] * b.m_data[5] + a.m_data[5] * b.m_data[8];
 	result.m_data[6] =
-		a.m_data[6] * b.m_data[0] + a.m_data[7] * b.m_data[3] + a.m_data[8] * b.m_data[6];
+	    a.m_data[6] * b.m_data[0] + a.m_data[7] * b.m_data[3] + a.m_data[8] * b.m_data[6];
 	result.m_data[7] =
-		a.m_data[6] * b.m_data[1] + a.m_data[7] * b.m_data[4] + a.m_data[8] * b.m_data[7];
+	    a.m_data[6] * b.m_data[1] + a.m_data[7] * b.m_data[4] + a.m_data[8] * b.m_data[7];
 	result.m_data[8] =
-		a.m_data[6] * b.m_data[2] + a.m_data[7] * b.m_data[5] + a.m_data[8] * b.m_data[8];
+	    a.m_data[6] * b.m_data[2] + a.m_data[7] * b.m_data[5] + a.m_data[8] * b.m_data[8];
 
 	return result;
 }
@@ -281,11 +341,11 @@ inline vec3 operator*(const mat33& a, const vec3& b)
 	vec3 result;
 
 	result.m_data[0] =
-		a.m_data[0] * b.m_data[0] + a.m_data[1] * b.m_data[1] + a.m_data[2] * b.m_data[2];
+	    a.m_data[0] * b.m_data[0] + a.m_data[1] * b.m_data[1] + a.m_data[2] * b.m_data[2];
 	result.m_data[1] =
-		a.m_data[3] * b.m_data[0] + a.m_data[4] * b.m_data[1] + a.m_data[5] * b.m_data[2];
+	    a.m_data[3] * b.m_data[0] + a.m_data[4] * b.m_data[1] + a.m_data[5] * b.m_data[2];
 	result.m_data[2] =
-		a.m_data[6] * b.m_data[0] + a.m_data[7] * b.m_data[1] + a.m_data[8] * b.m_data[2];
+	    a.m_data[6] * b.m_data[0] + a.m_data[7] * b.m_data[1] + a.m_data[8] * b.m_data[2];
 
 	return result;
 }
@@ -318,7 +378,10 @@ inline mat33 operator*(const mat33& a, const idScalar& s)
 	return result;
 }
 
-inline mat33 operator*(const idScalar& s, const mat33& a) { return a * s; }
+inline mat33 operator*(const idScalar& s, const mat33& a)
+{
+	return a * s;
+}
 
 inline vec3 operator*(const vec3& a, const idScalar& s)
 {
@@ -329,7 +392,10 @@ inline vec3 operator*(const vec3& a, const idScalar& s)
 	}
 	return result;
 }
-inline vec3 operator*(const idScalar& s, const vec3& a) { return a * s; }
+inline vec3 operator*(const idScalar& s, const vec3& a)
+{
+	return a * s;
+}
 
 inline mat33 operator+(const mat33& a, const mat33& b)
 {
@@ -411,7 +477,10 @@ inline vecx operator*(const vecx& a, const idScalar& s)
 	}
 	return result;
 }
-inline vecx operator*(const idScalar& s, const vecx& a) { return a * s; }
+inline vecx operator*(const idScalar& s, const vecx& a)
+{
+	return a * s;
+}
 inline vecx operator+(const vecx& a, const vecx& b)
 {
 	vecx result(a.size());

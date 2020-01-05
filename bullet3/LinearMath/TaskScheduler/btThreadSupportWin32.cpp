@@ -83,7 +83,7 @@ void getProcessorInformation(btProcessorInfo* procInfo)
 {
 	memset(procInfo, 0, sizeof(*procInfo));
 	Pfn_GetLogicalProcessorInformation getLogicalProcInfo =
-		(Pfn_GetLogicalProcessorInformation)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "GetLogicalProcessorInformation");
+	    (Pfn_GetLogicalProcessorInformation)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "GetLogicalProcessorInformation");
 	if (getLogicalProcInfo == NULL)
 	{
 		// no info
@@ -116,47 +116,47 @@ void getProcessorInformation(btProcessorInfo* procInfo)
 		PSYSTEM_LOGICAL_PROCESSOR_INFORMATION info = buf + i;
 		switch (info->Relationship)
 		{
-			case RelationNumaNode:
-				procInfo->numNumaNodes++;
-				break;
+		case RelationNumaNode:
+			procInfo->numNumaNodes++;
+			break;
 
-			case RelationProcessorCore:
-				procInfo->numCores++;
-				procInfo->numLogicalProcessors += countSetBits(info->ProcessorMask);
-				break;
+		case RelationProcessorCore:
+			procInfo->numCores++;
+			procInfo->numLogicalProcessors += countSetBits(info->ProcessorMask);
+			break;
 
-			case RelationCache:
-				if (info->Cache.Level == 1)
+		case RelationCache:
+			if (info->Cache.Level == 1)
+			{
+				procInfo->numL1Cache++;
+			}
+			else if (info->Cache.Level == 2)
+			{
+				procInfo->numL2Cache++;
+			}
+			else if (info->Cache.Level == 3)
+			{
+				procInfo->numL3Cache++;
+				// processors that share L3 cache are considered to be on the same team
+				// because they can more easily work together on the same data.
+				// Large performance penalties will occur if 2 or more threads from different
+				// teams attempt to frequently read and modify the same cache lines.
+				//
+				// On the AMD Ryzen 7 CPU for example, the 8 cores on the CPU are split into
+				// 2 CCX units of 4 cores each. Each CCX has a separate L3 cache, so if both
+				// CCXs are operating on the same data, many cycles will be spent keeping the
+				// two caches coherent.
+				if (procInfo->numTeamMasks < btProcessorInfo::maxNumTeamMasks)
 				{
-					procInfo->numL1Cache++;
+					procInfo->processorTeamMasks[procInfo->numTeamMasks] = info->ProcessorMask;
+					procInfo->numTeamMasks++;
 				}
-				else if (info->Cache.Level == 2)
-				{
-					procInfo->numL2Cache++;
-				}
-				else if (info->Cache.Level == 3)
-				{
-					procInfo->numL3Cache++;
-					// processors that share L3 cache are considered to be on the same team
-					// because they can more easily work together on the same data.
-					// Large performance penalties will occur if 2 or more threads from different
-					// teams attempt to frequently read and modify the same cache lines.
-					//
-					// On the AMD Ryzen 7 CPU for example, the 8 cores on the CPU are split into
-					// 2 CCX units of 4 cores each. Each CCX has a separate L3 cache, so if both
-					// CCXs are operating on the same data, many cycles will be spent keeping the
-					// two caches coherent.
-					if (procInfo->numTeamMasks < btProcessorInfo::maxNumTeamMasks)
-					{
-						procInfo->processorTeamMasks[procInfo->numTeamMasks] = info->ProcessorMask;
-						procInfo->numTeamMasks++;
-					}
-				}
-				break;
+			}
+			break;
 
-			case RelationProcessorPackage:
-				procInfo->numPhysicalPackages++;
-				break;
+		case RelationProcessorPackage:
+			procInfo->numPhysicalPackages++;
+			break;
 		}
 	}
 	free(buf);
@@ -199,9 +199,18 @@ public:
 	btThreadSupportWin32(const ConstructionInfo& threadConstructionInfo);
 	virtual ~btThreadSupportWin32();
 
-	virtual int getNumWorkerThreads() const BT_OVERRIDE { return m_numThreads; }
-	virtual int getCacheFriendlyNumThreads() const BT_OVERRIDE { return countSetBits(m_processorInfo.processorTeamMasks[0]); }
-	virtual int getLogicalToPhysicalCoreRatio() const BT_OVERRIDE { return m_processorInfo.numLogicalProcessors / m_processorInfo.numCores; }
+	virtual int getNumWorkerThreads() const BT_OVERRIDE
+	{
+		return m_numThreads;
+	}
+	virtual int getCacheFriendlyNumThreads() const BT_OVERRIDE
+	{
+		return countSetBits(m_processorInfo.processorTeamMasks[0]);
+	}
+	virtual int getLogicalToPhysicalCoreRatio() const BT_OVERRIDE
+	{
+		return m_processorInfo.numLogicalProcessors / m_processorInfo.numCores;
+	}
 
 	virtual void runTask(int threadIndex, void* userData) BT_OVERRIDE;
 	virtual void waitForAllTasks() BT_OVERRIDE;

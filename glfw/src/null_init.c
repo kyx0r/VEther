@@ -34,17 +34,17 @@
 
 int _glfwPlatformInit(void)
 {
-    _glfwInitTimerPOSIX();
-    return GLFW_TRUE;
+	_glfwInitTimerPOSIX();
+	return GLFW_TRUE;
 }
 
 void _glfwPlatformTerminate(void)
 {
-    _glfwTerminateOSMesa();
+	_glfwTerminateOSMesa();
 }
 
 const char* _glfwPlatformGetVersionString(void)
 {
-    return _GLFW_VERSION_NUMBER " null OSMesa";
+	return _GLFW_VERSION_NUMBER " null OSMesa";
 }
 

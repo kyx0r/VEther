@@ -9029,7 +9029,8 @@ char b3s_bulletDNAstr[] = {
 	char(1),
 };
 int b3s_bulletDNAlen = sizeof(b3s_bulletDNAstr);
-char b3s_bulletDNAstr64[] = {
+char b3s_bulletDNAstr64[] =
+{
 	char(83),
 	char(68),
 	char(78),

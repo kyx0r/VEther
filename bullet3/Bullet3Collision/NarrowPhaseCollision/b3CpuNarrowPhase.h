@@ -64,7 +64,7 @@ public:
 
 	/*const struct b3Contact4* getContactsCPU() const;
 
-	
+
 	int	getNumContactsGpu() const;
 	*/
 

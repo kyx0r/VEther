@@ -20,7 +20,8 @@ subject to the following restrictions:
 #include "Bullet3Collision/NarrowPhaseCollision/shared/b3Contact4Data.h"
 
 B3_ATTRIBUTE_ALIGNED16(struct)
-b3Contact4 : public b3Contact4Data
+b3Contact4 :
+public b3Contact4Data
 {
 	B3_DECLARE_ALIGNED_ALLOCATOR();
 
@@ -29,7 +30,10 @@ b3Contact4 : public b3Contact4Data
 	bool isBodyAFixed() const { return m_bodyAPtrAndSignBit < 0; }
 	bool isBodyBFixed() const { return m_bodyBPtrAndSignBit < 0; }
 	//	todo. make it safer
-	int& getBatchIdx() { return m_batchIdx; }
+	int& getBatchIdx()
+	{
+		return m_batchIdx;
+	}
 	const int& getBatchIdx() const { return m_batchIdx; }
 	float getRestituitionCoeff() const { return ((float)m_restituitionCoeffCmp / (float)0xffff); }
 	void setRestituitionCoeff(float c)

@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -23,7 +23,8 @@ subject to the following restrictions:
 
 ///The BvhTriangleMaterialMeshShape extends the btBvhTriangleMeshShape. Its main contribution is the interface into a material array, which allows per-triangle friction and restitution.
 ATTRIBUTE_ALIGNED16(class)
-btMultimaterialTriangleMeshShape : public btBvhTriangleMeshShape
+btMultimaterialTriangleMeshShape :
+public btBvhTriangleMeshShape
 {
 	btAlignedObjectArray<btMaterial *> m_materialList;
 
@@ -48,15 +49,15 @@ public:
 		for (int i = 0; i < meshInterface->getNumSubParts(); i++)
 		{
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
-				&vertexbase,
-				numverts,
-				type,
-				stride,
-				&indexbase,
-				indexstride,
-				numfaces,
-				indicestype,
-				i);
+			    &vertexbase,
+			    numverts,
+			    type,
+			    stride,
+			    &indexbase,
+			    indexstride,
+			    numfaces,
+			    indicestype,
+			    i);
 			//m_materialLookup[i] = (int*)(btAlignedAlloc(sizeof(int) * numfaces, 16));
 		}
 	}
@@ -80,15 +81,15 @@ public:
 		for (int i = 0; i < meshInterface->getNumSubParts(); i++)
 		{
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
-				&vertexbase,
-				numverts,
-				type,
-				stride,
-				&indexbase,
-				indexstride,
-				numfaces,
-				indicestype,
-				i);
+			    &vertexbase,
+			    numverts,
+			    type,
+			    stride,
+			    &indexbase,
+			    indexstride,
+			    numfaces,
+			    indicestype,
+			    i);
 			//m_materialLookup[i] = (int*)(btAlignedAlloc(sizeof(int) * numfaces * 2, 16));
 		}
 	}
@@ -96,14 +97,14 @@ public:
 	virtual ~btMultimaterialTriangleMeshShape()
 	{
 		/*
-        for(int i = 0; i < m_meshInterface->getNumSubParts(); i++)
-        {
-            btAlignedFree(m_materialValues[i]);
-            m_materialLookup[i] = NULL;
-        }
-        btAlignedFree(m_materialValues);
-        m_materialLookup = NULL;
-*/
+		for(int i = 0; i < m_meshInterface->getNumSubParts(); i++)
+		{
+		    btAlignedFree(m_materialValues[i]);
+		    m_materialLookup[i] = NULL;
+		}
+		btAlignedFree(m_materialValues);
+		m_materialLookup = NULL;
+		*/
 	}
 	//debugging
 	virtual const char *getName() const { return "MULTIMATERIALTRIANGLEMESH"; }

@@ -3,8 +3,8 @@ Copyright (c) 2003-2013 Gino van den Bergen / Erwin Coumans  http://bulletphysic
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -71,16 +71,16 @@ public:
 		//b3Assert(!((_x==1.f) && (_y==0.f) && (_z==0.f) && (_w==0.f)));
 	}
 	/**@brief Axis angle Constructor
-   * @param axis The axis which the rotation is around
-   * @param angle The magnitude of the rotation around the angle (Radians) */
+	* @param axis The axis which the rotation is around
+	* @param angle The magnitude of the rotation around the angle (Radians) */
 	b3Quaternion(const b3Vector3& _axis, const b3Scalar& _angle)
 	{
 		setRotation(_axis, _angle);
 	}
 	/**@brief Constructor from Euler angles
-   * @param yaw Angle around Y unless B3_EULER_DEFAULT_ZYX defined then Z
-   * @param pitch Angle around X unless B3_EULER_DEFAULT_ZYX defined then Y
-   * @param roll Angle around Z unless B3_EULER_DEFAULT_ZYX defined then X */
+	* @param yaw Angle around Y unless B3_EULER_DEFAULT_ZYX defined then Z
+	* @param pitch Angle around X unless B3_EULER_DEFAULT_ZYX defined then Y
+	* @param roll Angle around Z unless B3_EULER_DEFAULT_ZYX defined then X */
 	b3Quaternion(const b3Scalar& yaw, const b3Scalar& pitch, const b3Scalar& roll)
 	{
 #ifndef B3_EULER_DEFAULT_ZYX
@@ -89,14 +89,14 @@ public:
 		setEulerZYX(yaw, pitch, roll);
 #endif
 	}
-	/**@brief Set the rotation using axis angle notation 
-   * @param axis The axis around which to rotate
-   * @param angle The magnitude of the rotation in Radians */
+	/**@brief Set the rotation using axis angle notation
+	* @param axis The axis around which to rotate
+	* @param angle The magnitude of the rotation in Radians */
 	void setRotation(const b3Vector3& axis1, const b3Scalar& _angle)
 	{
 		b3Vector3 axis = axis1;
 		axis.safeNormalize();
-		
+
 		b3Scalar d = axis.length();
 		b3Assert(d != b3Scalar(0.0));
 		if (d < B3_EPSILON)
@@ -107,13 +107,13 @@ public:
 		{
 			b3Scalar s = b3Sin(_angle * b3Scalar(0.5)) / d;
 			setValue(axis.getX() * s, axis.getY() * s, axis.getZ() * s,
-				b3Cos(_angle * b3Scalar(0.5)));
+			         b3Cos(_angle * b3Scalar(0.5)));
 		}
 	}
 	/**@brief Set the quaternion using Euler angles
-   * @param yaw Angle around Y
-   * @param pitch Angle around X
-   * @param roll Angle around Z */
+	* @param yaw Angle around Y
+	* @param pitch Angle around X
+	* @param roll Angle around Z */
 	void setEuler(const b3Scalar& yaw, const b3Scalar& pitch, const b3Scalar& roll)
 	{
 		b3Scalar halfYaw = b3Scalar(yaw) * b3Scalar(0.5);
@@ -126,15 +126,15 @@ public:
 		b3Scalar cosRoll = b3Cos(halfRoll);
 		b3Scalar sinRoll = b3Sin(halfRoll);
 		setValue(cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,
-				 cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw,
-				 sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
-				 cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
+		         cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw,
+		         sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
+		         cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
 	}
 
-	/**@brief Set the quaternion using euler angles 
-   * @param yaw Angle around Z
-   * @param pitch Angle around Y
-   * @param roll Angle around X */
+	/**@brief Set the quaternion using euler angles
+	* @param yaw Angle around Z
+	* @param pitch Angle around Y
+	* @param roll Angle around X */
 	void setEulerZYX(const b3Scalar& yawZ, const b3Scalar& pitchY, const b3Scalar& rollX)
 	{
 		b3Scalar halfYaw = b3Scalar(yawZ) * b3Scalar(0.5);
@@ -147,9 +147,9 @@ public:
 		b3Scalar cosRoll = b3Cos(halfRoll);
 		b3Scalar sinRoll = b3Sin(halfRoll);
 		setValue(sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,   //x
-				 cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,   //y
-				 cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw,   //z
-				 cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);  //formerly yzx
+		         cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,   //y
+		         cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw,   //z
+		         cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);  //formerly yzx
 		normalize();
 	}
 
@@ -175,7 +175,7 @@ public:
 	}
 
 	/**@brief Add two quaternions
-   * @param q The quaternion to add to this one */
+	* @param q The quaternion to add to this one */
 	B3_FORCE_INLINE b3Quaternion& operator+=(const b3Quaternion& q)
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -192,7 +192,7 @@ public:
 	}
 
 	/**@brief Subtract out a quaternion
-   * @param q The quaternion to subtract from this one */
+	* @param q The quaternion to subtract from this one */
 	b3Quaternion& operator-=(const b3Quaternion& q)
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -209,7 +209,7 @@ public:
 	}
 
 	/**@brief Scale this quaternion
-   * @param s The scalar to scale by */
+	* @param s The scalar to scale by */
 	b3Quaternion& operator*=(const b3Scalar& s)
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -228,8 +228,8 @@ public:
 	}
 
 	/**@brief Multiply this quaternion by q on the right
-   * @param q The other quaternion 
-   * Equivilant to this = this * q */
+	* @param q The other quaternion
+	* Equivilant to this = this * q */
 	b3Quaternion& operator*=(const b3Quaternion& q)
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -304,15 +304,15 @@ public:
 		mVec128 = A0;
 #else
 		setValue(
-			m_floats[3] * q.getX() + m_floats[0] * q.m_floats[3] + m_floats[1] * q.getZ() - m_floats[2] * q.getY(),
-			m_floats[3] * q.getY() + m_floats[1] * q.m_floats[3] + m_floats[2] * q.getX() - m_floats[0] * q.getZ(),
-			m_floats[3] * q.getZ() + m_floats[2] * q.m_floats[3] + m_floats[0] * q.getY() - m_floats[1] * q.getX(),
-			m_floats[3] * q.m_floats[3] - m_floats[0] * q.getX() - m_floats[1] * q.getY() - m_floats[2] * q.getZ());
+		    m_floats[3] * q.getX() + m_floats[0] * q.m_floats[3] + m_floats[1] * q.getZ() - m_floats[2] * q.getY(),
+		    m_floats[3] * q.getY() + m_floats[1] * q.m_floats[3] + m_floats[2] * q.getX() - m_floats[0] * q.getZ(),
+		    m_floats[3] * q.getZ() + m_floats[2] * q.m_floats[3] + m_floats[0] * q.getY() - m_floats[1] * q.getX(),
+		    m_floats[3] * q.m_floats[3] - m_floats[0] * q.getX() - m_floats[1] * q.getY() - m_floats[2] * q.getZ());
 #endif
 		return *this;
 	}
 	/**@brief Return the dot product between this quaternion and another
-   * @param q The other quaternion */
+	* @param q The other quaternion */
 	b3Scalar dot(const b3Quaternion& q) const
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -333,9 +333,9 @@ public:
 		return vget_lane_f32(x, 0);
 #else
 		return m_floats[0] * q.getX() +
-			   m_floats[1] * q.getY() +
-			   m_floats[2] * q.getZ() +
-			   m_floats[3] * q.m_floats[3];
+		       m_floats[1] * q.getY() +
+		       m_floats[2] * q.getZ() +
+		       m_floats[3] * q.m_floats[3];
 #endif
 	}
 
@@ -351,8 +351,8 @@ public:
 		return b3Sqrt(length2());
 	}
 
-	/**@brief Normalize the quaternion 
-   * Such that x^2 + y^2 + z^2 +w^2 = 1 */
+	/**@brief Normalize the quaternion
+	* Such that x^2 + y^2 + z^2 +w^2 = 1 */
 	b3Quaternion& normalize()
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -377,7 +377,7 @@ public:
 	}
 
 	/**@brief Return a scaled version of this quaternion
-   * @param s The scale factor */
+	* @param s The scale factor */
 	B3_FORCE_INLINE b3Quaternion
 	operator*(const b3Scalar& s) const
 	{
@@ -394,7 +394,7 @@ public:
 	}
 
 	/**@brief Return an inversely scaled versionof this quaternion
-   * @param s The inverse scale factor */
+	* @param s The inverse scale factor */
 	b3Quaternion operator/(const b3Scalar& s) const
 	{
 		b3Assert(s != b3Scalar(0.0));
@@ -402,7 +402,7 @@ public:
 	}
 
 	/**@brief Inversely scale this quaternion
-   * @param s The scale factor */
+	* @param s The scale factor */
 	b3Quaternion& operator/=(const b3Scalar& s)
 	{
 		b3Assert(s != b3Scalar(0.0));
@@ -414,8 +414,8 @@ public:
 	{
 		return *this / length();
 	}
-	/**@brief Return the angle between this quaternion and the other 
-   * @param q The other quaternion */
+	/**@brief Return the angle between this quaternion and the other
+	* @param q The other quaternion */
 	b3Scalar angle(const b3Quaternion& q) const
 	{
 		b3Scalar s = b3Sqrt(length2() * q.length2());
@@ -452,8 +452,8 @@ public:
 #endif
 	}
 
-	/**@brief Return the sum of this quaternion and the other 
-   * @param q2 The other quaternion */
+	/**@brief Return the sum of this quaternion and the other
+	* @param q2 The other quaternion */
 	B3_FORCE_INLINE b3Quaternion
 	operator+(const b3Quaternion& q2) const
 	{
@@ -467,8 +467,8 @@ public:
 #endif
 	}
 
-	/**@brief Return the difference between this quaternion and the other 
-   * @param q2 The other quaternion */
+	/**@brief Return the difference between this quaternion and the other
+	* @param q2 The other quaternion */
 	B3_FORCE_INLINE b3Quaternion
 	operator-(const b3Quaternion& q2) const
 	{
@@ -482,8 +482,8 @@ public:
 #endif
 	}
 
-	/**@brief Return the negative of this quaternion 
-   * This simply negates each element */
+	/**@brief Return the negative of this quaternion
+	* This simply negates each element */
 	B3_FORCE_INLINE b3Quaternion operator-() const
 	{
 #if defined(B3_USE_SSE_IN_API) && defined(B3_USE_SSE)
@@ -518,9 +518,9 @@ public:
 	}
 
 	/**@brief Return the quaternion which is the result of Spherical Linear Interpolation between this and the other quaternion
-   * @param q The other quaternion to interpolate with 
-   * @param t The ratio between this and q to interpolate.  If t = 0 the result is this, if t=1 the result is q.
-   * Slerp interpolates assuming constant velocity.  */
+	* @param q The other quaternion to interpolate with
+	* @param t The ratio between this and q to interpolate.  If t = 0 the result is this, if t=1 the result is q.
+	* Slerp interpolates assuming constant velocity.  */
 	b3Quaternion slerp(const b3Quaternion& q, const b3Scalar& t) const
 	{
 		b3Scalar magnitude = b3Sqrt(length2() * q.length2());
@@ -538,10 +538,10 @@ public:
 			const b3Scalar s0 = b3Sin((b3Scalar(1.0) - t) * theta);
 
 			return b3Quaternion(
-				(m_floats[0] * s0 + q.getX() * s1) * d,
-				(m_floats[1] * s0 + q.getY() * s1) * d,
-				(m_floats[2] * s0 + q.getZ() * s1) * d,
-				(m_floats[3] * s0 + q.m_floats[3] * s1) * d);
+			           (m_floats[0] * s0 + q.getX() * s1) * d,
+			           (m_floats[1] * s0 + q.getY() * s1) * d,
+			           (m_floats[2] * s0 + q.getZ() * s1) * d,
+			           (m_floats[3] * s0 + q.m_floats[3] * s1) * d);
 		}
 		else
 		{
@@ -555,7 +555,10 @@ public:
 		return identityQuat;
 	}
 
-	B3_FORCE_INLINE const b3Scalar& getW() const { return m_floats[3]; }
+	B3_FORCE_INLINE const b3Scalar& getW() const
+	{
+		return m_floats[3];
+	}
 };
 
 /**@brief Return the product of two quaternions */
@@ -640,10 +643,10 @@ operator*(const b3Quaternion& q1, const b3Quaternion& q2)
 
 #else
 	return b3Quaternion(
-		q1.getW() * q2.getX() + q1.getX() * q2.getW() + q1.getY() * q2.getZ() - q1.getZ() * q2.getY(),
-		q1.getW() * q2.getY() + q1.getY() * q2.getW() + q1.getZ() * q2.getX() - q1.getX() * q2.getZ(),
-		q1.getW() * q2.getZ() + q1.getZ() * q2.getW() + q1.getX() * q2.getY() - q1.getY() * q2.getX(),
-		q1.getW() * q2.getW() - q1.getX() * q2.getX() - q1.getY() * q2.getY() - q1.getZ() * q2.getZ());
+	           q1.getW() * q2.getX() + q1.getX() * q2.getW() + q1.getY() * q2.getZ() - q1.getZ() * q2.getY(),
+	           q1.getW() * q2.getY() + q1.getY() * q2.getW() + q1.getZ() * q2.getX() - q1.getX() * q2.getZ(),
+	           q1.getW() * q2.getZ() + q1.getZ() * q2.getW() + q1.getX() * q2.getY() - q1.getY() * q2.getX(),
+	           q1.getW() * q2.getW() - q1.getX() * q2.getX() - q1.getY() * q2.getY() - q1.getZ() * q2.getZ());
 #endif
 }
 
@@ -723,10 +726,10 @@ operator*(const b3Quaternion& q, const b3Vector3& w)
 
 #else
 	return b3Quaternion(
-		q.getW() * w.getX() + q.getY() * w.getZ() - q.getZ() * w.getY(),
-		q.getW() * w.getY() + q.getZ() * w.getX() - q.getX() * w.getZ(),
-		q.getW() * w.getZ() + q.getX() * w.getY() - q.getY() * w.getX(),
-		-q.getX() * w.getX() - q.getY() * w.getY() - q.getZ() * w.getZ());
+	           q.getW() * w.getX() + q.getY() * w.getZ() - q.getZ() * w.getY(),
+	           q.getW() * w.getY() + q.getZ() * w.getX() - q.getX() * w.getZ(),
+	           q.getW() * w.getZ() + q.getX() * w.getY() - q.getY() * w.getX(),
+	           -q.getX() * w.getX() - q.getY() * w.getY() - q.getZ() * w.getZ());
 #endif
 }
 
@@ -806,10 +809,10 @@ operator*(const b3Vector3& w, const b3Quaternion& q)
 
 #else
 	return b3Quaternion(
-		+w.getX() * q.getW() + w.getY() * q.getZ() - w.getZ() * q.getY(),
-		+w.getY() * q.getW() + w.getZ() * q.getX() - w.getX() * q.getZ(),
-		+w.getZ() * q.getW() + w.getX() * q.getY() - w.getY() * q.getX(),
-		-w.getX() * q.getX() - w.getY() * q.getY() - w.getZ() * q.getZ());
+	           +w.getX() * q.getW() + w.getY() * q.getZ() - w.getZ() * q.getY(),
+	           +w.getY() * q.getW() + w.getZ() * q.getX() - w.getX() * q.getZ(),
+	           +w.getZ() * q.getW() + w.getX() * q.getY() - w.getY() * q.getX(),
+	           -w.getX() * q.getX() - w.getY() * q.getY() - w.getZ() * q.getZ());
 #endif
 }
 
@@ -841,10 +844,10 @@ b3Inverse(const b3Quaternion& q)
 	return q.inverse();
 }
 
-/**@brief Return the result of spherical linear interpolation betwen two quaternions 
+/**@brief Return the result of spherical linear interpolation betwen two quaternions
  * @param q1 The first quaternion
- * @param q2 The second quaternion 
- * @param t The ration between q1 and q2.  t = 0 return q1, t=1 returns q2 
+ * @param q2 The second quaternion
+ * @param t The ration between q1 and q2.  t = 0 return q1, t=1 returns q2
  * Slerp assumes constant velocity between positions. */
 B3_FORCE_INLINE b3Quaternion
 b3Slerp(const b3Quaternion& q1, const b3Quaternion& q2, const b3Scalar& t)

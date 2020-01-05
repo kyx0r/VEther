@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Stan Melax http://www.melax.com/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -26,22 +26,37 @@ class int3
 {
 public:
 	int x, y, z;
-	int3(){};
+	int3() {};
 	int3(int _x, int _y, int _z)
 	{
 		x = _x;
 		y = _y;
 		z = _z;
 	}
-	const int &operator[](int i) const { return (&x)[i]; }
-	int &operator[](int i) { return (&x)[i]; }
+	const int &operator[](int i) const
+	{
+		return (&x)[i];
+	}
+	int &operator[](int i)
+	{
+		return (&x)[i];
+	}
 };
 
 //------- btPlane ----------
 
-inline btPlane PlaneFlip(const btPlane &plane) { return btPlane(-plane.normal, -plane.dist); }
-inline int operator==(const btPlane &a, const btPlane &b) { return (a.normal == b.normal && a.dist == b.dist); }
-inline int coplanar(const btPlane &a, const btPlane &b) { return (a == b || a == PlaneFlip(b)); }
+inline btPlane PlaneFlip(const btPlane &plane)
+{
+	return btPlane(-plane.normal, -plane.dist);
+}
+inline int operator==(const btPlane &a, const btPlane &b)
+{
+	return (a.normal == b.normal && a.dist == b.dist);
+}
+inline int coplanar(const btPlane &a, const btPlane &b)
+{
+	return (a == b || a == PlaneFlip(b));
+}
 
 //--------- Utility Functions ------
 
@@ -668,7 +683,7 @@ void ReleaseHull(PHullResult &result)
 //*********************************************************************
 
 HullError HullLibrary::CreateConvexHull(const HullDesc &desc,  // describes the input request
-										HullResult &result)    // contains the resulst
+                                        HullResult &result)    // contains the resulst
 {
 	HullError ret = QE_FAIL;
 
@@ -820,12 +835,12 @@ btScalar GetDist(btScalar px, btScalar py, btScalar pz, const btScalar *p2)
 }
 
 bool HullLibrary::CleanupVertices(unsigned int svcount,
-								  const btVector3 *svertices,
-								  unsigned int stride,
-								  unsigned int &vcount,  // output number of vertices
-								  btVector3 *vertices,   // location to store the results.
-								  btScalar normalepsilon,
-								  btVector3 &scale)
+                                  const btVector3 *svertices,
+                                  unsigned int stride,
+                                  unsigned int &vcount,  // output number of vertices
+                                  btVector3 *vertices,   // location to store the results.
+                                  btScalar normalepsilon,
+                                  btVector3 &scale)
 {
 	if (svcount == 0) return false;
 

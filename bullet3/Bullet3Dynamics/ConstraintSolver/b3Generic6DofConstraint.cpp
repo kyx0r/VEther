@@ -204,7 +204,8 @@ void b3Generic6DofConstraint::calculateTransforms(const b3Transform& transA, con
 	calculateLinearInfo();
 	calculateAngleInfo();
 	if (m_useOffsetForConstraintFrame)
-	{  //  get weight factors depending on masses
+	{
+		//  get weight factors depending on masses
 		b3Scalar miA = bodies[m_rbA].m_invMass;
 		b3Scalar miB = bodies[m_rbB].m_invMass;
 		m_hasStaticBody = (miA < B3_EPSILON) || (miB < B3_EPSILON);
@@ -276,12 +277,14 @@ void b3Generic6DofConstraint::getInfo2(b3ConstraintInfo2* info, const b3RigidBod
 	const b3Vector3& angVelB = bodies[m_rbB].m_angVel;
 
 	if (m_useOffsetForConstraintFrame)
-	{  // for stability better to solve angular limits first
+	{
+		// for stability better to solve angular limits first
 		int row = setAngularLimits(info, 0, transA, transB, linVelA, linVelB, angVelA, angVelB);
 		setLinearLimits(info, row, transA, transB, linVelA, linVelB, angVelA, angVelB);
 	}
 	else
-	{  // leave old version for compatibility
+	{
+		// leave old version for compatibility
 		int row = setLinearLimits(info, 0, transA, transB, linVelA, linVelB, angVelA, angVelB);
 		setAngularLimits(info, row, transA, transB, linVelA, linVelB, angVelA, angVelB);
 	}
@@ -299,12 +302,14 @@ void b3Generic6DofConstraint::getInfo2NonVirtual(b3ConstraintInfo2* info, const 
 	}
 
 	if (m_useOffsetForConstraintFrame)
-	{  // for stability better to solve angular limits first
+	{
+		// for stability better to solve angular limits first
 		int row = setAngularLimits(info, 0, transA, transB, linVelA, linVelB, angVelA, angVelB);
 		setLinearLimits(info, row, transA, transB, linVelA, linVelB, angVelA, angVelB);
 	}
 	else
-	{  // leave old version for compatibility
+	{
+		// leave old version for compatibility
 		int row = setLinearLimits(info, 0, transA, transB, linVelA, linVelB, angVelA, angVelB);
 		setAngularLimits(info, row, transA, transB, linVelA, linVelB, angVelA, angVelB);
 	}
@@ -318,7 +323,8 @@ int b3Generic6DofConstraint::setLinearLimits(b3ConstraintInfo2* info, int row, c
 	for (int i = 0; i < 3; i++)
 	{
 		if (m_linearLimits.needApplyForce(i))
-		{  // re-use rotational motor code
+		{
+			// re-use rotational motor code
 			limot.m_bounce = b3Scalar(0.f);
 			limot.m_currentLimit = m_linearLimits.m_currentLimit[i];
 			limot.m_currentPosition = m_linearLimits.m_currentLinearDiff[i];
@@ -380,7 +386,7 @@ int b3Generic6DofConstraint::setAngularLimits(b3ConstraintInfo2* info, int row_o
 				m_angularLimits[i].m_stopERP = info->erp;
 			}
 			row += get_limit_motor_info2(d6constraint->getRotationalLimitMotor(i),
-										 transA, transB, linVelA, linVelB, angVelA, angVelB, info, row, axis, 1);
+			                             transA, transB, linVelA, linVelB, angVelA, angVelB, info, row, axis, 1);
 		}
 	}
 
@@ -446,15 +452,16 @@ void b3Generic6DofConstraint::calculateLinearInfo()
 }
 
 int b3Generic6DofConstraint::get_limit_motor_info2(
-	b3RotationalLimitMotor* limot,
-	const b3Transform& transA, const b3Transform& transB, const b3Vector3& linVelA, const b3Vector3& linVelB, const b3Vector3& angVelA, const b3Vector3& angVelB,
-	b3ConstraintInfo2* info, int row, b3Vector3& ax1, int rotational, int rotAllowed)
+    b3RotationalLimitMotor* limot,
+    const b3Transform& transA, const b3Transform& transB, const b3Vector3& linVelA, const b3Vector3& linVelB, const b3Vector3& angVelA, const b3Vector3& angVelB,
+    b3ConstraintInfo2* info, int row, b3Vector3& ax1, int rotational, int rotAllowed)
 {
 	int srow = row * info->rowskip;
 	bool powered = limot->m_enableMotor;
 	int limit = limot->m_currentLimit;
 	if (powered || limit)
-	{  // if the joint is powered, or has joint limits, add in the extra row
+	{
+		// if the joint is powered, or has joint limits, add in the extra row
 		b3Scalar* J1 = rotational ? info->m_J1angularAxis : info->m_J1linearAxis;
 		b3Scalar* J2 = rotational ? info->m_J2angularAxis : info->m_J2linearAxis;
 		if (J1)
@@ -530,10 +537,10 @@ int b3Generic6DofConstraint::get_limit_motor_info2(
 				b3Scalar tag_vel = rotational ? limot->m_targetVelocity : -limot->m_targetVelocity;
 
 				b3Scalar mot_fact = getMotorFactor(limot->m_currentPosition,
-												   limot->m_loLimit,
-												   limot->m_hiLimit,
-												   tag_vel,
-												   info->fps * limot->m_stopERP);
+				                                   limot->m_loLimit,
+				                                   limot->m_hiLimit,
+				                                   tag_vel,
+				                                   info->fps * limot->m_stopERP);
 				info->m_constraintError[srow] += mot_fact * limot->m_targetVelocity;
 				info->m_lowerLimit[srow] = -limot->m_maxMotorForce / info->fps;
 				info->m_upperLimit[srow] = limot->m_maxMotorForce / info->fps;
@@ -552,7 +559,8 @@ int b3Generic6DofConstraint::get_limit_motor_info2(
 			}
 			info->cfm[srow] = limot->m_stopCFM;
 			if (limot->m_loLimit == limot->m_hiLimit)
-			{  // limited low and high simultaneously
+			{
+				// limited low and high simultaneously
 				info->m_lowerLimit[srow] = -B3_INFINITY;
 				info->m_upperLimit[srow] = B3_INFINITY;
 			}
@@ -624,40 +632,40 @@ void b3Generic6DofConstraint::setParam(int num, b3Scalar value, int axis)
 	{
 		switch (num)
 		{
-			case B3_CONSTRAINT_STOP_ERP:
-				m_linearLimits.m_stopERP[axis] = value;
-				m_flags |= B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
-				break;
-			case B3_CONSTRAINT_STOP_CFM:
-				m_linearLimits.m_stopCFM[axis] = value;
-				m_flags |= B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
-				break;
-			case B3_CONSTRAINT_CFM:
-				m_linearLimits.m_normalCFM[axis] = value;
-				m_flags |= B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
-				break;
-			default:
-				b3AssertConstrParams(0);
+		case B3_CONSTRAINT_STOP_ERP:
+			m_linearLimits.m_stopERP[axis] = value;
+			m_flags |= B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
+			break;
+		case B3_CONSTRAINT_STOP_CFM:
+			m_linearLimits.m_stopCFM[axis] = value;
+			m_flags |= B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
+			break;
+		case B3_CONSTRAINT_CFM:
+			m_linearLimits.m_normalCFM[axis] = value;
+			m_flags |= B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
+			break;
+		default:
+			b3AssertConstrParams(0);
 		}
 	}
 	else if ((axis >= 3) && (axis < 6))
 	{
 		switch (num)
 		{
-			case B3_CONSTRAINT_STOP_ERP:
-				m_angularLimits[axis - 3].m_stopERP = value;
-				m_flags |= B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
-				break;
-			case B3_CONSTRAINT_STOP_CFM:
-				m_angularLimits[axis - 3].m_stopCFM = value;
-				m_flags |= B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
-				break;
-			case B3_CONSTRAINT_CFM:
-				m_angularLimits[axis - 3].m_normalCFM = value;
-				m_flags |= B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
-				break;
-			default:
-				b3AssertConstrParams(0);
+		case B3_CONSTRAINT_STOP_ERP:
+			m_angularLimits[axis - 3].m_stopERP = value;
+			m_flags |= B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
+			break;
+		case B3_CONSTRAINT_STOP_CFM:
+			m_angularLimits[axis - 3].m_stopCFM = value;
+			m_flags |= B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
+			break;
+		case B3_CONSTRAINT_CFM:
+			m_angularLimits[axis - 3].m_normalCFM = value;
+			m_flags |= B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT);
+			break;
+		default:
+			b3AssertConstrParams(0);
 		}
 	}
 	else
@@ -674,40 +682,40 @@ b3Scalar b3Generic6DofConstraint::getParam(int num, int axis) const
 	{
 		switch (num)
 		{
-			case B3_CONSTRAINT_STOP_ERP:
-				b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
-				retVal = m_linearLimits.m_stopERP[axis];
-				break;
-			case B3_CONSTRAINT_STOP_CFM:
-				b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
-				retVal = m_linearLimits.m_stopCFM[axis];
-				break;
-			case B3_CONSTRAINT_CFM:
-				b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
-				retVal = m_linearLimits.m_normalCFM[axis];
-				break;
-			default:
-				b3AssertConstrParams(0);
+		case B3_CONSTRAINT_STOP_ERP:
+			b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
+			retVal = m_linearLimits.m_stopERP[axis];
+			break;
+		case B3_CONSTRAINT_STOP_CFM:
+			b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
+			retVal = m_linearLimits.m_stopCFM[axis];
+			break;
+		case B3_CONSTRAINT_CFM:
+			b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
+			retVal = m_linearLimits.m_normalCFM[axis];
+			break;
+		default:
+			b3AssertConstrParams(0);
 		}
 	}
 	else if ((axis >= 3) && (axis < 6))
 	{
 		switch (num)
 		{
-			case B3_CONSTRAINT_STOP_ERP:
-				b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
-				retVal = m_angularLimits[axis - 3].m_stopERP;
-				break;
-			case B3_CONSTRAINT_STOP_CFM:
-				b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
-				retVal = m_angularLimits[axis - 3].m_stopCFM;
-				break;
-			case B3_CONSTRAINT_CFM:
-				b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
-				retVal = m_angularLimits[axis - 3].m_normalCFM;
-				break;
-			default:
-				b3AssertConstrParams(0);
+		case B3_CONSTRAINT_STOP_ERP:
+			b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_ERP_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
+			retVal = m_angularLimits[axis - 3].m_stopERP;
+			break;
+		case B3_CONSTRAINT_STOP_CFM:
+			b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_STOP << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
+			retVal = m_angularLimits[axis - 3].m_stopCFM;
+			break;
+		case B3_CONSTRAINT_CFM:
+			b3AssertConstrParams(m_flags & (B3_6DOF_FLAGS_CFM_NORM << (axis * B3_6DOF_FLAGS_AXIS_SHIFT)));
+			retVal = m_angularLimits[axis - 3].m_normalCFM;
+			break;
+		default:
+			b3AssertConstrParams(0);
 		}
 	}
 	else
@@ -726,8 +734,8 @@ void b3Generic6DofConstraint::setAxis(const b3Vector3& axis1, const b3Vector3& a
 	b3Transform frameInW;
 	frameInW.setIdentity();
 	frameInW.getBasis().setValue(xAxis[0], yAxis[0], zAxis[0],
-								 xAxis[1], yAxis[1], zAxis[1],
-								 xAxis[2], yAxis[2], zAxis[2]);
+	                             xAxis[1], yAxis[1], zAxis[1],
+	                             xAxis[2], yAxis[2], zAxis[2]);
 
 	// now get constraint frame in local coordinate systems
 	m_frameInA = getCenterOfMassTransform(bodies[m_rbA]).inverse() * frameInW;

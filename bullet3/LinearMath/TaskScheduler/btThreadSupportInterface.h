@@ -45,8 +45,8 @@ public:
 	struct ConstructionInfo
 	{
 		ConstructionInfo(const char* uniqueName,
-						 ThreadFunc userThreadFunc,
-						 int threadStackSize = 65535)
+		                 ThreadFunc userThreadFunc,
+		                 int threadStackSize = 65535)
 			: m_uniqueName(uniqueName),
 			  m_userThreadFunc(userThreadFunc),
 			  m_threadStackSize(threadStackSize)

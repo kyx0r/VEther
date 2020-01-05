@@ -3,7 +3,7 @@
  *   Class representing an articulated rigid body. Stores the body's
  *   current state, allows forces and torques to be set, handles
  *   timestepping and implements Featherstone's algorithm.
- *   
+ *
  * COPYRIGHT:
  *   Copyright (C) Stephen Thompson, <stephen@solarflare.org.uk>, 2011-2013
  *   Portions written By Erwin Coumans: connection to LCP solver, various multibody constraints, replacing Eigen math library by Bullet LinearMath and a dedicated 6x6 matrix inverse (solveImatrix)
@@ -14,11 +14,11 @@
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it freely,
  subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
  2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
  3. This notice may not be removed or altered from any source distribution.
- 
+
  */
 
 #ifndef BT_MULTIBODY_H
@@ -57,59 +57,59 @@ public:
 	//
 
 	btMultiBody(int n_links,               // NOT including the base
-				btScalar mass,             // mass of base
-				const btVector3 &inertia,  // inertia of base, in base frame; assumed diagonal
-				bool fixedBase,            // whether the base is fixed (true) or can move (false)
-				bool canSleep, bool deprecatedMultiDof = true);
+	            btScalar mass,             // mass of base
+	            const btVector3 &inertia,  // inertia of base, in base frame; assumed diagonal
+	            bool fixedBase,            // whether the base is fixed (true) or can move (false)
+	            bool canSleep, bool deprecatedMultiDof = true);
 
 	virtual ~btMultiBody();
 
 	//note: fixed link collision with parent is always disabled
 	void setupFixed(int i, //linkIndex
-					btScalar mass,
-					const btVector3 &inertia,
-					int parent,
-					const btQuaternion &rotParentToThis,
-					const btVector3 &parentComToThisPivotOffset,
-					const btVector3 &thisPivotToThisComOffset, bool deprecatedDisableParentCollision = true);
+	                btScalar mass,
+	                const btVector3 &inertia,
+	                int parent,
+	                const btQuaternion &rotParentToThis,
+	                const btVector3 &parentComToThisPivotOffset,
+	                const btVector3 &thisPivotToThisComOffset, bool deprecatedDisableParentCollision = true);
 
 	void setupPrismatic(int i,
-						btScalar mass,
-						const btVector3 &inertia,
-						int parent,
-						const btQuaternion &rotParentToThis,
-						const btVector3 &jointAxis,
-						const btVector3 &parentComToThisPivotOffset,
-						const btVector3 &thisPivotToThisComOffset,
-						bool disableParentCollision);
+	                    btScalar mass,
+	                    const btVector3 &inertia,
+	                    int parent,
+	                    const btQuaternion &rotParentToThis,
+	                    const btVector3 &jointAxis,
+	                    const btVector3 &parentComToThisPivotOffset,
+	                    const btVector3 &thisPivotToThisComOffset,
+	                    bool disableParentCollision);
 
 	void setupRevolute(int i,  // 0 to num_links-1
-					   btScalar mass,
-					   const btVector3 &inertia,
-					   int parentIndex,
-					   const btQuaternion &rotParentToThis,          // rotate points in parent frame to this frame, when q = 0
-					   const btVector3 &jointAxis,                   // in my frame
-					   const btVector3 &parentComToThisPivotOffset,  // vector from parent COM to joint axis, in PARENT frame
-					   const btVector3 &thisPivotToThisComOffset,    // vector from joint axis to my COM, in MY frame
-					   bool disableParentCollision = false);
+	                   btScalar mass,
+	                   const btVector3 &inertia,
+	                   int parentIndex,
+	                   const btQuaternion &rotParentToThis,          // rotate points in parent frame to this frame, when q = 0
+	                   const btVector3 &jointAxis,                   // in my frame
+	                   const btVector3 &parentComToThisPivotOffset,  // vector from parent COM to joint axis, in PARENT frame
+	                   const btVector3 &thisPivotToThisComOffset,    // vector from joint axis to my COM, in MY frame
+	                   bool disableParentCollision = false);
 
 	void setupSpherical(int i,  // linkIndex, 0 to num_links-1
-						btScalar mass,
-						const btVector3 &inertia,
-						int parent,
-						const btQuaternion &rotParentToThis,          // rotate points in parent frame to this frame, when q = 0
-						const btVector3 &parentComToThisPivotOffset,  // vector from parent COM to joint axis, in PARENT frame
-						const btVector3 &thisPivotToThisComOffset,    // vector from joint axis to my COM, in MY frame
-						bool disableParentCollision = false);
+	                    btScalar mass,
+	                    const btVector3 &inertia,
+	                    int parent,
+	                    const btQuaternion &rotParentToThis,          // rotate points in parent frame to this frame, when q = 0
+	                    const btVector3 &parentComToThisPivotOffset,  // vector from parent COM to joint axis, in PARENT frame
+	                    const btVector3 &thisPivotToThisComOffset,    // vector from joint axis to my COM, in MY frame
+	                    bool disableParentCollision = false);
 
 	void setupPlanar(int i,  // 0 to num_links-1
-					 btScalar mass,
-					 const btVector3 &inertia,
-					 int parent,
-					 const btQuaternion &rotParentToThis,  // rotate points in parent frame to this frame, when q = 0
-					 const btVector3 &rotationAxis,
-					 const btVector3 &parentComToThisComOffset,  // vector from parent COM to this COM, in PARENT frame
-					 bool disableParentCollision = false);
+	                 btScalar mass,
+	                 const btVector3 &inertia,
+	                 int parent,
+	                 const btQuaternion &rotParentToThis,  // rotate points in parent frame to this frame, when q = 0
+	                 const btVector3 &rotationAxis,
+	                 const btVector3 &parentComToThisComOffset,  // vector from parent COM to this COM, in PARENT frame
+	                 bool disableParentCollision = false);
 
 	const btMultibodyLink &getLink(int index) const
 	{
@@ -175,16 +175,22 @@ public:
 	// change mass (incomplete: can only change base mass and inertia at present)
 	//
 
-	void setBaseMass(btScalar mass) { m_baseMass = mass; }
-	void setBaseInertia(const btVector3 &inertia) { m_baseInertia = inertia; }
+	void setBaseMass(btScalar mass)
+	{
+		m_baseMass = mass;
+	}
+	void setBaseInertia(const btVector3 &inertia)
+	{
+		m_baseInertia = inertia;
+	}
 
 	//
 	// get/set pos/vel/rot/omega for the base link
 	//
 
-	const btVector3 &getBasePos() const 
-	{ 
-		return m_basePos; 
+	const btVector3 &getBasePos() const
+	{
+		return m_basePos;
 	}  // in world frame
 	const btVector3 getBaseVel() const
 	{
@@ -194,23 +200,23 @@ public:
 	{
 		return m_baseQuat;
 	}
-    
-    const btVector3 &getInterpolateBasePos() const
-    {
-        return m_basePos_interpolate;
-    }  // in world frame
-    const btQuaternion &getInterpolateWorldToBaseRot() const
-    {
-        return m_baseQuat_interpolate;
-    }
-    
-    // rotates world vectors into base frame
+
+	const btVector3 &getInterpolateBasePos() const
+	{
+		return m_basePos_interpolate;
+	}  // in world frame
+	const btQuaternion &getInterpolateWorldToBaseRot() const
+	{
+		return m_baseQuat_interpolate;
+	}
+
+	// rotates world vectors into base frame
 	btVector3 getBaseOmega() const { return btVector3(m_realBuf[0], m_realBuf[1], m_realBuf[2]); }  // in world frame
 
 	void setBasePos(const btVector3 &pos)
 	{
 		m_basePos = pos;
-        m_basePos_interpolate = pos;
+		m_basePos_interpolate = pos;
 	}
 
 	void setBaseWorldTransform(const btTransform &tr)
@@ -236,7 +242,7 @@ public:
 	void setWorldToBaseRot(const btQuaternion &rot)
 	{
 		m_baseQuat = rot;  //m_baseQuat asumed to ba alias!?
-        m_baseQuat_interpolate = rot;
+		m_baseQuat_interpolate = rot;
 	}
 	void setBaseOmega(const btVector3 &omega)
 	{
@@ -273,16 +279,16 @@ public:
 	{
 		return &m_realBuf[0];
 	}
-    
-    const btScalar *getDeltaVelocityVector() const
-    {
-        return &m_deltaV[0];
-    }
-	/*    btScalar * getVelocityVector() 
-	{ 
-		return &real_buf[0]; 
+
+	const btScalar *getDeltaVelocityVector() const
+	{
+		return &m_deltaV[0];
 	}
-  */
+	/*    btScalar * getVelocityVector()
+	{
+		return &real_buf[0];
+	}
+	*/
 
 	//
 	// get the frames of reference (positions and orientations) of the child m_links
@@ -291,8 +297,8 @@ public:
 
 	const btVector3 &getRVector(int i) const;              // vector from COM(parent(i)) to COM(i), in frame i's coords
 	const btQuaternion &getParentToLocalRot(int i) const;  // rotates vectors in frame parent(i) to vectors in frame i.
-    const btVector3 &getInterpolateRVector(int i) const;              // vector from COM(parent(i)) to COM(i), in frame i's coords
-    const btQuaternion &getInterpolateParentToLocalRot(int i) const;  // rotates vectors in frame parent(i) to vectors in frame i.
+	const btVector3 &getInterpolateRVector(int i) const;              // vector from COM(parent(i)) to COM(i), in frame i's coords
+	const btQuaternion &getInterpolateParentToLocalRot(int i) const;  // rotates vectors in frame parent(i) to vectors in frame i.
 
 	//
 	// transform vectors in local frame of link i to world frame (or vice versa)
@@ -328,7 +334,10 @@ public:
 	{
 		m_baseForce += f;
 	}
-	void addBaseTorque(const btVector3 &t) { m_baseTorque += t; }
+	void addBaseTorque(const btVector3 &t)
+	{
+		m_baseTorque += t;
+	}
 	void addLinkForce(int i, const btVector3 &f);
 	void addLinkTorque(int i, const btVector3 &t);
 
@@ -336,7 +345,10 @@ public:
 	{
 		m_baseConstraintForce += f;
 	}
-	void addBaseConstraintTorque(const btVector3 &t) { m_baseConstraintTorque += t; }
+	void addBaseConstraintTorque(const btVector3 &t)
+	{
+		m_baseConstraintTorque += t;
+	}
 	void addLinkConstraintForce(int i, const btVector3 &f);
 	void addLinkConstraintTorque(int i, const btVector3 &t);
 
@@ -369,13 +381,13 @@ public:
 	//
 
 	void computeAccelerationsArticulatedBodyAlgorithmMultiDof(btScalar dt,
-															  btAlignedObjectArray<btScalar> & scratch_r,
-															  btAlignedObjectArray<btVector3> & scratch_v,
-															  btAlignedObjectArray<btMatrix3x3> & scratch_m,
-															  bool isConstraintPass,
-                                                              bool jointFeedbackInWorldSpace,
-                                                              bool jointFeedbackInJointFrame
-                                                              );
+	        btAlignedObjectArray<btScalar> & scratch_r,
+	        btAlignedObjectArray<btVector3> & scratch_v,
+	        btAlignedObjectArray<btMatrix3x3> & scratch_m,
+	        bool isConstraintPass,
+	        bool jointFeedbackInWorldSpace,
+	        bool jointFeedbackInJointFrame
+	                                                         );
 
 	///stepVelocitiesMultiDof is deprecated, use computeAccelerationsArticulatedBodyAlgorithmMultiDof instead
 	//void stepVelocitiesMultiDof(btScalar dt,
@@ -394,8 +406,8 @@ public:
 	// (existing contents of output array are replaced)
 	// calcAccelerationDeltasMultiDof must have been called first.
 	void calcAccelerationDeltasMultiDof(const btScalar *force, btScalar *output,
-										btAlignedObjectArray<btScalar> &scratch_r,
-										btAlignedObjectArray<btVector3> &scratch_v) const;
+	                                    btAlignedObjectArray<btScalar> &scratch_r,
+	                                    btAlignedObjectArray<btVector3> &scratch_v) const;
 
 	void applyDeltaVeeMultiDof2(const btScalar *delta_vee, btScalar multiplier)
 	{
@@ -441,9 +453,9 @@ public:
 
 	// timestep the positions (given current velocities).
 	void stepPositionsMultiDof(btScalar dt, btScalar *pq = 0, btScalar *pqd = 0);
-    
-    // predict the positions
-    void predictPositionsMultiDof(btScalar dt);
+
+	// predict the positions
+	void predictPositionsMultiDof(btScalar dt);
 
 	//
 	// contacts
@@ -454,23 +466,23 @@ public:
 	// 'normal' & 'contact_point' are both given in world coordinates.
 
 	void fillContactJacobianMultiDof(int link,
-									 const btVector3 &contact_point,
-									 const btVector3 &normal,
-									 btScalar *jac,
-									 btAlignedObjectArray<btScalar> &scratch_r,
-									 btAlignedObjectArray<btVector3> &scratch_v,
-									 btAlignedObjectArray<btMatrix3x3> &scratch_m) const { fillConstraintJacobianMultiDof(link, contact_point, btVector3(0, 0, 0), normal, jac, scratch_r, scratch_v, scratch_m); }
+	                                 const btVector3 &contact_point,
+	                                 const btVector3 &normal,
+	                                 btScalar *jac,
+	                                 btAlignedObjectArray<btScalar> &scratch_r,
+	                                 btAlignedObjectArray<btVector3> &scratch_v,
+	                                 btAlignedObjectArray<btMatrix3x3> &scratch_m) const { fillConstraintJacobianMultiDof(link, contact_point, btVector3(0, 0, 0), normal, jac, scratch_r, scratch_v, scratch_m); }
 
 	//a more general version of fillContactJacobianMultiDof which does not assume..
 	//.. that the constraint in question is contact or, to be more precise, constrains linear velocity only
 	void fillConstraintJacobianMultiDof(int link,
-										const btVector3 &contact_point,
-										const btVector3 &normal_ang,
-										const btVector3 &normal_lin,
-										btScalar *jac,
-										btAlignedObjectArray<btScalar> &scratch_r,
-										btAlignedObjectArray<btVector3> &scratch_v,
-										btAlignedObjectArray<btMatrix3x3> &scratch_m) const;
+	                                    const btVector3 &contact_point,
+	                                    const btVector3 &normal_ang,
+	                                    const btVector3 &normal_lin,
+	                                    btScalar *jac,
+	                                    btAlignedObjectArray<btScalar> &scratch_r,
+	                                    btAlignedObjectArray<btVector3> &scratch_v,
+	                                    btAlignedObjectArray<btMatrix3x3> &scratch_m) const;
 
 	//
 	// sleeping
@@ -492,8 +504,8 @@ public:
 	{
 		return m_canWakeup;
 	}
-	
-	void setCanWakeup(bool canWakeup) 
+
+	void setCanWakeup(bool canWakeup)
 	{
 		m_canWakeup = canWakeup;
 	}
@@ -580,9 +592,15 @@ public:
 
 	void finalizeMultiDof();
 
-	void useRK4Integration(bool use) { m_useRK4 = use; }
+	void useRK4Integration(bool use)
+	{
+		m_useRK4 = use;
+	}
 	bool isUsingRK4Integration() const { return m_useRK4; }
-	void useGlobalVelocities(bool use) { m_useGlobalVelocities = use; }
+	void useGlobalVelocities(bool use)
+	{
+		m_useGlobalVelocities = use;
+	}
 	bool isUsingGlobalVelocities() const { return m_useGlobalVelocities; }
 
 	bool isPosUpdated() const
@@ -604,7 +622,7 @@ public:
 	void compTreeLinkVelocities(btVector3 * omega, btVector3 * vel) const;
 
 	void updateCollisionObjectWorldTransforms(btAlignedObjectArray<btQuaternion> & world_to_local, btAlignedObjectArray<btVector3> & local_origin);
-    void updateCollisionObjectInterpolationWorldTransforms(btAlignedObjectArray<btQuaternion> & world_to_local, btAlignedObjectArray<btVector3> & local_origin);
+	void updateCollisionObjectInterpolationWorldTransforms(btAlignedObjectArray<btQuaternion> & world_to_local, btAlignedObjectArray<btVector3> & local_origin);
 
 	virtual int calculateSerializeBufferSize() const;
 
@@ -654,11 +672,11 @@ public:
 	}
 
 	static void spatialTransform(const btMatrix3x3 &rotation_matrix,  // rotates vectors in 'from' frame to vectors in 'to' frame
-		const btVector3 &displacement,     // vector from origin of 'from' frame to origin of 'to' frame, in 'to' coordinates
-		const btVector3 &top_in,       // top part of input vector
-		const btVector3 &bottom_in,    // bottom part of input vector
-		btVector3 &top_out,         // top part of output vector
-		btVector3 &bottom_out);      // bottom part of output vector
+	                             const btVector3 &displacement,     // vector from origin of 'from' frame to origin of 'to' frame, in 'to' coordinates
+	                             const btVector3 &top_in,       // top part of input vector
+	                             const btVector3 &bottom_in,    // bottom part of input vector
+	                             btVector3 &top_out,         // top part of output vector
+	                             btVector3 &bottom_out);      // bottom part of output vector
 
 
 
@@ -688,9 +706,9 @@ private:
 	const char *m_baseName;                   //memory needs to be manager by user!
 
 	btVector3 m_basePos;      // position of COM of base (world frame)
-    btVector3 m_basePos_interpolate;      // position of interpolated COM of base (world frame)
+	btVector3 m_basePos_interpolate;      // position of interpolated COM of base (world frame)
 	btQuaternion m_baseQuat;  // rotates world points into base frame
-    btQuaternion m_baseQuat_interpolate;  
+	btQuaternion m_baseQuat_interpolate;
 
 	btScalar m_baseMass;      // mass of the base
 	btVector3 m_baseInertia;  // inertia of the base (in local frame; diagonal)

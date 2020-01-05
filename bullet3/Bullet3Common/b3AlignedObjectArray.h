@@ -287,9 +287,11 @@ public:
 	}
 
 	B3_FORCE_INLINE void reserve(int _Count)
-	{  // determine new minimum length of allocated storage
+	{
+		// determine new minimum length of allocated storage
 		if (capacity() < _Count)
-		{  // not enough room, reallocate
+		{
+			// not enough room, reallocate
 			T* s = (T*)allocate(_Count);
 			b3Assert(s);
 			if (s == 0)
@@ -343,7 +345,8 @@ public:
 				i++;
 				j--;
 			}
-		} while (i <= j);
+		}
+		while (i <= j);
 
 		//  recursion
 		if (lo < j)

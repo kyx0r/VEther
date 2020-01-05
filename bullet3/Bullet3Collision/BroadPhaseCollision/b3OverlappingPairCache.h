@@ -150,7 +150,10 @@ public:
 
 	b3BroadphasePair* findPair(int proxy0, int proxy1);
 
-	int GetCount() const { return m_overlappingPairArray.size(); }
+	int GetCount() const
+	{
+		return m_overlappingPairArray.size();
+	}
 	//	b3BroadphasePair* GetPairs() { return m_pairs; }
 
 	b3OverlapFilterCallback* getOverlapFilterCallback()
@@ -213,7 +216,7 @@ private:
 		int proxyId1 = proxy0;
 		int proxyId2 = proxy1;
 #if 0  // wrong, 'equalsPair' use unsorted uids, copy-past devil striked again. Nat.
-		if (proxyId1 > proxyId2) 
+		if (proxyId1 > proxyId2)
 			b3Swap(proxyId1, proxyId2);
 #endif
 

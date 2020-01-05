@@ -4,8 +4,8 @@
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies.
- * Erwin Coumans makes no representations about the suitability 
- * of this software for any purpose.  
+ * Erwin Coumans makes no representations about the suitability
+ * of this software for any purpose.
  * It is provided "as is" without express or implied warranty.
 */
 
@@ -124,7 +124,7 @@ void btRaycastVehicle::updateWheelTransform(int wheelIndex, bool interpolatedTra
 
 	wheel.m_worldTransform.setBasis(steeringMat * rotatingMat * basis2);
 	wheel.m_worldTransform.setOrigin(
-		wheel.m_raycastInfo.m_hardPointWS + wheel.m_raycastInfo.m_wheelDirectionWS * wheel.m_raycastInfo.m_suspensionLength);
+	    wheel.m_raycastInfo.m_hardPointWS + wheel.m_raycastInfo.m_wheelDirectionWS * wheel.m_raycastInfo.m_suspensionLength);
 }
 
 void btRaycastVehicle::resetSuspension()
@@ -267,9 +267,9 @@ void btRaycastVehicle::updateVehicle(btScalar step)
 	const btTransform& chassisTrans = getChassisWorldTransform();
 
 	btVector3 forwardW(
-		chassisTrans.getBasis()[0][m_indexForwardAxis],
-		chassisTrans.getBasis()[1][m_indexForwardAxis],
-		chassisTrans.getBasis()[2][m_indexForwardAxis]);
+	    chassisTrans.getBasis()[0][m_indexForwardAxis],
+	    chassisTrans.getBasis()[1][m_indexForwardAxis],
+	    chassisTrans.getBasis()[2][m_indexForwardAxis]);
 
 	if (forwardW.dot(getRigidBody()->getLinearVelocity()) < btScalar(0.))
 	{
@@ -320,9 +320,9 @@ void btRaycastVehicle::updateVehicle(btScalar step)
 			const btTransform& chassisWorldTransform = getChassisWorldTransform();
 
 			btVector3 fwd(
-				chassisWorldTransform.getBasis()[0][m_indexForwardAxis],
-				chassisWorldTransform.getBasis()[1][m_indexForwardAxis],
-				chassisWorldTransform.getBasis()[2][m_indexForwardAxis]);
+			    chassisWorldTransform.getBasis()[0][m_indexForwardAxis],
+			    chassisWorldTransform.getBasis()[1][m_indexForwardAxis],
+			    chassisWorldTransform.getBasis()[2][m_indexForwardAxis]);
 
 			btScalar proj = fwd.dot(wheel.m_raycastInfo.m_contactNormalWS);
 			fwd -= wheel.m_raycastInfo.m_contactNormalWS * proj;
@@ -523,9 +523,9 @@ void btRaycastVehicle::updateFriction(btScalar timeStep)
 
 				btMatrix3x3 wheelBasis0 = wheelTrans.getBasis();
 				m_axle[i] = -btVector3(
-					wheelBasis0[0][m_indexRightAxis],
-					wheelBasis0[1][m_indexRightAxis],
-					wheelBasis0[2][m_indexRightAxis]);
+				                wheelBasis0[0][m_indexRightAxis],
+				                wheelBasis0[1][m_indexRightAxis],
+				                wheelBasis0[2][m_indexRightAxis]);
 
 				const btVector3& surfNormalWS = wheelInfo.m_raycastInfo.m_contactNormalWS;
 				btScalar proj = m_axle[i].dot(surfNormalWS);
@@ -536,8 +536,8 @@ void btRaycastVehicle::updateFriction(btScalar timeStep)
 				m_forwardWS[i].normalize();
 
 				resolveSingleBilateral(*m_chassisBody, wheelInfo.m_raycastInfo.m_contactPointWS,
-									   *groundObject, wheelInfo.m_raycastInfo.m_contactPointWS,
-									   btScalar(0.), m_axle[i], m_sideImpulse[i], timeStep);
+				                       *groundObject, wheelInfo.m_raycastInfo.m_contactPointWS,
+				                       btScalar(0.), m_axle[i], m_sideImpulse[i], timeStep);
 
 				m_sideImpulse[i] *= sideFrictionStiffness2;
 			}
@@ -627,7 +627,7 @@ void btRaycastVehicle::updateFriction(btScalar timeStep)
 			btWheelInfo& wheelInfo = m_wheelInfo[wheel];
 
 			btVector3 rel_pos = wheelInfo.m_raycastInfo.m_contactPointWS -
-								m_chassisBody->getCenterOfMassPosition();
+			                    m_chassisBody->getCenterOfMassPosition();
 
 			if (m_forwardImpulse[wheel] != btScalar(0.))
 			{
@@ -638,7 +638,7 @@ void btRaycastVehicle::updateFriction(btScalar timeStep)
 				class btRigidBody* groundObject = (class btRigidBody*)m_wheelInfo[wheel].m_raycastInfo.m_groundObject;
 
 				btVector3 rel_pos2 = wheelInfo.m_raycastInfo.m_contactPointWS -
-									 groundObject->getCenterOfMassPosition();
+				                     groundObject->getCenterOfMassPosition();
 
 				btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
 
@@ -674,9 +674,9 @@ void btRaycastVehicle::debugDraw(btIDebugDraw* debugDrawer)
 		btVector3 wheelPosWS = getWheelInfo(v).m_worldTransform.getOrigin();
 
 		btVector3 axle = btVector3(
-			getWheelInfo(v).m_worldTransform.getBasis()[0][getRightAxis()],
-			getWheelInfo(v).m_worldTransform.getBasis()[1][getRightAxis()],
-			getWheelInfo(v).m_worldTransform.getBasis()[2][getRightAxis()]);
+		                     getWheelInfo(v).m_worldTransform.getBasis()[0][getRightAxis()],
+		                     getWheelInfo(v).m_worldTransform.getBasis()[1][getRightAxis()],
+		                     getWheelInfo(v).m_worldTransform.getBasis()[2][getRightAxis()]);
 
 		//debug wheels (cylinders)
 		debugDrawer->drawLine(wheelPosWS, wheelPosWS + axle, wheelColor);

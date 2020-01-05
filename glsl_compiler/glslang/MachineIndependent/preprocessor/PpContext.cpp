@@ -82,38 +82,39 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PpContext.h"
 
-namespace glslang {
+namespace glslang
+{
 
 TPpContext::TPpContext(TParseContextBase& pc, const std::string& rootFileName, TShader::Includer& inclr) :
-    preamble(0), strings(0), previous_token('\n'), parseContext(pc), includer(inclr), inComment(false),
-    rootFileName(rootFileName),
-    currentSourceFile(rootFileName)
+	preamble(0), strings(0), previous_token('\n'), parseContext(pc), includer(inclr), inComment(false),
+	rootFileName(rootFileName),
+	currentSourceFile(rootFileName)
 {
-    ifdepth = 0;
-    for (elsetracker = 0; elsetracker < maxIfNesting; elsetracker++)
-        elseSeen[elsetracker] = false;
-    elsetracker = 0;
+	ifdepth = 0;
+	for (elsetracker = 0; elsetracker < maxIfNesting; elsetracker++)
+		elseSeen[elsetracker] = false;
+	elsetracker = 0;
 
-    strtodStream.imbue(std::locale::classic());
+	strtodStream.imbue(std::locale::classic());
 }
 
 TPpContext::~TPpContext()
 {
-    delete [] preamble;
+	delete [] preamble;
 
-    // free up the inputStack
-    while (! inputStack.empty())
-        popInput();
+	// free up the inputStack
+	while (! inputStack.empty())
+		popInput();
 }
 
 void TPpContext::setInput(TInputScanner& input, bool versionWillBeError)
 {
-    assert(inputStack.size() == 0);
+	assert(inputStack.size() == 0);
 
-    pushInput(new tStringInput(this, input));
+	pushInput(new tStringInput(this, input));
 
-    errorOnVersion = versionWillBeError;
-    versionSeen = false;
+	errorOnVersion = versionWillBeError;
+	versionSeen = false;
 }
 
 } // end namespace glslang

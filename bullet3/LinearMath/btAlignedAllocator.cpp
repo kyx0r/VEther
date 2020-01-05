@@ -130,7 +130,8 @@ int btDumpMemoryLeaks()
 
 struct btDebugPtrMagic
 {
-	union {
+	union
+	{
 		void **vptrptr;
 		void *vptr;
 		int *iptr;

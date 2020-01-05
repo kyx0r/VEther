@@ -3,8 +3,8 @@ Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousph
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -37,20 +37,20 @@ public:
 	/**@brief No initialization constructor */
 	btTransform() {}
 	/**@brief Constructor from btQuaternion (optional btVector3 )
-   * @param q Rotation from quaternion 
-   * @param c Translation from Vector (default 0,0,0) */
+	* @param q Rotation from quaternion
+	* @param c Translation from Vector (default 0,0,0) */
 	explicit SIMD_FORCE_INLINE btTransform(const btQuaternion& q,
-										   const btVector3& c = btVector3(btScalar(0), btScalar(0), btScalar(0)))
+	                                       const btVector3& c = btVector3(btScalar(0), btScalar(0), btScalar(0)))
 		: m_basis(q),
 		  m_origin(c)
 	{
 	}
 
 	/**@brief Constructor from btMatrix3x3 (optional btVector3)
-   * @param b Rotation from Matrix 
-   * @param c Translation from Vector default (0,0,0)*/
+	* @param b Rotation from Matrix
+	* @param c Translation from Vector default (0,0,0)*/
 	explicit SIMD_FORCE_INLINE btTransform(const btMatrix3x3& b,
-										   const btVector3& c = btVector3(btScalar(0), btScalar(0), btScalar(0)))
+	                                       const btVector3& c = btVector3(btScalar(0), btScalar(0), btScalar(0)))
 		: m_basis(b),
 		  m_origin(c)
 	{
@@ -70,9 +70,9 @@ public:
 	}
 
 	/**@brief Set the current transform as the value of the product of two transforms
-   * @param t1 Transform 1
-   * @param t2 Transform 2
-   * This = Transform1 * Transform2 */
+	* @param t1 Transform 1
+	* @param t2 Transform 2
+	* This = Transform1 * Transform2 */
 	SIMD_FORCE_INLINE void mult(const btTransform& t1, const btTransform& t2)
 	{
 		m_basis = t1.m_basis * t2.m_basis;
@@ -105,12 +105,18 @@ public:
 	}
 
 	/**@brief Return the basis matrix for the rotation */
-	SIMD_FORCE_INLINE btMatrix3x3& getBasis() { return m_basis; }
+	SIMD_FORCE_INLINE btMatrix3x3& getBasis()
+	{
+		return m_basis;
+	}
 	/**@brief Return the basis matrix for the rotation */
 	SIMD_FORCE_INLINE const btMatrix3x3& getBasis() const { return m_basis; }
 
 	/**@brief Return the origin vector translation */
-	SIMD_FORCE_INLINE btVector3& getOrigin() { return m_origin; }
+	SIMD_FORCE_INLINE btVector3& getOrigin()
+	{
+		return m_origin;
+	}
 	/**@brief Return the origin vector translation */
 	SIMD_FORCE_INLINE const btVector3& getOrigin() const { return m_origin; }
 
@@ -122,8 +128,8 @@ public:
 		return q;
 	}
 
-	/**@brief Set from an array 
-   * @param m A pointer to a 16 element array (12 rotation(row major padded on the right by 1), and 3 translation */
+	/**@brief Set from an array
+	* @param m A pointer to a 16 element array (12 rotation(row major padded on the right by 1), and 3 translation */
 	void setFromOpenGLMatrix(const btScalar* m)
 	{
 		m_basis.setFromOpenGLSubMatrix(m);
@@ -131,7 +137,7 @@ public:
 	}
 
 	/**@brief Fill an array representation
-   * @param m A pointer to a 16 element array (12 rotation(row major padded on the right by 1), and 3 translation */
+	* @param m A pointer to a 16 element array (12 rotation(row major padded on the right by 1), and 3 translation */
 	void getOpenGLMatrix(btScalar * m) const
 	{
 		m_basis.getOpenGLSubMatrix(m);
@@ -142,7 +148,7 @@ public:
 	}
 
 	/**@brief Set the translational element
-   * @param origin The vector to set the translation to */
+	* @param origin The vector to set the translation to */
 	SIMD_FORCE_INLINE void setOrigin(const btVector3& origin)
 	{
 		m_origin = origin;
@@ -169,8 +175,8 @@ public:
 		m_origin.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	}
 
-	/**@brief Multiply this Transform by another(this = this * another) 
-   * @param t The other transform */
+	/**@brief Multiply this Transform by another(this = this * another)
+	* @param t The other transform */
 	btTransform& operator*=(const btTransform& t)
 	{
 		m_origin += m_basis * t.m_origin;
@@ -186,8 +192,8 @@ public:
 	}
 
 	/**@brief Return the inverse of this transform times the other transform
-   * @param t The other transform 
-   * return this.inverse() * the other */
+	* @param t The other transform
+	* return this.inverse() * the other */
 	btTransform inverseTimes(const btTransform& t) const;
 
 	/**@brief Return the product of this transform and the other */
@@ -223,21 +229,21 @@ btTransform::inverseTimes(const btTransform& t) const
 {
 	btVector3 v = t.getOrigin() - m_origin;
 	return btTransform(m_basis.transposeTimes(t.m_basis),
-					   v * m_basis);
+	                   v * m_basis);
 }
 
 SIMD_FORCE_INLINE btTransform
-	btTransform::operator*(const btTransform& t) const
+btTransform::operator*(const btTransform& t) const
 {
 	return btTransform(m_basis * t.m_basis,
-					   (*this)(t.m_origin));
+	                   (*this)(t.m_origin));
 }
 
 /**@brief Test if two transforms have all elements equal */
 SIMD_FORCE_INLINE bool operator==(const btTransform& t1, const btTransform& t2)
 {
 	return (t1.getBasis() == t2.getBasis() &&
-			t1.getOrigin() == t2.getOrigin());
+	        t1.getOrigin() == t2.getOrigin());
 }
 
 ///for serialization

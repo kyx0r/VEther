@@ -13,8 +13,8 @@ struct DeformableBodyInplaceSolverIslandCallback : public MultiBodyInplaceSolver
 	btDeformableMultiBodyConstraintSolver* m_deformableSolver;
 
 	DeformableBodyInplaceSolverIslandCallback(btDeformableMultiBodyConstraintSolver* solver,
-		 btDispatcher* dispatcher)
-	: MultiBodyInplaceSolverIslandCallback(solver, dispatcher), m_deformableSolver(solver)
+	        btDispatcher* dispatcher)
+		: MultiBodyInplaceSolverIslandCallback(solver, dispatcher), m_deformableSolver(solver)
 	{
 	}
 

@@ -63,7 +63,7 @@ struct GIM_TRIANGLE_CONTACT
 
 	//! classify points that are closer
 	void merge_points(const btVector4& plane,
-					  btScalar margin, const btVector3* points, int point_count);
+	                  btScalar margin, const btVector3* points, int point_count);
 };
 
 class btPrimitiveTriangle

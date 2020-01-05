@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -45,7 +45,8 @@ enum btHingeFlags
 /// hinge constraint between two rigidbodies each with a pivotpoint that descibes the axis location in local space
 /// axis defines the orientation of the hinge axis
 ATTRIBUTE_ALIGNED16(class)
-btHingeConstraint : public btTypedConstraint
+btHingeConstraint :
+public btTypedConstraint
 {
 #ifdef IN_PARALLELL_SOLVER
 public:
@@ -166,9 +167,18 @@ public:
 	// extra motor API, including ability to set a target rotation (as opposed to angular velocity)
 	// note: setMotorTarget sets angular velocity under the hood, so you must call it every tick to
 	//       maintain a given angular target.
-	void enableMotor(bool enableMotor) { m_enableAngularMotor = enableMotor; }
-	void setMaxMotorImpulse(btScalar maxMotorImpulse) { m_maxMotorImpulse = maxMotorImpulse; }
-	void setMotorTargetVelocity(btScalar motorTargetVelocity) { m_motorTargetVelocity = motorTargetVelocity; }
+	void enableMotor(bool enableMotor)
+	{
+		m_enableAngularMotor = enableMotor;
+	}
+	void setMaxMotorImpulse(btScalar maxMotorImpulse)
+	{
+		m_maxMotorImpulse = maxMotorImpulse;
+	}
+	void setMotorTargetVelocity(btScalar motorTargetVelocity)
+	{
+		m_motorTargetVelocity = motorTargetVelocity;
+	}
 	void setMotorTarget(const btQuaternion& qAinB, btScalar dt);  // qAinB is rotation of body A wrt body B.
 	void setMotorTarget(btScalar targetAngle, btScalar dt);
 
@@ -219,8 +229,8 @@ public:
 		btVector3 pivotInA = m_rbAFrame.getOrigin();
 		//		m_rbAFrame.getOrigin() = pivotInA;
 		m_rbAFrame.getBasis().setValue(rbAxisA1.getX(), rbAxisA2.getX(), axisInA.getX(),
-									   rbAxisA1.getY(), rbAxisA2.getY(), axisInA.getY(),
-									   rbAxisA1.getZ(), rbAxisA2.getZ(), axisInA.getZ());
+		                               rbAxisA1.getY(), rbAxisA2.getY(), axisInA.getY(),
+		                               rbAxisA1.getZ(), rbAxisA2.getZ(), axisInA.getZ());
 
 		btVector3 axisInB = m_rbA.getCenterOfMassTransform().getBasis() * axisInA;
 
@@ -231,8 +241,8 @@ public:
 		m_rbBFrame.getOrigin() = m_rbB.getCenterOfMassTransform().inverse()(m_rbA.getCenterOfMassTransform()(pivotInA));
 
 		m_rbBFrame.getBasis().setValue(rbAxisB1.getX(), rbAxisB2.getX(), axisInB.getX(),
-									   rbAxisB1.getY(), rbAxisB2.getY(), axisInB.getY(),
-									   rbAxisB1.getZ(), rbAxisB2.getZ(), axisInB.getZ());
+		                               rbAxisB1.getY(), rbAxisB2.getY(), axisInB.getY(),
+		                               rbAxisB1.getZ(), rbAxisB2.getZ(), axisInB.getZ());
 		m_rbBFrame.getBasis() = m_rbB.getCenterOfMassTransform().getBasis().inverse() * m_rbBFrame.getBasis();
 	}
 
@@ -273,8 +283,14 @@ public:
 	const btTransform& getAFrame() const { return m_rbAFrame; };
 	const btTransform& getBFrame() const { return m_rbBFrame; };
 
-	btTransform& getAFrame() { return m_rbAFrame; };
-	btTransform& getBFrame() { return m_rbBFrame; };
+	btTransform& getAFrame()
+	{
+		return m_rbAFrame;
+	};
+	btTransform& getBFrame()
+	{
+		return m_rbBFrame;
+	};
 
 	inline int getSolveLimit()
 	{
@@ -311,11 +327,20 @@ public:
 		return m_maxMotorImpulse;
 	}
 	// access for UseFrameOffset
-	bool getUseFrameOffset() { return m_useOffsetForConstraintFrame; }
-	void setUseFrameOffset(bool frameOffsetOnOff) { m_useOffsetForConstraintFrame = frameOffsetOnOff; }
+	bool getUseFrameOffset()
+	{
+		return m_useOffsetForConstraintFrame;
+	}
+	void setUseFrameOffset(bool frameOffsetOnOff)
+	{
+		m_useOffsetForConstraintFrame = frameOffsetOnOff;
+	}
 	// access for UseReferenceFrameA
 	bool getUseReferenceFrameA() const { return m_useReferenceFrameA; }
-	void setUseReferenceFrameA(bool useReferenceFrameA) { m_useReferenceFrameA = useReferenceFrameA; }
+	void setUseReferenceFrameA(bool useReferenceFrameA)
+	{
+		m_useReferenceFrameA = useReferenceFrameA;
+	}
 
 	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5).
 	///If no axis is provided, it uses the default axis for this constraint.
@@ -358,7 +383,8 @@ struct btHingeConstraintDoubleData
 
 ///The getAccumulatedHingeAngle returns the accumulated hinge angle, taking rotation across the -PI/PI boundary into account
 ATTRIBUTE_ALIGNED16(class)
-btHingeAccumulatedAngleConstraint : public btHingeConstraint
+btHingeAccumulatedAngleConstraint :
+public btHingeConstraint
 {
 protected:
 	btScalar m_accumulatedAngle;

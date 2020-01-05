@@ -115,14 +115,14 @@ btConstraintSolverPoolMt::~btConstraintSolverPoolMt()
 
 ///solve a group of constraints
 btScalar btConstraintSolverPoolMt::solveGroup(btCollisionObject** bodies,
-											  int numBodies,
-											  btPersistentManifold** manifolds,
-											  int numManifolds,
-											  btTypedConstraint** constraints,
-											  int numConstraints,
-											  const btContactSolverInfo& info,
-											  btIDebugDraw* debugDrawer,
-											  btDispatcher* dispatcher)
+        int numBodies,
+        btPersistentManifold** manifolds,
+        int numManifolds,
+        btTypedConstraint** constraints,
+        int numConstraints,
+        const btContactSolverInfo& info,
+        btIDebugDraw* debugDrawer,
+        btDispatcher* dispatcher)
 {
 	ThreadSolver* ts = getAndLockThreadSolver();
 	ts->solver->solveGroup(bodies, numBodies, manifolds, numManifolds, constraints, numConstraints, info, debugDrawer, dispatcher);
@@ -146,10 +146,10 @@ void btConstraintSolverPoolMt::reset()
 ///
 
 btDiscreteDynamicsWorldMt::btDiscreteDynamicsWorldMt(btDispatcher* dispatcher,
-													 btBroadphaseInterface* pairCache,
-													 btConstraintSolverPoolMt* solverPool,
-													 btConstraintSolver* constraintSolverMt,
-													 btCollisionConfiguration* collisionConfiguration)
+        btBroadphaseInterface* pairCache,
+        btConstraintSolverPoolMt* solverPool,
+        btConstraintSolver* constraintSolverMt,
+        btCollisionConfiguration* collisionConfiguration)
 	: btDiscreteDynamicsWorld(dispatcher, pairCache, solverPool, collisionConfiguration)
 {
 	if (m_ownsIslandManager)

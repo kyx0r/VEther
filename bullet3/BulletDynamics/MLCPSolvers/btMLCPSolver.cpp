@@ -4,8 +4,8 @@ Copyright (c) 2003-2013 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -363,7 +363,7 @@ void btMLCPSolver::createMLCPFast(const btContactSolverInfo& infoGlobal)
 						size_t ofsother = (m_allConstraintPtrArray[cr0]->m_solverBodyIdB == sbA) ? 8 * numRowsOther : 0;
 						//printf("%d joint i %d and j0: %d: ",count++,i,j0);
 						m_A.multiplyAdd2_p8r(JinvMrow,
-											 Jptr + 2 * 8 * (size_t)ofs[j0] + ofsother, numRows, numRowsOther, row__, ofs[j0]);
+						                     Jptr + 2 * 8 * (size_t)ofs[j0] + ofsother, numRows, numRowsOther, row__, ofs[j0]);
 					}
 					startJointNodeA = jointNodeArray[startJointNodeA].nextJointNodeIndex;
 				}
@@ -381,7 +381,7 @@ void btMLCPSolver::createMLCPFast(const btContactSolverInfo& infoGlobal)
 						int numRowsOther = cj1 < m_tmpSolverNonContactConstraintPool.size() ? m_tmpConstraintSizesPool[j1].m_numConstraintRows : numContactRows;
 						size_t ofsother = (m_allConstraintPtrArray[cj1]->m_solverBodyIdB == sbB) ? 8 * numRowsOther : 0;
 						m_A.multiplyAdd2_p8r(JinvMrow + 8 * (size_t)numRows,
-											 Jptr + 2 * 8 * (size_t)ofs[j1] + ofsother, numRows, numRowsOther, row__, ofs[j1]);
+						                     Jptr + 2 * 8 * (size_t)ofs[j1] + ofsother, numRows, numRowsOther, row__, ofs[j1]);
 					}
 					startJointNodeB = jointNodeArray[startJointNodeB].nextJointNodeIndex;
 				}

@@ -51,16 +51,17 @@
 #error Trying to build a windows specific file in a non windows build.
 #endif
 
-namespace glslang {
+namespace glslang
+{
 
 inline OS_TLSIndex ToGenericTLSIndex (DWORD handle)
 {
-    return (OS_TLSIndex)((uintptr_t)handle + 1);
+	return (OS_TLSIndex)((uintptr_t)handle + 1);
 }
 
 inline DWORD ToNativeTLSIndex (OS_TLSIndex nIndex)
 {
-    return (DWORD)((uintptr_t)nIndex - 1);
+	return (DWORD)((uintptr_t)nIndex - 1);
 }
 
 //
@@ -68,67 +69,70 @@ inline DWORD ToNativeTLSIndex (OS_TLSIndex nIndex)
 //
 OS_TLSIndex OS_AllocTLSIndex()
 {
-    DWORD dwIndex = TlsAlloc();
-    if (dwIndex == TLS_OUT_OF_INDEXES) {
-        assert(0 && "OS_AllocTLSIndex(): Unable to allocate Thread Local Storage");
-        return OS_INVALID_TLS_INDEX;
-    }
+	DWORD dwIndex = TlsAlloc();
+	if (dwIndex == TLS_OUT_OF_INDEXES)
+	{
+		assert(0 && "OS_AllocTLSIndex(): Unable to allocate Thread Local Storage");
+		return OS_INVALID_TLS_INDEX;
+	}
 
-    return ToGenericTLSIndex(dwIndex);
+	return ToGenericTLSIndex(dwIndex);
 }
 
 bool OS_SetTLSValue(OS_TLSIndex nIndex, void *lpvValue)
 {
-    if (nIndex == OS_INVALID_TLS_INDEX) {
-        assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
-        return false;
-    }
+	if (nIndex == OS_INVALID_TLS_INDEX)
+	{
+		assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
+		return false;
+	}
 
-    if (TlsSetValue(ToNativeTLSIndex(nIndex), lpvValue))
-        return true;
-    else
-        return false;
+	if (TlsSetValue(ToNativeTLSIndex(nIndex), lpvValue))
+		return true;
+	else
+		return false;
 }
 
 void* OS_GetTLSValue(OS_TLSIndex nIndex)
 {
-    assert(nIndex != OS_INVALID_TLS_INDEX);
-    return TlsGetValue(ToNativeTLSIndex(nIndex));
+	assert(nIndex != OS_INVALID_TLS_INDEX);
+	return TlsGetValue(ToNativeTLSIndex(nIndex));
 }
 
 bool OS_FreeTLSIndex(OS_TLSIndex nIndex)
 {
-    if (nIndex == OS_INVALID_TLS_INDEX) {
-        assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
-        return false;
-    }
+	if (nIndex == OS_INVALID_TLS_INDEX)
+	{
+		assert(0 && "OS_SetTLSValue(): Invalid TLS Index");
+		return false;
+	}
 
-    if (TlsFree(ToNativeTLSIndex(nIndex)))
-        return true;
-    else
-        return false;
+	if (TlsFree(ToNativeTLSIndex(nIndex)))
+		return true;
+	else
+		return false;
 }
 
 HANDLE GlobalLock;
 
 void InitGlobalLock()
 {
-    GlobalLock = CreateMutex(0, false, 0);
+	GlobalLock = CreateMutex(0, false, 0);
 }
 
 void GetGlobalLock()
 {
-    WaitForSingleObject(GlobalLock, INFINITE);
+	WaitForSingleObject(GlobalLock, INFINITE);
 }
 
 void ReleaseGlobalLock()
 {
-    ReleaseMutex(GlobalLock);
+	ReleaseMutex(GlobalLock);
 }
 
 unsigned int __stdcall EnterGenericThread (void* entry)
 {
-    return ((TThreadEntrypoint)entry)(0);
+	return ((TThreadEntrypoint)entry)(0);
 }
 
 //#define DUMP_COUNTERS
@@ -136,11 +140,11 @@ unsigned int __stdcall EnterGenericThread (void* entry)
 void OS_DumpMemoryCounters()
 {
 #ifdef DUMP_COUNTERS
-    PROCESS_MEMORY_COUNTERS counters;
-    GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters));
-    printf("Working set size: %d\n", counters.WorkingSetSize);
+	PROCESS_MEMORY_COUNTERS counters;
+	GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters));
+	printf("Working set size: %d\n", counters.WorkingSetSize);
 #else
-    printf("Recompile with DUMP_COUNTERS defined to see counters.\n");
+	printf("Recompile with DUMP_COUNTERS defined to see counters.\n");
 #endif
 }
 

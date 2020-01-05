@@ -112,7 +112,8 @@ public:
 
 class b3HashPtr
 {
-	union {
+	union
+	{
 		const void* m_pointer;
 		int m_hashValues[2];
 	};

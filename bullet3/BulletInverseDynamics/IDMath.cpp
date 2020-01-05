@@ -99,7 +99,7 @@ void mul(const mat33 &a, const mat3x &b, mat3x *result)
 	if (b.cols() != result->cols())
 	{
 		bt_id_error_message("size missmatch. b.cols()= %d, result->cols()= %d\n",
-							static_cast<int>(b.cols()), static_cast<int>(result->cols()));
+		                    static_cast<int>(b.cols()), static_cast<int>(result->cols()));
 		abort();
 	}
 
@@ -118,7 +118,7 @@ void add(const mat3x &a, const mat3x &b, mat3x *result)
 	if (a.cols() != b.cols())
 	{
 		bt_id_error_message("size missmatch. a.cols()= %d, b.cols()= %d\n",
-							static_cast<int>(a.cols()), static_cast<int>(b.cols()));
+		                    static_cast<int>(a.cols()), static_cast<int>(b.cols()));
 		abort();
 	}
 	for (idArrayIdx col = 0; col < b.cols(); col++)
@@ -134,7 +134,7 @@ void sub(const mat3x &a, const mat3x &b, mat3x *result)
 	if (a.cols() != b.cols())
 	{
 		bt_id_error_message("size missmatch. a.cols()= %d, b.cols()= %d\n",
-							static_cast<int>(a.cols()), static_cast<int>(b.cols()));
+		                    static_cast<int>(a.cols()), static_cast<int>(b.cols()));
 		abort();
 	}
 	for (idArrayIdx col = 0; col < b.cols(); col++)
@@ -282,16 +282,18 @@ bool isPositiveDefinite(const mat33 &m)
 {
 	// test if all upper left determinants are positive
 	if (m(0, 0) <= 0)
-	{  // upper 1x1
+	{
+		// upper 1x1
 		return false;
 	}
 	if (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0) <= 0)
-	{  // upper 2x2
+	{
+		// upper 2x2
 		return false;
 	}
 	if ((m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) -
-		 m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
-		 m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0))) < 0)
+	        m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
+	        m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0))) < 0)
 	{
 		return false;
 	}
@@ -302,16 +304,18 @@ bool isPositiveSemiDefinite(const mat33 &m)
 {
 	// test if all upper left determinants are positive
 	if (m(0, 0) < 0)
-	{  // upper 1x1
+	{
+		// upper 1x1
 		return false;
 	}
 	if (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0) < 0)
-	{  // upper 2x2
+	{
+		// upper 2x2
 		return false;
 	}
 	if ((m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) -
-		 m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
-		 m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0))) < 0)
+	        m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
+	        m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0))) < 0)
 	{
 		return false;
 	}
@@ -322,16 +326,18 @@ bool isPositiveSemiDefiniteFuzzy(const mat33 &m)
 {
 	// test if all upper left determinants are positive
 	if (m(0, 0) < -kIsZero)
-	{  // upper 1x1
+	{
+		// upper 1x1
 		return false;
 	}
 	if (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0) < -kIsZero)
-	{  // upper 2x2
+	{
+		// upper 2x2
 		return false;
 	}
 	if ((m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) -
-		 m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
-		 m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0))) < -kIsZero)
+	        m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
+	        m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0))) < -kIsZero)
 	{
 		return false;
 	}
@@ -341,7 +347,7 @@ bool isPositiveSemiDefiniteFuzzy(const mat33 &m)
 idScalar determinant(const mat33 &m)
 {
 	return m(0, 0) * m(1, 1) * m(2, 2) + m(0, 1) * m(1, 2) * m(2, 0) + m(0, 2) * m(1, 0) * m(2, 1) -
-		   m(0, 2) * m(1, 1) * m(2, 0) - m(0, 0) * m(1, 2) * m(2, 1) - m(0, 1) * m(1, 0) * m(2, 2);
+	       m(0, 2) * m(1, 1) * m(2, 0) - m(0, 0) * m(1, 2) * m(2, 1) - m(0, 1) * m(1, 0) * m(2, 2);
 }
 
 bool isValidInertiaMatrix(const mat33 &I, const int index, bool has_fixed_joint)
@@ -353,16 +359,16 @@ bool isValidInertiaMatrix(const mat33 &I, const int index, bool has_fixed_joint)
 	if (!isPositiveSemiDefiniteFuzzy(I))
 	{
 		bt_id_error_message(
-			"invalid inertia matrix for body %d, not positive definite "
-			"(fixed joint)\n",
-			index);
+		    "invalid inertia matrix for body %d, not positive definite "
+		    "(fixed joint)\n",
+		    index);
 		bt_id_error_message(
-			"matrix is:\n"
-			"[%.20e %.20e %.20e;\n"
-			"%.20e %.20e %.20e;\n"
-			"%.20e %.20e %.20e]\n",
-			I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
-			I(2, 2));
+		    "matrix is:\n"
+		    "[%.20e %.20e %.20e;\n"
+		    "%.20e %.20e %.20e;\n"
+		    "%.20e %.20e %.20e]\n",
+		    I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
+		    I(2, 2));
 
 		return false;
 	}
@@ -374,36 +380,36 @@ bool isValidInertiaMatrix(const mat33 &I, const int index, bool has_fixed_joint)
 		{
 			bt_id_error_message("invalid inertia tensor for body %d, I(0,0) + I(1,1) < I(2,2)\n", index);
 			bt_id_error_message(
-				"matrix is:\n"
-				"[%.20e %.20e %.20e;\n"
-				"%.20e %.20e %.20e;\n"
-				"%.20e %.20e %.20e]\n",
-				I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
-				I(2, 2));
+			    "matrix is:\n"
+			    "[%.20e %.20e %.20e;\n"
+			    "%.20e %.20e %.20e;\n"
+			    "%.20e %.20e %.20e]\n",
+			    I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
+			    I(2, 2));
 			return false;
 		}
 		if (I(0, 0) + I(1, 1) < I(2, 2))
 		{
 			bt_id_error_message("invalid inertia tensor for body %d, I(0,0) + I(1,1) < I(2,2)\n", index);
 			bt_id_error_message(
-				"matrix is:\n"
-				"[%.20e %.20e %.20e;\n"
-				"%.20e %.20e %.20e;\n"
-				"%.20e %.20e %.20e]\n",
-				I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
-				I(2, 2));
+			    "matrix is:\n"
+			    "[%.20e %.20e %.20e;\n"
+			    "%.20e %.20e %.20e;\n"
+			    "%.20e %.20e %.20e]\n",
+			    I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
+			    I(2, 2));
 			return false;
 		}
 		if (I(1, 1) + I(2, 2) < I(0, 0))
 		{
 			bt_id_error_message("invalid inertia tensor for body %d, I(1,1) + I(2,2) < I(0,0)\n", index);
 			bt_id_error_message(
-				"matrix is:\n"
-				"[%.20e %.20e %.20e;\n"
-				"%.20e %.20e %.20e;\n"
-				"%.20e %.20e %.20e]\n",
-				I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
-				I(2, 2));
+			    "matrix is:\n"
+			    "[%.20e %.20e %.20e;\n"
+			    "%.20e %.20e %.20e;\n"
+			    "%.20e %.20e %.20e]\n",
+			    I(0, 0), I(0, 1), I(0, 2), I(1, 0), I(1, 1), I(1, 2), I(2, 0), I(2, 1),
+			    I(2, 2));
 			return false;
 		}
 	}
@@ -411,7 +417,8 @@ bool isValidInertiaMatrix(const mat33 &I, const int index, bool has_fixed_joint)
 	for (int i = 0; i < 3; i++)
 	{
 		if (I(i, i) < 0)
-		{  // accept zero
+		{
+			// accept zero
 			bt_id_error_message("invalid inertia tensor, I(%d,%d)= %e <0\n", i, i, I(i, i));
 			return false;
 		}
@@ -420,23 +427,23 @@ bool isValidInertiaMatrix(const mat33 &I, const int index, bool has_fixed_joint)
 	if (BT_ID_FABS(I(1, 0) - I(0, 1)) > kIsZero)
 	{
 		bt_id_error_message(
-			"invalid inertia tensor for body %d I(1,0)!=I(0,1). I(1,0)-I(0,1)= "
-			"%e\n",
-			index, I(1, 0) - I(0, 1));
+		    "invalid inertia tensor for body %d I(1,0)!=I(0,1). I(1,0)-I(0,1)= "
+		    "%e\n",
+		    index, I(1, 0) - I(0, 1));
 		return false;
 	}
 	if (BT_ID_FABS(I(2, 0) - I(0, 2)) > kIsZero)
 	{
 		bt_id_error_message(
-			"invalid inertia tensor for body %d I(2,0)!=I(0,2). I(2,0)-I(0,2)= "
-			"%e\n",
-			index, I(2, 0) - I(0, 2));
+		    "invalid inertia tensor for body %d I(2,0)!=I(0,2). I(2,0)-I(0,2)= "
+		    "%e\n",
+		    index, I(2, 0) - I(0, 2));
 		return false;
 	}
 	if (BT_ID_FABS(I(1, 2) - I(2, 1)) > kIsZero)
 	{
 		bt_id_error_message("invalid inertia tensor body %d I(1,2)!=I(2,1). I(1,2)-I(2,1)= %e\n", index,
-							I(1, 2) - I(2, 1));
+		                    I(1, 2) - I(2, 1));
 		return false;
 	}
 	return true;
@@ -452,14 +459,14 @@ bool isValidTransformMatrix(const mat33 &m)
 	for (int i = 0; i < 3; i++)
 	{
 		const idScalar length_minus_1 =
-			BT_ID_FABS(m(0, i) * m(0, i) + m(1, i) * m(1, i) + m(2, i) * m(2, i) - 1.0);
+		    BT_ID_FABS(m(0, i) * m(0, i) + m(1, i) * m(1, i) + m(2, i) * m(2, i) - 1.0);
 		if (length_minus_1 > kAxisLengthEpsilon)
 		{
 			bt_id_error_message(
-				"Not a valid rotation matrix (column %d not unit length)\n"
-				"column = [%.18e %.18e %.18e]\n"
-				"length-1.0= %.18e\n",
-				i, m(0, i), m(1, i), m(2, i), length_minus_1);
+			    "Not a valid rotation matrix (column %d not unit length)\n"
+			    "column = [%.18e %.18e %.18e]\n"
+			    "length-1.0= %.18e\n",
+			    i, m(0, i), m(1, i), m(2, i), length_minus_1);
 			print_mat(m);
 			return false;
 		}
@@ -496,7 +503,7 @@ bool isValidTransformMatrix(const mat33 &m)
 bool isUnitVector(const vec3 &vector)
 {
 	return BT_ID_FABS(vector(0) * vector(0) + vector(1) * vector(1) + vector(2) * vector(2) - 1.0) <
-		   kIsZero;
+	       kIsZero;
 }
 
 vec3 rpyFromMatrix(const mat33 &rot)

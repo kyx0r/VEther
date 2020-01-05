@@ -33,7 +33,7 @@ protected:
 
 public:
 	btMultiBodySphericalJointMotor(btMultiBody* body, int link, btScalar maxMotorImpulse);
-	
+
 	virtual ~btMultiBodySphericalJointMotor();
 	virtual void finalizeMultiDof();
 
@@ -41,8 +41,8 @@ public:
 	virtual int getIslandIdB() const;
 
 	virtual void createConstraintRows(btMultiBodyConstraintArray& constraintRows,
-									  btMultiBodyJacobianData& data,
-									  const btContactSolverInfo& infoGlobal);
+	                                  btMultiBodyJacobianData& data,
+	                                  const btContactSolverInfo& infoGlobal);
 
 	virtual void setVelocityTarget(const btVector3& velTarget, btScalar kd = 1.f)
 	{

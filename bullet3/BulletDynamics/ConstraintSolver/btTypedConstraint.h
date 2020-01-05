@@ -4,8 +4,8 @@ Copyright (c) 2003-2010 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -72,7 +72,8 @@ btJointFeedback
 
 ///TypedConstraint is the baseclass for Bullet constraints and vehicles
 ATTRIBUTE_ALIGNED16(class)
-btTypedConstraint : public btTypedObject
+btTypedConstraint :
+public btTypedObject
 {
 	int m_userConstraintType;
 
@@ -106,7 +107,7 @@ protected:
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-	virtual ~btTypedConstraint(){};
+	virtual ~btTypedConstraint() {};
 	btTypedConstraint(btTypedConstraintType type, btRigidBody & rbA);
 	btTypedConstraint(btTypedConstraintType type, btRigidBody & rbA, btRigidBody & rbB);
 
@@ -160,7 +161,7 @@ public:
 	}
 
 	///internal method used by the constraint solver, don't use them directly
-	virtual void buildJacobian(){};
+	virtual void buildJacobian() {};
 
 	///internal method used by the constraint solver, don't use them directly
 	virtual void setupSolverConstraint(btConstraintArray & ca, int solverBodyA, int solverBodyB, btScalar timeStep)
@@ -209,7 +210,7 @@ public:
 	}
 
 	///internal method used by the constraint solver, don't use them directly
-	virtual void solveConstraintObsolete(btSolverBody& /*bodyA*/, btSolverBody& /*bodyB*/, btScalar /*timeStep*/){};
+	virtual void solveConstraintObsolete(btSolverBody& /*bodyA*/, btSolverBody& /*bodyB*/, btScalar /*timeStep*/) {};
 
 	const btRigidBody& getRigidBodyA() const
 	{
@@ -374,7 +375,7 @@ struct	btTypedConstraintFloatData
 
 	float	m_breakingImpulseThreshold;
 	int		m_isEnabled;
-	
+
 };
 
 
@@ -403,7 +404,7 @@ struct	btTypedConstraintData
 
 	float	m_breakingImpulseThreshold;
 	int		m_isEnabled;
-	
+
 };
 #endif //BACKWARDS_COMPATIBLE
 
@@ -427,7 +428,7 @@ struct	btTypedConstraintDoubleData
 	double	m_breakingImpulseThreshold;
 	int		m_isEnabled;
 	char	padding[4];
-	
+
 };
 
 // clang-format on
@@ -441,16 +442,16 @@ class btAngularLimit
 {
 private:
 	btScalar
-		m_center,
-		m_halfRange,
-		m_softness,
-		m_biasFactor,
-		m_relaxationFactor,
-		m_correction,
-		m_sign;
+	m_center,
+	m_halfRange,
+	m_softness,
+	m_biasFactor,
+	m_relaxationFactor,
+	m_correction,
+	m_sign;
 
 	bool
-		m_solveLimit;
+	m_solveLimit;
 
 public:
 	/// Default constructor initializes limit as inactive, allowing free constraint movement

@@ -90,13 +90,13 @@ void b3CpuRigidBodyPipeline::stepSimulation(float deltaTime)
 }
 
 static inline float b3CalcRelVel(const b3Vector3& l0, const b3Vector3& l1, const b3Vector3& a0, const b3Vector3& a1,
-								 const b3Vector3& linVel0, const b3Vector3& angVel0, const b3Vector3& linVel1, const b3Vector3& angVel1)
+                                 const b3Vector3& linVel0, const b3Vector3& angVel0, const b3Vector3& linVel1, const b3Vector3& angVel1)
 {
 	return b3Dot(l0, linVel0) + b3Dot(a0, angVel0) + b3Dot(l1, linVel1) + b3Dot(a1, angVel1);
 }
 
 static inline void b3SetLinearAndAngular(const b3Vector3& n, const b3Vector3& r0, const b3Vector3& r1,
-										 b3Vector3& linear, b3Vector3& angular0, b3Vector3& angular1)
+        b3Vector3& linear, b3Vector3& angular0, b3Vector3& angular1)
 {
 	linear = -n;
 	angular0 = -b3Cross(r0, n);
@@ -104,9 +104,9 @@ static inline void b3SetLinearAndAngular(const b3Vector3& n, const b3Vector3& r0
 }
 
 static inline void b3SolveContact(b3ContactConstraint4& cs,
-								  const b3Vector3& posA, b3Vector3& linVelA, b3Vector3& angVelA, float invMassA, const b3Matrix3x3& invInertiaA,
-								  const b3Vector3& posB, b3Vector3& linVelB, b3Vector3& angVelB, float invMassB, const b3Matrix3x3& invInertiaB,
-								  float maxRambdaDt[4], float minRambdaDt[4])
+                                  const b3Vector3& posA, b3Vector3& linVelA, b3Vector3& angVelA, float invMassA, const b3Matrix3x3& invInertiaA,
+                                  const b3Vector3& posB, b3Vector3& linVelB, b3Vector3& angVelB, float invMassB, const b3Matrix3x3& invInertiaB,
+                                  float maxRambdaDt[4], float minRambdaDt[4])
 {
 	b3Vector3 dLinVelA;
 	dLinVelA.setZero();
@@ -129,8 +129,8 @@ static inline void b3SolveContact(b3ContactConstraint4& cs,
 			b3SetLinearAndAngular((const b3Vector3&)-cs.m_linear, (const b3Vector3&)r0, (const b3Vector3&)r1, linear, angular0, angular1);
 
 			float rambdaDt = b3CalcRelVel((const b3Vector3&)cs.m_linear, (const b3Vector3&)-cs.m_linear, angular0, angular1,
-										  linVelA, angVelA, linVelB, angVelB) +
-							 cs.m_b[ic];
+			                              linVelA, angVelA, linVelB, angVelB) +
+			                 cs.m_b[ic];
 			rambdaDt *= cs.m_jacCoeffInv[ic];
 
 			{
@@ -162,9 +162,9 @@ static inline void b3SolveContact(b3ContactConstraint4& cs,
 }
 
 static inline void b3SolveFriction(b3ContactConstraint4& cs,
-								   const b3Vector3& posA, b3Vector3& linVelA, b3Vector3& angVelA, float invMassA, const b3Matrix3x3& invInertiaA,
-								   const b3Vector3& posB, b3Vector3& linVelB, b3Vector3& angVelB, float invMassB, const b3Matrix3x3& invInertiaB,
-								   float maxRambdaDt[4], float minRambdaDt[4])
+                                   const b3Vector3& posA, b3Vector3& linVelA, b3Vector3& angVelA, float invMassA, const b3Matrix3x3& invInertiaA,
+                                   const b3Vector3& posB, b3Vector3& linVelB, b3Vector3& angVelB, float invMassB, const b3Matrix3x3& invInertiaB,
+                                   float maxRambdaDt[4], float minRambdaDt[4])
 {
 	if (cs.m_fJacCoeffInv[0] == 0 && cs.m_fJacCoeffInv[0] == 0) return;
 	const b3Vector3& center = (const b3Vector3&)cs.m_center;
@@ -182,7 +182,7 @@ static inline void b3SolveFriction(b3ContactConstraint4& cs,
 	{
 		b3SetLinearAndAngular(tangent[i], r0, r1, linear, angular0, angular1);
 		float rambdaDt = b3CalcRelVel(linear, -linear, angular0, angular1,
-									  linVelA, angVelA, linVelB, angVelB);
+		                              linVelA, angVelA, linVelB, angVelB);
 		rambdaDt *= cs.m_fJacCoeffInv[i];
 
 		{
@@ -209,7 +209,8 @@ static inline void b3SolveFriction(b3ContactConstraint4& cs,
 		angVelB += angImp1;
 	}
 
-	{  //	angular damping for point constraint
+	{
+		//	angular damping for point constraint
 		b3Vector3 ab = (posB - posA).normalized();
 		b3Vector3 ac = (center - posA).normalized();
 		if (b3Dot(ab, ac) > 0.95f || (invMassA == 0.f || invMassB == 0.f))
@@ -226,16 +227,19 @@ static inline void b3SolveFriction(b3ContactConstraint4& cs,
 struct b3SolveTask  // : public ThreadPool::Task
 {
 	b3SolveTask(b3AlignedObjectArray<b3RigidBodyData>& bodies,
-				b3AlignedObjectArray<b3Inertia>& shapes,
-				b3AlignedObjectArray<b3ContactConstraint4>& constraints,
-				int start, int nConstraints,
-				int maxNumBatches,
-				b3AlignedObjectArray<int>* wgUsedBodies, int curWgidx)
+	            b3AlignedObjectArray<b3Inertia>& shapes,
+	            b3AlignedObjectArray<b3ContactConstraint4>& constraints,
+	            int start, int nConstraints,
+	            int maxNumBatches,
+	            b3AlignedObjectArray<int>* wgUsedBodies, int curWgidx)
 		: m_bodies(bodies), m_shapes(shapes), m_constraints(constraints), m_wgUsedBodies(wgUsedBodies), m_curWgidx(curWgidx), m_start(start), m_nConstraints(nConstraints), m_solveFriction(true), m_maxNumBatches(maxNumBatches)
 	{
 	}
 
-	unsigned short int getType() { return 0; }
+	unsigned short int getType()
+	{
+		return 0;
+	}
 
 	void run(int tIdx)
 	{
@@ -246,7 +250,7 @@ struct b3SolveTask  // : public ThreadPool::Task
 		{
 			usedBodies.resize(0);
 			for (int ic = m_nConstraints - 1; ic >= 0; ic--)
-			//for(int ic=0; ic<m_nConstraints; ic++)
+				//for(int ic=0; ic<m_nConstraints; ic++)
 			{
 				int i = m_start + ic;
 				if (m_constraints[i].m_batchIdx != bb)
@@ -262,7 +266,7 @@ struct b3SolveTask  // : public ThreadPool::Task
 #if 0
 				if ((bodyA.m_invMass) && (bodyB.m_invMass))
 				{
-				//	printf("aIdx=%d, bIdx=%d\n", aIdx,bIdx);
+					//	printf("aIdx=%d, bIdx=%d\n", aIdx,bIdx);
 				}
 				if (bIdx==10)
 				{
@@ -301,8 +305,8 @@ struct b3SolveTask  // : public ThreadPool::Task
 					float minRambdaDt[4] = {0.f, 0.f, 0.f, 0.f};
 
 					b3SolveContact(m_constraints[i], (b3Vector3&)bodyA.m_pos, (b3Vector3&)bodyA.m_linVel, (b3Vector3&)bodyA.m_angVel, bodyA.m_invMass, (const b3Matrix3x3&)m_shapes[aIdx].m_invInertiaWorld,
-								   (b3Vector3&)bodyB.m_pos, (b3Vector3&)bodyB.m_linVel, (b3Vector3&)bodyB.m_angVel, bodyB.m_invMass, (const b3Matrix3x3&)m_shapes[bIdx].m_invInertiaWorld,
-								   maxRambdaDt, minRambdaDt);
+					               (b3Vector3&)bodyB.m_pos, (b3Vector3&)bodyB.m_linVel, (b3Vector3&)bodyB.m_angVel, bodyB.m_invMass, (const b3Matrix3x3&)m_shapes[bIdx].m_invInertiaWorld,
+					               maxRambdaDt, minRambdaDt);
 				}
 				else
 				{
@@ -322,8 +326,8 @@ struct b3SolveTask  // : public ThreadPool::Task
 					}
 
 					b3SolveFriction(m_constraints[i], (b3Vector3&)bodyA.m_pos, (b3Vector3&)bodyA.m_linVel, (b3Vector3&)bodyA.m_angVel, bodyA.m_invMass, (const b3Matrix3x3&)m_shapes[aIdx].m_invInertiaWorld,
-									(b3Vector3&)bodyB.m_pos, (b3Vector3&)bodyB.m_linVel, (b3Vector3&)bodyB.m_angVel, bodyB.m_invMass, (const b3Matrix3x3&)m_shapes[bIdx].m_invInertiaWorld,
-									maxRambdaDt, minRambdaDt);
+					                (b3Vector3&)bodyB.m_pos, (b3Vector3&)bodyB.m_linVel, (b3Vector3&)bodyB.m_angVel, bodyB.m_invMass, (const b3Matrix3x3&)m_shapes[bIdx].m_invInertiaWorld,
+					                maxRambdaDt, minRambdaDt);
 				}
 			}
 

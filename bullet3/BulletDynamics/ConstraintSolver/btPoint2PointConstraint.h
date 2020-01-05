@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -33,8 +33,8 @@ class btRigidBody;
 struct btConstraintSetting
 {
 	btConstraintSetting() : m_tau(btScalar(0.3)),
-							m_damping(btScalar(1.)),
-							m_impulseClamp(btScalar(0.))
+		m_damping(btScalar(1.)),
+		m_impulseClamp(btScalar(0.))
 	{
 	}
 	btScalar m_tau;
@@ -50,7 +50,8 @@ enum btPoint2PointFlags
 
 /// point to point constraint between two rigidbodies each with a pivotpoint that descibes the 'ballsocket' location in local space
 ATTRIBUTE_ALIGNED16(class)
-btPoint2PointConstraint : public btTypedConstraint
+btPoint2PointConstraint :
+public btTypedConstraint
 {
 #ifdef IN_PARALLELL_SOLVER
 public:

@@ -63,7 +63,7 @@ public:
 };
 
 void btContactArray::merge_contacts(
-	const btContactArray& contacts, bool normal_contact_average)
+    const btContactArray& contacts, bool normal_contact_average)
 {
 	clear();
 
@@ -127,7 +127,8 @@ void btContactArray::merge_contacts(
 			}
 		}
 		else
-		{  //add new contact
+		{
+			//add new contact
 
 			if (normal_contact_average && coincident_count > 0)
 			{

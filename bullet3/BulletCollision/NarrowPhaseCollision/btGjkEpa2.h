@@ -47,26 +47,26 @@ struct btGjkEpaSolver2
 	static int StackSizeRequirement();
 
 	static bool Distance(const btConvexShape* shape0, const btTransform& wtrs0,
-						 const btConvexShape* shape1, const btTransform& wtrs1,
-						 const btVector3& guess,
-						 sResults& results);
+	                     const btConvexShape* shape1, const btTransform& wtrs1,
+	                     const btVector3& guess,
+	                     sResults& results);
 
 	static bool Penetration(const btConvexShape* shape0, const btTransform& wtrs0,
-							const btConvexShape* shape1, const btTransform& wtrs1,
-							const btVector3& guess,
-							sResults& results,
-							bool usemargins = true);
+	                        const btConvexShape* shape1, const btTransform& wtrs1,
+	                        const btVector3& guess,
+	                        sResults& results,
+	                        bool usemargins = true);
 #ifndef __SPU__
 	static btScalar SignedDistance(const btVector3& position,
-								   btScalar margin,
-								   const btConvexShape* shape,
-								   const btTransform& wtrs,
-								   sResults& results);
+	                               btScalar margin,
+	                               const btConvexShape* shape,
+	                               const btTransform& wtrs,
+	                               sResults& results);
 
 	static bool SignedDistance(const btConvexShape* shape0, const btTransform& wtrs0,
-							   const btConvexShape* shape1, const btTransform& wtrs1,
-							   const btVector3& guess,
-							   sResults& results);
+	                           const btConvexShape* shape1, const btTransform& wtrs1,
+	                           const btVector3& guess,
+	                           sResults& results);
 #endif  //__SPU__
 };
 

@@ -84,19 +84,31 @@ public:
 	typedef T& reference;
 	typedef T value_type;
 
-	pointer address(reference ref) const { return &ref; }
-	const_pointer address(const_reference ref) const { return &ref; }
+	pointer address(reference ref) const
+	{
+		return &ref;
+	}
+	const_pointer address(const_reference ref) const
+	{
+		return &ref;
+	}
 	pointer allocate(size_type n, const_pointer* hint = 0)
 	{
 		(void)hint;
 		return reinterpret_cast<pointer>(btAlignedAlloc(sizeof(value_type) * n, Alignment));
 	}
-	void construct(pointer ptr, const value_type& value) { new (ptr) value_type(value); }
+	void construct(pointer ptr, const value_type& value)
+	{
+		new (ptr) value_type(value);
+	}
 	void deallocate(pointer ptr)
 	{
 		btAlignedFree(reinterpret_cast<void*>(ptr));
 	}
-	void destroy(pointer ptr) { ptr->~value_type(); }
+	void destroy(pointer ptr)
+	{
+		ptr->~value_type();
+	}
 
 	template <typename O>
 	struct rebind
@@ -109,7 +121,10 @@ public:
 		return *this;
 	}
 
-	friend bool operator==(const self_type&, const self_type&) { return true; }
+	friend bool operator==(const self_type&, const self_type&)
+	{
+		return true;
+	}
 };
 
 #endif  //BT_ALIGNED_ALLOCATOR

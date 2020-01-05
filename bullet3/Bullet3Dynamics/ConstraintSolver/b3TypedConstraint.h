@@ -4,8 +4,8 @@ Copyright (c) 2003-2010 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -63,7 +63,8 @@ struct b3RigidBodyData;
 
 ///TypedConstraint is the baseclass for Bullet constraints and vehicles
 B3_ATTRIBUTE_ALIGNED16(class)
-b3TypedConstraint : public b3TypedObject
+b3TypedConstraint :
+public b3TypedObject
 {
 	int m_userConstraintType;
 
@@ -97,7 +98,7 @@ protected:
 public:
 	B3_DECLARE_ALIGNED_ALLOCATOR();
 
-	virtual ~b3TypedConstraint(){};
+	virtual ~b3TypedConstraint() {};
 	b3TypedConstraint(b3TypedConstraintType type, int bodyA, int bodyB);
 
 	struct b3ConstraintInfo1
@@ -199,7 +200,7 @@ public:
 	}
 
 	///internal method used by the constraint solver, don't use them directly
-	virtual void solveConstraintObsolete(b3SolverBody& /*bodyA*/, b3SolverBody& /*bodyB*/, b3Scalar /*timeStep*/){};
+	virtual void solveConstraintObsolete(b3SolverBody& /*bodyA*/, b3SolverBody& /*bodyB*/, b3Scalar /*timeStep*/) {};
 
 	int getRigidBodyA() const
 	{
@@ -363,7 +364,7 @@ struct	b3TypedConstraintData
 
 	float	m_breakingImpulseThreshold;
 	int		m_isEnabled;
-	
+
 };
 
 // clang-format on
@@ -378,16 +379,16 @@ class b3AngularLimit
 {
 private:
 	b3Scalar
-		m_center,
-		m_halfRange,
-		m_softness,
-		m_biasFactor,
-		m_relaxationFactor,
-		m_correction,
-		m_sign;
+	m_center,
+	m_halfRange,
+	m_softness,
+	m_biasFactor,
+	m_relaxationFactor,
+	m_correction,
+	m_sign;
 
 	bool
-		m_solveLimit;
+	m_solveLimit;
 
 public:
 	/// Default constructor initializes limit as inactive, allowing free constraint movement

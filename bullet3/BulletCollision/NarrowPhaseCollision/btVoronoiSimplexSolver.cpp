@@ -5,14 +5,14 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
-	
+
 	Elsevier CDROM license agreements grants nonexclusive license to use the software
 	for any purpose, commercial or non-commercial as long as the following credit is included
 	identifying the original source of the software:
@@ -20,7 +20,7 @@ subject to the following restrictions:
 	Parts of the source are "from the book Real-Time Collision Detection by
 	Christer Ericson, published by Morgan Kaufmann Publishers,
 	(c) 2005 Elsevier Inc."
-		
+
 */
 
 #include "btVoronoiSimplexSolver.h"
@@ -88,144 +88,144 @@ bool btVoronoiSimplexSolver::updateClosestVectorAndPoints()
 
 		switch (numVertices())
 		{
-			case 0:
-				m_cachedValidClosest = false;
-				break;
-			case 1:
-			{
-				m_cachedP1 = m_simplexPointsP[0];
-				m_cachedP2 = m_simplexPointsQ[0];
-				m_cachedV = m_cachedP1 - m_cachedP2;  //== m_simplexVectorW[0]
-				m_cachedBC.reset();
-				m_cachedBC.setBarycentricCoordinates(btScalar(1.), btScalar(0.), btScalar(0.), btScalar(0.));
-				m_cachedValidClosest = m_cachedBC.isValid();
-				break;
-			};
-			case 2:
-			{
-				//closest point origin from line segment
-				const btVector3& from = m_simplexVectorW[0];
-				const btVector3& to = m_simplexVectorW[1];
-				btVector3 nearest;
+		case 0:
+			m_cachedValidClosest = false;
+			break;
+		case 1:
+		{
+			m_cachedP1 = m_simplexPointsP[0];
+			m_cachedP2 = m_simplexPointsQ[0];
+			m_cachedV = m_cachedP1 - m_cachedP2;  //== m_simplexVectorW[0]
+			m_cachedBC.reset();
+			m_cachedBC.setBarycentricCoordinates(btScalar(1.), btScalar(0.), btScalar(0.), btScalar(0.));
+			m_cachedValidClosest = m_cachedBC.isValid();
+			break;
+		};
+		case 2:
+		{
+			//closest point origin from line segment
+			const btVector3& from = m_simplexVectorW[0];
+			const btVector3& to = m_simplexVectorW[1];
+			btVector3 nearest;
 
-				btVector3 p(btScalar(0.), btScalar(0.), btScalar(0.));
-				btVector3 diff = p - from;
-				btVector3 v = to - from;
-				btScalar t = v.dot(diff);
+			btVector3 p(btScalar(0.), btScalar(0.), btScalar(0.));
+			btVector3 diff = p - from;
+			btVector3 v = to - from;
+			btScalar t = v.dot(diff);
 
-				if (t > 0)
+			if (t > 0)
+			{
+				btScalar dotVV = v.dot(v);
+				if (t < dotVV)
 				{
-					btScalar dotVV = v.dot(v);
-					if (t < dotVV)
-					{
-						t /= dotVV;
-						diff -= t * v;
-						m_cachedBC.m_usedVertices.usedVertexA = true;
-						m_cachedBC.m_usedVertices.usedVertexB = true;
-					}
-					else
-					{
-						t = 1;
-						diff -= v;
-						//reduce to 1 point
-						m_cachedBC.m_usedVertices.usedVertexB = true;
-					}
+					t /= dotVV;
+					diff -= t * v;
+					m_cachedBC.m_usedVertices.usedVertexA = true;
+					m_cachedBC.m_usedVertices.usedVertexB = true;
 				}
 				else
 				{
-					t = 0;
+					t = 1;
+					diff -= v;
 					//reduce to 1 point
-					m_cachedBC.m_usedVertices.usedVertexA = true;
+					m_cachedBC.m_usedVertices.usedVertexB = true;
 				}
-				m_cachedBC.setBarycentricCoordinates(1 - t, t);
-				nearest = from + t * v;
-
-				m_cachedP1 = m_simplexPointsP[0] + t * (m_simplexPointsP[1] - m_simplexPointsP[0]);
-				m_cachedP2 = m_simplexPointsQ[0] + t * (m_simplexPointsQ[1] - m_simplexPointsQ[0]);
-				m_cachedV = m_cachedP1 - m_cachedP2;
-
-				reduceVertices(m_cachedBC.m_usedVertices);
-
-				m_cachedValidClosest = m_cachedBC.isValid();
-				break;
 			}
-			case 3:
+			else
 			{
-				//closest point origin from triangle
-				btVector3 p(btScalar(0.), btScalar(0.), btScalar(0.));
+				t = 0;
+				//reduce to 1 point
+				m_cachedBC.m_usedVertices.usedVertexA = true;
+			}
+			m_cachedBC.setBarycentricCoordinates(1 - t, t);
+			nearest = from + t * v;
 
-				const btVector3& a = m_simplexVectorW[0];
-				const btVector3& b = m_simplexVectorW[1];
-				const btVector3& c = m_simplexVectorW[2];
+			m_cachedP1 = m_simplexPointsP[0] + t * (m_simplexPointsP[1] - m_simplexPointsP[0]);
+			m_cachedP2 = m_simplexPointsQ[0] + t * (m_simplexPointsQ[1] - m_simplexPointsQ[0]);
+			m_cachedV = m_cachedP1 - m_cachedP2;
 
-				closestPtPointTriangle(p, a, b, c, m_cachedBC);
+			reduceVertices(m_cachedBC.m_usedVertices);
+
+			m_cachedValidClosest = m_cachedBC.isValid();
+			break;
+		}
+		case 3:
+		{
+			//closest point origin from triangle
+			btVector3 p(btScalar(0.), btScalar(0.), btScalar(0.));
+
+			const btVector3& a = m_simplexVectorW[0];
+			const btVector3& b = m_simplexVectorW[1];
+			const btVector3& c = m_simplexVectorW[2];
+
+			closestPtPointTriangle(p, a, b, c, m_cachedBC);
+			m_cachedP1 = m_simplexPointsP[0] * m_cachedBC.m_barycentricCoords[0] +
+			             m_simplexPointsP[1] * m_cachedBC.m_barycentricCoords[1] +
+			             m_simplexPointsP[2] * m_cachedBC.m_barycentricCoords[2];
+
+			m_cachedP2 = m_simplexPointsQ[0] * m_cachedBC.m_barycentricCoords[0] +
+			             m_simplexPointsQ[1] * m_cachedBC.m_barycentricCoords[1] +
+			             m_simplexPointsQ[2] * m_cachedBC.m_barycentricCoords[2];
+
+			m_cachedV = m_cachedP1 - m_cachedP2;
+
+			reduceVertices(m_cachedBC.m_usedVertices);
+			m_cachedValidClosest = m_cachedBC.isValid();
+
+			break;
+		}
+		case 4:
+		{
+			btVector3 p(btScalar(0.), btScalar(0.), btScalar(0.));
+
+			const btVector3& a = m_simplexVectorW[0];
+			const btVector3& b = m_simplexVectorW[1];
+			const btVector3& c = m_simplexVectorW[2];
+			const btVector3& d = m_simplexVectorW[3];
+
+			bool hasSeparation = closestPtPointTetrahedron(p, a, b, c, d, m_cachedBC);
+
+			if (hasSeparation)
+			{
 				m_cachedP1 = m_simplexPointsP[0] * m_cachedBC.m_barycentricCoords[0] +
-							 m_simplexPointsP[1] * m_cachedBC.m_barycentricCoords[1] +
-							 m_simplexPointsP[2] * m_cachedBC.m_barycentricCoords[2];
+				             m_simplexPointsP[1] * m_cachedBC.m_barycentricCoords[1] +
+				             m_simplexPointsP[2] * m_cachedBC.m_barycentricCoords[2] +
+				             m_simplexPointsP[3] * m_cachedBC.m_barycentricCoords[3];
 
 				m_cachedP2 = m_simplexPointsQ[0] * m_cachedBC.m_barycentricCoords[0] +
-							 m_simplexPointsQ[1] * m_cachedBC.m_barycentricCoords[1] +
-							 m_simplexPointsQ[2] * m_cachedBC.m_barycentricCoords[2];
+				             m_simplexPointsQ[1] * m_cachedBC.m_barycentricCoords[1] +
+				             m_simplexPointsQ[2] * m_cachedBC.m_barycentricCoords[2] +
+				             m_simplexPointsQ[3] * m_cachedBC.m_barycentricCoords[3];
 
 				m_cachedV = m_cachedP1 - m_cachedP2;
-
 				reduceVertices(m_cachedBC.m_usedVertices);
-				m_cachedValidClosest = m_cachedBC.isValid();
-
-				break;
 			}
-			case 4:
+			else
 			{
-				btVector3 p(btScalar(0.), btScalar(0.), btScalar(0.));
+				//					printf("sub distance got penetration\n");
 
-				const btVector3& a = m_simplexVectorW[0];
-				const btVector3& b = m_simplexVectorW[1];
-				const btVector3& c = m_simplexVectorW[2];
-				const btVector3& d = m_simplexVectorW[3];
-
-				bool hasSeparation = closestPtPointTetrahedron(p, a, b, c, d, m_cachedBC);
-
-				if (hasSeparation)
+				if (m_cachedBC.m_degenerate)
 				{
-					m_cachedP1 = m_simplexPointsP[0] * m_cachedBC.m_barycentricCoords[0] +
-								 m_simplexPointsP[1] * m_cachedBC.m_barycentricCoords[1] +
-								 m_simplexPointsP[2] * m_cachedBC.m_barycentricCoords[2] +
-								 m_simplexPointsP[3] * m_cachedBC.m_barycentricCoords[3];
-
-					m_cachedP2 = m_simplexPointsQ[0] * m_cachedBC.m_barycentricCoords[0] +
-								 m_simplexPointsQ[1] * m_cachedBC.m_barycentricCoords[1] +
-								 m_simplexPointsQ[2] * m_cachedBC.m_barycentricCoords[2] +
-								 m_simplexPointsQ[3] * m_cachedBC.m_barycentricCoords[3];
-
-					m_cachedV = m_cachedP1 - m_cachedP2;
-					reduceVertices(m_cachedBC.m_usedVertices);
+					m_cachedValidClosest = false;
 				}
 				else
 				{
-					//					printf("sub distance got penetration\n");
-
-					if (m_cachedBC.m_degenerate)
-					{
-						m_cachedValidClosest = false;
-					}
-					else
-					{
-						m_cachedValidClosest = true;
-						//degenerate case == false, penetration = true + zero
-						m_cachedV.setValue(btScalar(0.), btScalar(0.), btScalar(0.));
-					}
-					break;
+					m_cachedValidClosest = true;
+					//degenerate case == false, penetration = true + zero
+					m_cachedV.setValue(btScalar(0.), btScalar(0.), btScalar(0.));
 				}
-
-				m_cachedValidClosest = m_cachedBC.isValid();
-
-				//closest point origin from tetrahedron
 				break;
 			}
-			default:
-			{
-				m_cachedValidClosest = false;
-			}
+
+			m_cachedValidClosest = m_cachedBC.isValid();
+
+			//closest point origin from tetrahedron
+			break;
+		}
+		default:
+		{
+			m_cachedValidClosest = false;
+		}
 		};
 	}
 
@@ -481,10 +481,10 @@ bool btVoronoiSimplexSolver::closestPtPointTetrahedron(const btVector3& p, const
 			finalResult.m_usedVertices.usedVertexB = tempResult.m_usedVertices.usedVertexB;
 			finalResult.m_usedVertices.usedVertexC = tempResult.m_usedVertices.usedVertexC;
 			finalResult.setBarycentricCoordinates(
-				tempResult.m_barycentricCoords[VERTA],
-				tempResult.m_barycentricCoords[VERTB],
-				tempResult.m_barycentricCoords[VERTC],
-				0);
+			    tempResult.m_barycentricCoords[VERTA],
+			    tempResult.m_barycentricCoords[VERTB],
+			    tempResult.m_barycentricCoords[VERTC],
+			    0);
 		}
 	}
 
@@ -506,10 +506,10 @@ bool btVoronoiSimplexSolver::closestPtPointTetrahedron(const btVector3& p, const
 			finalResult.m_usedVertices.usedVertexC = tempResult.m_usedVertices.usedVertexB;
 			finalResult.m_usedVertices.usedVertexD = tempResult.m_usedVertices.usedVertexC;
 			finalResult.setBarycentricCoordinates(
-				tempResult.m_barycentricCoords[VERTA],
-				0,
-				tempResult.m_barycentricCoords[VERTB],
-				tempResult.m_barycentricCoords[VERTC]);
+			    tempResult.m_barycentricCoords[VERTA],
+			    0,
+			    tempResult.m_barycentricCoords[VERTB],
+			    tempResult.m_barycentricCoords[VERTC]);
 		}
 	}
 	// Repeat test for face adb
@@ -531,10 +531,10 @@ bool btVoronoiSimplexSolver::closestPtPointTetrahedron(const btVector3& p, const
 
 			finalResult.m_usedVertices.usedVertexD = tempResult.m_usedVertices.usedVertexB;
 			finalResult.setBarycentricCoordinates(
-				tempResult.m_barycentricCoords[VERTA],
-				tempResult.m_barycentricCoords[VERTC],
-				0,
-				tempResult.m_barycentricCoords[VERTB]);
+			    tempResult.m_barycentricCoords[VERTA],
+			    tempResult.m_barycentricCoords[VERTC],
+			    0,
+			    tempResult.m_barycentricCoords[VERTB]);
 		}
 	}
 	// Repeat test for face bdc
@@ -556,19 +556,19 @@ bool btVoronoiSimplexSolver::closestPtPointTetrahedron(const btVector3& p, const
 			finalResult.m_usedVertices.usedVertexD = tempResult.m_usedVertices.usedVertexB;
 
 			finalResult.setBarycentricCoordinates(
-				0,
-				tempResult.m_barycentricCoords[VERTA],
-				tempResult.m_barycentricCoords[VERTC],
-				tempResult.m_barycentricCoords[VERTB]);
+			    0,
+			    tempResult.m_barycentricCoords[VERTA],
+			    tempResult.m_barycentricCoords[VERTC],
+			    tempResult.m_barycentricCoords[VERTB]);
 		}
 	}
 
 	//help! we ended up full !
 
 	if (finalResult.m_usedVertices.usedVertexA &&
-		finalResult.m_usedVertices.usedVertexB &&
-		finalResult.m_usedVertices.usedVertexC &&
-		finalResult.m_usedVertices.usedVertexD)
+	        finalResult.m_usedVertices.usedVertexB &&
+	        finalResult.m_usedVertices.usedVertexC &&
+	        finalResult.m_usedVertices.usedVertexD)
 	{
 		return true;
 	}

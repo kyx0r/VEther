@@ -3,8 +3,8 @@ Copyright (c) 2003-2013 Gino van den Bergen / Erwin Coumans  http://bulletphysic
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -358,10 +358,22 @@ B3_FORCE_INLINE b3Scalar b3Sqrt(b3Scalar x)
 {
 	return sqrt(x);
 }
-B3_FORCE_INLINE b3Scalar b3Fabs(b3Scalar x) { return fabs(x); }
-B3_FORCE_INLINE b3Scalar b3Cos(b3Scalar x) { return cos(x); }
-B3_FORCE_INLINE b3Scalar b3Sin(b3Scalar x) { return sin(x); }
-B3_FORCE_INLINE b3Scalar b3Tan(b3Scalar x) { return tan(x); }
+B3_FORCE_INLINE b3Scalar b3Fabs(b3Scalar x)
+{
+	return fabs(x);
+}
+B3_FORCE_INLINE b3Scalar b3Cos(b3Scalar x)
+{
+	return cos(x);
+}
+B3_FORCE_INLINE b3Scalar b3Sin(b3Scalar x)
+{
+	return sin(x);
+}
+B3_FORCE_INLINE b3Scalar b3Tan(b3Scalar x)
+{
+	return tan(x);
+}
 B3_FORCE_INLINE b3Scalar b3Acos(b3Scalar x)
 {
 	if (x < b3Scalar(-1)) x = b3Scalar(-1);
@@ -374,12 +386,30 @@ B3_FORCE_INLINE b3Scalar b3Asin(b3Scalar x)
 	if (x > b3Scalar(1)) x = b3Scalar(1);
 	return asin(x);
 }
-B3_FORCE_INLINE b3Scalar b3Atan(b3Scalar x) { return atan(x); }
-B3_FORCE_INLINE b3Scalar b3Atan2(b3Scalar x, b3Scalar y) { return atan2(x, y); }
-B3_FORCE_INLINE b3Scalar b3Exp(b3Scalar x) { return exp(x); }
-B3_FORCE_INLINE b3Scalar b3Log(b3Scalar x) { return log(x); }
-B3_FORCE_INLINE b3Scalar b3Pow(b3Scalar x, b3Scalar y) { return pow(x, y); }
-B3_FORCE_INLINE b3Scalar b3Fmod(b3Scalar x, b3Scalar y) { return fmod(x, y); }
+B3_FORCE_INLINE b3Scalar b3Atan(b3Scalar x)
+{
+	return atan(x);
+}
+B3_FORCE_INLINE b3Scalar b3Atan2(b3Scalar x, b3Scalar y)
+{
+	return atan2(x, y);
+}
+B3_FORCE_INLINE b3Scalar b3Exp(b3Scalar x)
+{
+	return exp(x);
+}
+B3_FORCE_INLINE b3Scalar b3Log(b3Scalar x)
+{
+	return log(x);
+}
+B3_FORCE_INLINE b3Scalar b3Pow(b3Scalar x, b3Scalar y)
+{
+	return pow(x, y);
+}
+B3_FORCE_INLINE b3Scalar b3Fmod(b3Scalar x, b3Scalar y)
+{
+	return fmod(x, y);
+}
 
 #else
 
@@ -403,10 +433,22 @@ B3_FORCE_INLINE b3Scalar b3Sqrt(b3Scalar y)
 	return sqrtf(y);
 #endif
 }
-B3_FORCE_INLINE b3Scalar b3Fabs(b3Scalar x) { return fabsf(x); }
-B3_FORCE_INLINE b3Scalar b3Cos(b3Scalar x) { return cosf(x); }
-B3_FORCE_INLINE b3Scalar b3Sin(b3Scalar x) { return sinf(x); }
-B3_FORCE_INLINE b3Scalar b3Tan(b3Scalar x) { return tanf(x); }
+B3_FORCE_INLINE b3Scalar b3Fabs(b3Scalar x)
+{
+	return fabsf(x);
+}
+B3_FORCE_INLINE b3Scalar b3Cos(b3Scalar x)
+{
+	return cosf(x);
+}
+B3_FORCE_INLINE b3Scalar b3Sin(b3Scalar x)
+{
+	return sinf(x);
+}
+B3_FORCE_INLINE b3Scalar b3Tan(b3Scalar x)
+{
+	return tanf(x);
+}
 B3_FORCE_INLINE b3Scalar b3Acos(b3Scalar x)
 {
 	if (x < b3Scalar(-1))
@@ -423,12 +465,30 @@ B3_FORCE_INLINE b3Scalar b3Asin(b3Scalar x)
 		x = b3Scalar(1);
 	return asinf(x);
 }
-B3_FORCE_INLINE b3Scalar b3Atan(b3Scalar x) { return atanf(x); }
-B3_FORCE_INLINE b3Scalar b3Atan2(b3Scalar x, b3Scalar y) { return atan2f(x, y); }
-B3_FORCE_INLINE b3Scalar b3Exp(b3Scalar x) { return expf(x); }
-B3_FORCE_INLINE b3Scalar b3Log(b3Scalar x) { return logf(x); }
-B3_FORCE_INLINE b3Scalar b3Pow(b3Scalar x, b3Scalar y) { return powf(x, y); }
-B3_FORCE_INLINE b3Scalar b3Fmod(b3Scalar x, b3Scalar y) { return fmodf(x, y); }
+B3_FORCE_INLINE b3Scalar b3Atan(b3Scalar x)
+{
+	return atanf(x);
+}
+B3_FORCE_INLINE b3Scalar b3Atan2(b3Scalar x, b3Scalar y)
+{
+	return atan2f(x, y);
+}
+B3_FORCE_INLINE b3Scalar b3Exp(b3Scalar x)
+{
+	return expf(x);
+}
+B3_FORCE_INLINE b3Scalar b3Log(b3Scalar x)
+{
+	return logf(x);
+}
+B3_FORCE_INLINE b3Scalar b3Pow(b3Scalar x, b3Scalar y)
+{
+	return powf(x, y);
+}
+B3_FORCE_INLINE b3Scalar b3Fmod(b3Scalar x, b3Scalar y)
+{
+	return fmodf(x, y);
+}
 
 #endif
 
@@ -468,7 +528,10 @@ B3_FORCE_INLINE b3Scalar b3Atan2Fast(b3Scalar y, b3Scalar x)
 	return (y < 0.0f) ? -angle : angle;
 }
 
-B3_FORCE_INLINE bool b3FuzzyZero(b3Scalar x) { return b3Fabs(x) < B3_EPSILON; }
+B3_FORCE_INLINE bool b3FuzzyZero(b3Scalar x)
+{
+	return b3Fabs(x) < B3_EPSILON;
+}
 
 B3_FORCE_INLINE bool b3Equal(b3Scalar a, b3Scalar eps)
 {
@@ -484,8 +547,14 @@ B3_FORCE_INLINE int b3IsNegative(b3Scalar x)
 	return x < b3Scalar(0.0) ? 1 : 0;
 }
 
-B3_FORCE_INLINE b3Scalar b3Radians(b3Scalar x) { return x * B3_RADS_PER_DEG; }
-B3_FORCE_INLINE b3Scalar b3Degrees(b3Scalar x) { return x * B3_DEGS_PER_RAD; }
+B3_FORCE_INLINE b3Scalar b3Radians(b3Scalar x)
+{
+	return x * B3_RADS_PER_DEG;
+}
+B3_FORCE_INLINE b3Scalar b3Degrees(b3Scalar x)
+{
+	return x * B3_DEGS_PER_RAD;
+}
 
 #define B3_DECLARE_HANDLE(name) \
 	typedef struct name##__     \
@@ -672,7 +741,8 @@ T *b3AlignPointer(T *unalignedPtr, size_t alignment)
 {
 	struct b3ConvertPointerSizeT
 	{
-		union {
+		union
+		{
 			T *ptr;
 			size_t integer;
 		};

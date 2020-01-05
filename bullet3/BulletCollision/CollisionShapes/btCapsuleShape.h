@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -23,14 +23,18 @@ subject to the following restrictions:
 ///The total height is height+2*radius, so the height is just the height between the center of each 'sphere' of the capsule caps.
 ///The btCapsuleShape is a convex hull of two spheres. The btMultiSphereShape is a more general collision shape that takes the convex hull of multiple sphere, so it can also represent a capsule when just using two spheres.
 ATTRIBUTE_ALIGNED16(class)
-btCapsuleShape : public btConvexInternalShape
+btCapsuleShape :
+public btConvexInternalShape
 {
 protected:
 	int m_upAxis;
 
 protected:
 	///only used for btCapsuleShapeZ and btCapsuleShapeX subclasses.
-	btCapsuleShape() : btConvexInternalShape() { m_shapeType = CAPSULE_SHAPE_PROXYTYPE; };
+	btCapsuleShape() : btConvexInternalShape()
+	{
+		m_shapeType = CAPSULE_SHAPE_PROXYTYPE;
+	};
 
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();

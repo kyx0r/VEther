@@ -5,8 +5,8 @@ Copyright (c) 2008 Stan Melax http://www.melax.com/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -67,9 +67,9 @@ public:
 	};
 
 	HullDesc(HullFlag flag,
-			 unsigned int vcount,
-			 const btVector3* vertices,
-			 unsigned int stride = sizeof(btVector3))
+	         unsigned int vcount,
+	         const btVector3* vertices,
+	         unsigned int stride = sizeof(btVector3))
 	{
 		mFlags = flag;
 		mVcount = vcount;
@@ -147,7 +147,7 @@ class int4
 {
 public:
 	int x, y, z, w;
-	int4(){};
+	int4() {};
 	int4(int _x, int _y, int _z, int _w)
 	{
 		x = _x;
@@ -155,8 +155,14 @@ public:
 		z = _z;
 		w = _w;
 	}
-	const int& operator[](int i) const { return (&x)[i]; }
-	int& operator[](int i) { return (&x)[i]; }
+	const int& operator[](int i) const
+	{
+		return (&x)[i];
+	}
+	int& operator[](int i)
+	{
+		return (&x)[i];
+	}
 };
 
 class PHullResult
@@ -187,7 +193,7 @@ public:
 	btAlignedObjectArray<int> m_vertexIndexMapping;
 
 	HullError CreateConvexHull(const HullDesc& desc,  // describes the input request
-							   HullResult& result);   // contains the resulst
+	                           HullResult& result);   // contains the resulst
 	HullError ReleaseResult(HullResult& result);      // release memory allocated for this result, we are done with it.
 
 private:
@@ -222,12 +228,12 @@ private:
 	void BringOutYourDead(const btVector3* verts, unsigned int vcount, btVector3* overts, unsigned int& ocount, unsigned int* indices, unsigned indexcount);
 
 	bool CleanupVertices(unsigned int svcount,
-						 const btVector3* svertices,
-						 unsigned int stride,
-						 unsigned int& vcount,  // output number of vertices
-						 btVector3* vertices,   // location to store the results.
-						 btScalar normalepsilon,
-						 btVector3& scale);
+	                     const btVector3* svertices,
+	                     unsigned int stride,
+	                     unsigned int& vcount,  // output number of vertices
+	                     btVector3* vertices,   // location to store the results.
+	                     btScalar normalepsilon,
+	                     btVector3& scale);
 };
 
 #endif  //BT_CD_HULL_H

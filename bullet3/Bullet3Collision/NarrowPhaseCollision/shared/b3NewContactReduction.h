@@ -94,17 +94,17 @@ int b3ExtractManifoldSequentialGlobal(__global const b3Float4* p, int nPoints, b
 }
 
 __kernel void b3NewContactReductionKernel(__global b3Int4* pairs,
-										  __global const b3RigidBodyData_t* rigidBodies,
-										  __global const b3Float4* separatingNormals,
-										  __global const int* hasSeparatingAxis,
-										  __global struct b3Contact4Data* globalContactsOut,
-										  __global b3Int4* clippingFaces,
-										  __global b3Float4* worldVertsB2,
-										  volatile __global int* nGlobalContactsOut,
-										  int vertexFaceCapacity,
-										  int contactCapacity,
-										  int numPairs,
-										  int pairIndex)
+        __global const b3RigidBodyData_t* rigidBodies,
+        __global const b3Float4* separatingNormals,
+        __global const int* hasSeparatingAxis,
+        __global struct b3Contact4Data* globalContactsOut,
+        __global b3Int4* clippingFaces,
+        __global b3Float4* worldVertsB2,
+        volatile __global int* nGlobalContactsOut,
+        int vertexFaceCapacity,
+        int contactCapacity,
+        int numPairs,
+        int pairIndex)
 {
 	//    int i = get_global_id(0);
 	//int pairIndex = i;
@@ -150,17 +150,17 @@ __kernel void b3NewContactReductionKernel(__global b3Int4* pairs,
 
 					switch (nReducedContacts)
 					{
-						case 4:
-							c->m_worldPosB[3] = pointsIn[contactIdx.w];
-						case 3:
-							c->m_worldPosB[2] = pointsIn[contactIdx.z];
-						case 2:
-							c->m_worldPosB[1] = pointsIn[contactIdx.y];
-						case 1:
-							c->m_worldPosB[0] = pointsIn[contactIdx.x];
-						default:
-						{
-						}
+					case 4:
+						c->m_worldPosB[3] = pointsIn[contactIdx.w];
+					case 3:
+						c->m_worldPosB[2] = pointsIn[contactIdx.z];
+					case 2:
+						c->m_worldPosB[1] = pointsIn[contactIdx.y];
+					case 1:
+						c->m_worldPosB[0] = pointsIn[contactIdx.x];
+					default:
+					{
+					}
 					};
 
 					GET_NPOINTS(*c) = nReducedContacts;

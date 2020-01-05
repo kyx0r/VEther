@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -29,7 +29,7 @@ b3Point2PointConstraint::b3Point2PointConstraint(int  rbA,const b3Vector3& pivot
 m_flags(0),
 m_useSolveConstraintObsolete(false)
 {
-	
+
 }
 */
 
@@ -144,18 +144,18 @@ void b3Point2PointConstraint::setParam(int num, b3Scalar value, int axis)
 	{
 		switch (num)
 		{
-			case B3_CONSTRAINT_ERP:
-			case B3_CONSTRAINT_STOP_ERP:
-				m_erp = value;
-				m_flags |= B3_P2P_FLAGS_ERP;
-				break;
-			case B3_CONSTRAINT_CFM:
-			case B3_CONSTRAINT_STOP_CFM:
-				m_cfm = value;
-				m_flags |= B3_P2P_FLAGS_CFM;
-				break;
-			default:
-				b3AssertConstrParams(0);
+		case B3_CONSTRAINT_ERP:
+		case B3_CONSTRAINT_STOP_ERP:
+			m_erp = value;
+			m_flags |= B3_P2P_FLAGS_ERP;
+			break;
+		case B3_CONSTRAINT_CFM:
+		case B3_CONSTRAINT_STOP_CFM:
+			m_cfm = value;
+			m_flags |= B3_P2P_FLAGS_CFM;
+			break;
+		default:
+			b3AssertConstrParams(0);
 		}
 	}
 }
@@ -172,18 +172,18 @@ b3Scalar b3Point2PointConstraint::getParam(int num, int axis) const
 	{
 		switch (num)
 		{
-			case B3_CONSTRAINT_ERP:
-			case B3_CONSTRAINT_STOP_ERP:
-				b3AssertConstrParams(m_flags & B3_P2P_FLAGS_ERP);
-				retVal = m_erp;
-				break;
-			case B3_CONSTRAINT_CFM:
-			case B3_CONSTRAINT_STOP_CFM:
-				b3AssertConstrParams(m_flags & B3_P2P_FLAGS_CFM);
-				retVal = m_cfm;
-				break;
-			default:
-				b3AssertConstrParams(0);
+		case B3_CONSTRAINT_ERP:
+		case B3_CONSTRAINT_STOP_ERP:
+			b3AssertConstrParams(m_flags & B3_P2P_FLAGS_ERP);
+			retVal = m_erp;
+			break;
+		case B3_CONSTRAINT_CFM:
+		case B3_CONSTRAINT_STOP_CFM:
+			b3AssertConstrParams(m_flags & B3_P2P_FLAGS_CFM);
+			retVal = m_cfm;
+			break;
+		default:
+			b3AssertConstrParams(0);
 		}
 	}
 	return retVal;

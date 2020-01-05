@@ -96,11 +96,20 @@ public:
 	btThreadSupportPosix(const ConstructionInfo& threadConstructionInfo);
 	virtual ~btThreadSupportPosix();
 
-	virtual int getNumWorkerThreads() const BT_OVERRIDE { return m_numThreads; }
+	virtual int getNumWorkerThreads() const BT_OVERRIDE
+	{
+		return m_numThreads;
+	}
 	// TODO: return the number of logical processors sharing the first L3 cache
-	virtual int getCacheFriendlyNumThreads() const BT_OVERRIDE { return m_numThreads + 1; }
+	virtual int getCacheFriendlyNumThreads() const BT_OVERRIDE
+	{
+		return m_numThreads + 1;
+	}
 	// TODO: detect if CPU has hyperthreading enabled
-	virtual int getLogicalToPhysicalCoreRatio() const BT_OVERRIDE { return 1; }
+	virtual int getLogicalToPhysicalCoreRatio() const BT_OVERRIDE
+	{
+		return 1;
+	}
 
 	virtual void runTask(int threadIndex, void* userData) BT_OVERRIDE;
 	virtual void waitForAllTasks() BT_OVERRIDE;
@@ -239,7 +248,7 @@ int btThreadSupportPosix::waitForResponse()
 	{
 		m_cs->lock();
 		bool hasFinished = (2 == m_activeThreadStatus[t].m_status);
-		m_cs->unlock(); 
+		m_cs->unlock();
 		if (hasFinished)
 		{
 			last = t;

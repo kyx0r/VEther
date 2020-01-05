@@ -37,47 +37,47 @@
 namespace FW
 {
 
-	//--------
-	FileWatcher::FileWatcher()
-	{
-		mImpl = new FILEWATCHER_IMPL();
-	}
+//--------
+FileWatcher::FileWatcher()
+{
+	mImpl = new FILEWATCHER_IMPL();
+}
 
-	//--------
-	FileWatcher::~FileWatcher()
-	{
-		delete mImpl;
-		mImpl = 0;
-	}
+//--------
+FileWatcher::~FileWatcher()
+{
+	delete mImpl;
+	mImpl = 0;
+}
 
-	//--------
-	WatchID FileWatcher::addWatch(const String& directory, FileWatchListener* watcher)
-	{
-		return mImpl->addWatch(directory, watcher, false);
-	}
+//--------
+WatchID FileWatcher::addWatch(const String& directory, FileWatchListener* watcher)
+{
+	return mImpl->addWatch(directory, watcher, false);
+}
 
-	//--------
-	WatchID FileWatcher::addWatch(const String& directory, FileWatchListener* watcher, bool recursive)
-	{
-		return mImpl->addWatch(directory, watcher, recursive);
-	}
+//--------
+WatchID FileWatcher::addWatch(const String& directory, FileWatchListener* watcher, bool recursive)
+{
+	return mImpl->addWatch(directory, watcher, recursive);
+}
 
-	//--------
-	void FileWatcher::removeWatch(const String& directory)
-	{
-		mImpl->removeWatch(directory);
-	}
+//--------
+void FileWatcher::removeWatch(const String& directory)
+{
+	mImpl->removeWatch(directory);
+}
 
-	//--------
-	void FileWatcher::removeWatch(WatchID watchid)
-	{
-		mImpl->removeWatch(watchid);
-	}
+//--------
+void FileWatcher::removeWatch(WatchID watchid)
+{
+	mImpl->removeWatch(watchid);
+}
 
-	//--------
-	void FileWatcher::update()
-	{
-		mImpl->update();
-	}
+//--------
+void FileWatcher::update()
+{
+	mImpl->update();
+}
 
 };//namespace FW

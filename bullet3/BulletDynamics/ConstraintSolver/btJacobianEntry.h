@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -30,17 +30,17 @@ ATTRIBUTE_ALIGNED16(class)
 btJacobianEntry
 {
 public:
-	btJacobianEntry(){};
+	btJacobianEntry() {};
 	//constraint between two different rigidbodies
 	btJacobianEntry(
-		const btMatrix3x3& world2A,
-		const btMatrix3x3& world2B,
-		const btVector3& rel_pos1, const btVector3& rel_pos2,
-		const btVector3& jointAxis,
-		const btVector3& inertiaInvA,
-		const btScalar massInvA,
-		const btVector3& inertiaInvB,
-		const btScalar massInvB)
+	    const btMatrix3x3& world2A,
+	    const btMatrix3x3& world2B,
+	    const btVector3& rel_pos1, const btVector3& rel_pos2,
+	    const btVector3& jointAxis,
+	    const btVector3& inertiaInvA,
+	    const btScalar massInvA,
+	    const btVector3& inertiaInvB,
+	    const btScalar massInvB)
 		: m_linearJointAxis(jointAxis)
 	{
 		m_aJ = world2A * (rel_pos1.cross(m_linearJointAxis));
@@ -54,10 +54,10 @@ public:
 
 	//angular constraint between two different rigidbodies
 	btJacobianEntry(const btVector3& jointAxis,
-					const btMatrix3x3& world2A,
-					const btMatrix3x3& world2B,
-					const btVector3& inertiaInvA,
-					const btVector3& inertiaInvB)
+	                const btMatrix3x3& world2A,
+	                const btMatrix3x3& world2B,
+	                const btVector3& inertiaInvA,
+	                const btVector3& inertiaInvB)
 		: m_linearJointAxis(btVector3(btScalar(0.), btScalar(0.), btScalar(0.)))
 	{
 		m_aJ = world2A * jointAxis;
@@ -71,9 +71,9 @@ public:
 
 	//angular constraint between two different rigidbodies
 	btJacobianEntry(const btVector3& axisInA,
-					const btVector3& axisInB,
-					const btVector3& inertiaInvA,
-					const btVector3& inertiaInvB)
+	                const btVector3& axisInB,
+	                const btVector3& inertiaInvA,
+	                const btVector3& inertiaInvB)
 		: m_linearJointAxis(btVector3(btScalar(0.), btScalar(0.), btScalar(0.))), m_aJ(axisInA), m_bJ(-axisInB)
 	{
 		m_0MinvJt = inertiaInvA * m_aJ;
@@ -85,11 +85,11 @@ public:
 
 	//constraint on one rigidbody
 	btJacobianEntry(
-		const btMatrix3x3& world2A,
-		const btVector3& rel_pos1, const btVector3& rel_pos2,
-		const btVector3& jointAxis,
-		const btVector3& inertiaInvA,
-		const btScalar massInvA)
+	    const btMatrix3x3& world2A,
+	    const btVector3& rel_pos1, const btVector3& rel_pos2,
+	    const btVector3& jointAxis,
+	    const btVector3& inertiaInvA,
+	    const btScalar massInvA)
 		: m_linearJointAxis(jointAxis)
 	{
 		m_aJ = world2A * (rel_pos1.cross(jointAxis));

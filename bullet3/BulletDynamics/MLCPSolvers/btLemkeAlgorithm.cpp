@@ -4,8 +4,8 @@ Code was converted for the Bullet Continuous Collision Detection and Physics Lib
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -37,7 +37,8 @@ btScalar btMachEps()
 			machEps /= btScalar(2.0);
 			// If next epsilon yields 1, then break, because current
 			// epsilon is the machine epsilon.
-		} while ((btScalar)(1.0 + (machEps / btScalar(2.0))) != btScalar(1.0));
+		}
+		while ((btScalar)(1.0 + (machEps / btScalar(2.0))) != btScalar(1.0));
 		//		printf( "\nCalculated Machine epsilon: %G\n", machEps );
 		calculated = true;
 	}
@@ -173,7 +174,8 @@ btVectorXu btLemkeAlgorithm::solve(unsigned int maxloops /* = 0*/)
 			pivotRowIndex = findLexicographicMinimum(A, pivotColIndex);
 
 			if (z0Row == pivotRowIndex)
-			{  //if z0 leaves the basis the solution is found --> one last elimination step is necessary
+			{
+				//if z0 leaves the basis the solution is found --> one last elimination step is necessary
 				GaussJordanEliminationStep(A, pivotRowIndex, pivotColIndex, basis);
 				basis[pivotRowIndex] = pivotColIndex;  //update basis
 				break;
@@ -236,9 +238,9 @@ int btLemkeAlgorithm::findLexicographicMinimum(const btMatrixXu& A, const int& p
 				Rows[row][j] = A(row, j - 1) / a;
 
 #ifdef BT_DEBUG_OSTREAM
-				//		if (DEBUGLEVEL) {
-				//	  cout << "Rows(" << row << ") = " << Rows[row] << endl;
-				// }
+			//		if (DEBUGLEVEL) {
+			//	  cout << "Rows(" << row << ") = " << Rows[row] << endl;
+			// }
 #endif
 		}
 	}
@@ -359,7 +361,8 @@ bool btLemkeAlgorithm::validBasis(const btAlignedObjectArray<int>& basis)
 	for (int i = 0; i < basis.size(); i++)
 	{
 		if (basis[i] >= basis.size() * 2)
-		{  //then z0 is in the base
+		{
+			//then z0 is in the base
 			isValid = false;
 			break;
 		}

@@ -198,9 +198,9 @@ struct GJK
 		m_ray = m_simplices[0].c[0]->w;
 		sqdist = sqrl;
 		lastw[0] =
-			lastw[1] =
-				lastw[2] =
-					lastw[3] = m_ray;
+		    lastw[1] =
+		        lastw[2] =
+		            lastw[3] = m_ray;
 		/* Loop						*/
 		do
 		{
@@ -210,7 +210,8 @@ struct GJK
 			/* Check zero							*/
 			const btScalar rl = m_ray.length();
 			if (rl < GJK_MIN_DISTANCE)
-			{ /* Touching or inside				*/
+			{
+				/* Touching or inside				*/
 				m_status = eGjkInside;
 				break;
 			}
@@ -227,19 +228,22 @@ struct GJK
 				}
 			}
 			if (found)
-			{ /* Return old simplex				*/
+			{
+				/* Return old simplex				*/
 				removevertice(m_simplices[m_current]);
 				break;
 			}
 			else
-			{ /* Update lastw					*/
+			{
+				/* Update lastw					*/
 				lastw[clastw = (clastw + 1) & 3] = w;
 			}
 			/* Check for termination				*/
 			const btScalar omega = btDot(m_ray, w) / rl;
 			alpha = btMax(omega, alpha);
 			if (((rl - alpha) - (GJK_ACCURARY * rl)) <= 0)
-			{ /* Return old simplex				*/
+			{
+				/* Return old simplex				*/
 				removevertice(m_simplices[m_current]);
 				break;
 			}
@@ -248,27 +252,28 @@ struct GJK
 			U mask = 0;
 			switch (cs.rank)
 			{
-				case 2:
-					sqdist = projectorigin(cs.c[0]->w,
-										   cs.c[1]->w,
-										   weights, mask);
-					break;
-				case 3:
-					sqdist = projectorigin(cs.c[0]->w,
-										   cs.c[1]->w,
-										   cs.c[2]->w,
-										   weights, mask);
-					break;
-				case 4:
-					sqdist = projectorigin(cs.c[0]->w,
-										   cs.c[1]->w,
-										   cs.c[2]->w,
-										   cs.c[3]->w,
-										   weights, mask);
-					break;
+			case 2:
+				sqdist = projectorigin(cs.c[0]->w,
+				                       cs.c[1]->w,
+				                       weights, mask);
+				break;
+			case 3:
+				sqdist = projectorigin(cs.c[0]->w,
+				                       cs.c[1]->w,
+				                       cs.c[2]->w,
+				                       weights, mask);
+				break;
+			case 4:
+				sqdist = projectorigin(cs.c[0]->w,
+				                       cs.c[1]->w,
+				                       cs.c[2]->w,
+				                       cs.c[3]->w,
+				                       weights, mask);
+				break;
 			}
 			if (sqdist >= 0)
-			{ /* Valid	*/
+			{
+				/* Valid	*/
 				ns.rank = 0;
 				m_ray = btVector3(0, 0, 0);
 				m_current = next;
@@ -288,24 +293,26 @@ struct GJK
 				if (mask == 15) m_status = eGjkInside;
 			}
 			else
-			{ /* Return old simplex				*/
+			{
+				/* Return old simplex				*/
 				removevertice(m_simplices[m_current]);
 				break;
 			}
 			m_status = ((++iterations) < GJK_MAX_ITERATIONS) ? m_status : eGjkFailed;
-		} while (m_status == eGjkValid);
+		}
+		while (m_status == eGjkValid);
 		m_simplex = &m_simplices[m_current];
 		switch (m_status)
 		{
-			case eGjkValid:
-				m_distance = m_ray.length();
-				break;
-			case eGjkInside:
-				m_distance = 0;
-				break;
-			default:
-			{
-			}
+		case eGjkValid:
+			m_distance = m_ray.length();
+			break;
+		case eGjkInside:
+			m_distance = 0;
+			break;
+		default:
+		{
+		}
 		}
 		return (m_status);
 	}
@@ -313,64 +320,64 @@ struct GJK
 	{
 		switch (m_simplex->rank)
 		{
-			case 1:
+		case 1:
+		{
+			for (U i = 0; i < 3; ++i)
 			{
-				for (U i = 0; i < 3; ++i)
+				btVector3 axis = btVector3(0, 0, 0);
+				axis[i] = 1;
+				appendvertice(*m_simplex, axis);
+				if (EncloseOrigin()) return (true);
+				removevertice(*m_simplex);
+				appendvertice(*m_simplex, -axis);
+				if (EncloseOrigin()) return (true);
+				removevertice(*m_simplex);
+			}
+		}
+		break;
+		case 2:
+		{
+			const btVector3 d = m_simplex->c[1]->w - m_simplex->c[0]->w;
+			for (U i = 0; i < 3; ++i)
+			{
+				btVector3 axis = btVector3(0, 0, 0);
+				axis[i] = 1;
+				const btVector3 p = btCross(d, axis);
+				if (p.length2() > 0)
 				{
-					btVector3 axis = btVector3(0, 0, 0);
-					axis[i] = 1;
-					appendvertice(*m_simplex, axis);
+					appendvertice(*m_simplex, p);
 					if (EncloseOrigin()) return (true);
 					removevertice(*m_simplex);
-					appendvertice(*m_simplex, -axis);
+					appendvertice(*m_simplex, -p);
 					if (EncloseOrigin()) return (true);
 					removevertice(*m_simplex);
 				}
 			}
-			break;
-			case 2:
+		}
+		break;
+		case 3:
+		{
+			const btVector3 n = btCross(m_simplex->c[1]->w - m_simplex->c[0]->w,
+			                            m_simplex->c[2]->w - m_simplex->c[0]->w);
+			if (n.length2() > 0)
 			{
-				const btVector3 d = m_simplex->c[1]->w - m_simplex->c[0]->w;
-				for (U i = 0; i < 3; ++i)
-				{
-					btVector3 axis = btVector3(0, 0, 0);
-					axis[i] = 1;
-					const btVector3 p = btCross(d, axis);
-					if (p.length2() > 0)
-					{
-						appendvertice(*m_simplex, p);
-						if (EncloseOrigin()) return (true);
-						removevertice(*m_simplex);
-						appendvertice(*m_simplex, -p);
-						if (EncloseOrigin()) return (true);
-						removevertice(*m_simplex);
-					}
-				}
+				appendvertice(*m_simplex, n);
+				if (EncloseOrigin()) return (true);
+				removevertice(*m_simplex);
+				appendvertice(*m_simplex, -n);
+				if (EncloseOrigin()) return (true);
+				removevertice(*m_simplex);
 			}
-			break;
-			case 3:
-			{
-				const btVector3 n = btCross(m_simplex->c[1]->w - m_simplex->c[0]->w,
-											m_simplex->c[2]->w - m_simplex->c[0]->w);
-				if (n.length2() > 0)
-				{
-					appendvertice(*m_simplex, n);
-					if (EncloseOrigin()) return (true);
-					removevertice(*m_simplex);
-					appendvertice(*m_simplex, -n);
-					if (EncloseOrigin()) return (true);
-					removevertice(*m_simplex);
-				}
-			}
-			break;
-			case 4:
-			{
-				if (btFabs(det(m_simplex->c[0]->w - m_simplex->c[3]->w,
-							   m_simplex->c[1]->w - m_simplex->c[3]->w,
-							   m_simplex->c[2]->w - m_simplex->c[3]->w)) > 0)
-					return (true);
-			}
-			break;
+		}
+		break;
+		case 4:
+		{
+			if (btFabs(det(m_simplex->c[0]->w - m_simplex->c[3]->w,
+			               m_simplex->c[1]->w - m_simplex->c[3]->w,
+			               m_simplex->c[2]->w - m_simplex->c[3]->w)) > 0)
+				return (true);
+		}
+		break;
 		}
 		return (false);
 	}
@@ -393,12 +400,12 @@ struct GJK
 	static btScalar det(const btVector3& a, const btVector3& b, const btVector3& c)
 	{
 		return (a.y() * b.z() * c.x() + a.z() * b.x() * c.y() -
-				a.x() * b.z() * c.y() - a.y() * b.x() * c.z() +
-				a.x() * b.y() * c.z() - a.z() * b.y() * c.x());
+		        a.x() * b.z() * c.y() - a.y() * b.x() * c.z() +
+		        a.x() * b.y() * c.z() - a.z() * b.y() * c.x());
 	}
 	static btScalar projectorigin(const btVector3& a,
-								  const btVector3& b,
-								  btScalar* w, U& m)
+	                              const btVector3& b,
+	                              btScalar* w, U& m)
 	{
 		const btVector3 d = b - a;
 		const btScalar l = d.length2();
@@ -429,9 +436,9 @@ struct GJK
 		return (-1);
 	}
 	static btScalar projectorigin(const btVector3& a,
-								  const btVector3& b,
-								  const btVector3& c,
-								  btScalar* w, U& m)
+	                              const btVector3& b,
+	                              const btVector3& c,
+	                              btScalar* w, U& m)
 	{
 		static const U imd3[] = {1, 2, 0};
 		const btVector3* vt[] = {&a, &b, &c};
@@ -475,10 +482,10 @@ struct GJK
 		return (-1);
 	}
 	static btScalar projectorigin(const btVector3& a,
-								  const btVector3& b,
-								  const btVector3& c,
-								  const btVector3& d,
-								  btScalar* w, U& m)
+	                              const btVector3& b,
+	                              const btVector3& c,
+	                              const btVector3& d,
+	                              btScalar* w, U& m)
 	{
 		static const U imd3[] = {1, 2, 0};
 		const btVector3* vt[] = {&a, &b, &c, &d};
@@ -501,8 +508,8 @@ struct GJK
 					{
 						mindist = subd;
 						m = static_cast<U>((subm & 1 ? 1 << i : 0) +
-										   (subm & 2 ? 1 << j : 0) +
-										   (subm & 4 ? 8 : 0));
+						                   (subm & 2 ? 1 << j : 0) +
+						                   (subm & 4 ? 8 : 0));
 						w[i] = subw[0];
 						w[j] = subw[1];
 						w[imd3[j]] = 0;
@@ -635,17 +642,18 @@ struct EPA
 			m_nextsv = 0;
 			/* Orient simplex		*/
 			if (gjk.det(simplex.c[0]->w - simplex.c[3]->w,
-						simplex.c[1]->w - simplex.c[3]->w,
-						simplex.c[2]->w - simplex.c[3]->w) < 0)
+			            simplex.c[1]->w - simplex.c[3]->w,
+			            simplex.c[2]->w - simplex.c[3]->w) < 0)
 			{
 				btSwap(simplex.c[0], simplex.c[1]);
 				btSwap(simplex.p[0], simplex.p[1]);
 			}
 			/* Build initial hull	*/
 			sFace* tetra[] = {newface(simplex.c[0], simplex.c[1], simplex.c[2], true),
-							  newface(simplex.c[1], simplex.c[0], simplex.c[3], true),
-							  newface(simplex.c[2], simplex.c[1], simplex.c[3], true),
-							  newface(simplex.c[0], simplex.c[2], simplex.c[3], true)};
+			                  newface(simplex.c[1], simplex.c[0], simplex.c[3], true),
+			                  newface(simplex.c[2], simplex.c[1], simplex.c[3], true),
+			                  newface(simplex.c[0], simplex.c[2], simplex.c[3], true)
+			                 };
 			if (m_hull.count == 4)
 			{
 				sFace* best = findbest();
@@ -674,8 +682,8 @@ struct EPA
 							for (U j = 0; (j < 3) && valid; ++j)
 							{
 								valid &= expand(pass, w,
-												best->f[j], best->e[j],
-												horizon);
+								                best->f[j], best->e[j],
+								                horizon);
 							}
 							if (valid && (horizon.nf >= 3))
 							{
@@ -711,14 +719,14 @@ struct EPA
 				m_result.c[1] = outer.c[1];
 				m_result.c[2] = outer.c[2];
 				m_result.p[0] = btCross(outer.c[1]->w - projection,
-										outer.c[2]->w - projection)
-									.length();
+				                        outer.c[2]->w - projection)
+				                .length();
 				m_result.p[1] = btCross(outer.c[2]->w - projection,
-										outer.c[0]->w - projection)
-									.length();
+				                        outer.c[0]->w - projection)
+				                .length();
 				m_result.p[2] = btCross(outer.c[0]->w - projection,
-										outer.c[1]->w - projection)
-									.length();
+				                        outer.c[1]->w - projection)
+				                .length();
 				const btScalar sum = m_result.p[0] + m_result.p[1] + m_result.p[2];
 				m_result.p[0] /= sum;
 				m_result.p[1] /= sum;
@@ -794,8 +802,8 @@ struct EPA
 			if (v)
 			{
 				if (!(getedgedist(face, a, b, face->d) ||
-					  getedgedist(face, b, c, face->d) ||
-					  getedgedist(face, c, a, face->d)))
+				        getedgedist(face, b, c, face->d) ||
+				        getedgedist(face, c, a, face->d)))
 				{
 					// Origin projects to the interior of the triangle
 					// Use distance to triangle plane
@@ -862,7 +870,7 @@ struct EPA
 				const U e2 = i2m3[e];
 				f->pass = (U1)pass;
 				if (expand(pass, w, f->f[e1], f->e[e1], horizon) &&
-					expand(pass, w, f->f[e2], f->e[e2], horizon))
+				        expand(pass, w, f->f[e2], f->e[e2], horizon))
 				{
 					remove(m_hull, f);
 					append(m_stock, f);
@@ -876,12 +884,12 @@ struct EPA
 
 template <typename btConvexTemplate>
 static void Initialize(const btConvexTemplate& a, const btConvexTemplate& b,
-					   btGjkEpaSolver3::sResults& results,
-					   MinkowskiDiff<btConvexTemplate>& shape)
+                       btGjkEpaSolver3::sResults& results,
+                       MinkowskiDiff<btConvexTemplate>& shape)
 {
 	/* Results		*/
 	results.witnesses[0] =
-		results.witnesses[1] = btVector3(0, 0, 0);
+	    results.witnesses[1] = btVector3(0, 0, 0);
 	results.status = btGjkEpaSolver3::sResults::Separated;
 	/* Shape		*/
 
@@ -896,8 +904,8 @@ static void Initialize(const btConvexTemplate& a, const btConvexTemplate& b,
 //
 template <typename btConvexTemplate>
 bool btGjkEpaSolver3_Distance(const btConvexTemplate& a, const btConvexTemplate& b,
-							  const btVector3& guess,
-							  btGjkEpaSolver3::sResults& results)
+                              const btVector3& guess,
+                              btGjkEpaSolver3::sResults& results)
 {
 	MinkowskiDiff<btConvexTemplate> shape(a, b);
 	Initialize(a, b, results, shape);
@@ -929,9 +937,9 @@ bool btGjkEpaSolver3_Distance(const btConvexTemplate& a, const btConvexTemplate&
 
 template <typename btConvexTemplate>
 bool btGjkEpaSolver3_Penetration(const btConvexTemplate& a,
-								 const btConvexTemplate& b,
-								 const btVector3& guess,
-								 btGjkEpaSolver3::sResults& results)
+                                 const btConvexTemplate& b,
+                                 const btVector3& guess,
+                                 btGjkEpaSolver3::sResults& results)
 {
 	MinkowskiDiff<btConvexTemplate> shape(a, b);
 	Initialize(a, b, results, shape);
@@ -939,34 +947,34 @@ bool btGjkEpaSolver3_Penetration(const btConvexTemplate& a,
 	eGjkStatus gjk_status = gjk.Evaluate(shape, -guess);
 	switch (gjk_status)
 	{
-		case eGjkInside:
+	case eGjkInside:
+	{
+		EPA<btConvexTemplate> epa;
+		eEpaStatus epa_status = epa.Evaluate(gjk, -guess);
+		if (epa_status != eEpaFailed)
 		{
-			EPA<btConvexTemplate> epa;
-			eEpaStatus epa_status = epa.Evaluate(gjk, -guess);
-			if (epa_status != eEpaFailed)
+			btVector3 w0 = btVector3(0, 0, 0);
+			for (U i = 0; i < epa.m_result.rank; ++i)
 			{
-				btVector3 w0 = btVector3(0, 0, 0);
-				for (U i = 0; i < epa.m_result.rank; ++i)
-				{
-					w0 += shape.Support(epa.m_result.c[i]->d, 0) * epa.m_result.p[i];
-				}
-				results.status = btGjkEpaSolver3::sResults::Penetrating;
-				results.witnesses[0] = a.getWorldTransform() * w0;
-				results.witnesses[1] = a.getWorldTransform() * (w0 - epa.m_normal * epa.m_depth);
-				results.normal = -epa.m_normal;
-				results.distance = -epa.m_depth;
-				return (true);
+				w0 += shape.Support(epa.m_result.c[i]->d, 0) * epa.m_result.p[i];
 			}
-			else
-				results.status = btGjkEpaSolver3::sResults::EPA_Failed;
+			results.status = btGjkEpaSolver3::sResults::Penetrating;
+			results.witnesses[0] = a.getWorldTransform() * w0;
+			results.witnesses[1] = a.getWorldTransform() * (w0 - epa.m_normal * epa.m_depth);
+			results.normal = -epa.m_normal;
+			results.distance = -epa.m_depth;
+			return (true);
 		}
+		else
+			results.status = btGjkEpaSolver3::sResults::EPA_Failed;
+	}
+	break;
+	case eGjkFailed:
+		results.status = btGjkEpaSolver3::sResults::GJK_Failed;
 		break;
-		case eGjkFailed:
-			results.status = btGjkEpaSolver3::sResults::GJK_Failed;
-			break;
-		default:
-		{
-		}
+	default:
+	{
+	}
 	}
 	return (false);
 }
@@ -974,62 +982,62 @@ bool btGjkEpaSolver3_Penetration(const btConvexTemplate& a,
 #if 0
 int	btComputeGjkEpaPenetration2(const btCollisionDescription& colDesc, btDistanceInfo* distInfo)
 {
-    btGjkEpaSolver3::sResults results;
-    btVector3 guess = colDesc.m_firstDir;
-    
-    bool res = btGjkEpaSolver3::Penetration(colDesc.m_objA,colDesc.m_objB,
-                                            colDesc.m_transformA,colDesc.m_transformB,
-                                            colDesc.m_localSupportFuncA,colDesc.m_localSupportFuncB,
-                                            guess,
-                                            results);
-    if (res)
-    {
-        if ((results.status==btGjkEpaSolver3::sResults::Penetrating) || results.status==GJK::eStatus::Inside)
-        {
-            //normal could be 'swapped'
-            
-            distInfo->m_distance = results.distance;
-            distInfo->m_normalBtoA = results.normal;
-            btVector3 tmpNormalInB = results.witnesses[1]-results.witnesses[0];
-            btScalar lenSqr = tmpNormalInB.length2();
-            if (lenSqr <= (SIMD_EPSILON*SIMD_EPSILON))
-            {
-                tmpNormalInB = results.normal;
-                lenSqr = results.normal.length2();
-            }
-            
-            if (lenSqr > (SIMD_EPSILON*SIMD_EPSILON))
-            {
-                tmpNormalInB /= btSqrt(lenSqr);
-                btScalar distance2 = -(results.witnesses[0]-results.witnesses[1]).length();
-                //only replace valid penetrations when the result is deeper (check)
-                //if ((distance2 < results.distance))
-                {
-                    distInfo->m_distance = distance2;
-                    distInfo->m_pointOnA= results.witnesses[0];
-                    distInfo->m_pointOnB= results.witnesses[1];
-                    distInfo->m_normalBtoA= tmpNormalInB;
-                    return 0;
-                }
-            }
-        }
-        
-    }
-    
-    return -1;
+	btGjkEpaSolver3::sResults results;
+	btVector3 guess = colDesc.m_firstDir;
+
+	bool res = btGjkEpaSolver3::Penetration(colDesc.m_objA,colDesc.m_objB,
+	                                        colDesc.m_transformA,colDesc.m_transformB,
+	                                        colDesc.m_localSupportFuncA,colDesc.m_localSupportFuncB,
+	                                        guess,
+	                                        results);
+	if (res)
+	{
+		if ((results.status==btGjkEpaSolver3::sResults::Penetrating) || results.status==GJK::eStatus::Inside)
+		{
+			//normal could be 'swapped'
+
+			distInfo->m_distance = results.distance;
+			distInfo->m_normalBtoA = results.normal;
+			btVector3 tmpNormalInB = results.witnesses[1]-results.witnesses[0];
+			btScalar lenSqr = tmpNormalInB.length2();
+			if (lenSqr <= (SIMD_EPSILON*SIMD_EPSILON))
+			{
+				tmpNormalInB = results.normal;
+				lenSqr = results.normal.length2();
+			}
+
+			if (lenSqr > (SIMD_EPSILON*SIMD_EPSILON))
+			{
+				tmpNormalInB /= btSqrt(lenSqr);
+				btScalar distance2 = -(results.witnesses[0]-results.witnesses[1]).length();
+				//only replace valid penetrations when the result is deeper (check)
+				//if ((distance2 < results.distance))
+				{
+					distInfo->m_distance = distance2;
+					distInfo->m_pointOnA= results.witnesses[0];
+					distInfo->m_pointOnB= results.witnesses[1];
+					distInfo->m_normalBtoA= tmpNormalInB;
+					return 0;
+				}
+			}
+		}
+
+	}
+
+	return -1;
 }
 #endif
 
 template <typename btConvexTemplate, typename btDistanceInfoTemplate>
 int btComputeGjkDistance(const btConvexTemplate& a, const btConvexTemplate& b,
-						 const btGjkCollisionDescription& colDesc, btDistanceInfoTemplate* distInfo)
+                         const btGjkCollisionDescription& colDesc, btDistanceInfoTemplate* distInfo)
 {
 	btGjkEpaSolver3::sResults results;
 	btVector3 guess = colDesc.m_firstDir;
 
 	bool isSeparated = btGjkEpaSolver3_Distance(a, b,
-												guess,
-												results);
+	                   guess,
+	                   results);
 	if (isSeparated)
 	{
 		distInfo->m_distance = results.distance;

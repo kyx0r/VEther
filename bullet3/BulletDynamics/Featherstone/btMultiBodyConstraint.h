@@ -65,19 +65,19 @@ protected:
 	void applyDeltaVee(btMultiBodyJacobianData & data, btScalar * delta_vee, btScalar impulse, int velocityIndex, int ndof);
 
 	btScalar fillMultiBodyConstraint(btMultiBodySolverConstraint & solverConstraint,
-									 btMultiBodyJacobianData & data,
-									 btScalar * jacOrgA, btScalar * jacOrgB,
-									 const btVector3& constraintNormalAng,
+	                                 btMultiBodyJacobianData & data,
+	                                 btScalar * jacOrgA, btScalar * jacOrgB,
+	                                 const btVector3& constraintNormalAng,
 
-									 const btVector3& constraintNormalLin,
-									 const btVector3& posAworld, const btVector3& posBworld,
-									 btScalar posError,
-									 const btContactSolverInfo& infoGlobal,
-									 btScalar lowerLimit, btScalar upperLimit,
-									 bool angConstraint = false,
+	                                 const btVector3& constraintNormalLin,
+	                                 const btVector3& posAworld, const btVector3& posBworld,
+	                                 btScalar posError,
+	                                 const btContactSolverInfo& infoGlobal,
+	                                 btScalar lowerLimit, btScalar upperLimit,
+	                                 bool angConstraint = false,
 
-									 btScalar relaxation = 1.f,
-									 bool isFriction = false, btScalar desiredVelocity = 0, btScalar cfmSlip = 0);
+	                                 btScalar relaxation = 1.f,
+	                                 bool isFriction = false, btScalar desiredVelocity = 0, btScalar cfmSlip = 0);
 
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
@@ -98,8 +98,8 @@ public:
 	virtual int getIslandIdB() const = 0;
 
 	virtual void createConstraintRows(btMultiBodyConstraintArray & constraintRows,
-									  btMultiBodyJacobianData & data,
-									  const btContactSolverInfo& infoGlobal) = 0;
+	                                  btMultiBodyJacobianData & data,
+	                                  const btContactSolverInfo& infoGlobal) = 0;
 
 	int getNumRows() const
 	{

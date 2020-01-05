@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -48,7 +48,8 @@ typedef btAlignedObjectArray<btMaterialProperties> MaterialArray;
 ///is the users responsibility to maintain the array during the lifetime of the
 ///TriangleIndexVertexMaterialArray.
 ATTRIBUTE_ALIGNED16(class)
-btTriangleIndexVertexMaterialArray : public btTriangleIndexVertexArray
+btTriangleIndexVertexMaterialArray :
+public btTriangleIndexVertexArray
 {
 protected:
 	MaterialArray m_materials;
@@ -61,9 +62,9 @@ public:
 	}
 
 	btTriangleIndexVertexMaterialArray(int numTriangles, int* triangleIndexBase, int triangleIndexStride,
-									   int numVertices, btScalar* vertexBase, int vertexStride,
-									   int numMaterials, unsigned char* materialBase, int materialStride,
-									   int* triangleMaterialsBase, int materialIndexStride);
+	                                   int numVertices, btScalar* vertexBase, int vertexStride,
+	                                   int numMaterials, unsigned char* materialBase, int materialStride,
+	                                   int* triangleMaterialsBase, int materialIndexStride);
 
 	virtual ~btTriangleIndexVertexMaterialArray() {}
 
@@ -74,10 +75,10 @@ public:
 	}
 
 	virtual void getLockedMaterialBase(unsigned char** materialBase, int& numMaterials, PHY_ScalarType& materialType, int& materialStride,
-									   unsigned char** triangleMaterialBase, int& numTriangles, int& triangleMaterialStride, PHY_ScalarType& triangleType, int subpart = 0);
+	                                   unsigned char** triangleMaterialBase, int& numTriangles, int& triangleMaterialStride, PHY_ScalarType& triangleType, int subpart = 0);
 
 	virtual void getLockedReadOnlyMaterialBase(const unsigned char** materialBase, int& numMaterials, PHY_ScalarType& materialType, int& materialStride,
-											   const unsigned char** triangleMaterialBase, int& numTriangles, int& triangleMaterialStride, PHY_ScalarType& triangleType, int subpart = 0);
+	        const unsigned char** triangleMaterialBase, int& numTriangles, int& triangleMaterialStride, PHY_ScalarType& triangleType, int subpart = 0);
 };
 
 #endif  //BT_MULTIMATERIAL_TRIANGLE_INDEX_VERTEX_ARRAY_H

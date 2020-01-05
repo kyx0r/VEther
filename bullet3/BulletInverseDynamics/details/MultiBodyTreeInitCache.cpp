@@ -11,32 +11,32 @@ MultiBodyTree::InitCache::InitCache()
 }
 
 int MultiBodyTree::InitCache::addBody(const int body_index, const int parent_index,
-									  const JointType joint_type,
-									  const vec3& parent_r_parent_body_ref,
-									  const mat33& body_T_parent_ref,
-									  const vec3& body_axis_of_motion, const idScalar mass,
-									  const vec3& body_r_body_com, const mat33& body_I_body,
-									  const int user_int, void* user_ptr)
+                                      const JointType joint_type,
+                                      const vec3& parent_r_parent_body_ref,
+                                      const mat33& body_T_parent_ref,
+                                      const vec3& body_axis_of_motion, const idScalar mass,
+                                      const vec3& body_r_body_com, const mat33& body_I_body,
+                                      const int user_int, void* user_ptr)
 {
 	switch (joint_type)
 	{
-		case REVOLUTE:
-		case PRISMATIC:
-			m_num_dofs += 1;
-			break;
-		case FIXED:
-			// does not add a degree of freedom
-			// m_num_dofs+=0;
-			break;
-		case SPHERICAL:
-			m_num_dofs += 3;
-			break;
-		case FLOATING:
-			m_num_dofs += 6;
-			break;
-		default:
-			bt_id_error_message("unknown joint type %d\n", joint_type);
-			return -1;
+	case REVOLUTE:
+	case PRISMATIC:
+		m_num_dofs += 1;
+		break;
+	case FIXED:
+		// does not add a degree of freedom
+		// m_num_dofs+=0;
+		break;
+	case SPHERICAL:
+		m_num_dofs += 3;
+		break;
+	case FLOATING:
+		m_num_dofs += 6;
+		break;
+	default:
+		bt_id_error_message("unknown joint type %d\n", joint_type);
+		return -1;
 	}
 
 	if (-1 == parent_index)
@@ -44,7 +44,7 @@ int MultiBodyTree::InitCache::addBody(const int body_index, const int parent_ind
 		if (m_root_index >= 0)
 		{
 			bt_id_error_message("trying to add body %d as root, but already added %d as root body\n",
-								body_index, m_root_index);
+			                    body_index, m_root_index);
 			return -1;
 		}
 		m_root_index = body_index;

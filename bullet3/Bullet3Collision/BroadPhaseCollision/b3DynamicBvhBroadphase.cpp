@@ -169,16 +169,16 @@ b3DynamicBvhBroadphase::~b3DynamicBvhBroadphase()
 
 //
 b3BroadphaseProxy* b3DynamicBvhBroadphase::createProxy(const b3Vector3& aabbMin,
-													   const b3Vector3& aabbMax,
-													   int objectId,
-													   void* userPtr,
-													   int collisionFilterGroup,
-													   int collisionFilterMask)
+        const b3Vector3& aabbMax,
+        int objectId,
+        void* userPtr,
+        int collisionFilterGroup,
+        int collisionFilterMask)
 {
 	b3DbvtProxy* mem = &m_proxies[objectId];
 	b3DbvtProxy* proxy = new (mem) b3DbvtProxy(aabbMin, aabbMax, userPtr,
-											   collisionFilterGroup,
-											   collisionFilterMask);
+	        collisionFilterGroup,
+	        collisionFilterMask);
 
 	b3DbvtAabbMm aabb = b3DbvtVolume::FromMM(aabbMin, aabbMax);
 
@@ -199,7 +199,7 @@ b3BroadphaseProxy* b3DynamicBvhBroadphase::createProxy(const b3Vector3& aabbMin,
 
 //
 void b3DynamicBvhBroadphase::destroyProxy(b3BroadphaseProxy* absproxy,
-										  b3Dispatcher* dispatcher)
+        b3Dispatcher* dispatcher)
 {
 	b3DbvtProxy* proxy = (b3DbvtProxy*)absproxy;
 	if (proxy->stage == STAGECOUNT)
@@ -246,24 +246,24 @@ void b3DynamicBvhBroadphase::rayTest(const b3Vector3& rayFrom, const b3Vector3& 
 	BroadphaseRayTester callback(rayCallback);
 
 	m_sets[0].rayTestInternal(m_sets[0].m_root,
-							  rayFrom,
-							  rayTo,
-							  rayCallback.m_rayDirectionInverse,
-							  rayCallback.m_signs,
-							  rayCallback.m_lambda_max,
-							  aabbMin,
-							  aabbMax,
-							  callback);
+	                          rayFrom,
+	                          rayTo,
+	                          rayCallback.m_rayDirectionInverse,
+	                          rayCallback.m_signs,
+	                          rayCallback.m_lambda_max,
+	                          aabbMin,
+	                          aabbMax,
+	                          callback);
 
 	m_sets[1].rayTestInternal(m_sets[1].m_root,
-							  rayFrom,
-							  rayTo,
-							  rayCallback.m_rayDirectionInverse,
-							  rayCallback.m_signs,
-							  rayCallback.m_lambda_max,
-							  aabbMin,
-							  aabbMax,
-							  callback);
+	                          rayFrom,
+	                          rayTo,
+	                          rayCallback.m_rayDirectionInverse,
+	                          rayCallback.m_signs,
+	                          rayCallback.m_lambda_max,
+	                          aabbMin,
+	                          aabbMax,
+	                          callback);
 }
 
 struct BroadphaseAabbTester : b3DynamicBvh::ICollide
@@ -292,9 +292,9 @@ void b3DynamicBvhBroadphase::aabbTest(const b3Vector3& aabbMin, const b3Vector3&
 
 //
 void b3DynamicBvhBroadphase::setAabb(int objectId,
-									 const b3Vector3& aabbMin,
-									 const b3Vector3& aabbMax,
-									 b3Dispatcher* /*dispatcher*/)
+                                     const b3Vector3& aabbMin,
+                                     const b3Vector3& aabbMax,
+                                     b3Dispatcher* /*dispatcher*/)
 {
 	b3DbvtProxy* proxy = &m_proxies[objectId];
 	//	b3DbvtProxy*						proxy=(b3DbvtProxy*)absproxy;
@@ -306,16 +306,19 @@ void b3DynamicBvhBroadphase::setAabb(int objectId,
 	{
 		bool docollide = false;
 		if (proxy->stage == STAGECOUNT)
-		{ /* fixed -> dynamic set	*/
+		{
+			/* fixed -> dynamic set	*/
 			m_sets[1].remove(proxy->leaf);
 			proxy->leaf = m_sets[0].insert(aabb, proxy);
 			docollide = true;
 		}
 		else
-		{ /* dynamic set				*/
+		{
+			/* dynamic set				*/
 			++m_updates_call;
 			if (b3Intersect(proxy->leaf->volume, aabb))
-			{ /* Moving				*/
+			{
+				/* Moving				*/
 
 				const b3Vector3 delta = aabbMin - proxy->m_aabbMin;
 				b3Vector3 velocity(((proxy->m_aabbMax - proxy->m_aabbMin) / 2) * m_prediction);
@@ -324,9 +327,9 @@ void b3DynamicBvhBroadphase::setAabb(int objectId,
 				if (delta[2] < 0) velocity[2] = -velocity[2];
 				if (
 #ifdef B3_DBVT_BP_MARGIN
-					m_sets[0].update(proxy->leaf, aabb, velocity, B3_DBVT_BP_MARGIN)
+				    m_sets[0].update(proxy->leaf, aabb, velocity, B3_DBVT_BP_MARGIN)
 #else
-					m_sets[0].update(proxy->leaf, aabb, velocity)
+				    m_sets[0].update(proxy->leaf, aabb, velocity)
 #endif
 				)
 				{
@@ -335,7 +338,8 @@ void b3DynamicBvhBroadphase::setAabb(int objectId,
 				}
 			}
 			else
-			{ /* Teleporting			*/
+			{
+				/* Teleporting			*/
 				m_sets[0].update(proxy->leaf, aabb);
 				++m_updates_done;
 				docollide = true;
@@ -361,22 +365,24 @@ void b3DynamicBvhBroadphase::setAabb(int objectId,
 
 //
 void b3DynamicBvhBroadphase::setAabbForceUpdate(b3BroadphaseProxy* absproxy,
-												const b3Vector3& aabbMin,
-												const b3Vector3& aabbMax,
-												b3Dispatcher* /*dispatcher*/)
+        const b3Vector3& aabbMin,
+        const b3Vector3& aabbMax,
+        b3Dispatcher* /*dispatcher*/)
 {
 	b3DbvtProxy* proxy = (b3DbvtProxy*)absproxy;
 	B3_ATTRIBUTE_ALIGNED16(b3DbvtVolume)
 	aabb = b3DbvtVolume::FromMM(aabbMin, aabbMax);
 	bool docollide = false;
 	if (proxy->stage == STAGECOUNT)
-	{ /* fixed -> dynamic set	*/
+	{
+		/* fixed -> dynamic set	*/
 		m_sets[1].remove(proxy->leaf);
 		proxy->leaf = m_sets[0].insert(aabb, proxy);
 		docollide = true;
 	}
 	else
-	{ /* dynamic set				*/
+	{
+		/* dynamic set				*/
 		++m_updates_call;
 		/* Teleporting			*/
 		m_sets[0].update(proxy->leaf, aabb);
@@ -415,8 +421,8 @@ void b3DynamicBvhBroadphase::calculateOverlappingPairs(b3Dispatcher* dispatcher)
 		printf("cleanup:   %u%% (%uus)\r\n", (50 + m_profiling.m_cleanup * 100) / total, m_profiling.m_cleanup / B3_DBVT_BP_PROFILING_RATE);
 		printf("total:     %uus\r\n", total / B3_DBVT_BP_PROFILING_RATE);
 		const unsigned long sum = m_profiling.m_ddcollide +
-								  m_profiling.m_fdcollide +
-								  m_profiling.m_cleanup;
+		                          m_profiling.m_fdcollide +
+		                          m_profiling.m_cleanup;
 		printf("leaked: %u%% (%uus)\r\n", 100 - ((50 + sum * 100) / total), (total - sum) / B3_DBVT_BP_PROFILING_RATE);
 		printf("job counts: %u%%\r\n", (m_profiling.m_jobcount * 100) / ((m_sets[0].m_leaves + m_sets[1].m_leaves) * B3_DBVT_BP_PROFILING_RATE));
 		b3Clear(m_profiling);
@@ -507,7 +513,7 @@ void b3DynamicBvhBroadphase::collide(b3Dispatcher* dispatcher)
 		}
 		printf("\n");
 	}
-*/
+	*/
 
 	b3SPC(m_profiling.m_total);
 	/* optimize				*/
@@ -541,7 +547,8 @@ void b3DynamicBvhBroadphase::collide(b3Dispatcher* dispatcher)
 			current->leaf = m_sets[1].insert(curAabb, current);
 			current->stage = STAGECOUNT;
 			current = next;
-		} while (current);
+		}
+		while (current);
 		m_fixedleft = m_sets[1].m_leaves;
 		m_needcleanup = true;
 	}
@@ -632,7 +639,7 @@ void b3DynamicBvhBroadphase::getBroadphaseAabb(b3Vector3& aabbMin, b3Vector3& aa
 	if (!m_sets[0].empty())
 		if (!m_sets[1].empty())
 			b3Merge(m_sets[0].m_root->volume,
-					m_sets[1].m_root->volume, bounds);
+			        m_sets[1].m_root->volume, bounds);
 		else
 			bounds = m_sets[0].m_root->volume;
 	else if (!m_sets[1].empty())
@@ -703,15 +710,21 @@ struct b3BroadphaseBenchmark
 		{
 			time += speed;
 			center[0] = b3Cos(time * (b3Scalar)2.17) * amplitude +
-						b3Sin(time) * amplitude / 2;
+			            b3Sin(time) * amplitude / 2;
 			center[1] = b3Cos(time * (b3Scalar)1.38) * amplitude +
-						b3Sin(time) * amplitude;
+			            b3Sin(time) * amplitude;
 			center[2] = b3Sin(time * (b3Scalar)0.777) * amplitude;
 			pbi->setAabb(proxy, center - extents, center + extents, 0);
 		}
 	};
-	static int UnsignedRand(int range = RAND_MAX - 1) { return (rand() % (range + 1)); }
-	static b3Scalar UnitRand() { return (UnsignedRand(16384) / (b3Scalar)16384); }
+	static int UnsignedRand(int range = RAND_MAX - 1)
+	{
+		return (rand() % (range + 1));
+	}
+	static b3Scalar UnitRand()
+	{
+		return (UnsignedRand(16384) / (b3Scalar)16384);
+	}
 	static void OutputTime(const char* name, b3Clock& c, unsigned count = 0)
 	{
 		const unsigned long us = c.getTimeMicroseconds();
@@ -727,11 +740,11 @@ struct b3BroadphaseBenchmark
 void b3DynamicBvhBroadphase::benchmark(b3BroadphaseInterface* pbi)
 {
 	static const b3BroadphaseBenchmark::Experiment experiments[] =
-		{
-			{"1024o.10%", 1024, 10, 0, 8192, (b3Scalar)0.005, (b3Scalar)100},
-			/*{"4096o.10%",4096,10,0,8192,(b3Scalar)0.005,(b3Scalar)100},
+	{
+		{"1024o.10%", 1024, 10, 0, 8192, (b3Scalar)0.005, (b3Scalar)100},
+		/*{"4096o.10%",4096,10,0,8192,(b3Scalar)0.005,(b3Scalar)100},
 		{"8192o.10%",8192,10,0,8192,(b3Scalar)0.005,(b3Scalar)100},*/
-		};
+	};
 	static const int nexperiments = sizeof(experiments) / sizeof(experiments[0]);
 	b3AlignedObjectArray<b3BroadphaseBenchmark::Object*> objects;
 	b3Clock wallclock;

@@ -45,7 +45,7 @@ inline b3Int4 b3MakeBroadphasePair(int xx, int yy)
 /*struct b3BroadphasePair : public b3Int4
 {
 	explicit b3BroadphasePair(){}
-	
+
 };
 */
 

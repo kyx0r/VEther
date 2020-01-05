@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -46,7 +46,7 @@ struct btContactSolverInfoData
 	btScalar m_sor;          //successive over-relaxation term
 	btScalar m_erp;          //error reduction for non-contact constraints
 	btScalar m_erp2;         //error reduction for contact constraints
-    btScalar m_deformable_erp;          //error reduction for deformable constraints
+	btScalar m_deformable_erp;          //error reduction for deformable constraints
 	btScalar m_globalCfm;    //constraint force mixing for contacts and non-contacts
 	btScalar m_frictionERP;  //error reduction for friction constraints
 	btScalar m_frictionCFM;  //constraint force mixing for friction constraints
@@ -82,7 +82,7 @@ struct btContactSolverInfo : public btContactSolverInfoData
 		m_numIterations = 10;
 		m_erp = btScalar(0.2);
 		m_erp2 = btScalar(0.2);
-        m_deformable_erp = btScalar(0.);
+		m_deformable_erp = btScalar(0.);
 		m_globalCfm = btScalar(0.);
 		m_frictionERP = btScalar(0.2);  //positional friction 'anchors' are disabled by default
 		m_frictionCFM = btScalar(0.);
@@ -165,7 +165,7 @@ struct btContactSolverInfoFloatData
 
 	int m_minimumSolverBatchSize;
 	int m_splitImpulse;
-	
+
 };
 
 #endif  //BT_CONTACT_SOLVER_INFO

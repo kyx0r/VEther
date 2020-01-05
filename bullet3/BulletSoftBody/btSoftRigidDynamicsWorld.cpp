@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -24,13 +24,13 @@ subject to the following restrictions:
 #include "LinearMath/btSerializer.h"
 
 btSoftRigidDynamicsWorld::btSoftRigidDynamicsWorld(
-	btDispatcher* dispatcher,
-	btBroadphaseInterface* pairCache,
-	btConstraintSolver* constraintSolver,
-	btCollisionConfiguration* collisionConfiguration,
-	btSoftBodySolver* softBodySolver) : btDiscreteDynamicsWorld(dispatcher, pairCache, constraintSolver, collisionConfiguration),
-										m_softBodySolver(softBodySolver),
-										m_ownsSolver(false)
+    btDispatcher* dispatcher,
+    btBroadphaseInterface* pairCache,
+    btConstraintSolver* constraintSolver,
+    btCollisionConfiguration* collisionConfiguration,
+    btSoftBodySolver* softBodySolver) : btDiscreteDynamicsWorld(dispatcher, pairCache, constraintSolver, collisionConfiguration),
+	m_softBodySolver(softBodySolver),
+	m_ownsSolver(false)
 {
 	if (!m_softBodySolver)
 	{
@@ -126,8 +126,8 @@ void btSoftRigidDynamicsWorld::addSoftBody(btSoftBody* body, int collisionFilter
 	body->setSoftBodySolver(m_softBodySolver);
 
 	btCollisionWorld::addCollisionObject(body,
-										 collisionFilterGroup,
-										 collisionFilterMask);
+	                                     collisionFilterGroup,
+	                                     collisionFilterMask);
 }
 
 void btSoftRigidDynamicsWorld::removeSoftBody(btSoftBody* body)
@@ -236,10 +236,10 @@ struct btSoftSingleRayCallback : public btBroadphaseRayCallback
 			//if (btRayAabb(m_rayFromWorld,m_rayToWorld,collisionObjectAabbMin,collisionObjectAabbMax,hitLambda,m_hitNormal))
 			{
 				m_world->rayTestSingle(m_rayFromTrans, m_rayToTrans,
-									   collisionObject,
-									   collisionObject->getCollisionShape(),
-									   collisionObject->getWorldTransform(),
-									   m_resultCallback);
+				                       collisionObject,
+				                       collisionObject->getCollisionShape(),
+				                       collisionObject->getWorldTransform(),
+				                       m_resultCallback);
 			}
 		}
 		return true;
@@ -264,10 +264,10 @@ void btSoftRigidDynamicsWorld::rayTest(const btVector3& rayFromWorld, const btVe
 }
 
 void btSoftRigidDynamicsWorld::rayTestSingle(const btTransform& rayFromTrans, const btTransform& rayToTrans,
-											 btCollisionObject* collisionObject,
-											 const btCollisionShape* collisionShape,
-											 const btTransform& colObjWorldTransform,
-											 RayResultCallback& resultCallback)
+        btCollisionObject* collisionObject,
+        const btCollisionShape* collisionShape,
+        const btTransform& colObjWorldTransform,
+        RayResultCallback& resultCallback)
 {
 	if (collisionShape->isSoftBody())
 	{
@@ -298,9 +298,9 @@ void btSoftRigidDynamicsWorld::rayTestSingle(const btTransform& rayFromTrans, co
 					}
 
 					btCollisionWorld::LocalRayResult rayResult(collisionObject,
-															   &shapeInfo,
-															   normal,
-															   softResult.fraction);
+					        &shapeInfo,
+					        normal,
+					        softResult.fraction);
 					bool normalInWorldSpace = true;
 					resultCallback.addSingleResult(rayResult, normalInWorldSpace);
 				}

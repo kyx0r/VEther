@@ -203,8 +203,8 @@ public:
 	}
 
 	GIM_AABB(const btVector3 &V1,
-			 const btVector3 &V2,
-			 const btVector3 &V3)
+	         const btVector3 &V2,
+	         const btVector3 &V3)
 	{
 		m_min[0] = GIM_MIN3(V1[0], V2[0], V3[0]);
 		m_min[1] = GIM_MIN3(V1[1], V2[1], V3[1]);
@@ -216,9 +216,9 @@ public:
 	}
 
 	GIM_AABB(const btVector3 &V1,
-			 const btVector3 &V2,
-			 const btVector3 &V3,
-			 GREAL margin)
+	         const btVector3 &V2,
+	         const btVector3 &V3,
+	         GREAL margin)
 	{
 		m_min[0] = GIM_MIN3(V1[0], V2[0], V3[0]);
 		m_min[1] = GIM_MIN3(V1[1], V2[1], V3[1]);
@@ -283,9 +283,9 @@ public:
 
 	template <typename CLASS_POINT>
 	SIMD_FORCE_INLINE void calc_from_triangle(
-		const CLASS_POINT &V1,
-		const CLASS_POINT &V2,
-		const CLASS_POINT &V3)
+	    const CLASS_POINT &V1,
+	    const CLASS_POINT &V2,
+	    const CLASS_POINT &V3)
 	{
 		m_min[0] = GIM_MIN3(V1[0], V2[0], V3[0]);
 		m_min[1] = GIM_MIN3(V1[1], V2[1], V3[1]);
@@ -298,9 +298,9 @@ public:
 
 	template <typename CLASS_POINT>
 	SIMD_FORCE_INLINE void calc_from_triangle_margin(
-		const CLASS_POINT &V1,
-		const CLASS_POINT &V2,
-		const CLASS_POINT &V3, btScalar margin)
+	    const CLASS_POINT &V1,
+	    const CLASS_POINT &V2,
+	    const CLASS_POINT &V3, btScalar margin)
 	{
 		m_min[0] = GIM_MIN3(V1[0], V2[0], V3[0]);
 		m_min[1] = GIM_MIN3(V1[1], V2[1], V3[1]);
@@ -327,8 +327,8 @@ public:
 		center = trans(center);
 
 		btVector3 textends = extends.dot3(trans.getBasis().getRow(0).absolute(),
-										  trans.getBasis().getRow(1).absolute(),
-										  trans.getBasis().getRow(2).absolute());
+		                                  trans.getBasis().getRow(1).absolute(),
+		                                  trans.getBasis().getRow(2).absolute());
 
 		m_min = center - textends;
 		m_max = center + textends;
@@ -381,11 +381,11 @@ public:
 	SIMD_FORCE_INLINE bool has_collision(const GIM_AABB &other) const
 	{
 		if (m_min[0] > other.m_max[0] ||
-			m_max[0] < other.m_min[0] ||
-			m_min[1] > other.m_max[1] ||
-			m_max[1] < other.m_min[1] ||
-			m_min[2] > other.m_max[2] ||
-			m_max[2] < other.m_min[2])
+		        m_max[0] < other.m_min[0] ||
+		        m_min[1] > other.m_max[1] ||
+		        m_max[1] < other.m_min[1] ||
+		        m_min[2] > other.m_max[2] ||
+		        m_max[2] < other.m_min[2])
 		{
 			return false;
 		}
@@ -456,7 +456,7 @@ public:
 
 	//! transcache is the transformation cache from box to this AABB
 	SIMD_FORCE_INLINE bool overlapping_trans_cache(
-		const GIM_AABB &box, const GIM_BOX_BOX_TRANSFORM_CACHE &transcache, bool fulltest)
+	    const GIM_AABB &box, const GIM_BOX_BOX_TRANSFORM_CACHE &transcache, bool fulltest)
 	{
 		//Taken from OPCODE
 		btVector3 ea, eb;  //extends
@@ -498,7 +498,7 @@ public:
 					r = j == 0 ? 1 : 0;
 					t = T[n] * transcache.m_R1to0[m][j] - T[m] * transcache.m_R1to0[n][j];
 					t2 = ea[o] * transcache.m_AR[p][j] + ea[p] * transcache.m_AR[o][j] +
-						 eb[r] * transcache.m_AR[i][q] + eb[q] * transcache.m_AR[i][r];
+					     eb[r] * transcache.m_AR[i][q] + eb[q] * transcache.m_AR[i][r];
 					if (GIM_GREATER(t, t2)) return false;
 				}
 			}
@@ -508,7 +508,7 @@ public:
 
 	//! Simple test for planes.
 	SIMD_FORCE_INLINE bool collide_plane(
-		const btVector4 &plane)
+	    const btVector4 &plane)
 	{
 		ePLANE_INTERSECTION_TYPE classify = plane_classify(plane);
 		return (classify == G_COLLIDE_PLANE);
@@ -516,10 +516,10 @@ public:
 
 	//! test for a triangle, with edges
 	SIMD_FORCE_INLINE bool collide_triangle_exact(
-		const btVector3 &p1,
-		const btVector3 &p2,
-		const btVector3 &p3,
-		const btVector4 &triangle_plane)
+	    const btVector3 &p1,
+	    const btVector3 &p2,
+	    const btVector3 &p3,
+	    const btVector4 &triangle_plane)
 	{
 		if (!collide_plane(triangle_plane)) return false;
 

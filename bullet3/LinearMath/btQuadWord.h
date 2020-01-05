@@ -3,8 +3,8 @@ Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousph
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -22,7 +22,7 @@ subject to the following restrictions:
 #include <altivec.h>
 #endif
 
-/**@brief The btQuadWord class is base class for btVector3 and btQuaternion. 
+/**@brief The btQuadWord class is base class for btVector3 and btQuaternion.
  * Some issues under PS3 Linux with IBM 2.1 SDK, gcc compiler prevent from using aligned quadword.
  */
 #ifndef USE_LIBSPE2
@@ -34,7 +34,8 @@ class btQuadWord
 {
 protected:
 #if defined(__SPU__) && defined(__CELLOS_LV2__)
-	union {
+	union
+	{
 		vec_float4 mVec128;
 		btScalar m_floats[4];
 	};
@@ -49,7 +50,8 @@ protected:
 #else  //__CELLOS_LV2__ __SPU__
 
 #if defined(BT_USE_SSE) || defined(BT_USE_NEON)
-	union {
+	union
+	{
 		btSimdFloat4 mVec128;
 		btScalar m_floats[4];
 	};
@@ -96,33 +98,72 @@ public:
 #endif
 
 	/**@brief Return the x value */
-	SIMD_FORCE_INLINE const btScalar& getX() const { return m_floats[0]; }
+	SIMD_FORCE_INLINE const btScalar& getX() const
+	{
+		return m_floats[0];
+	}
 	/**@brief Return the y value */
-	SIMD_FORCE_INLINE const btScalar& getY() const { return m_floats[1]; }
+	SIMD_FORCE_INLINE const btScalar& getY() const
+	{
+		return m_floats[1];
+	}
 	/**@brief Return the z value */
-	SIMD_FORCE_INLINE const btScalar& getZ() const { return m_floats[2]; }
+	SIMD_FORCE_INLINE const btScalar& getZ() const
+	{
+		return m_floats[2];
+	}
 	/**@brief Set the x value */
-	SIMD_FORCE_INLINE void setX(btScalar _x) { m_floats[0] = _x; };
+	SIMD_FORCE_INLINE void setX(btScalar _x)
+	{
+		m_floats[0] = _x;
+	};
 	/**@brief Set the y value */
-	SIMD_FORCE_INLINE void setY(btScalar _y) { m_floats[1] = _y; };
+	SIMD_FORCE_INLINE void setY(btScalar _y)
+	{
+		m_floats[1] = _y;
+	};
 	/**@brief Set the z value */
-	SIMD_FORCE_INLINE void setZ(btScalar _z) { m_floats[2] = _z; };
+	SIMD_FORCE_INLINE void setZ(btScalar _z)
+	{
+		m_floats[2] = _z;
+	};
 	/**@brief Set the w value */
-	SIMD_FORCE_INLINE void setW(btScalar _w) { m_floats[3] = _w; };
+	SIMD_FORCE_INLINE void setW(btScalar _w)
+	{
+		m_floats[3] = _w;
+	};
 	/**@brief Return the x value */
-	SIMD_FORCE_INLINE const btScalar& x() const { return m_floats[0]; }
+	SIMD_FORCE_INLINE const btScalar& x() const
+	{
+		return m_floats[0];
+	}
 	/**@brief Return the y value */
-	SIMD_FORCE_INLINE const btScalar& y() const { return m_floats[1]; }
+	SIMD_FORCE_INLINE const btScalar& y() const
+	{
+		return m_floats[1];
+	}
 	/**@brief Return the z value */
-	SIMD_FORCE_INLINE const btScalar& z() const { return m_floats[2]; }
+	SIMD_FORCE_INLINE const btScalar& z() const
+	{
+		return m_floats[2];
+	}
 	/**@brief Return the w value */
-	SIMD_FORCE_INLINE const btScalar& w() const { return m_floats[3]; }
+	SIMD_FORCE_INLINE const btScalar& w() const
+	{
+		return m_floats[3];
+	}
 
 	//SIMD_FORCE_INLINE btScalar&       operator[](int i)       { return (&m_floats[0])[i];	}
 	//SIMD_FORCE_INLINE const btScalar& operator[](int i) const { return (&m_floats[0])[i]; }
 	///operator btScalar*() replaces operator[], using implicit conversion. We added operator != and operator == to avoid pointer comparisons.
-	SIMD_FORCE_INLINE operator btScalar*() { return &m_floats[0]; }
-	SIMD_FORCE_INLINE operator const btScalar*() const { return &m_floats[0]; }
+	SIMD_FORCE_INLINE operator btScalar*()
+	{
+		return &m_floats[0];
+	}
+	SIMD_FORCE_INLINE operator const btScalar*() const
+	{
+		return &m_floats[0];
+	}
 
 	SIMD_FORCE_INLINE bool operator==(const btQuadWord& other) const
 	{
@@ -130,9 +171,9 @@ public:
 		return (0xf == _mm_movemask_ps((__m128)_mm_cmpeq_ps(mVec128, other.mVec128)));
 #else
 		return ((m_floats[3] == other.m_floats[3]) &&
-				(m_floats[2] == other.m_floats[2]) &&
-				(m_floats[1] == other.m_floats[1]) &&
-				(m_floats[0] == other.m_floats[0]));
+		        (m_floats[2] == other.m_floats[2]) &&
+		        (m_floats[1] == other.m_floats[1]) &&
+		        (m_floats[0] == other.m_floats[0]));
 #endif
 	}
 
@@ -141,11 +182,11 @@ public:
 		return !(*this == other);
 	}
 
-	/**@brief Set x,y,z and zero w 
-   * @param x Value of x
-   * @param y Value of y
-   * @param z Value of z
-   */
+	/**@brief Set x,y,z and zero w
+	* @param x Value of x
+	* @param y Value of y
+	* @param z Value of z
+	*/
 	SIMD_FORCE_INLINE void setValue(const btScalar& _x, const btScalar& _y, const btScalar& _z)
 	{
 		m_floats[0] = _x;
@@ -154,19 +195,19 @@ public:
 		m_floats[3] = 0.f;
 	}
 
-	/*		void getValue(btScalar *m) const 
+	/*		void getValue(btScalar *m) const
 		{
 			m[0] = m_floats[0];
 			m[1] = m_floats[1];
 			m[2] = m_floats[2];
 		}
-*/
-	/**@brief Set the values 
-   * @param x Value of x
-   * @param y Value of y
-   * @param z Value of z
-   * @param w Value of w
-   */
+	*/
+	/**@brief Set the values
+	* @param x Value of x
+	* @param y Value of y
+	* @param z Value of z
+	* @param w Value of w
+	*/
 	SIMD_FORCE_INLINE void setValue(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 	{
 		m_floats[0] = _x;
@@ -181,29 +222,29 @@ public:
 	}
 
 	/**@brief Three argument constructor (zeros w)
-   * @param x Value of x
-   * @param y Value of y
-   * @param z Value of z
-   */
+	* @param x Value of x
+	* @param y Value of y
+	* @param z Value of z
+	*/
 	SIMD_FORCE_INLINE btQuadWord(const btScalar& _x, const btScalar& _y, const btScalar& _z)
 	{
 		m_floats[0] = _x, m_floats[1] = _y, m_floats[2] = _z, m_floats[3] = 0.0f;
 	}
 
 	/**@brief Initializing constructor
-   * @param x Value of x
-   * @param y Value of y
-   * @param z Value of z
-   * @param w Value of w
-   */
+	* @param x Value of x
+	* @param y Value of y
+	* @param z Value of z
+	* @param w Value of w
+	*/
 	SIMD_FORCE_INLINE btQuadWord(const btScalar& _x, const btScalar& _y, const btScalar& _z, const btScalar& _w)
 	{
 		m_floats[0] = _x, m_floats[1] = _y, m_floats[2] = _z, m_floats[3] = _w;
 	}
 
 	/**@brief Set each element to the max of the current values and the values of another btQuadWord
-   * @param other The other btQuadWord to compare with 
-   */
+	* @param other The other btQuadWord to compare with
+	*/
 	SIMD_FORCE_INLINE void setMax(const btQuadWord& other)
 	{
 #ifdef BT_USE_SSE
@@ -218,8 +259,8 @@ public:
 #endif
 	}
 	/**@brief Set each element to the min of the current values and the values of another btQuadWord
-   * @param other The other btQuadWord to compare with 
-   */
+	* @param other The other btQuadWord to compare with
+	*/
 	SIMD_FORCE_INLINE void setMin(const btQuadWord& other)
 	{
 #ifdef BT_USE_SSE

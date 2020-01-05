@@ -80,15 +80,15 @@ struct btConnectivityProcessor : public btTriangleCallback
 
 #if 0
 		printf("triangle A[0]	=	(%f,%f,%f)\ntriangle A[1]	=	(%f,%f,%f)\ntriangle A[2]	=	(%f,%f,%f)\n",
-			m_triangleVerticesA[0].getX(),m_triangleVerticesA[0].getY(),m_triangleVerticesA[0].getZ(),
-			m_triangleVerticesA[1].getX(),m_triangleVerticesA[1].getY(),m_triangleVerticesA[1].getZ(),
-			m_triangleVerticesA[2].getX(),m_triangleVerticesA[2].getY(),m_triangleVerticesA[2].getZ());
+		       m_triangleVerticesA[0].getX(),m_triangleVerticesA[0].getY(),m_triangleVerticesA[0].getZ(),
+		       m_triangleVerticesA[1].getX(),m_triangleVerticesA[1].getY(),m_triangleVerticesA[1].getZ(),
+		       m_triangleVerticesA[2].getX(),m_triangleVerticesA[2].getY(),m_triangleVerticesA[2].getZ());
 
 		printf("partId=%d, triangleIndex=%d\n",partId,triangleIndex);
 		printf("triangle B[0]	=	(%f,%f,%f)\ntriangle B[1]	=	(%f,%f,%f)\ntriangle B[2]	=	(%f,%f,%f)\n",
-			triangle[0].getX(),triangle[0].getY(),triangle[0].getZ(),
-			triangle[1].getX(),triangle[1].getY(),triangle[1].getZ(),
-			triangle[2].getX(),triangle[2].getY(),triangle[2].getZ());
+		       triangle[0].getX(),triangle[0].getY(),triangle[0].getZ(),
+		       triangle[1].getX(),triangle[1].getY(),triangle[1].getZ(),
+		       triangle[2].getX(),triangle[2].getY(),triangle[2].getZ());
 #endif
 
 		for (int i = 0; i < 3; i++)
@@ -111,184 +111,184 @@ struct btConnectivityProcessor : public btTriangleCallback
 		}
 		switch (numshared)
 		{
-			case 0:
+		case 0:
+		{
+			break;
+		}
+		case 1:
+		{
+			//shared vertex
+			break;
+		}
+		case 2:
+		{
+			//shared edge
+			//we need to make sure the edge is in the order V2V0 and not V0V2 so that the signs are correct
+			if (sharedVertsA[0] == 0 && sharedVertsA[1] == 2)
 			{
-				break;
+				sharedVertsA[0] = 2;
+				sharedVertsA[1] = 0;
+				int tmp = sharedVertsB[1];
+				sharedVertsB[1] = sharedVertsB[0];
+				sharedVertsB[0] = tmp;
 			}
+
+			int hash = btGetHash(m_partIdA, m_triangleIndexA);
+
+			btTriangleInfo* info = m_triangleInfoMap->find(hash);
+			if (!info)
+			{
+				btTriangleInfo tmp;
+				m_triangleInfoMap->insert(hash, tmp);
+				info = m_triangleInfoMap->find(hash);
+			}
+
+			int sumvertsA = sharedVertsA[0] + sharedVertsA[1];
+			int otherIndexA = 3 - sumvertsA;
+
+			btVector3 edge(m_triangleVerticesA[sharedVertsA[1]] - m_triangleVerticesA[sharedVertsA[0]]);
+
+			btTriangleShape tA(m_triangleVerticesA[0], m_triangleVerticesA[1], m_triangleVerticesA[2]);
+			int otherIndexB = 3 - (sharedVertsB[0] + sharedVertsB[1]);
+
+			btTriangleShape tB(triangle[sharedVertsB[1]], triangle[sharedVertsB[0]], triangle[otherIndexB]);
+			//btTriangleShape tB(triangle[0],triangle[1],triangle[2]);
+
+			btVector3 normalA;
+			btVector3 normalB;
+			tA.calcNormal(normalA);
+			tB.calcNormal(normalB);
+			edge.normalize();
+			btVector3 edgeCrossA = edge.cross(normalA).normalize();
+
+			{
+				btVector3 tmp = m_triangleVerticesA[otherIndexA] - m_triangleVerticesA[sharedVertsA[0]];
+				if (edgeCrossA.dot(tmp) < 0)
+				{
+					edgeCrossA *= -1;
+				}
+			}
+
+			btVector3 edgeCrossB = edge.cross(normalB).normalize();
+
+			{
+				btVector3 tmp = triangle[otherIndexB] - triangle[sharedVertsB[0]];
+				if (edgeCrossB.dot(tmp) < 0)
+				{
+					edgeCrossB *= -1;
+				}
+			}
+
+			btScalar angle2 = 0;
+			btScalar ang4 = 0.f;
+
+			btVector3 calculatedEdge = edgeCrossA.cross(edgeCrossB);
+			btScalar len2 = calculatedEdge.length2();
+
+			btScalar correctedAngle(0);
+			//btVector3 calculatedNormalB = normalA;
+			bool isConvex = false;
+
+			if (len2 < m_triangleInfoMap->m_planarEpsilon)
+			{
+				angle2 = 0.f;
+				ang4 = 0.f;
+			}
+			else
+			{
+				calculatedEdge.normalize();
+				btVector3 calculatedNormalA = calculatedEdge.cross(edgeCrossA);
+				calculatedNormalA.normalize();
+				angle2 = btGetAngle(calculatedNormalA, edgeCrossA, edgeCrossB);
+				ang4 = SIMD_PI - angle2;
+				btScalar dotA = normalA.dot(edgeCrossB);
+				///@todo: check if we need some epsilon, due to floating point imprecision
+				isConvex = (dotA < 0.);
+
+				correctedAngle = isConvex ? ang4 : -ang4;
+			}
+
+			//alternatively use
+			//btVector3 calculatedNormalB2 = quatRotate(orn,normalA);
+
+			switch (sumvertsA)
+			{
 			case 1:
 			{
-				//shared vertex
+				btVector3 edge = m_triangleVerticesA[0] - m_triangleVerticesA[1];
+				btQuaternion orn(edge, -correctedAngle);
+				btVector3 computedNormalB = quatRotate(orn, normalA);
+				btScalar bla = computedNormalB.dot(normalB);
+				if (bla < 0)
+				{
+					computedNormalB *= -1;
+					info->m_flags |= TRI_INFO_V0V1_SWAP_NORMALB;
+				}
+#ifdef DEBUG_INTERNAL_EDGE
+				if ((computedNormalB - normalB).length() > 0.0001)
+				{
+					printf("warning: normals not identical\n");
+				}
+#endif  //DEBUG_INTERNAL_EDGE
+
+				info->m_edgeV0V1Angle = -correctedAngle;
+
+				if (isConvex)
+					info->m_flags |= TRI_INFO_V0V1_CONVEX;
 				break;
 			}
 			case 2:
 			{
-				//shared edge
-				//we need to make sure the edge is in the order V2V0 and not V0V2 so that the signs are correct
-				if (sharedVertsA[0] == 0 && sharedVertsA[1] == 2)
+				btVector3 edge = m_triangleVerticesA[2] - m_triangleVerticesA[0];
+				btQuaternion orn(edge, -correctedAngle);
+				btVector3 computedNormalB = quatRotate(orn, normalA);
+				if (computedNormalB.dot(normalB) < 0)
 				{
-					sharedVertsA[0] = 2;
-					sharedVertsA[1] = 0;
-					int tmp = sharedVertsB[1];
-					sharedVertsB[1] = sharedVertsB[0];
-					sharedVertsB[0] = tmp;
+					computedNormalB *= -1;
+					info->m_flags |= TRI_INFO_V2V0_SWAP_NORMALB;
 				}
-
-				int hash = btGetHash(m_partIdA, m_triangleIndexA);
-
-				btTriangleInfo* info = m_triangleInfoMap->find(hash);
-				if (!info)
-				{
-					btTriangleInfo tmp;
-					m_triangleInfoMap->insert(hash, tmp);
-					info = m_triangleInfoMap->find(hash);
-				}
-
-				int sumvertsA = sharedVertsA[0] + sharedVertsA[1];
-				int otherIndexA = 3 - sumvertsA;
-
-				btVector3 edge(m_triangleVerticesA[sharedVertsA[1]] - m_triangleVerticesA[sharedVertsA[0]]);
-
-				btTriangleShape tA(m_triangleVerticesA[0], m_triangleVerticesA[1], m_triangleVerticesA[2]);
-				int otherIndexB = 3 - (sharedVertsB[0] + sharedVertsB[1]);
-
-				btTriangleShape tB(triangle[sharedVertsB[1]], triangle[sharedVertsB[0]], triangle[otherIndexB]);
-				//btTriangleShape tB(triangle[0],triangle[1],triangle[2]);
-
-				btVector3 normalA;
-				btVector3 normalB;
-				tA.calcNormal(normalA);
-				tB.calcNormal(normalB);
-				edge.normalize();
-				btVector3 edgeCrossA = edge.cross(normalA).normalize();
-
-				{
-					btVector3 tmp = m_triangleVerticesA[otherIndexA] - m_triangleVerticesA[sharedVertsA[0]];
-					if (edgeCrossA.dot(tmp) < 0)
-					{
-						edgeCrossA *= -1;
-					}
-				}
-
-				btVector3 edgeCrossB = edge.cross(normalB).normalize();
-
-				{
-					btVector3 tmp = triangle[otherIndexB] - triangle[sharedVertsB[0]];
-					if (edgeCrossB.dot(tmp) < 0)
-					{
-						edgeCrossB *= -1;
-					}
-				}
-
-				btScalar angle2 = 0;
-				btScalar ang4 = 0.f;
-
-				btVector3 calculatedEdge = edgeCrossA.cross(edgeCrossB);
-				btScalar len2 = calculatedEdge.length2();
-
-				btScalar correctedAngle(0);
-				//btVector3 calculatedNormalB = normalA;
-				bool isConvex = false;
-
-				if (len2 < m_triangleInfoMap->m_planarEpsilon)
-				{
-					angle2 = 0.f;
-					ang4 = 0.f;
-				}
-				else
-				{
-					calculatedEdge.normalize();
-					btVector3 calculatedNormalA = calculatedEdge.cross(edgeCrossA);
-					calculatedNormalA.normalize();
-					angle2 = btGetAngle(calculatedNormalA, edgeCrossA, edgeCrossB);
-					ang4 = SIMD_PI - angle2;
-					btScalar dotA = normalA.dot(edgeCrossB);
-					///@todo: check if we need some epsilon, due to floating point imprecision
-					isConvex = (dotA < 0.);
-
-					correctedAngle = isConvex ? ang4 : -ang4;
-				}
-
-				//alternatively use
-				//btVector3 calculatedNormalB2 = quatRotate(orn,normalA);
-
-				switch (sumvertsA)
-				{
-					case 1:
-					{
-						btVector3 edge = m_triangleVerticesA[0] - m_triangleVerticesA[1];
-						btQuaternion orn(edge, -correctedAngle);
-						btVector3 computedNormalB = quatRotate(orn, normalA);
-						btScalar bla = computedNormalB.dot(normalB);
-						if (bla < 0)
-						{
-							computedNormalB *= -1;
-							info->m_flags |= TRI_INFO_V0V1_SWAP_NORMALB;
-						}
-#ifdef DEBUG_INTERNAL_EDGE
-						if ((computedNormalB - normalB).length() > 0.0001)
-						{
-							printf("warning: normals not identical\n");
-						}
-#endif  //DEBUG_INTERNAL_EDGE
-
-						info->m_edgeV0V1Angle = -correctedAngle;
-
-						if (isConvex)
-							info->m_flags |= TRI_INFO_V0V1_CONVEX;
-						break;
-					}
-					case 2:
-					{
-						btVector3 edge = m_triangleVerticesA[2] - m_triangleVerticesA[0];
-						btQuaternion orn(edge, -correctedAngle);
-						btVector3 computedNormalB = quatRotate(orn, normalA);
-						if (computedNormalB.dot(normalB) < 0)
-						{
-							computedNormalB *= -1;
-							info->m_flags |= TRI_INFO_V2V0_SWAP_NORMALB;
-						}
 
 #ifdef DEBUG_INTERNAL_EDGE
-						if ((computedNormalB - normalB).length() > 0.0001)
-						{
-							printf("warning: normals not identical\n");
-						}
-#endif  //DEBUG_INTERNAL_EDGE
-						info->m_edgeV2V0Angle = -correctedAngle;
-						if (isConvex)
-							info->m_flags |= TRI_INFO_V2V0_CONVEX;
-						break;
-					}
-					case 3:
-					{
-						btVector3 edge = m_triangleVerticesA[1] - m_triangleVerticesA[2];
-						btQuaternion orn(edge, -correctedAngle);
-						btVector3 computedNormalB = quatRotate(orn, normalA);
-						if (computedNormalB.dot(normalB) < 0)
-						{
-							info->m_flags |= TRI_INFO_V1V2_SWAP_NORMALB;
-							computedNormalB *= -1;
-						}
-#ifdef DEBUG_INTERNAL_EDGE
-						if ((computedNormalB - normalB).length() > 0.0001)
-						{
-							printf("warning: normals not identical\n");
-						}
-#endif  //DEBUG_INTERNAL_EDGE
-						info->m_edgeV1V2Angle = -correctedAngle;
-
-						if (isConvex)
-							info->m_flags |= TRI_INFO_V1V2_CONVEX;
-						break;
-					}
+				if ((computedNormalB - normalB).length() > 0.0001)
+				{
+					printf("warning: normals not identical\n");
 				}
-
+#endif  //DEBUG_INTERNAL_EDGE
+				info->m_edgeV2V0Angle = -correctedAngle;
+				if (isConvex)
+					info->m_flags |= TRI_INFO_V2V0_CONVEX;
 				break;
 			}
-			default:
+			case 3:
 			{
-				//				printf("warning: duplicate triangle\n");
+				btVector3 edge = m_triangleVerticesA[1] - m_triangleVerticesA[2];
+				btQuaternion orn(edge, -correctedAngle);
+				btVector3 computedNormalB = quatRotate(orn, normalA);
+				if (computedNormalB.dot(normalB) < 0)
+				{
+					info->m_flags |= TRI_INFO_V1V2_SWAP_NORMALB;
+					computedNormalB *= -1;
+				}
+#ifdef DEBUG_INTERNAL_EDGE
+				if ((computedNormalB - normalB).length() > 0.0001)
+				{
+					printf("warning: normals not identical\n");
+				}
+#endif  //DEBUG_INTERNAL_EDGE
+				info->m_edgeV1V2Angle = -correctedAngle;
+
+				if (isConvex)
+					info->m_flags |= TRI_INFO_V1V2_CONVEX;
+				break;
 			}
+			}
+
+			break;
+		}
+		default:
+		{
+			//				printf("warning: duplicate triangle\n");
+		}
 		}
 	}
 };
@@ -298,11 +298,11 @@ struct b3ProcessAllTrianglesHeightfield: public btTriangleCallback
 {
 	btHeightfieldTerrainShape* m_heightfieldShape;
 	btTriangleInfoMap* m_triangleInfoMap;
-	
+
 
 	b3ProcessAllTrianglesHeightfield(btHeightfieldTerrainShape* heightFieldShape, btTriangleInfoMap* triangleInfoMap)
 		:m_heightfieldShape(heightFieldShape),
-		m_triangleInfoMap(triangleInfoMap)
+		 m_triangleInfoMap(triangleInfoMap)
 	{
 	}
 	virtual void processTriangle(btVector3* triangle, int partId, int triangleIndex)
@@ -366,9 +366,9 @@ void btGenerateInternalEdgeInfo(btBvhTriangleMeshShape* trimeshShape, btTriangle
 				{
 					float* graphicsbase = (float*)(vertexbase + graphicsindex * stride);
 					triangleVerts[j] = btVector3(
-						graphicsbase[0] * meshScaling.getX(),
-						graphicsbase[1] * meshScaling.getY(),
-						graphicsbase[2] * meshScaling.getZ());
+					                       graphicsbase[0] * meshScaling.getX(),
+					                       graphicsbase[1] * meshScaling.getY(),
+					                       graphicsbase[2] * meshScaling.getZ());
 				}
 				else
 				{
@@ -483,7 +483,7 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObjectWr
 	if (colObj0Wrap->getCollisionShape()->getShapeType() != TRIANGLE_SHAPE_PROXYTYPE)
 		return;
 
-	
+
 	btTriangleInfoMap* triangleInfoMapPtr = 0;
 
 	if (colObj0Wrap->getCollisionObject()->getCollisionShape()->getShapeType() == TERRAIN_SHAPE_PROXYTYPE)
@@ -526,8 +526,8 @@ void btAdjustInternalEdgeContacts(btManifoldPoint& cp, const btCollisionObjectWr
 	{
 		triangleInfoMapPtr = (btTriangleInfoMap*)trimesh->getTriangleInfoMap();
 	}
-	
-	
+
+
 	if (!triangleInfoMapPtr)
 		return;
 

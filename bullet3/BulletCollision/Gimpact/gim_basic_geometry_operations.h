@@ -99,7 +99,7 @@ email: projectileman@yahoo.com
 //! Verifies if a point is in the plane hull
 template <typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE bool POINT_IN_HULL(
-	const CLASS_POINT &point, const CLASS_PLANE *planes, GUINT plane_count)
+    const CLASS_POINT &point, const CLASS_PLANE *planes, GUINT plane_count)
 {
 	GREAL _dis;
 	for (GUINT _i = 0; _i < plane_count; ++_i)
@@ -112,8 +112,8 @@ SIMD_FORCE_INLINE bool POINT_IN_HULL(
 
 template <typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE void PLANE_CLIP_SEGMENT(
-	const CLASS_POINT &s1,
-	const CLASS_POINT &s2, const CLASS_PLANE &plane, CLASS_POINT &clipped)
+    const CLASS_POINT &s1,
+    const CLASS_POINT &s2, const CLASS_PLANE &plane, CLASS_POINT &clipped)
 {
 	GREAL _dis1, _dis2;
 	_dis1 = DISTANCE_PLANE_POINT(plane, s1);
@@ -155,9 +155,9 @@ intersection type must have the following values
 
 template <typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE eLINE_PLANE_INTERSECTION_TYPE PLANE_CLIP_SEGMENT2(
-	const CLASS_POINT &s1,
-	const CLASS_POINT &s2,
-	const CLASS_PLANE &plane, CLASS_POINT &clipped)
+    const CLASS_POINT &s1,
+    const CLASS_POINT &s2,
+    const CLASS_PLANE &plane, CLASS_POINT &clipped)
 {
 	GREAL _dis1 = DISTANCE_PLANE_POINT(plane, s1);
 	GREAL _dis2 = DISTANCE_PLANE_POINT(plane, s2);
@@ -197,36 +197,36 @@ intersection_type must have the following values
 */
 template <typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE eLINE_PLANE_INTERSECTION_TYPE PLANE_CLIP_SEGMENT_CLOSEST(
-	const CLASS_POINT &s1,
-	const CLASS_POINT &s2,
-	const CLASS_PLANE &plane,
-	CLASS_POINT &clipped1, CLASS_POINT &clipped2)
+    const CLASS_POINT &s1,
+    const CLASS_POINT &s2,
+    const CLASS_PLANE &plane,
+    CLASS_POINT &clipped1, CLASS_POINT &clipped2)
 {
 	eLINE_PLANE_INTERSECTION_TYPE intersection_type = PLANE_CLIP_SEGMENT2(s1, s2, plane, clipped1);
 	switch (intersection_type)
 	{
-		case G_FRONT_PLANE_S1:
-			VEC_COPY(clipped1, s1);
-			VEC_COPY(clipped2, s2);
-			break;
-		case G_FRONT_PLANE_S2:
-			VEC_COPY(clipped1, s2);
-			VEC_COPY(clipped2, s1);
-			break;
-		case G_BACK_PLANE_S1:
-			VEC_COPY(clipped1, s1);
-			VEC_COPY(clipped2, s2);
-			break;
-		case G_BACK_PLANE_S2:
-			VEC_COPY(clipped1, s2);
-			VEC_COPY(clipped2, s1);
-			break;
-		case G_COLLIDE_PLANE_S1:
-			VEC_COPY(clipped2, s1);
-			break;
-		case G_COLLIDE_PLANE_S2:
-			VEC_COPY(clipped2, s2);
-			break;
+	case G_FRONT_PLANE_S1:
+		VEC_COPY(clipped1, s1);
+		VEC_COPY(clipped2, s2);
+		break;
+	case G_FRONT_PLANE_S2:
+		VEC_COPY(clipped1, s2);
+		VEC_COPY(clipped2, s1);
+		break;
+	case G_BACK_PLANE_S1:
+		VEC_COPY(clipped1, s1);
+		VEC_COPY(clipped2, s2);
+		break;
+	case G_BACK_PLANE_S2:
+		VEC_COPY(clipped1, s2);
+		VEC_COPY(clipped2, s1);
+		break;
+	case G_COLLIDE_PLANE_S1:
+		VEC_COPY(clipped2, s1);
+		break;
+	case G_COLLIDE_PLANE_S2:
+		VEC_COPY(clipped2, s2);
+		break;
 	}
 	return intersection_type;
 }
@@ -241,10 +241,10 @@ It uses the PLANEDIREPSILON constant.
 */
 template <typename T, typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE bool RAY_PLANE_COLLISION(
-	const CLASS_PLANE &plane,
-	const CLASS_POINT &vDir,
-	const CLASS_POINT &vPoint,
-	CLASS_POINT &pout, T &tparam)
+    const CLASS_PLANE &plane,
+    const CLASS_POINT &vDir,
+    const CLASS_POINT &vPoint,
+    CLASS_POINT &pout, T &tparam)
 {
 	GREAL _dis, _dotdir;
 	_dotdir = VEC_DOT(plane, vDir);
@@ -268,12 +268,12 @@ SIMD_FORCE_INLINE bool RAY_PLANE_COLLISION(
 */
 template <typename T, typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE GUINT LINE_PLANE_COLLISION(
-	const CLASS_PLANE &plane,
-	const CLASS_POINT &vDir,
-	const CLASS_POINT &vPoint,
-	CLASS_POINT &pout,
-	T &tparam,
-	T tmin, T tmax)
+    const CLASS_PLANE &plane,
+    const CLASS_POINT &vDir,
+    const CLASS_POINT &vPoint,
+    CLASS_POINT &pout,
+    T &tparam,
+    T tmin, T tmax)
 {
 	GREAL _dis, _dotdir;
 	_dotdir = VEC_DOT(plane, vDir);
@@ -314,10 +314,10 @@ SIMD_FORCE_INLINE GUINT LINE_PLANE_COLLISION(
 */
 template <typename CLASS_POINT, typename CLASS_PLANE>
 SIMD_FORCE_INLINE bool INTERSECT_PLANES(
-	const CLASS_PLANE &p1,
-	const CLASS_PLANE &p2,
-	CLASS_POINT &p,
-	CLASS_POINT &d)
+    const CLASS_PLANE &p1,
+    const CLASS_PLANE &p2,
+    CLASS_POINT &p,
+    CLASS_POINT &d)
 {
 	VEC_CROSS(d, p1, p2);
 	GREAL denom = VEC_DOT(d, d);
@@ -339,8 +339,8 @@ SIMD_FORCE_INLINE bool INTERSECT_PLANES(
  */
 template <typename CLASS_POINT>
 SIMD_FORCE_INLINE void CLOSEST_POINT_ON_SEGMENT(
-	CLASS_POINT &cp, const CLASS_POINT &v,
-	const CLASS_POINT &e1, const CLASS_POINT &e2)
+    CLASS_POINT &cp, const CLASS_POINT &v,
+    const CLASS_POINT &e1, const CLASS_POINT &e2)
 {
 	vec3f _n;
 	VEC_DIFF(_n, e2, e1);
@@ -375,11 +375,11 @@ SIMD_FORCE_INLINE void CLOSEST_POINT_ON_SEGMENT(
 */
 template <typename T, typename CLASS_POINT>
 SIMD_FORCE_INLINE bool LINE_INTERSECTION_PARAMS(
-	const CLASS_POINT &dir1,
-	CLASS_POINT &point1,
-	const CLASS_POINT &dir2,
-	CLASS_POINT &point2,
-	T &t1, T &t2)
+    const CLASS_POINT &dir1,
+    CLASS_POINT &point1,
+    const CLASS_POINT &dir2,
+    CLASS_POINT &point2,
+    T &t1, T &t2)
 {
 	GREAL det;
 	GREAL e1e1 = VEC_DOT(dir1, dir1);
@@ -399,12 +399,12 @@ SIMD_FORCE_INLINE bool LINE_INTERSECTION_PARAMS(
 //! Find closest points on segments
 template <typename CLASS_POINT>
 SIMD_FORCE_INLINE void SEGMENT_COLLISION(
-	const CLASS_POINT &vA1,
-	const CLASS_POINT &vA2,
-	const CLASS_POINT &vB1,
-	const CLASS_POINT &vB2,
-	CLASS_POINT &vPointA,
-	CLASS_POINT &vPointB)
+    const CLASS_POINT &vA1,
+    const CLASS_POINT &vA2,
+    const CLASS_POINT &vB1,
+    const CLASS_POINT &vB2,
+    CLASS_POINT &vPointA,
+    CLASS_POINT &vPointB)
 {
 	CLASS_POINT _AD, _BD, n;
 	vec4f _M;  //plane
@@ -511,8 +511,8 @@ SIMD_FORCE_INLINE bool BOX_AXIS_INTERSECT(T pos, T dir, T bmin, T bmax, T &tfirs
 //! Sorts 3 componets
 template <typename T>
 SIMD_FORCE_INLINE void SORT_3_INDICES(
-	const T *values,
-	GUINT *order_indices)
+    const T *values,
+    GUINT *order_indices)
 {
 	//get minimum
 	order_indices[0] = values[0] < values[1] ? (values[0] < values[2] ? 0 : 2) : (values[1] < values[2] ? 1 : 2);

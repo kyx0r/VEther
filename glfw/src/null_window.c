@@ -31,10 +31,10 @@
 static int createNativeWindow(_GLFWwindow* window,
                               const _GLFWwndconfig* wndconfig)
 {
-    window->null.width = wndconfig->width;
-    window->null.height = wndconfig->height;
+	window->null.width = wndconfig->width;
+	window->null.height = wndconfig->height;
 
-    return GLFW_TRUE;
+	return GLFW_TRUE;
 }
 
 
@@ -47,33 +47,33 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
                               const _GLFWctxconfig* ctxconfig,
                               const _GLFWfbconfig* fbconfig)
 {
-    if (!createNativeWindow(window, wndconfig))
-        return GLFW_FALSE;
+	if (!createNativeWindow(window, wndconfig))
+		return GLFW_FALSE;
 
-    if (ctxconfig->client != GLFW_NO_API)
-    {
-        if (ctxconfig->source == GLFW_NATIVE_CONTEXT_API ||
-            ctxconfig->source == GLFW_OSMESA_CONTEXT_API)
-        {
-            if (!_glfwInitOSMesa())
-                return GLFW_FALSE;
-            if (!_glfwCreateContextOSMesa(window, ctxconfig, fbconfig))
-                return GLFW_FALSE;
-        }
-        else
-        {
-            _glfwInputError(GLFW_API_UNAVAILABLE, "Null: EGL not available");
-            return GLFW_FALSE;
-        }
-    }
+	if (ctxconfig->client != GLFW_NO_API)
+	{
+		if (ctxconfig->source == GLFW_NATIVE_CONTEXT_API ||
+		        ctxconfig->source == GLFW_OSMESA_CONTEXT_API)
+		{
+			if (!_glfwInitOSMesa())
+				return GLFW_FALSE;
+			if (!_glfwCreateContextOSMesa(window, ctxconfig, fbconfig))
+				return GLFW_FALSE;
+		}
+		else
+		{
+			_glfwInputError(GLFW_API_UNAVAILABLE, "Null: EGL not available");
+			return GLFW_FALSE;
+		}
+	}
 
-    return GLFW_TRUE;
+	return GLFW_TRUE;
 }
 
 void _glfwPlatformDestroyWindow(_GLFWwindow* window)
 {
-    if (window->context.destroy)
-        window->context.destroy(window);
+	if (window->context.destroy)
+		window->context.destroy(window);
 }
 
 void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char* title)
@@ -103,16 +103,16 @@ void _glfwPlatformSetWindowPos(_GLFWwindow* window, int xpos, int ypos)
 
 void _glfwPlatformGetWindowSize(_GLFWwindow* window, int* width, int* height)
 {
-    if (width)
-        *width = window->null.width;
-    if (height)
-        *height = window->null.height;
+	if (width)
+		*width = window->null.width;
+	if (height)
+		*height = window->null.height;
 }
 
 void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
 {
-    window->null.width = width;
-    window->null.height = height;
+	window->null.width = width;
+	window->null.height = height;
 }
 
 void _glfwPlatformSetWindowSizeLimits(_GLFWwindow* window,
@@ -127,10 +127,10 @@ void _glfwPlatformSetWindowAspectRatio(_GLFWwindow* window, int n, int d)
 
 void _glfwPlatformGetFramebufferSize(_GLFWwindow* window, int* width, int* height)
 {
-    if (width)
-        *width = window->null.width;
-    if (height)
-        *height = window->null.height;
+	if (width)
+		*width = window->null.width;
+	if (height)
+		*height = window->null.height;
 }
 
 void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
@@ -142,10 +142,10 @@ void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
 void _glfwPlatformGetWindowContentScale(_GLFWwindow* window,
                                         float* xscale, float* yscale)
 {
-    if (xscale)
-        *xscale = 1.f;
-    if (yscale)
-        *yscale = 1.f;
+	if (xscale)
+		*xscale = 1.f;
+	if (yscale)
+		*yscale = 1.f;
 }
 
 void _glfwPlatformIconifyWindow(_GLFWwindow* window)
@@ -162,17 +162,17 @@ void _glfwPlatformMaximizeWindow(_GLFWwindow* window)
 
 int _glfwPlatformWindowMaximized(_GLFWwindow* window)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 int _glfwPlatformWindowHovered(_GLFWwindow* window)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 int _glfwPlatformFramebufferTransparent(_GLFWwindow* window)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 void _glfwPlatformSetWindowResizable(_GLFWwindow* window, GLFWbool enabled)
@@ -189,7 +189,7 @@ void _glfwPlatformSetWindowFloating(_GLFWwindow* window, GLFWbool enabled)
 
 float _glfwPlatformGetWindowOpacity(_GLFWwindow* window)
 {
-    return 1.f;
+	return 1.f;
 }
 
 void _glfwPlatformSetWindowOpacity(_GLFWwindow* window, float opacity)
@@ -219,17 +219,17 @@ void _glfwPlatformFocusWindow(_GLFWwindow* window)
 
 int _glfwPlatformWindowFocused(_GLFWwindow* window)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 int _glfwPlatformWindowIconified(_GLFWwindow* window)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 int _glfwPlatformWindowVisible(_GLFWwindow* window)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 void _glfwPlatformPollEvents(void)
@@ -264,12 +264,12 @@ int _glfwPlatformCreateCursor(_GLFWcursor* cursor,
                               const GLFWimage* image,
                               int xhot, int yhot)
 {
-    return GLFW_TRUE;
+	return GLFW_TRUE;
 }
 
 int _glfwPlatformCreateStandardCursor(_GLFWcursor* cursor, int shape)
 {
-    return GLFW_TRUE;
+	return GLFW_TRUE;
 }
 
 void _glfwPlatformDestroyCursor(_GLFWcursor* cursor)
@@ -286,17 +286,17 @@ void _glfwPlatformSetClipboardString(const char* string)
 
 const char* _glfwPlatformGetClipboardString(void)
 {
-    return NULL;
+	return NULL;
 }
 
 const char* _glfwPlatformGetScancodeName(int scancode)
 {
-    return "";
+	return "";
 }
 
 int _glfwPlatformGetKeyScancode(int key)
 {
-    return -1;
+	return -1;
 }
 
 void _glfwPlatformGetRequiredInstanceExtensions(char** extensions)
@@ -304,18 +304,18 @@ void _glfwPlatformGetRequiredInstanceExtensions(char** extensions)
 }
 
 int _glfwPlatformGetPhysicalDevicePresentationSupport(VkInstance instance,
-                                                      VkPhysicalDevice device,
-                                                      uint32_t queuefamily)
+        VkPhysicalDevice device,
+        uint32_t queuefamily)
 {
-    return GLFW_FALSE;
+	return GLFW_FALSE;
 }
 
 VkResult _glfwPlatformCreateWindowSurface(VkInstance instance,
-                                          _GLFWwindow* window,
-                                          const VkAllocationCallbacks* allocator,
-                                          VkSurfaceKHR* surface)
+        _GLFWwindow* window,
+        const VkAllocationCallbacks* allocator,
+        VkSurfaceKHR* surface)
 {
-    // This seems like the most appropriate error to return here
-    return VK_ERROR_INITIALIZATION_FAILED;
+	// This seems like the most appropriate error to return here
+	return VK_ERROR_INITIALIZATION_FAILED;
 }
 

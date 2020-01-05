@@ -59,16 +59,22 @@ public:
 	InitCache();
 	///\copydoc MultiBodyTree::addBody
 	int addBody(const int body_index, const int parent_index, const JointType joint_type,
-				const vec3 &parent_r_parent_body_ref, const mat33 &body_T_parent_ref,
-				const vec3 &body_axis_of_motion, idScalar mass, const vec3 &body_r_body_com,
-				const mat33 &body_I_body, const int user_int, void *user_ptr);
+	            const vec3 &parent_r_parent_body_ref, const mat33 &body_T_parent_ref,
+	            const vec3 &body_axis_of_motion, idScalar mass, const vec3 &body_r_body_com,
+	            const mat33 &body_I_body, const int user_int, void *user_ptr);
 	/// build index arrays
 	/// @return 0 on success, -1 on failure
 	int buildIndexSets();
 	/// @return number of degrees of freedom
-	int numDoFs() const { return m_num_dofs; }
+	int numDoFs() const
+	{
+		return m_num_dofs;
+	}
 	/// @return number of bodies
-	int numBodies() const { return m_inertias.size(); }
+	int numBodies() const
+	{
+		return m_inertias.size();
+	}
 	/// get inertia data for index
 	/// @param index of the body
 	/// @param inertia pointer for return data
@@ -81,7 +87,10 @@ public:
 	int getJointData(const int index, JointData *joint) const;
 	/// get parent index array (paren_index[i] is the index of the parent of i)
 	/// @param parent_index pointer for return data
-	void getParentIndexArray(idArray<int>::type *parent_index) { *parent_index = m_parent_index; }
+	void getParentIndexArray(idArray<int>::type *parent_index)
+	{
+		*parent_index = m_parent_index;
+	}
 	/// get user integer
 	/// @param index body index
 	/// @param user_int user integer

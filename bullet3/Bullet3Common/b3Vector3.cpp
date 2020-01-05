@@ -64,7 +64,8 @@ long b3_maxdot_large(const float *vv, const float *vec, unsigned long count, flo
 		max = dotMax;
 
 		for (index = 0; index < STACK_ARRAY_COUNT; index += 4)
-		{  // do four dot products at a time. Carefully avoid touching the w element.
+		{
+			// do four dot products at a time. Carefully avoid touching the w element.
 			float4 v0 = vertices[0];
 			float4 v1 = vertices[1];
 			float4 v2 = vertices[2];
@@ -185,7 +186,8 @@ long b3_maxdot_large(const float *vv, const float *vec, unsigned long count, flo
 	if (b3Unlikely(count > 16))
 	{
 		for (; index + 4 <= count / 4; index += 4)
-		{  // do four dot products at a time. Carefully avoid touching the w element.
+		{
+			// do four dot products at a time. Carefully avoid touching the w element.
 			float4 v0 = vertices[0];
 			float4 v1 = vertices[1];
 			float4 v2 = vertices[2];
@@ -288,7 +290,7 @@ long b3_maxdot_large(const float *vv, const float *vec, unsigned long count, flo
 		size_t byteIndex = -(localCount) * sizeof(float);
 		//AT&T Code style assembly
 		asm volatile(
-			".align 4                                                                   \n\
+		    ".align 4                                                                   \n\
              0: movaps  %[max], %[t2]                            // move max out of the way to avoid propagating NaNs in max \n\
           movaps  (%[vertices], %[byteIndex], 4),    %[t0]    // vertices[0]      \n\
           movaps  16(%[vertices], %[byteIndex], 4),  %[t1]    // vertices[1]      \n\
@@ -314,14 +316,15 @@ long b3_maxdot_large(const float *vv, const float *vec, unsigned long count, flo
          add     $16, %[byteIndex]                           // advance loop counter\n\
          jnz     0b                                          \n\
      "
-			: [max] "+x"(max), [t0] "=&x"(t0), [t1] "=&x"(t1), [t2] "=&x"(t2), [t3] "=&x"(t3), [t4] "=&x"(t4), [byteIndex] "+r"(byteIndex)
-			: [vLo] "x"(vLo), [vHi] "x"(vHi), [vertices] "r"(vertices), [sap] "r"(sap)
-			: "memory", "cc");
+		    : [max] "+x"(max), [t0] "=&x"(t0), [t1] "=&x"(t1), [t2] "=&x"(t2), [t3] "=&x"(t3), [t4] "=&x"(t4), [byteIndex] "+r"(byteIndex)
+		    : [vLo] "x"(vLo), [vHi] "x"(vHi), [vertices] "r"(vertices), [sap] "r"(sap)
+		    : "memory", "cc");
 		index += localCount / 4;
 #else
 		{
 			for (unsigned int i = 0; i < localCount / 4; i++, index++)
-			{  // do four dot products at a time. Carefully avoid touching the w element.
+			{
+				// do four dot products at a time. Carefully avoid touching the w element.
 				float4 v0 = vertices[0];
 				float4 v1 = vertices[1];
 				float4 v2 = vertices[2];
@@ -354,47 +357,47 @@ long b3_maxdot_large(const float *vv, const float *vec, unsigned long count, flo
 		float4 v0, v1, v2, x, y, z;
 		switch (count & 3)
 		{
-			case 3:
-			{
-				v0 = vertices[0];
-				v1 = vertices[1];
-				v2 = vertices[2];
+		case 3:
+		{
+			v0 = vertices[0];
+			v1 = vertices[1];
+			v2 = vertices[2];
 
-				// Calculate 3 dot products, transpose, duplicate v2
-				float4 lo0 = _mm_movelh_ps(v0, v1);  // xyxy.lo
-				float4 hi0 = _mm_movehl_ps(v1, v0);  // z?z?.lo
-				lo0 = lo0 * vLo;
-				z = _mm_shuffle_ps(hi0, v2, 0xa8);  // z0z1z2z2
-				z = z * vHi;
-				float4 lo1 = _mm_movelh_ps(v2, v2);  // xyxy
-				lo1 = lo1 * vLo;
-				x = _mm_shuffle_ps(lo0, lo1, 0x88);
-				y = _mm_shuffle_ps(lo0, lo1, 0xdd);
-			}
-			break;
-			case 2:
-			{
-				v0 = vertices[0];
-				v1 = vertices[1];
-				float4 xy = _mm_movelh_ps(v0, v1);
-				z = _mm_movehl_ps(v1, v0);
-				xy = xy * vLo;
-				z = _mm_shuffle_ps(z, z, 0xa8);
-				x = _mm_shuffle_ps(xy, xy, 0xa8);
-				y = _mm_shuffle_ps(xy, xy, 0xfd);
-				z = z * vHi;
-			}
-			break;
-			case 1:
-			{
-				float4 xy = vertices[0];
-				z = _mm_shuffle_ps(xy, xy, 0xaa);
-				xy = xy * vLo;
-				z = z * vHi;
-				x = _mm_shuffle_ps(xy, xy, 0);
-				y = _mm_shuffle_ps(xy, xy, 0x55);
-			}
-			break;
+			// Calculate 3 dot products, transpose, duplicate v2
+			float4 lo0 = _mm_movelh_ps(v0, v1);  // xyxy.lo
+			float4 hi0 = _mm_movehl_ps(v1, v0);  // z?z?.lo
+			lo0 = lo0 * vLo;
+			z = _mm_shuffle_ps(hi0, v2, 0xa8);  // z0z1z2z2
+			z = z * vHi;
+			float4 lo1 = _mm_movelh_ps(v2, v2);  // xyxy
+			lo1 = lo1 * vLo;
+			x = _mm_shuffle_ps(lo0, lo1, 0x88);
+			y = _mm_shuffle_ps(lo0, lo1, 0xdd);
+		}
+		break;
+		case 2:
+		{
+			v0 = vertices[0];
+			v1 = vertices[1];
+			float4 xy = _mm_movelh_ps(v0, v1);
+			z = _mm_movehl_ps(v1, v0);
+			xy = xy * vLo;
+			z = _mm_shuffle_ps(z, z, 0xa8);
+			x = _mm_shuffle_ps(xy, xy, 0xa8);
+			y = _mm_shuffle_ps(xy, xy, 0xfd);
+			z = z * vHi;
+		}
+		break;
+		case 1:
+		{
+			float4 xy = vertices[0];
+			z = _mm_shuffle_ps(xy, xy, 0xaa);
+			xy = xy * vLo;
+			z = z * vHi;
+			x = _mm_shuffle_ps(xy, xy, 0);
+			y = _mm_shuffle_ps(xy, xy, 0x55);
+		}
+		break;
 		}
 		x = x + y;
 		x = x + z;
@@ -405,7 +408,8 @@ long b3_maxdot_large(const float *vv, const float *vec, unsigned long count, flo
 
 	// if we found a new max.
 	if (0 == segment || 0xf != _mm_movemask_ps((float4)_mm_cmpeq_ps(max, dotMax)))
-	{  // we found a new max. Search for it
+	{
+		// we found a new max. Search for it
 		// find max across the max vector, place in all elements of max -- big latency hit here
 		max = _mm_max_ps(max, (float4)_mm_shuffle_ps(max, max, 0x4e));
 		max = _mm_max_ps(max, (float4)_mm_shuffle_ps(max, max, 0xb1));
@@ -458,7 +462,8 @@ long b3_mindot_large(const float *vv, const float *vec, unsigned long count, flo
 		min = dotmin;
 
 		for (index = 0; index < STACK_ARRAY_COUNT; index += 4)
-		{  // do four dot products at a time. Carefully avoid touching the w element.
+		{
+			// do four dot products at a time. Carefully avoid touching the w element.
 			float4 v0 = vertices[0];
 			float4 v1 = vertices[1];
 			float4 v2 = vertices[2];
@@ -579,7 +584,8 @@ long b3_mindot_large(const float *vv, const float *vec, unsigned long count, flo
 	if (b3Unlikely(count > 16))
 	{
 		for (; index + 4 <= count / 4; index += 4)
-		{  // do four dot products at a time. Carefully avoid touching the w element.
+		{
+			// do four dot products at a time. Carefully avoid touching the w element.
 			float4 v0 = vertices[0];
 			float4 v1 = vertices[1];
 			float4 v2 = vertices[2];
@@ -682,7 +688,7 @@ long b3_mindot_large(const float *vv, const float *vec, unsigned long count, flo
 		float4 *sap = &stack_array[index + localCount / 4];
 
 		asm volatile(
-			".align 4                                                                   \n\
+		    ".align 4                                                                   \n\
              0: movaps  %[min], %[t2]                            // move min out of the way to avoid propagating NaNs in min \n\
              movaps  (%[vertices], %[byteIndex], 4),    %[t0]    // vertices[0]      \n\
              movaps  16(%[vertices], %[byteIndex], 4),  %[t1]    // vertices[1]      \n\
@@ -708,14 +714,15 @@ long b3_mindot_large(const float *vv, const float *vec, unsigned long count, flo
              add     $16, %[byteIndex]                           // advance loop counter\n\
              jnz     0b                                          \n\
              "
-			: [min] "+x"(min), [t0] "=&x"(t0), [t1] "=&x"(t1), [t2] "=&x"(t2), [t3] "=&x"(t3), [t4] "=&x"(t4), [byteIndex] "+r"(byteIndex)
-			: [vLo] "x"(vLo), [vHi] "x"(vHi), [vertices] "r"(vertices), [sap] "r"(sap)
-			: "memory", "cc");
+		    : [min] "+x"(min), [t0] "=&x"(t0), [t1] "=&x"(t1), [t2] "=&x"(t2), [t3] "=&x"(t3), [t4] "=&x"(t4), [byteIndex] "+r"(byteIndex)
+		    : [vLo] "x"(vLo), [vHi] "x"(vHi), [vertices] "r"(vertices), [sap] "r"(sap)
+		    : "memory", "cc");
 		index += localCount / 4;
 #else
 		{
 			for (unsigned int i = 0; i < localCount / 4; i++, index++)
-			{  // do four dot products at a time. Carefully avoid touching the w element.
+			{
+				// do four dot products at a time. Carefully avoid touching the w element.
 				float4 v0 = vertices[0];
 				float4 v1 = vertices[1];
 				float4 v2 = vertices[2];
@@ -749,47 +756,47 @@ long b3_mindot_large(const float *vv, const float *vec, unsigned long count, flo
 		float4 v0, v1, v2, x, y, z;
 		switch (count & 3)
 		{
-			case 3:
-			{
-				v0 = vertices[0];
-				v1 = vertices[1];
-				v2 = vertices[2];
+		case 3:
+		{
+			v0 = vertices[0];
+			v1 = vertices[1];
+			v2 = vertices[2];
 
-				// Calculate 3 dot products, transpose, duplicate v2
-				float4 lo0 = _mm_movelh_ps(v0, v1);  // xyxy.lo
-				float4 hi0 = _mm_movehl_ps(v1, v0);  // z?z?.lo
-				lo0 = lo0 * vLo;
-				z = _mm_shuffle_ps(hi0, v2, 0xa8);  // z0z1z2z2
-				z = z * vHi;
-				float4 lo1 = _mm_movelh_ps(v2, v2);  // xyxy
-				lo1 = lo1 * vLo;
-				x = _mm_shuffle_ps(lo0, lo1, 0x88);
-				y = _mm_shuffle_ps(lo0, lo1, 0xdd);
-			}
-			break;
-			case 2:
-			{
-				v0 = vertices[0];
-				v1 = vertices[1];
-				float4 xy = _mm_movelh_ps(v0, v1);
-				z = _mm_movehl_ps(v1, v0);
-				xy = xy * vLo;
-				z = _mm_shuffle_ps(z, z, 0xa8);
-				x = _mm_shuffle_ps(xy, xy, 0xa8);
-				y = _mm_shuffle_ps(xy, xy, 0xfd);
-				z = z * vHi;
-			}
-			break;
-			case 1:
-			{
-				float4 xy = vertices[0];
-				z = _mm_shuffle_ps(xy, xy, 0xaa);
-				xy = xy * vLo;
-				z = z * vHi;
-				x = _mm_shuffle_ps(xy, xy, 0);
-				y = _mm_shuffle_ps(xy, xy, 0x55);
-			}
-			break;
+			// Calculate 3 dot products, transpose, duplicate v2
+			float4 lo0 = _mm_movelh_ps(v0, v1);  // xyxy.lo
+			float4 hi0 = _mm_movehl_ps(v1, v0);  // z?z?.lo
+			lo0 = lo0 * vLo;
+			z = _mm_shuffle_ps(hi0, v2, 0xa8);  // z0z1z2z2
+			z = z * vHi;
+			float4 lo1 = _mm_movelh_ps(v2, v2);  // xyxy
+			lo1 = lo1 * vLo;
+			x = _mm_shuffle_ps(lo0, lo1, 0x88);
+			y = _mm_shuffle_ps(lo0, lo1, 0xdd);
+		}
+		break;
+		case 2:
+		{
+			v0 = vertices[0];
+			v1 = vertices[1];
+			float4 xy = _mm_movelh_ps(v0, v1);
+			z = _mm_movehl_ps(v1, v0);
+			xy = xy * vLo;
+			z = _mm_shuffle_ps(z, z, 0xa8);
+			x = _mm_shuffle_ps(xy, xy, 0xa8);
+			y = _mm_shuffle_ps(xy, xy, 0xfd);
+			z = z * vHi;
+		}
+		break;
+		case 1:
+		{
+			float4 xy = vertices[0];
+			z = _mm_shuffle_ps(xy, xy, 0xaa);
+			xy = xy * vLo;
+			z = z * vHi;
+			x = _mm_shuffle_ps(xy, xy, 0);
+			y = _mm_shuffle_ps(xy, xy, 0x55);
+		}
+		break;
 		}
 		x = x + y;
 		x = x + z;
@@ -800,7 +807,8 @@ long b3_mindot_large(const float *vv, const float *vec, unsigned long count, flo
 
 	// if we found a new min.
 	if (0 == segment || 0xf != _mm_movemask_ps((float4)_mm_cmpeq_ps(min, dotmin)))
-	{  // we found a new min. Search for it
+	{
+		// we found a new min. Search for it
 		// find min across the min vector, place in all elements of min -- big latency hit here
 		min = _mm_min_ps(min, (float4)_mm_shuffle_ps(min, min, 0x4e));
 		min = _mm_min_ps(min, (float4)_mm_shuffle_ps(min, min, 0xb1));
@@ -871,13 +879,34 @@ long b3_maxdot_large_v0(const float *vv, const float *vec, unsigned long count, 
 	float32x4_t vvec = vld1q_f32_aligned_postincrement(vec);
 	float32x2_t vLo = vget_low_f32(vvec);
 	float32x2_t vHi = vdup_lane_f32(vget_high_f32(vvec), 0);
-	float32x2_t dotMaxLo = (float32x2_t){-B3_INFINITY, -B3_INFINITY};
-	float32x2_t dotMaxHi = (float32x2_t){-B3_INFINITY, -B3_INFINITY};
-	uint32x2_t indexLo = (uint32x2_t){0, 1};
-	uint32x2_t indexHi = (uint32x2_t){2, 3};
-	uint32x2_t iLo = (uint32x2_t){-1, -1};
-	uint32x2_t iHi = (uint32x2_t){-1, -1};
-	const uint32x2_t four = (uint32x2_t){4, 4};
+	float32x2_t dotMaxLo = (float32x2_t)
+	{
+		-B3_INFINITY, -B3_INFINITY
+	    };
+	float32x2_t dotMaxHi = (float32x2_t)
+	{
+		-B3_INFINITY, -B3_INFINITY
+	    };
+	uint32x2_t indexLo = (uint32x2_t)
+	{
+		0, 1
+	};
+	uint32x2_t indexHi = (uint32x2_t)
+	{
+		2, 3
+	};
+	uint32x2_t iLo = (uint32x2_t)
+	{
+		-1, -1
+	    };
+	uint32x2_t iHi = (uint32x2_t)
+	{
+		-1, -1
+	    };
+	const uint32x2_t four = (uint32x2_t)
+	{
+		4, 4
+	};
 
 	for (; i + 8 <= count; i += 8)
 	{
@@ -974,68 +1003,68 @@ long b3_maxdot_large_v0(const float *vv, const float *vec, unsigned long count, 
 
 	switch (count & 3)
 	{
-		case 3:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
+	case 3:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
 
-			float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
-			float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
-			float32x2_t xy2 = vmul_f32(vget_low_f32(v2), vLo);
+		float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
+		float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
+		float32x2_t xy2 = vmul_f32(vget_low_f32(v2), vLo);
 
-			float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
-			float32x2_t zLo = vmul_f32(z0.val[0], vHi);
-			float32x2_t zHi = vmul_f32(vdup_lane_f32(vget_high_f32(v2), 0), vHi);
+		float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
+		float32x2_t zLo = vmul_f32(z0.val[0], vHi);
+		float32x2_t zHi = vmul_f32(vdup_lane_f32(vget_high_f32(v2), 0), vHi);
 
-			float32x2_t rLo = vpadd_f32(xy0, xy1);
-			float32x2_t rHi = vpadd_f32(xy2, xy2);
-			rLo = vadd_f32(rLo, zLo);
-			rHi = vadd_f32(rHi, zHi);
+		float32x2_t rLo = vpadd_f32(xy0, xy1);
+		float32x2_t rHi = vpadd_f32(xy2, xy2);
+		rLo = vadd_f32(rLo, zLo);
+		rHi = vadd_f32(rHi, zHi);
 
-			uint32x2_t maskLo = vcgt_f32(rLo, dotMaxLo);
-			uint32x2_t maskHi = vcgt_f32(rHi, dotMaxHi);
-			dotMaxLo = vbsl_f32(maskLo, rLo, dotMaxLo);
-			dotMaxHi = vbsl_f32(maskHi, rHi, dotMaxHi);
-			iLo = vbsl_u32(maskLo, indexLo, iLo);
-			iHi = vbsl_u32(maskHi, indexHi, iHi);
-		}
+		uint32x2_t maskLo = vcgt_f32(rLo, dotMaxLo);
+		uint32x2_t maskHi = vcgt_f32(rHi, dotMaxHi);
+		dotMaxLo = vbsl_f32(maskLo, rLo, dotMaxLo);
+		dotMaxHi = vbsl_f32(maskHi, rHi, dotMaxHi);
+		iLo = vbsl_u32(maskLo, indexLo, iLo);
+		iHi = vbsl_u32(maskHi, indexHi, iHi);
+	}
+	break;
+	case 2:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+
+		float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
+		float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
+
+		float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
+		float32x2_t zLo = vmul_f32(z0.val[0], vHi);
+
+		float32x2_t rLo = vpadd_f32(xy0, xy1);
+		rLo = vadd_f32(rLo, zLo);
+
+		uint32x2_t maskLo = vcgt_f32(rLo, dotMaxLo);
+		dotMaxLo = vbsl_f32(maskLo, rLo, dotMaxLo);
+		iLo = vbsl_u32(maskLo, indexLo, iLo);
+	}
+	break;
+	case 1:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
+		float32x2_t z0 = vdup_lane_f32(vget_high_f32(v0), 0);
+		float32x2_t zLo = vmul_f32(z0, vHi);
+		float32x2_t rLo = vpadd_f32(xy0, xy0);
+		rLo = vadd_f32(rLo, zLo);
+		uint32x2_t maskLo = vcgt_f32(rLo, dotMaxLo);
+		dotMaxLo = vbsl_f32(maskLo, rLo, dotMaxLo);
+		iLo = vbsl_u32(maskLo, indexLo, iLo);
+	}
+	break;
+
+	default:
 		break;
-		case 2:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-
-			float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
-			float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
-
-			float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
-			float32x2_t zLo = vmul_f32(z0.val[0], vHi);
-
-			float32x2_t rLo = vpadd_f32(xy0, xy1);
-			rLo = vadd_f32(rLo, zLo);
-
-			uint32x2_t maskLo = vcgt_f32(rLo, dotMaxLo);
-			dotMaxLo = vbsl_f32(maskLo, rLo, dotMaxLo);
-			iLo = vbsl_u32(maskLo, indexLo, iLo);
-		}
-		break;
-		case 1:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
-			float32x2_t z0 = vdup_lane_f32(vget_high_f32(v0), 0);
-			float32x2_t zLo = vmul_f32(z0, vHi);
-			float32x2_t rLo = vpadd_f32(xy0, xy0);
-			rLo = vadd_f32(rLo, zLo);
-			uint32x2_t maskLo = vcgt_f32(rLo, dotMaxLo);
-			dotMaxLo = vbsl_f32(maskLo, rLo, dotMaxLo);
-			iLo = vbsl_u32(maskLo, indexLo, iLo);
-		}
-		break;
-
-		default:
-			break;
 	}
 
 	// select best answer between hi and lo results
@@ -1059,10 +1088,22 @@ long b3_maxdot_large_v1(const float *vv, const float *vec, unsigned long count, 
 	float32x4_t vvec = vld1q_f32_aligned_postincrement(vec);
 	float32x4_t vLo = vcombine_f32(vget_low_f32(vvec), vget_low_f32(vvec));
 	float32x4_t vHi = vdupq_lane_f32(vget_high_f32(vvec), 0);
-	const uint32x4_t four = (uint32x4_t){4, 4, 4, 4};
-	uint32x4_t local_index = (uint32x4_t){0, 1, 2, 3};
-	uint32x4_t index = (uint32x4_t){-1, -1, -1, -1};
-	float32x4_t maxDot = (float32x4_t){-B3_INFINITY, -B3_INFINITY, -B3_INFINITY, -B3_INFINITY};
+	const uint32x4_t four = (uint32x4_t)
+	{
+		4, 4, 4, 4
+	};
+	uint32x4_t local_index = (uint32x4_t)
+	{
+		0, 1, 2, 3
+	};
+	uint32x4_t index = (uint32x4_t)
+	{
+		-1, -1, -1, -1
+	    };
+	float32x4_t maxDot = (float32x4_t)
+	{
+		-B3_INFINITY, -B3_INFINITY, -B3_INFINITY, -B3_INFINITY
+	    };
 
 	unsigned long i = 0;
 	for (; i + 8 <= count; i += 8)
@@ -1151,85 +1192,85 @@ long b3_maxdot_large_v1(const float *vv, const float *vec, unsigned long count, 
 
 	switch (count & 3)
 	{
-		case 3:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
+	case 3:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
 
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
-			float32x4_t xy1 = vcombine_f32(vget_low_f32(v2), vget_low_f32(v2));
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
-			float32x4_t z1 = vcombine_f32(vget_high_f32(v2), vget_high_f32(v2));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
+		float32x4_t xy1 = vcombine_f32(vget_low_f32(v2), vget_low_f32(v2));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
+		float32x4_t z1 = vcombine_f32(vget_high_f32(v2), vget_high_f32(v2));
 
-			xy0 = vmulq_f32(xy0, vLo);
-			xy1 = vmulq_f32(xy1, vLo);
+		xy0 = vmulq_f32(xy0, vLo);
+		xy1 = vmulq_f32(xy1, vLo);
 
-			float32x4x2_t zb = vuzpq_f32(z0, z1);
-			float32x4_t z = vmulq_f32(zb.val[0], vHi);
-			float32x4x2_t xy = vuzpq_f32(xy0, xy1);
-			float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
-			x = vaddq_f32(x, z);
+		float32x4x2_t zb = vuzpq_f32(z0, z1);
+		float32x4_t z = vmulq_f32(zb.val[0], vHi);
+		float32x4x2_t xy = vuzpq_f32(xy0, xy1);
+		float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
+		x = vaddq_f32(x, z);
 
-			uint32x4_t mask = vcgtq_f32(x, maxDot);
-			maxDot = vbslq_f32(mask, x, maxDot);
-			index = vbslq_u32(mask, local_index, index);
-			local_index = vaddq_u32(local_index, four);
-		}
+		uint32x4_t mask = vcgtq_f32(x, maxDot);
+		maxDot = vbslq_f32(mask, x, maxDot);
+		index = vbslq_u32(mask, local_index, index);
+		local_index = vaddq_u32(local_index, four);
+	}
+	break;
+
+	case 2:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
+
+		xy0 = vmulq_f32(xy0, vLo);
+
+		float32x4x2_t zb = vuzpq_f32(z0, z0);
+		float32x4_t z = vmulq_f32(zb.val[0], vHi);
+		float32x4x2_t xy = vuzpq_f32(xy0, xy0);
+		float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
+		x = vaddq_f32(x, z);
+
+		uint32x4_t mask = vcgtq_f32(x, maxDot);
+		maxDot = vbslq_f32(mask, x, maxDot);
+		index = vbslq_u32(mask, local_index, index);
+		local_index = vaddq_u32(local_index, four);
+	}
+	break;
+
+	case 1:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v0));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t z = vdupq_lane_f32(vget_high_f32(v0), 0);
+
+		xy0 = vmulq_f32(xy0, vLo);
+
+		z = vmulq_f32(z, vHi);
+		float32x4x2_t xy = vuzpq_f32(xy0, xy0);
+		float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
+		x = vaddq_f32(x, z);
+
+		uint32x4_t mask = vcgtq_f32(x, maxDot);
+		maxDot = vbslq_f32(mask, x, maxDot);
+		index = vbslq_u32(mask, local_index, index);
+		local_index = vaddq_u32(local_index, four);
+	}
+	break;
+
+	default:
 		break;
-
-		case 2:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
-
-			xy0 = vmulq_f32(xy0, vLo);
-
-			float32x4x2_t zb = vuzpq_f32(z0, z0);
-			float32x4_t z = vmulq_f32(zb.val[0], vHi);
-			float32x4x2_t xy = vuzpq_f32(xy0, xy0);
-			float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
-			x = vaddq_f32(x, z);
-
-			uint32x4_t mask = vcgtq_f32(x, maxDot);
-			maxDot = vbslq_f32(mask, x, maxDot);
-			index = vbslq_u32(mask, local_index, index);
-			local_index = vaddq_u32(local_index, four);
-		}
-		break;
-
-		case 1:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v0));
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t z = vdupq_lane_f32(vget_high_f32(v0), 0);
-
-			xy0 = vmulq_f32(xy0, vLo);
-
-			z = vmulq_f32(z, vHi);
-			float32x4x2_t xy = vuzpq_f32(xy0, xy0);
-			float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
-			x = vaddq_f32(x, z);
-
-			uint32x4_t mask = vcgtq_f32(x, maxDot);
-			maxDot = vbslq_f32(mask, x, maxDot);
-			index = vbslq_u32(mask, local_index, index);
-			local_index = vaddq_u32(local_index, four);
-		}
-		break;
-
-		default:
-			break;
 	}
 
 	// select best answer between hi and lo results
@@ -1254,13 +1295,34 @@ long b3_mindot_large_v0(const float *vv, const float *vec, unsigned long count, 
 	float32x4_t vvec = vld1q_f32_aligned_postincrement(vec);
 	float32x2_t vLo = vget_low_f32(vvec);
 	float32x2_t vHi = vdup_lane_f32(vget_high_f32(vvec), 0);
-	float32x2_t dotMinLo = (float32x2_t){B3_INFINITY, B3_INFINITY};
-	float32x2_t dotMinHi = (float32x2_t){B3_INFINITY, B3_INFINITY};
-	uint32x2_t indexLo = (uint32x2_t){0, 1};
-	uint32x2_t indexHi = (uint32x2_t){2, 3};
-	uint32x2_t iLo = (uint32x2_t){-1, -1};
-	uint32x2_t iHi = (uint32x2_t){-1, -1};
-	const uint32x2_t four = (uint32x2_t){4, 4};
+	float32x2_t dotMinLo = (float32x2_t)
+	{
+		B3_INFINITY, B3_INFINITY
+	};
+	float32x2_t dotMinHi = (float32x2_t)
+	{
+		B3_INFINITY, B3_INFINITY
+	};
+	uint32x2_t indexLo = (uint32x2_t)
+	{
+		0, 1
+	};
+	uint32x2_t indexHi = (uint32x2_t)
+	{
+		2, 3
+	};
+	uint32x2_t iLo = (uint32x2_t)
+	{
+		-1, -1
+	    };
+	uint32x2_t iHi = (uint32x2_t)
+	{
+		-1, -1
+	    };
+	const uint32x2_t four = (uint32x2_t)
+	{
+		4, 4
+	};
 
 	for (; i + 8 <= count; i += 8)
 	{
@@ -1356,68 +1418,68 @@ long b3_mindot_large_v0(const float *vv, const float *vec, unsigned long count, 
 	}
 	switch (count & 3)
 	{
-		case 3:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
+	case 3:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
 
-			float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
-			float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
-			float32x2_t xy2 = vmul_f32(vget_low_f32(v2), vLo);
+		float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
+		float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
+		float32x2_t xy2 = vmul_f32(vget_low_f32(v2), vLo);
 
-			float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
-			float32x2_t zLo = vmul_f32(z0.val[0], vHi);
-			float32x2_t zHi = vmul_f32(vdup_lane_f32(vget_high_f32(v2), 0), vHi);
+		float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
+		float32x2_t zLo = vmul_f32(z0.val[0], vHi);
+		float32x2_t zHi = vmul_f32(vdup_lane_f32(vget_high_f32(v2), 0), vHi);
 
-			float32x2_t rLo = vpadd_f32(xy0, xy1);
-			float32x2_t rHi = vpadd_f32(xy2, xy2);
-			rLo = vadd_f32(rLo, zLo);
-			rHi = vadd_f32(rHi, zHi);
+		float32x2_t rLo = vpadd_f32(xy0, xy1);
+		float32x2_t rHi = vpadd_f32(xy2, xy2);
+		rLo = vadd_f32(rLo, zLo);
+		rHi = vadd_f32(rHi, zHi);
 
-			uint32x2_t maskLo = vclt_f32(rLo, dotMinLo);
-			uint32x2_t maskHi = vclt_f32(rHi, dotMinHi);
-			dotMinLo = vbsl_f32(maskLo, rLo, dotMinLo);
-			dotMinHi = vbsl_f32(maskHi, rHi, dotMinHi);
-			iLo = vbsl_u32(maskLo, indexLo, iLo);
-			iHi = vbsl_u32(maskHi, indexHi, iHi);
-		}
+		uint32x2_t maskLo = vclt_f32(rLo, dotMinLo);
+		uint32x2_t maskHi = vclt_f32(rHi, dotMinHi);
+		dotMinLo = vbsl_f32(maskLo, rLo, dotMinLo);
+		dotMinHi = vbsl_f32(maskHi, rHi, dotMinHi);
+		iLo = vbsl_u32(maskLo, indexLo, iLo);
+		iHi = vbsl_u32(maskHi, indexHi, iHi);
+	}
+	break;
+	case 2:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+
+		float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
+		float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
+
+		float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
+		float32x2_t zLo = vmul_f32(z0.val[0], vHi);
+
+		float32x2_t rLo = vpadd_f32(xy0, xy1);
+		rLo = vadd_f32(rLo, zLo);
+
+		uint32x2_t maskLo = vclt_f32(rLo, dotMinLo);
+		dotMinLo = vbsl_f32(maskLo, rLo, dotMinLo);
+		iLo = vbsl_u32(maskLo, indexLo, iLo);
+	}
+	break;
+	case 1:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
+		float32x2_t z0 = vdup_lane_f32(vget_high_f32(v0), 0);
+		float32x2_t zLo = vmul_f32(z0, vHi);
+		float32x2_t rLo = vpadd_f32(xy0, xy0);
+		rLo = vadd_f32(rLo, zLo);
+		uint32x2_t maskLo = vclt_f32(rLo, dotMinLo);
+		dotMinLo = vbsl_f32(maskLo, rLo, dotMinLo);
+		iLo = vbsl_u32(maskLo, indexLo, iLo);
+	}
+	break;
+
+	default:
 		break;
-		case 2:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-
-			float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
-			float32x2_t xy1 = vmul_f32(vget_low_f32(v1), vLo);
-
-			float32x2x2_t z0 = vtrn_f32(vget_high_f32(v0), vget_high_f32(v1));
-			float32x2_t zLo = vmul_f32(z0.val[0], vHi);
-
-			float32x2_t rLo = vpadd_f32(xy0, xy1);
-			rLo = vadd_f32(rLo, zLo);
-
-			uint32x2_t maskLo = vclt_f32(rLo, dotMinLo);
-			dotMinLo = vbsl_f32(maskLo, rLo, dotMinLo);
-			iLo = vbsl_u32(maskLo, indexLo, iLo);
-		}
-		break;
-		case 1:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x2_t xy0 = vmul_f32(vget_low_f32(v0), vLo);
-			float32x2_t z0 = vdup_lane_f32(vget_high_f32(v0), 0);
-			float32x2_t zLo = vmul_f32(z0, vHi);
-			float32x2_t rLo = vpadd_f32(xy0, xy0);
-			rLo = vadd_f32(rLo, zLo);
-			uint32x2_t maskLo = vclt_f32(rLo, dotMinLo);
-			dotMinLo = vbsl_f32(maskLo, rLo, dotMinLo);
-			iLo = vbsl_u32(maskLo, indexLo, iLo);
-		}
-		break;
-
-		default:
-			break;
 	}
 
 	// select best answer between hi and lo results
@@ -1441,10 +1503,22 @@ long b3_mindot_large_v1(const float *vv, const float *vec, unsigned long count, 
 	float32x4_t vvec = vld1q_f32_aligned_postincrement(vec);
 	float32x4_t vLo = vcombine_f32(vget_low_f32(vvec), vget_low_f32(vvec));
 	float32x4_t vHi = vdupq_lane_f32(vget_high_f32(vvec), 0);
-	const uint32x4_t four = (uint32x4_t){4, 4, 4, 4};
-	uint32x4_t local_index = (uint32x4_t){0, 1, 2, 3};
-	uint32x4_t index = (uint32x4_t){-1, -1, -1, -1};
-	float32x4_t minDot = (float32x4_t){B3_INFINITY, B3_INFINITY, B3_INFINITY, B3_INFINITY};
+	const uint32x4_t four = (uint32x4_t)
+	{
+		4, 4, 4, 4
+	};
+	uint32x4_t local_index = (uint32x4_t)
+	{
+		0, 1, 2, 3
+	};
+	uint32x4_t index = (uint32x4_t)
+	{
+		-1, -1, -1, -1
+	    };
+	float32x4_t minDot = (float32x4_t)
+	{
+		B3_INFINITY, B3_INFINITY, B3_INFINITY, B3_INFINITY
+	};
 
 	unsigned long i = 0;
 	for (; i + 8 <= count; i += 8)
@@ -1533,85 +1607,85 @@ long b3_mindot_large_v1(const float *vv, const float *vec, unsigned long count, 
 
 	switch (count & 3)
 	{
-		case 3:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
+	case 3:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v2 = vld1q_f32_aligned_postincrement(vv);
 
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
-			float32x4_t xy1 = vcombine_f32(vget_low_f32(v2), vget_low_f32(v2));
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
-			float32x4_t z1 = vcombine_f32(vget_high_f32(v2), vget_high_f32(v2));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
+		float32x4_t xy1 = vcombine_f32(vget_low_f32(v2), vget_low_f32(v2));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
+		float32x4_t z1 = vcombine_f32(vget_high_f32(v2), vget_high_f32(v2));
 
-			xy0 = vmulq_f32(xy0, vLo);
-			xy1 = vmulq_f32(xy1, vLo);
+		xy0 = vmulq_f32(xy0, vLo);
+		xy1 = vmulq_f32(xy1, vLo);
 
-			float32x4x2_t zb = vuzpq_f32(z0, z1);
-			float32x4_t z = vmulq_f32(zb.val[0], vHi);
-			float32x4x2_t xy = vuzpq_f32(xy0, xy1);
-			float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
-			x = vaddq_f32(x, z);
+		float32x4x2_t zb = vuzpq_f32(z0, z1);
+		float32x4_t z = vmulq_f32(zb.val[0], vHi);
+		float32x4x2_t xy = vuzpq_f32(xy0, xy1);
+		float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
+		x = vaddq_f32(x, z);
 
-			uint32x4_t mask = vcltq_f32(x, minDot);
-			minDot = vbslq_f32(mask, x, minDot);
-			index = vbslq_u32(mask, local_index, index);
-			local_index = vaddq_u32(local_index, four);
-		}
+		uint32x4_t mask = vcltq_f32(x, minDot);
+		minDot = vbslq_f32(mask, x, minDot);
+		index = vbslq_u32(mask, local_index, index);
+		local_index = vaddq_u32(local_index, four);
+	}
+	break;
+
+	case 2:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+		float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
+
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
+
+		xy0 = vmulq_f32(xy0, vLo);
+
+		float32x4x2_t zb = vuzpq_f32(z0, z0);
+		float32x4_t z = vmulq_f32(zb.val[0], vHi);
+		float32x4x2_t xy = vuzpq_f32(xy0, xy0);
+		float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
+		x = vaddq_f32(x, z);
+
+		uint32x4_t mask = vcltq_f32(x, minDot);
+		minDot = vbslq_f32(mask, x, minDot);
+		index = vbslq_u32(mask, local_index, index);
+		local_index = vaddq_u32(local_index, four);
+	}
+	break;
+
+	case 1:
+	{
+		float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
+
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v0));
+		// the next two lines should resolve to a single vswp d, d
+		float32x4_t z = vdupq_lane_f32(vget_high_f32(v0), 0);
+
+		xy0 = vmulq_f32(xy0, vLo);
+
+		z = vmulq_f32(z, vHi);
+		float32x4x2_t xy = vuzpq_f32(xy0, xy0);
+		float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
+		x = vaddq_f32(x, z);
+
+		uint32x4_t mask = vcltq_f32(x, minDot);
+		minDot = vbslq_f32(mask, x, minDot);
+		index = vbslq_u32(mask, local_index, index);
+		local_index = vaddq_u32(local_index, four);
+	}
+	break;
+
+	default:
 		break;
-
-		case 2:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-			float32x4_t v1 = vld1q_f32_aligned_postincrement(vv);
-
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v1));
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t z0 = vcombine_f32(vget_high_f32(v0), vget_high_f32(v1));
-
-			xy0 = vmulq_f32(xy0, vLo);
-
-			float32x4x2_t zb = vuzpq_f32(z0, z0);
-			float32x4_t z = vmulq_f32(zb.val[0], vHi);
-			float32x4x2_t xy = vuzpq_f32(xy0, xy0);
-			float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
-			x = vaddq_f32(x, z);
-
-			uint32x4_t mask = vcltq_f32(x, minDot);
-			minDot = vbslq_f32(mask, x, minDot);
-			index = vbslq_u32(mask, local_index, index);
-			local_index = vaddq_u32(local_index, four);
-		}
-		break;
-
-		case 1:
-		{
-			float32x4_t v0 = vld1q_f32_aligned_postincrement(vv);
-
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t xy0 = vcombine_f32(vget_low_f32(v0), vget_low_f32(v0));
-			// the next two lines should resolve to a single vswp d, d
-			float32x4_t z = vdupq_lane_f32(vget_high_f32(v0), 0);
-
-			xy0 = vmulq_f32(xy0, vLo);
-
-			z = vmulq_f32(z, vHi);
-			float32x4x2_t xy = vuzpq_f32(xy0, xy0);
-			float32x4_t x = vaddq_f32(xy.val[0], xy.val[1]);
-			x = vaddq_f32(x, z);
-
-			uint32x4_t mask = vcltq_f32(x, minDot);
-			minDot = vbslq_f32(mask, x, minDot);
-			index = vbslq_u32(mask, local_index, index);
-			local_index = vaddq_u32(local_index, four);
-		}
-		break;
-
-		default:
-			break;
 	}
 
 	// select best answer between hi and lo results

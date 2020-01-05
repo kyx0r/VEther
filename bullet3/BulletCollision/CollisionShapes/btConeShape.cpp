@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -16,8 +16,8 @@ subject to the following restrictions:
 #include "btConeShape.h"
 
 btConeShape::btConeShape(btScalar radius, btScalar height) : btConvexInternalShape(),
-															 m_radius(radius),
-															 m_height(height)
+	m_radius(radius),
+	m_height(height)
 {
 	m_shapeType = CONE_SHAPE_PROXYTYPE;
 	setConeUpIndex(1);
@@ -40,23 +40,23 @@ void btConeShape::setConeUpIndex(int upIndex)
 {
 	switch (upIndex)
 	{
-		case 0:
-			m_coneIndices[0] = 1;
-			m_coneIndices[1] = 0;
-			m_coneIndices[2] = 2;
-			break;
-		case 1:
-			m_coneIndices[0] = 0;
-			m_coneIndices[1] = 1;
-			m_coneIndices[2] = 2;
-			break;
-		case 2:
-			m_coneIndices[0] = 0;
-			m_coneIndices[1] = 2;
-			m_coneIndices[2] = 1;
-			break;
-		default:
-			btAssert(0);
+	case 0:
+		m_coneIndices[0] = 1;
+		m_coneIndices[1] = 0;
+		m_coneIndices[2] = 2;
+		break;
+	case 1:
+		m_coneIndices[0] = 0;
+		m_coneIndices[1] = 1;
+		m_coneIndices[2] = 2;
+		break;
+	case 2:
+		m_coneIndices[0] = 0;
+		m_coneIndices[1] = 2;
+		m_coneIndices[2] = 1;
+		break;
+	default:
+		btAssert(0);
 	};
 
 	m_implicitShapeDimensions[m_coneIndices[0]] = m_radius;

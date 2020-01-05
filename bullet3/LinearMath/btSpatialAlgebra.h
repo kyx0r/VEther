@@ -3,8 +3,8 @@ Copyright (c) 2003-2015 Erwin Coumans, Jakub Stepien
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -24,7 +24,10 @@ struct btSpatialForceVector
 {
 	btVector3 m_topVec, m_bottomVec;
 	//
-	btSpatialForceVector() { setZero(); }
+	btSpatialForceVector()
+	{
+		setZero();
+	}
 	btSpatialForceVector(const btVector3 &angular, const btVector3 &linear) : m_topVec(linear), m_bottomVec(angular) {}
 	btSpatialForceVector(const btScalar &ax, const btScalar &ay, const btScalar &az, const btScalar &lx, const btScalar &ly, const btScalar &lz)
 	{
@@ -57,14 +60,32 @@ struct btSpatialForceVector
 		m_topVec[2] += lz;
 	}
 	//
-	const btVector3 &getLinear() const { return m_topVec; }
-	const btVector3 &getAngular() const { return m_bottomVec; }
+	const btVector3 &getLinear() const
+	{
+		return m_topVec;
+	}
+	const btVector3 &getAngular() const
+	{
+		return m_bottomVec;
+	}
 	//
-	void setLinear(const btVector3 &linear) { m_topVec = linear; }
-	void setAngular(const btVector3 &angular) { m_bottomVec = angular; }
+	void setLinear(const btVector3 &linear)
+	{
+		m_topVec = linear;
+	}
+	void setAngular(const btVector3 &angular)
+	{
+		m_bottomVec = angular;
+	}
 	//
-	void addAngular(const btVector3 &angular) { m_bottomVec += angular; }
-	void addLinear(const btVector3 &linear) { m_topVec += linear; }
+	void addAngular(const btVector3 &angular)
+	{
+		m_bottomVec += angular;
+	}
+	void addLinear(const btVector3 &linear)
+	{
+		m_topVec += linear;
+	}
 	//
 	void setZero()
 	{
@@ -84,10 +105,22 @@ struct btSpatialForceVector
 		m_bottomVec -= vec.m_bottomVec;
 		return *this;
 	}
-	btSpatialForceVector operator-(const btSpatialForceVector &vec) const { return btSpatialForceVector(m_bottomVec - vec.m_bottomVec, m_topVec - vec.m_topVec); }
-	btSpatialForceVector operator+(const btSpatialForceVector &vec) const { return btSpatialForceVector(m_bottomVec + vec.m_bottomVec, m_topVec + vec.m_topVec); }
-	btSpatialForceVector operator-() const { return btSpatialForceVector(-m_bottomVec, -m_topVec); }
-	btSpatialForceVector operator*(const btScalar &s) const { return btSpatialForceVector(s * m_bottomVec, s * m_topVec); }
+	btSpatialForceVector operator-(const btSpatialForceVector &vec) const
+	{
+		return btSpatialForceVector(m_bottomVec - vec.m_bottomVec, m_topVec - vec.m_topVec);
+	}
+	btSpatialForceVector operator+(const btSpatialForceVector &vec) const
+	{
+		return btSpatialForceVector(m_bottomVec + vec.m_bottomVec, m_topVec + vec.m_topVec);
+	}
+	btSpatialForceVector operator-() const
+	{
+		return btSpatialForceVector(-m_bottomVec, -m_topVec);
+	}
+	btSpatialForceVector operator*(const btScalar &s) const
+	{
+		return btSpatialForceVector(s * m_bottomVec, s * m_topVec);
+	}
 	//btSpatialForceVector & operator = (const btSpatialForceVector &vec) { m_topVec = vec.m_topVec; m_bottomVec = vec.m_bottomVec; return *this; }
 };
 
@@ -95,7 +128,10 @@ struct btSpatialMotionVector
 {
 	btVector3 m_topVec, m_bottomVec;
 	//
-	btSpatialMotionVector() { setZero(); }
+	btSpatialMotionVector()
+	{
+		setZero();
+	}
 	btSpatialMotionVector(const btVector3 &angular, const btVector3 &linear) : m_topVec(angular), m_bottomVec(linear) {}
 	//
 	void setVector(const btVector3 &angular, const btVector3 &linear)
@@ -124,14 +160,32 @@ struct btSpatialMotionVector
 		m_bottomVec[2] += lz;
 	}
 	//
-	const btVector3 &getAngular() const { return m_topVec; }
-	const btVector3 &getLinear() const { return m_bottomVec; }
+	const btVector3 &getAngular() const
+	{
+		return m_topVec;
+	}
+	const btVector3 &getLinear() const
+	{
+		return m_bottomVec;
+	}
 	//
-	void setAngular(const btVector3 &angular) { m_topVec = angular; }
-	void setLinear(const btVector3 &linear) { m_bottomVec = linear; }
+	void setAngular(const btVector3 &angular)
+	{
+		m_topVec = angular;
+	}
+	void setLinear(const btVector3 &linear)
+	{
+		m_bottomVec = linear;
+	}
 	//
-	void addAngular(const btVector3 &angular) { m_topVec += angular; }
-	void addLinear(const btVector3 &linear) { m_bottomVec += linear; }
+	void addAngular(const btVector3 &angular)
+	{
+		m_topVec += angular;
+	}
+	void addLinear(const btVector3 &linear)
+	{
+		m_bottomVec += linear;
+	}
 	//
 	void setZero()
 	{
@@ -177,18 +231,36 @@ struct btSpatialMotionVector
 		m_bottomVec *= s;
 		return *this;
 	}
-	btSpatialMotionVector operator-(const btSpatialMotionVector &vec) const { return btSpatialMotionVector(m_topVec - vec.m_topVec, m_bottomVec - vec.m_bottomVec); }
-	btSpatialMotionVector operator+(const btSpatialMotionVector &vec) const { return btSpatialMotionVector(m_topVec + vec.m_topVec, m_bottomVec + vec.m_bottomVec); }
-	btSpatialMotionVector operator-() const { return btSpatialMotionVector(-m_topVec, -m_bottomVec); }
-	btSpatialMotionVector operator*(const btScalar &s) const { return btSpatialMotionVector(s * m_topVec, s * m_bottomVec); }
+	btSpatialMotionVector operator-(const btSpatialMotionVector &vec) const
+	{
+		return btSpatialMotionVector(m_topVec - vec.m_topVec, m_bottomVec - vec.m_bottomVec);
+	}
+	btSpatialMotionVector operator+(const btSpatialMotionVector &vec) const
+	{
+		return btSpatialMotionVector(m_topVec + vec.m_topVec, m_bottomVec + vec.m_bottomVec);
+	}
+	btSpatialMotionVector operator-() const
+	{
+		return btSpatialMotionVector(-m_topVec, -m_bottomVec);
+	}
+	btSpatialMotionVector operator*(const btScalar &s) const
+	{
+		return btSpatialMotionVector(s * m_topVec, s * m_bottomVec);
+	}
 };
 
 struct btSymmetricSpatialDyad
 {
 	btMatrix3x3 m_topLeftMat, m_topRightMat, m_bottomLeftMat;
 	//
-	btSymmetricSpatialDyad() { setIdentity(); }
-	btSymmetricSpatialDyad(const btMatrix3x3 &topLeftMat, const btMatrix3x3 &topRightMat, const btMatrix3x3 &bottomLeftMat) { setMatrix(topLeftMat, topRightMat, bottomLeftMat); }
+	btSymmetricSpatialDyad()
+	{
+		setIdentity();
+	}
+	btSymmetricSpatialDyad(const btMatrix3x3 &topLeftMat, const btMatrix3x3 &topRightMat, const btMatrix3x3 &bottomLeftMat)
+	{
+		setMatrix(topLeftMat, topRightMat, bottomLeftMat);
+	}
 	//
 	void setMatrix(const btMatrix3x3 &topLeftMat, const btMatrix3x3 &topRightMat, const btMatrix3x3 &bottomLeftMat)
 	{
@@ -239,8 +311,8 @@ struct btSpatialTransformationMatrix
 	//
 	template <typename SpatialVectorType>
 	void transform(const SpatialVectorType &inVec,
-				   SpatialVectorType &outVec,
-				   eOutputOperation outOp = None)
+	               SpatialVectorType &outVec,
+	               eOutputOperation outOp = None)
 	{
 		if (outOp == None)
 		{
@@ -261,8 +333,8 @@ struct btSpatialTransformationMatrix
 
 	template <typename SpatialVectorType>
 	void transformRotationOnly(const SpatialVectorType &inVec,
-							   SpatialVectorType &outVec,
-							   eOutputOperation outOp = None)
+	                           SpatialVectorType &outVec,
+	                           eOutputOperation outOp = None)
 	{
 		if (outOp == None)
 		{
@@ -283,8 +355,8 @@ struct btSpatialTransformationMatrix
 
 	template <typename SpatialVectorType>
 	void transformInverse(const SpatialVectorType &inVec,
-						  SpatialVectorType &outVec,
-						  eOutputOperation outOp = None)
+	                      SpatialVectorType &outVec,
+	                      eOutputOperation outOp = None)
 	{
 		if (outOp == None)
 		{
@@ -305,8 +377,8 @@ struct btSpatialTransformationMatrix
 
 	template <typename SpatialVectorType>
 	void transformInverseRotationOnly(const SpatialVectorType &inVec,
-									  SpatialVectorType &outVec,
-									  eOutputOperation outOp = None)
+	                                  SpatialVectorType &outVec,
+	                                  eOutputOperation outOp = None)
 	{
 		if (outOp == None)
 		{
@@ -326,12 +398,12 @@ struct btSpatialTransformationMatrix
 	}
 
 	void transformInverse(const btSymmetricSpatialDyad &inMat,
-						  btSymmetricSpatialDyad &outMat,
-						  eOutputOperation outOp = None)
+	                      btSymmetricSpatialDyad &outMat,
+	                      eOutputOperation outOp = None)
 	{
 		const btMatrix3x3 r_cross(0, -m_trnVec[2], m_trnVec[1],
-								  m_trnVec[2], 0, -m_trnVec[0],
-								  -m_trnVec[1], m_trnVec[0], 0);
+		                          m_trnVec[2], 0, -m_trnVec[0],
+		                          -m_trnVec[1], m_trnVec[0], 0);
 
 		if (outOp == None)
 		{

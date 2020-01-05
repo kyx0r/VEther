@@ -44,31 +44,31 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
 	switch (fdwReason)
 	{
-		case DLL_PROCESS_ATTACH:
+	case DLL_PROCESS_ATTACH:
 
-            if (! glslang::InitProcess())
-                return FALSE;
-            break;
-		case DLL_THREAD_ATTACH:
-
-            if (! glslang::InitThread())
-                return FALSE;
-            break;
-
-		case DLL_THREAD_DETACH:
-
-			if (! glslang::DetachThread())
-				return FALSE;
-			break;
-
-		case DLL_PROCESS_DETACH:
-
-			glslang::DetachProcess();
-			break;
-
-		default:
-			assert(0 && "DllMain(): Reason for calling DLL Main is unknown");
+		if (! glslang::InitProcess())
 			return FALSE;
+		break;
+	case DLL_THREAD_ATTACH:
+
+		if (! glslang::InitThread())
+			return FALSE;
+		break;
+
+	case DLL_THREAD_DETACH:
+
+		if (! glslang::DetachThread())
+			return FALSE;
+		break;
+
+	case DLL_PROCESS_DETACH:
+
+		glslang::DetachProcess();
+		break;
+
+	default:
+		assert(0 && "DllMain(): Reason for calling DLL Main is unknown");
+		return FALSE;
 	}
 
 	return TRUE;

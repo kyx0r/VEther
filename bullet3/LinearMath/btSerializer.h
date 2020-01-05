@@ -124,7 +124,8 @@ public:
 
 struct btPointerUid
 {
-	union {
+	union
+	{
 		void* m_ptr;
 		int m_uniqueIds[2];
 	};
@@ -787,70 +788,70 @@ struct btInMemorySerializer : public btDefaultSerializer
 
 		switch (chunk->m_chunkCode)
 		{
-			case BT_SOFTBODY_CODE:
-			{
+		case BT_SOFTBODY_CODE:
+		{
 #ifdef BT_USE_DOUBLE_PRECISION
-				m_arrays.m_softBodyDoubleData.push_back((btSoftBodyDoubleData*)chunk->m_oldPtr);
+			m_arrays.m_softBodyDoubleData.push_back((btSoftBodyDoubleData*)chunk->m_oldPtr);
 #else
-				m_arrays.m_softBodyFloatData.push_back((btSoftBodyFloatData*)chunk->m_oldPtr);
+			m_arrays.m_softBodyFloatData.push_back((btSoftBodyFloatData*)chunk->m_oldPtr);
 #endif
-				break;
-			}
-			case BT_COLLISIONOBJECT_CODE:
-			{
+			break;
+		}
+		case BT_COLLISIONOBJECT_CODE:
+		{
 #ifdef BT_USE_DOUBLE_PRECISION
-				m_arrays.m_collisionObjectDataDouble.push_back((btCollisionObjectDoubleData*)chunk->m_oldPtr);
+			m_arrays.m_collisionObjectDataDouble.push_back((btCollisionObjectDoubleData*)chunk->m_oldPtr);
 #else   //BT_USE_DOUBLE_PRECISION
-				m_arrays.m_collisionObjectDataFloat.push_back((btCollisionObjectFloatData*)chunk->m_oldPtr);
+			m_arrays.m_collisionObjectDataFloat.push_back((btCollisionObjectFloatData*)chunk->m_oldPtr);
 #endif  //BT_USE_DOUBLE_PRECISION
-				break;
-			}
-			case BT_RIGIDBODY_CODE:
-			{
+			break;
+		}
+		case BT_RIGIDBODY_CODE:
+		{
 #ifdef BT_USE_DOUBLE_PRECISION
-				m_arrays.m_rigidBodyDataDouble.push_back((btRigidBodyDoubleData*)chunk->m_oldPtr);
+			m_arrays.m_rigidBodyDataDouble.push_back((btRigidBodyDoubleData*)chunk->m_oldPtr);
 #else
-				m_arrays.m_rigidBodyDataFloat.push_back((btRigidBodyFloatData*)chunk->m_oldPtr);
+			m_arrays.m_rigidBodyDataFloat.push_back((btRigidBodyFloatData*)chunk->m_oldPtr);
 #endif  //BT_USE_DOUBLE_PRECISION
-				break;
-			};
-			case BT_CONSTRAINT_CODE:
-			{
+			break;
+		};
+		case BT_CONSTRAINT_CODE:
+		{
 #ifdef BT_USE_DOUBLE_PRECISION
-				m_arrays.m_constraintDataDouble.push_back((btTypedConstraintDoubleData*)chunk->m_oldPtr);
+			m_arrays.m_constraintDataDouble.push_back((btTypedConstraintDoubleData*)chunk->m_oldPtr);
 #else
-				m_arrays.m_constraintDataFloat.push_back((btTypedConstraintFloatData*)chunk->m_oldPtr);
+			m_arrays.m_constraintDataFloat.push_back((btTypedConstraintFloatData*)chunk->m_oldPtr);
 #endif
-				break;
-			}
-			case BT_QUANTIZED_BVH_CODE:
-			{
+			break;
+		}
+		case BT_QUANTIZED_BVH_CODE:
+		{
 #ifdef BT_USE_DOUBLE_PRECISION
-				m_arrays.m_bvhsDouble.push_back((btQuantizedBvhDoubleData*)chunk->m_oldPtr);
+			m_arrays.m_bvhsDouble.push_back((btQuantizedBvhDoubleData*)chunk->m_oldPtr);
 #else
-				m_arrays.m_bvhsFloat.push_back((btQuantizedBvhFloatData*)chunk->m_oldPtr);
+			m_arrays.m_bvhsFloat.push_back((btQuantizedBvhFloatData*)chunk->m_oldPtr);
 #endif
-				break;
-			}
+			break;
+		}
 
-			case BT_SHAPE_CODE:
-			{
-				btCollisionShapeData* shapeData = (btCollisionShapeData*)chunk->m_oldPtr;
-				m_arrays.m_colShapeData.push_back(shapeData);
-				break;
-			}
-			case BT_TRIANLGE_INFO_MAP:
-			case BT_ARRAY_CODE:
-			case BT_SBMATERIAL_CODE:
-			case BT_SBNODE_CODE:
-			case BT_DYNAMICSWORLD_CODE:
-			case BT_DNA_CODE:
-			{
-				break;
-			}
-			default:
-			{
-			}
+		case BT_SHAPE_CODE:
+		{
+			btCollisionShapeData* shapeData = (btCollisionShapeData*)chunk->m_oldPtr;
+			m_arrays.m_colShapeData.push_back(shapeData);
+			break;
+		}
+		case BT_TRIANLGE_INFO_MAP:
+		case BT_ARRAY_CODE:
+		case BT_SBMATERIAL_CODE:
+		case BT_SBNODE_CODE:
+		case BT_DYNAMICSWORLD_CODE:
+		case BT_DNA_CODE:
+		{
+			break;
+		}
+		default:
+		{
+		}
 		};
 	}
 

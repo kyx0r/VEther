@@ -6,8 +6,8 @@ EPA Copyright (c) Ricardo Padrela 2006
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -21,16 +21,17 @@ subject to the following restrictions:
 #include "BulletCollision/NarrowPhaseCollision/btGjkEpa2.h"
 
 bool btGjkEpaPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& simplexSolver,
-												  const btConvexShape* pConvexA, const btConvexShape* pConvexB,
-												  const btTransform& transformA, const btTransform& transformB,
-												  btVector3& v, btVector3& wWitnessOnA, btVector3& wWitnessOnB,
-												  class btIDebugDraw* debugDraw)
+        const btConvexShape* pConvexA, const btConvexShape* pConvexB,
+        const btTransform& transformA, const btTransform& transformB,
+        btVector3& v, btVector3& wWitnessOnA, btVector3& wWitnessOnB,
+        class btIDebugDraw* debugDraw)
 {
 	(void)debugDraw;
 	(void)v;
 	(void)simplexSolver;
 
-	btVector3 guessVectors[] = {
+	btVector3 guessVectors[] =
+	{
 		btVector3(transformB.getOrigin() - transformA.getOrigin()).safeNormalize(),
 		btVector3(transformA.getOrigin() - transformB.getOrigin()).safeNormalize(),
 		btVector3(0, 0, 1),
@@ -52,8 +53,8 @@ bool btGjkEpaPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& simp
 		btGjkEpaSolver2::sResults results;
 
 		if (btGjkEpaSolver2::Penetration(pConvexA, transformA,
-										 pConvexB, transformB,
-										 guessVector, results))
+		                                 pConvexB, transformB,
+		                                 guessVector, results))
 
 		{
 			wWitnessOnA = results.witnesses[0];

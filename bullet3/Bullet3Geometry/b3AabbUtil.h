@@ -3,8 +3,8 @@ Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousph
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -20,9 +20,9 @@ subject to the following restrictions:
 #include "Bullet3Common/b3MinMax.h"
 
 B3_FORCE_INLINE void b3AabbExpand(b3Vector3& aabbMin,
-								  b3Vector3& aabbMax,
-								  const b3Vector3& expansionMin,
-								  const b3Vector3& expansionMax)
+                                  b3Vector3& aabbMax,
+                                  const b3Vector3& expansionMin,
+                                  const b3Vector3& expansionMax)
 {
 	aabbMin = aabbMin + expansionMin;
 	aabbMax = aabbMax + expansionMax;
@@ -30,7 +30,7 @@ B3_FORCE_INLINE void b3AabbExpand(b3Vector3& aabbMin,
 
 /// conservative test for overlap between two aabbs
 B3_FORCE_INLINE bool b3TestPointAgainstAabb2(const b3Vector3& aabbMin1, const b3Vector3& aabbMax1,
-											 const b3Vector3& point)
+        const b3Vector3& point)
 {
 	bool overlap = true;
 	overlap = (aabbMin1.getX() > point.getX() || aabbMax1.getX() < point.getX()) ? false : overlap;
@@ -41,7 +41,7 @@ B3_FORCE_INLINE bool b3TestPointAgainstAabb2(const b3Vector3& aabbMin1, const b3
 
 /// conservative test for overlap between two aabbs
 B3_FORCE_INLINE bool b3TestAabbAgainstAabb2(const b3Vector3& aabbMin1, const b3Vector3& aabbMax1,
-											const b3Vector3& aabbMin2, const b3Vector3& aabbMax2)
+        const b3Vector3& aabbMin2, const b3Vector3& aabbMax2)
 {
 	bool overlap = true;
 	overlap = (aabbMin1.getX() > aabbMax2.getX() || aabbMax1.getX() < aabbMin2.getX()) ? false : overlap;
@@ -52,7 +52,7 @@ B3_FORCE_INLINE bool b3TestAabbAgainstAabb2(const b3Vector3& aabbMin1, const b3V
 
 /// conservative test for overlap between triangle and aabb
 B3_FORCE_INLINE bool b3TestTriangleAgainstAabb2(const b3Vector3* vertices,
-												const b3Vector3& aabbMin, const b3Vector3& aabbMax)
+        const b3Vector3& aabbMin, const b3Vector3& aabbMax)
 {
 	const b3Vector3& p1 = vertices[0];
 	const b3Vector3& p2 = vertices[1];
@@ -72,20 +72,20 @@ B3_FORCE_INLINE bool b3TestTriangleAgainstAabb2(const b3Vector3* vertices,
 B3_FORCE_INLINE int b3Outcode(const b3Vector3& p, const b3Vector3& halfExtent)
 {
 	return (p.getX() < -halfExtent.getX() ? 0x01 : 0x0) |
-		   (p.getX() > halfExtent.getX() ? 0x08 : 0x0) |
-		   (p.getY() < -halfExtent.getY() ? 0x02 : 0x0) |
-		   (p.getY() > halfExtent.getY() ? 0x10 : 0x0) |
-		   (p.getZ() < -halfExtent.getZ() ? 0x4 : 0x0) |
-		   (p.getZ() > halfExtent.getZ() ? 0x20 : 0x0);
+	       (p.getX() > halfExtent.getX() ? 0x08 : 0x0) |
+	       (p.getY() < -halfExtent.getY() ? 0x02 : 0x0) |
+	       (p.getY() > halfExtent.getY() ? 0x10 : 0x0) |
+	       (p.getZ() < -halfExtent.getZ() ? 0x4 : 0x0) |
+	       (p.getZ() > halfExtent.getZ() ? 0x20 : 0x0);
 }
 
 B3_FORCE_INLINE bool b3RayAabb2(const b3Vector3& rayFrom,
-								const b3Vector3& rayInvDirection,
-								const unsigned int raySign[3],
-								const b3Vector3 bounds[2],
-								b3Scalar& tmin,
-								b3Scalar lambda_min,
-								b3Scalar lambda_max)
+                                const b3Vector3& rayInvDirection,
+                                const unsigned int raySign[3],
+                                const b3Vector3 bounds[2],
+                                b3Scalar& tmin,
+                                b3Scalar lambda_min,
+                                b3Scalar lambda_max)
 {
 	b3Scalar tmax, tymin, tymax, tzmin, tzmax;
 	tmin = (bounds[raySign[0]].getX() - rayFrom.getX()) * rayInvDirection.getX();
@@ -115,10 +115,10 @@ B3_FORCE_INLINE bool b3RayAabb2(const b3Vector3& rayFrom,
 }
 
 B3_FORCE_INLINE bool b3RayAabb(const b3Vector3& rayFrom,
-							   const b3Vector3& rayTo,
-							   const b3Vector3& aabbMin,
-							   const b3Vector3& aabbMax,
-							   b3Scalar& param, b3Vector3& normal)
+                               const b3Vector3& rayTo,
+                               const b3Vector3& aabbMin,
+                               const b3Vector3& aabbMax,
+                               b3Scalar& param, b3Vector3& normal)
 {
 	b3Vector3 aabbHalfExtent = (aabbMax - aabbMin) * b3Scalar(0.5);
 	b3Vector3 aabbCenter = (aabbMax + aabbMin) * b3Scalar(0.5);
@@ -201,7 +201,7 @@ B3_FORCE_INLINE void b3TransformAabb(const b3Vector3& localAabbMin, const b3Vect
 B3_FORCE_INLINE unsigned b3TestQuantizedAabbAgainstQuantizedAabb(const unsigned short int* aabbMin1, const unsigned short int* aabbMax1, const unsigned short int* aabbMin2, const unsigned short int* aabbMax2)
 {
 	return static_cast<unsigned int>(b3Select((unsigned)((aabbMin1[0] <= aabbMax2[0]) & (aabbMax1[0] >= aabbMin2[0]) & (aabbMin1[2] <= aabbMax2[2]) & (aabbMax1[2] >= aabbMin2[2]) & (aabbMin1[1] <= aabbMax2[1]) & (aabbMax1[1] >= aabbMin2[1])),
-											  1, 0));
+	                                 1, 0));
 }
 #else
 B3_FORCE_INLINE bool b3TestQuantizedAabbAgainstQuantizedAabb(const unsigned short int* aabbMin1, const unsigned short int* aabbMax1, const unsigned short int* aabbMin2, const unsigned short int* aabbMax2)

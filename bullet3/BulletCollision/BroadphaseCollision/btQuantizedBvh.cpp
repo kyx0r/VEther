@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -22,12 +22,12 @@ subject to the following restrictions:
 #define RAYAABB2
 
 btQuantizedBvh::btQuantizedBvh() : m_bulletVersion(BT_BULLET_VERSION),
-								   m_useQuantization(false),
-								   //m_traversalMode(TRAVERSAL_STACKLESS_CACHE_FRIENDLY)
-								   m_traversalMode(TRAVERSAL_STACKLESS)
-								   //m_traversalMode(TRAVERSAL_RECURSIVE)
-								   ,
-								   m_subtreeHeaderCount(0)  //PCK: add this line
+	m_useQuantization(false),
+	//m_traversalMode(TRAVERSAL_STACKLESS_CACHE_FRIENDLY)
+	m_traversalMode(TRAVERSAL_STACKLESS)
+	//m_traversalMode(TRAVERSAL_RECURSIVE)
+	,
+	m_subtreeHeaderCount(0)  //PCK: add this line
 {
 	m_bvhAabbMin.setValue(-SIMD_INFINITY, -SIMD_INFINITY, -SIMD_INFINITY);
 	m_bvhAabbMax.setValue(SIMD_INFINITY, SIMD_INFINITY, SIMD_INFINITY);
@@ -71,11 +71,12 @@ void btQuantizedBvh::buildInternal()
 ///just for debugging, to visualize the individual patches/subtrees
 #ifdef DEBUG_PATCH_COLORS
 btVector3 color[4] =
-	{
-		btVector3(1, 0, 0),
-		btVector3(0, 1, 0),
-		btVector3(0, 0, 1),
-		btVector3(0, 1, 1)};
+{
+	btVector3(1, 0, 0),
+	btVector3(0, 1, 0),
+	btVector3(0, 0, 1),
+	btVector3(0, 1, 1)
+};
 #endif  //DEBUG_PATCH_COLORS
 
 void btQuantizedBvh::setQuantizationValues(const btVector3& bvhAabbMin, const btVector3& bvhAabbMax, btScalar quantizationMargin)
@@ -323,21 +324,21 @@ void btQuantizedBvh::reportAabbOverlappingNodex(btNodeOverlapCallback* nodeCallb
 
 		switch (m_traversalMode)
 		{
-			case TRAVERSAL_STACKLESS:
-				walkStacklessQuantizedTree(nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax, 0, m_curNodeIndex);
-				break;
-			case TRAVERSAL_STACKLESS_CACHE_FRIENDLY:
-				walkStacklessQuantizedTreeCacheFriendly(nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax);
-				break;
-			case TRAVERSAL_RECURSIVE:
-			{
-				const btQuantizedBvhNode* rootNode = &m_quantizedContiguousNodes[0];
-				walkRecursiveQuantizedTreeAgainstQueryAabb(rootNode, nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax);
-			}
+		case TRAVERSAL_STACKLESS:
+			walkStacklessQuantizedTree(nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax, 0, m_curNodeIndex);
 			break;
-			default:
-				//unsupported
-				btAssert(0);
+		case TRAVERSAL_STACKLESS_CACHE_FRIENDLY:
+			walkStacklessQuantizedTreeCacheFriendly(nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax);
+			break;
+		case TRAVERSAL_RECURSIVE:
+		{
+			const btQuantizedBvhNode* rootNode = &m_quantizedContiguousNodes[0];
+			walkRecursiveQuantizedTreeAgainstQueryAabb(rootNode, nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax);
+		}
+		break;
+		default:
+			//unsupported
+			btAssert(0);
 		}
 	}
 	else
@@ -738,8 +739,8 @@ void btQuantizedBvh::walkStacklessQuantizedTreeCacheFriendly(btNodeOverlapCallba
 		if (overlap != 0)
 		{
 			walkStacklessQuantizedTree(nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax,
-									   subtree.m_rootNodeIndex,
-									   subtree.m_rootNodeIndex + subtree.m_subtreeSize);
+			                           subtree.m_rootNodeIndex,
+			                           subtree.m_rootNodeIndex + subtree.m_subtreeSize);
 		}
 	}
 }
@@ -842,7 +843,7 @@ bool btQuantizedBvh::serialize(void* o_alignedDataBuffer, unsigned /*i_dataBuffe
 		btAssert(0);
 		return false;
 	}
-*/
+	*/
 
 	btQuantizedBvh* targetBvh = (btQuantizedBvh*)o_alignedDataBuffer;
 
@@ -1120,9 +1121,9 @@ btQuantizedBvh* btQuantizedBvh::deSerializeInPlace(void* i_alignedDataBuffer, un
 
 // Constructor that prevents btVector3's default constructor from being called
 btQuantizedBvh::btQuantizedBvh(btQuantizedBvh& self, bool /* ownsMemory */) : m_bvhAabbMin(self.m_bvhAabbMin),
-																			  m_bvhAabbMax(self.m_bvhAabbMax),
-																			  m_bvhQuantization(self.m_bvhQuantization),
-																			  m_bulletVersion(BT_BULLET_VERSION)
+	m_bvhAabbMax(self.m_bvhAabbMax),
+	m_bvhQuantization(self.m_bvhQuantization),
+	m_bulletVersion(BT_BULLET_VERSION)
 {
 }
 

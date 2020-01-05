@@ -66,8 +66,8 @@ protected:
 
 protected:
 	int _sort_and_calc_splitting_index(
-		GIM_BVH_DATA_ARRAY& primitive_boxes,
-		int startIndex, int endIndex, int splitAxis);
+	    GIM_BVH_DATA_ARRAY& primitive_boxes,
+	    int startIndex, int endIndex, int splitAxis);
 
 	int _calc_splitting_axis(GIM_BVH_DATA_ARRAY& primitive_boxes, int startIndex, int endIndex);
 
@@ -221,7 +221,7 @@ public:
 
 	//! returns the indices of the primitives in the m_primitive_manager
 	SIMD_FORCE_INLINE bool boxQueryTrans(const btAABB& box,
-										 const btTransform& transform, btAlignedObjectArray<int>& collided_results) const
+	                                     const btTransform& transform, btAlignedObjectArray<int>& collided_results) const
 	{
 		btAABB transbox = box;
 		transbox.appy_transform(transform);
@@ -230,8 +230,8 @@ public:
 
 	//! returns the indices of the primitives in the m_primitive_manager
 	bool rayQuery(
-		const btVector3& ray_dir, const btVector3& ray_origin,
-		btAlignedObjectArray<int>& collided_results) const;
+	    const btVector3& ray_dir, const btVector3& ray_origin,
+	    btAlignedObjectArray<int>& collided_results) const;
 
 	//! tells if this set has hierarcht
 	SIMD_FORCE_INLINE bool hasHierarchy() const
@@ -302,8 +302,8 @@ public:
 #endif  //TRI_COLLISION_PROFILING
 
 	static void find_collision(btGImpactBvh* boxset1, const btTransform& trans1,
-							   btGImpactBvh* boxset2, const btTransform& trans2,
-							   btPairSet& collision_pairs);
+	                           btGImpactBvh* boxset2, const btTransform& trans2,
+	                           btPairSet& collision_pairs);
 };
 
 #endif  // BT_GIMPACT_BVH_H_INCLUDED

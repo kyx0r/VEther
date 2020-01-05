@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -30,7 +30,7 @@ subject to the following restrictions:
 #endif
 
 btCollisionDispatcher::btCollisionDispatcher(btCollisionConfiguration* collisionConfiguration) : m_dispatcherFlags(btCollisionDispatcher::CD_USE_RELATIVE_CONTACT_BREAKING_THRESHOLD),
-																								 m_collisionConfiguration(collisionConfiguration)
+	m_collisionConfiguration(collisionConfiguration)
 {
 	int i;
 
@@ -72,7 +72,7 @@ btPersistentManifold* btCollisionDispatcher::getNewManifold(const btCollisionObj
 	//optional relative contact breaking threshold, turned on by default (use setDispatcherFlags to switch off feature for improved performance)
 
 	btScalar contactBreakingThreshold = (m_dispatcherFlags & btCollisionDispatcher::CD_USE_RELATIVE_CONTACT_BREAKING_THRESHOLD) ? btMin(body0->getCollisionShape()->getContactBreakingThreshold(gContactBreakingThreshold), body1->getCollisionShape()->getContactBreakingThreshold(gContactBreakingThreshold))
-																																: gContactBreakingThreshold;
+	                                    : gContactBreakingThreshold;
 
 	btScalar contactProcessingThreshold = btMin(body0->getContactProcessingThreshold(), body1->getContactProcessingThreshold());
 
@@ -148,10 +148,10 @@ bool btCollisionDispatcher::needsResponse(const btCollisionObject* body0, const 
 {
 	//here you can do filtering
 	bool hasResponse =
-		(body0->hasContactResponse() && body1->hasContactResponse());
+	    (body0->hasContactResponse() && body1->hasContactResponse());
 	//no response between two static/kinematic bodies:
 	hasResponse = hasResponse &&
-				  ((!body0->isStaticOrKinematicObject()) || (!body1->isStaticOrKinematicObject()));
+	              ((!body0->isStaticOrKinematicObject()) || (!body1->isStaticOrKinematicObject()));
 	return hasResponse;
 }
 

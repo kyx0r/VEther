@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -44,7 +44,7 @@ btSoftBodyConcaveCollisionAlgorithm::~btSoftBodyConcaveCollisionAlgorithm()
 }
 
 btSoftBodyTriangleCallback::btSoftBodyTriangleCallback(btDispatcher* dispatcher, const btCollisionObjectWrapper* body0Wrap, const btCollisionObjectWrapper* body1Wrap, bool isSwapped) : m_dispatcher(dispatcher),
-																																														 m_dispatchInfoPtr(0)
+	m_dispatchInfoPtr(0)
 {
 	m_softBody = (isSwapped ? (btSoftBody*)body1Wrap->getCollisionObject() : (btSoftBody*)body0Wrap->getCollisionObject());
 	m_triBody = isSwapped ? body0Wrap->getCollisionObject() : body1Wrap->getCollisionObject();
@@ -132,11 +132,12 @@ void btSoftBodyTriangleCallback::processTriangle(btVector3* triangle, int partId
 		//		other=(triangle[0]+triangle[1]+triangle[2])*0.333333f;
 		//		other+=normal*22.f;
 		btVector3 pts[6] = {triangle[0] + normal,
-							triangle[1] + normal,
-							triangle[2] + normal,
-							triangle[0] - normal,
-							triangle[1] - normal,
-							triangle[2] - normal};
+		                    triangle[1] + normal,
+		                    triangle[2] + normal,
+		                    triangle[0] - normal,
+		                    triangle[1] - normal,
+		                    triangle[2] - normal
+		                   };
 
 		btConvexHullShape* tm = new btConvexHullShape(&pts[0].getX(), 6);
 
@@ -272,7 +273,7 @@ btScalar btSoftBodyConcaveCollisionAlgorithm::calculateTimeOfImpact(btCollisionO
 			//local space?
 
 			if (convexCaster.calcTimeOfImpact(m_ccdSphereFromTrans, m_ccdSphereToTrans,
-											  ident, ident, castResult))
+			                                  ident, ident, castResult))
 			{
 				if (m_hitFraction > castResult.m_fraction)
 					m_hitFraction = castResult.m_fraction;
@@ -292,7 +293,7 @@ btScalar btSoftBodyConcaveCollisionAlgorithm::calculateTimeOfImpact(btCollisionO
 
 		btScalar curHitFraction = btScalar(1.);  //is this available?
 		LocalTriangleSphereCastCallback raycastCallback(convexFromLocal, convexToLocal,
-														convexbody->getCcdSweptSphereRadius(), curHitFraction);
+		        convexbody->getCcdSweptSphereRadius(), curHitFraction);
 
 		raycastCallback.m_hitFraction = convexbody->getHitFraction();
 

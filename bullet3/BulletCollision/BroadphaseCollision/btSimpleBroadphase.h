@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -24,7 +24,7 @@ struct btSimpleBroadphaseProxy : public btBroadphaseProxy
 
 	//	int			m_handleId;
 
-	btSimpleBroadphaseProxy(){};
+	btSimpleBroadphaseProxy() {};
 
 	btSimpleBroadphaseProxy(const btVector3& minpt, const btVector3& maxpt, int shapeType, void* userPtr, int collisionFilterGroup, int collisionFilterMask)
 		: btBroadphaseProxy(minpt, maxpt, userPtr, collisionFilterGroup, collisionFilterMask)
@@ -32,8 +32,14 @@ struct btSimpleBroadphaseProxy : public btBroadphaseProxy
 		(void)shapeType;
 	}
 
-	SIMD_FORCE_INLINE void SetNextFree(int next) { m_nextFree = next; }
-	SIMD_FORCE_INLINE int GetNextFree() const { return m_nextFree; }
+	SIMD_FORCE_INLINE void SetNextFree(int next)
+	{
+		m_nextFree = next;
+	}
+	SIMD_FORCE_INLINE int GetNextFree() const
+	{
+		return m_nextFree;
+	}
 };
 
 ///The SimpleBroadphase is just a unit-test for btAxisSweep3, bt32BitAxisSweep3, or btDbvtBroadphase, so use those classes instead.

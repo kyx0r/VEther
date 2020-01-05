@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -58,12 +58,12 @@ void btContactConstraint::buildJacobian()
 
 //response  between two dynamic objects without friction and no restitution, assuming 0 penetration depth
 btScalar resolveSingleCollision(
-	btRigidBody* body1,
-	btCollisionObject* colObj2,
-	const btVector3& contactPositionWorld,
-	const btVector3& contactNormalOnB,
-	const btContactSolverInfo& solverInfo,
-	btScalar distance)
+    btRigidBody* body1,
+    btCollisionObject* colObj2,
+    const btVector3& contactPositionWorld,
+    const btVector3& contactNormalOnB,
+    const btContactSolverInfo& solverInfo,
+    btScalar distance)
 {
 	btRigidBody* body2 = btRigidBody::upcast(colObj2);
 
@@ -103,8 +103,8 @@ btScalar resolveSingleCollision(
 
 //bilateral constraint between two dynamic objects
 void resolveSingleBilateral(btRigidBody& body1, const btVector3& pos1,
-							btRigidBody& body2, const btVector3& pos2,
-							btScalar distance, const btVector3& normal, btScalar& impulse, btScalar timeStep)
+                            btRigidBody& body2, const btVector3& pos2,
+                            btScalar distance, const btVector3& normal, btScalar& impulse, btScalar timeStep)
 {
 	(void)timeStep;
 	(void)distance;
@@ -125,18 +125,18 @@ void resolveSingleBilateral(btRigidBody& body1, const btVector3& pos1,
 	btVector3 vel = vel1 - vel2;
 
 	btJacobianEntry jac(body1.getCenterOfMassTransform().getBasis().transpose(),
-						body2.getCenterOfMassTransform().getBasis().transpose(),
-						rel_pos1, rel_pos2, normal, body1.getInvInertiaDiagLocal(), body1.getInvMass(),
-						body2.getInvInertiaDiagLocal(), body2.getInvMass());
+	                    body2.getCenterOfMassTransform().getBasis().transpose(),
+	                    rel_pos1, rel_pos2, normal, body1.getInvInertiaDiagLocal(), body1.getInvMass(),
+	                    body2.getInvInertiaDiagLocal(), body2.getInvMass());
 
 	btScalar jacDiagAB = jac.getDiagonal();
 	btScalar jacDiagABInv = btScalar(1.) / jacDiagAB;
 
 	btScalar rel_vel = jac.getRelativeVelocity(
-		body1.getLinearVelocity(),
-		body1.getCenterOfMassTransform().getBasis().transpose() * body1.getAngularVelocity(),
-		body2.getLinearVelocity(),
-		body2.getCenterOfMassTransform().getBasis().transpose() * body2.getAngularVelocity());
+	                       body1.getLinearVelocity(),
+	                       body1.getCenterOfMassTransform().getBasis().transpose() * body1.getAngularVelocity(),
+	                       body2.getLinearVelocity(),
+	                       body2.getCenterOfMassTransform().getBasis().transpose() * body2.getAngularVelocity());
 
 	rel_vel = normal.dot(vel);
 

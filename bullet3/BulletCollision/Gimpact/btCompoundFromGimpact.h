@@ -6,7 +6,8 @@
 #include "BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 
 ATTRIBUTE_ALIGNED16(class)
-btCompoundFromGimpactShape : public btCompoundShape
+btCompoundFromGimpactShape :
+public btCompoundShape
 {
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();

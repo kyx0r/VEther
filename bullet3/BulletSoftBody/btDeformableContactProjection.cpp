@@ -1,6 +1,6 @@
 /*
  Written by Xuchen Han <xuchenhan2015@u.northwestern.edu>
- 
+
  Bullet Continuous Collision Detection and Physics Library
  Copyright (c) 2019 Google Inc. http://bulletphysics.org
  This software is provided 'as-is', without any express or implied warranty.
@@ -128,7 +128,7 @@ void btDeformableContactProjection::setConstraints()
 				m_staticConstraints[i].push_back(static_constraint);
 			}
 		}
-		
+
 		// set up deformable anchors
 		for (int j = 0; j < psb->m_deformableAnchors.size(); ++j)
 		{
@@ -142,7 +142,7 @@ void btDeformableContactProjection::setConstraints()
 			btDeformableNodeAnchorConstraint constraint(anchor);
 			m_nodeAnchorConstraints[i].push_back(constraint);
 		}
-		
+
 		// set Deformable Node vs. Rigid constraint
 		for (int j = 0; j < psb->m_nodeRigidContacts.size(); ++j)
 		{
@@ -163,7 +163,7 @@ void btDeformableContactProjection::setConstraints()
 				m_nodeRigidConstraints[i].push_back(constraint);
 			}
 		}
-		
+
 		// set Deformable Face vs. Rigid constraint
 		for (int j = 0; j < psb->m_faceRigidContacts.size(); ++j)
 		{
@@ -184,7 +184,7 @@ void btDeformableContactProjection::setConstraints()
 				m_faceRigidConstraints[i].push_back(constraint);
 			}
 		}
-		
+
 		// set Deformable Face vs. Deformable Node constraint
 		for (int j = 0; j < psb->m_faceNodeContacts.size(); ++j)
 		{
@@ -394,7 +394,7 @@ void btDeformableContactProjection::setProjection()
 					}
 				}
 			}
-			
+
 			const btSoftBody::Node* node = m_deformableConstraints[i][j].m_node;
 			int index = node->index;
 			if (m_deformableConstraints[i][j].m_static)
@@ -492,7 +492,7 @@ void btDeformableContactProjection::reinitialize(bool nodeUpdated)
 		m_nodeRigidConstraints.resize(N);
 		m_faceRigidConstraints.resize(N);
 		m_deformableConstraints.resize(N);
-		
+
 	}
 	for (int i = 0 ; i < N; ++i)
 	{

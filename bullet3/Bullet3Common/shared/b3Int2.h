@@ -20,7 +20,8 @@ subject to the following restrictions:
 
 struct b3UnsignedInt2
 {
-	union {
+	union
+	{
 		struct
 		{
 			unsigned int x, y;
@@ -34,7 +35,8 @@ struct b3UnsignedInt2
 
 struct b3Int2
 {
-	union {
+	union
+	{
 		struct
 		{
 			int x, y;

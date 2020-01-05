@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -32,7 +32,8 @@ subject to the following restrictions:
 ///Instead of building the bounding volume hierarchy acceleration structure, it is also possible to serialize (save) and deserialize (load) the structure from disk.
 ///See Demos\ConcaveDemo\ConcavePhysicsDemo.cpp for an example.
 ATTRIBUTE_ALIGNED16(class)
-btBvhTriangleMeshShape : public btTriangleMeshShape
+btBvhTriangleMeshShape :
+public btTriangleMeshShape
 {
 	btOptimizedBvh* m_bvh;
 	btTriangleInfoMap* m_triangleInfoMap;
@@ -127,11 +128,11 @@ struct	btTriangleMeshShapeData
 	btQuantizedBvhDoubleData	*m_quantizedDoubleBvh;
 
 	btTriangleInfoMapData	*m_triangleInfoMap;
-	
+
 	float	m_collisionMargin;
 
 	char m_pad3[4];
-	
+
 };
 
 // clang-format on

@@ -139,13 +139,14 @@ void gim_sort_hash_node_array(T* array, GUINT array_count)
 #define GIM_NUM_PRIME 28
 
 static const GUINT gim_prime_list[GIM_NUM_PRIME] =
-	{
-		53ul, 97ul, 193ul, 389ul, 769ul,
-		1543ul, 3079ul, 6151ul, 12289ul, 24593ul,
-		49157ul, 98317ul, 196613ul, 393241ul, 786433ul,
-		1572869ul, 3145739ul, 6291469ul, 12582917ul, 25165843ul,
-		50331653ul, 100663319ul, 201326611ul, 402653189ul, 805306457ul,
-		1610612741ul, 3221225473ul, 4294967291ul};
+{
+	53ul, 97ul, 193ul, 389ul, 769ul,
+	1543ul, 3079ul, 6151ul, 12289ul, 24593ul,
+	49157ul, 98317ul, 196613ul, 393241ul, 786433ul,
+	1572869ul, 3145739ul, 6291469ul, 12582917ul, 25165843ul,
+	50331653ul, 100663319ul, 201326611ul, 402653189ul, 805306457ul,
+	1610612741ul, 3221225473ul, 4294967291ul
+};
 
 inline GUINT gim_next_prime(GUINT number)
 {
@@ -238,9 +239,9 @@ protected:
 
 	//! reserves the memory for the hash table.
 	/*!
-    \pre hash table must be empty
-    \post reserves the memory for the hash table, an initializes all elements to GIM_INVALID_HASH.
-    */
+	\pre hash table must be empty
+	\post reserves the memory for the hash table, an initializes all elements to GIM_INVALID_HASH.
+	*/
 	inline void _reserve_table_memory(GUINT newtablesize)
 	{
 		if (newtablesize == 0) return;
@@ -288,7 +289,8 @@ protected:
 				GUINT index = _find_avaliable_cell(nodekey);
 
 				if (m_hash_table[index] != GIM_INVALID_HASH)
-				{  //The new index is alreade used... discard this new incomming object, repeated key
+				{
+					//The new index is alreade used... discard this new incomming object, repeated key
 					btAssert(m_hash_table[index] == nodekey);
 					nodesptr[i].m_key = GIM_INVALID_HASH;
 				}
@@ -370,10 +372,10 @@ protected:
 
 	//! insert an element in hash table
 	/*!
-    If the element exists, this won't insert the element
-    \return the index in the array of the existing element,or GIM_INVALID_HASH if the element has been inserted
-    If so, the element has been inserted at the last position of the array.
-    */
+	If the element exists, this won't insert the element
+	\return the index in the array of the existing element,or GIM_INVALID_HASH if the element has been inserted
+	If so, the element has been inserted at the last position of the array.
+	*/
 	inline GUINT _insert_hash_table(GUINT hashkey, const T& value)
 	{
 		if (hashkey == GIM_INVALID_HASH)
@@ -397,10 +399,10 @@ protected:
 
 	//! insert an element in hash table.
 	/*!
-    If the element exists, this replaces the element.
-    \return the index in the array of the existing element,or GIM_INVALID_HASH if the element has been inserted
-    If so, the element has been inserted at the last position of the array.
-    */
+	If the element exists, this replaces the element.
+	\return the index in the array of the existing element,or GIM_INVALID_HASH if the element has been inserted
+	If so, the element has been inserted at the last position of the array.
+	*/
 	inline GUINT _insert_hash_table_replace(GUINT hashkey, const T& value)
 	{
 		if (hashkey == GIM_INVALID_HASH)
@@ -415,7 +417,8 @@ protected:
 		GUINT value_key = m_hash_table[cell_index];
 
 		if (value_key != GIM_INVALID_HASH)
-		{  //replaces the existing
+		{
+			//replaces the existing
 			m_nodes[value_key] = _node_type(hashkey, value);
 			return value_key;  // index of the replaced element
 		}
@@ -460,8 +463,8 @@ protected:
 
 	//! Insert in position ordered
 	/*!
-    Also checks if it is needed to transform this container to a hash table, by calling check_for_switching_to_hashtable
-    */
+	Also checks if it is needed to transform this container to a hash table, by calling check_for_switching_to_hashtable
+	*/
 	inline void _insert_in_pos(GUINT hashkey, const T& value, GUINT pos)
 	{
 		m_nodes.insert(_node_type(hashkey, value), pos);
@@ -484,7 +487,7 @@ protected:
 		_node_type* ptr = m_nodes.pointer();
 
 		bool found = gim_binary_search_ex(
-			ptr, 0, last_index, result_ind, hashkey, GIM_HASH_NODE_CMP_KEY_MACRO());
+		                 ptr, 0, last_index, result_ind, hashkey, GIM_HASH_NODE_CMP_KEY_MACRO());
 
 		//Insert before found index
 		if (found)
@@ -512,7 +515,7 @@ protected:
 		_node_type* ptr = m_nodes.pointer();
 
 		bool found = gim_binary_search_ex(
-			ptr, 0, last_index, result_ind, hashkey, GIM_HASH_NODE_CMP_KEY_MACRO());
+		                 ptr, 0, last_index, result_ind, hashkey, GIM_HASH_NODE_CMP_KEY_MACRO());
 
 		//Insert before found index
 		if (found)
@@ -536,14 +539,14 @@ protected:
 
 public:
 	/*!
-        <li> if node_size = 0, then this container becomes a simple sorted array allocator. reserve_size is used for reserve memory in m_nodes.
-        When the array size reaches the size equivalent to 'min_hash_table_size', then it becomes a hash table by calling check_for_switching_to_hashtable.
-        <li> If node_size != 0, then this container becomes a hash table for ever
-        </ul>
-    */
+	    <li> if node_size = 0, then this container becomes a simple sorted array allocator. reserve_size is used for reserve memory in m_nodes.
+	    When the array size reaches the size equivalent to 'min_hash_table_size', then it becomes a hash table by calling check_for_switching_to_hashtable.
+	    <li> If node_size != 0, then this container becomes a hash table for ever
+	    </ul>
+	*/
 	gim_hash_table(GUINT reserve_size = GIM_DEFAULT_HASH_TABLE_SIZE,
-				   GUINT node_size = GIM_DEFAULT_HASH_TABLE_NODE_SIZE,
-				   GUINT min_hash_table_size = GIM_INVALID_HASH)
+	               GUINT node_size = GIM_DEFAULT_HASH_TABLE_NODE_SIZE,
+	               GUINT min_hash_table_size = GIM_INVALID_HASH)
 	{
 		m_hash_table = NULL;
 		m_table_size = 0;
@@ -666,7 +669,7 @@ public:
 
 	//! Retrieves the value by index
 	/*!
-    */
+	*/
 	inline T* get_value_by_index(GUINT index)
 	{
 		return &m_nodes[index].m_data;
@@ -684,9 +687,9 @@ public:
 
 	//! Finds the index of the element with the key
 	/*!
-    \return the index in the array of the existing element,or GIM_INVALID_HASH if the element has been inserted
-    If so, the element has been inserted at the last position of the array.
-    */
+	\return the index in the array of the existing element,or GIM_INVALID_HASH if the element has been inserted
+	If so, the element has been inserted at the last position of the array.
+	*/
 	inline GUINT find(GUINT hashkey)
 	{
 		if (m_hash_table)
@@ -718,8 +721,8 @@ public:
 
 	//! Retrieves the value associated with the index
 	/*!
-    \return the found element, or null
-    */
+	\return the found element, or null
+	*/
 	inline T* get_value(GUINT hashkey)
 	{
 		GUINT index = find(hashkey);
@@ -728,7 +731,7 @@ public:
 	}
 
 	/*!
-    */
+	*/
 	inline bool erase_by_index(GUINT index)
 	{
 		if (index > m_nodes.size()) return false;
@@ -768,7 +771,7 @@ public:
 
 	/*!
 
-    */
+	*/
 	inline bool erase_by_key(GUINT hashkey)
 	{
 		if (size() == 0) return false;
@@ -806,9 +809,9 @@ public:
 
 	//! Insert an element into the hash
 	/*!
-    \return If GIM_INVALID_HASH, the object has been inserted succesfully. Else it returns the position
-    of the existing element.
-    */
+	\return If GIM_INVALID_HASH, the object has been inserted succesfully. Else it returns the position
+	of the existing element.
+	*/
 	inline GUINT insert(GUINT hashkey, const T& element)
 	{
 		if (m_hash_table)
@@ -824,9 +827,9 @@ public:
 
 	//! Insert an element into the hash, and could overrite an existing object with the same hash.
 	/*!
-    \return If GIM_INVALID_HASH, the object has been inserted succesfully. Else it returns the position
-    of the replaced element.
-    */
+	\return If GIM_INVALID_HASH, the object has been inserted succesfully. Else it returns the position
+	of the replaced element.
+	*/
 	inline GUINT insert_override(GUINT hashkey, const T& element)
 	{
 		if (m_hash_table)
@@ -843,7 +846,7 @@ public:
 
 	//! Insert an element into the hash,But if this container is a sorted array, this inserts it unsorted
 	/*!
-    */
+	*/
 	inline GUINT insert_unsorted(GUINT hashkey, const T& element)
 	{
 		if (m_hash_table)

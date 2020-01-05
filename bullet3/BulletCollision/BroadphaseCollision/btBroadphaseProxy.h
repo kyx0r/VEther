@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -145,7 +145,7 @@ btBroadphaseProxy
 	static SIMD_FORCE_INLINE bool isConcave(int proxyType)
 	{
 		return ((proxyType > CONCAVE_SHAPES_START_HERE) &&
-				(proxyType < CONCAVE_SHAPES_END_HERE));
+		        (proxyType < CONCAVE_SHAPES_END_HERE));
 	}
 	static SIMD_FORCE_INLINE bool isCompound(int proxyType)
 	{
@@ -217,10 +217,10 @@ btBroadphasePair
 
 /*
 //comparison for set operation, see Solid DT_Encounter
-SIMD_FORCE_INLINE bool operator<(const btBroadphasePair& a, const btBroadphasePair& b) 
-{ 
-    return a.m_pProxy0 < b.m_pProxy0 || 
-        (a.m_pProxy0 == b.m_pProxy0 && a.m_pProxy1 < b.m_pProxy1); 
+SIMD_FORCE_INLINE bool operator<(const btBroadphasePair& a, const btBroadphasePair& b)
+{
+    return a.m_pProxy0 < b.m_pProxy0 ||
+        (a.m_pProxy0 == b.m_pProxy0 && a.m_pProxy1 < b.m_pProxy1);
 }
 */
 
@@ -235,8 +235,8 @@ public:
 		const int uidB1 = b.m_pProxy1 ? b.m_pProxy1->m_uniqueId : -1;
 
 		return uidA0 > uidB0 ||
-			   (a.m_pProxy0 == b.m_pProxy0 && uidA1 > uidB1) ||
-			   (a.m_pProxy0 == b.m_pProxy0 && a.m_pProxy1 == b.m_pProxy1 && a.m_algorithm > b.m_algorithm);
+		       (a.m_pProxy0 == b.m_pProxy0 && uidA1 > uidB1) ||
+		       (a.m_pProxy0 == b.m_pProxy0 && a.m_pProxy1 == b.m_pProxy1 && a.m_algorithm > b.m_algorithm);
 	}
 };
 

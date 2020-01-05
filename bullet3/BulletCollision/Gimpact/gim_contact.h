@@ -69,10 +69,10 @@ public:
 	}
 
 	GIM_CONTACT(const GIM_CONTACT &contact) : m_point(contact.m_point),
-											  m_normal(contact.m_normal),
-											  m_depth(contact.m_depth),
-											  m_feature1(contact.m_feature1),
-											  m_feature2(contact.m_feature2)
+		m_normal(contact.m_normal),
+		m_depth(contact.m_depth),
+		m_feature1(contact.m_feature1),
+		m_feature2(contact.m_feature2)
 	{
 		m_point = contact.m_point;
 		m_normal = contact.m_normal;
@@ -82,21 +82,23 @@ public:
 	}
 
 	GIM_CONTACT(const btVector3 &point, const btVector3 &normal,
-				GREAL depth, GUINT feature1, GUINT feature2) : m_point(point),
-															   m_normal(normal),
-															   m_depth(depth),
-															   m_feature1(feature1),
-															   m_feature2(feature2)
+	            GREAL depth, GUINT feature1, GUINT feature2) : m_point(point),
+		m_normal(normal),
+		m_depth(depth),
+		m_feature1(feature1),
+		m_feature2(feature2)
 	{
 	}
 
 	//! Calcs key for coord classification
 	SIMD_FORCE_INLINE GUINT calc_key_contact() const
 	{
-		GINT _coords[] = {
+		GINT _coords[] =
+		{
 			(GINT)(m_point[0] * 1000.0f + 1.0f),
 			(GINT)(m_point[1] * 1333.0f),
-			(GINT)(m_point[2] * 2133.0f + 3.0f)};
+			(GINT)(m_point[2] * 2133.0f + 3.0f)
+		};
 		GUINT _hash = 0;
 		GUINT *_uitmp = (GUINT *)(&_coords[0]);
 		_hash = *_uitmp;
@@ -134,7 +136,7 @@ public:
 	}
 
 	SIMD_FORCE_INLINE void push_contact(const btVector3 &point, const btVector3 &normal,
-										GREAL depth, GUINT feature1, GUINT feature2)
+	                                    GREAL depth, GUINT feature1, GUINT feature2)
 	{
 		push_back_mem();
 		GIM_CONTACT &newele = back();
@@ -146,8 +148,8 @@ public:
 	}
 
 	SIMD_FORCE_INLINE void push_triangle_contacts(
-		const GIM_TRIANGLE_CONTACT_DATA &tricontact,
-		GUINT feature1, GUINT feature2)
+	    const GIM_TRIANGLE_CONTACT_DATA &tricontact,
+	    GUINT feature1, GUINT feature2)
 	{
 		for (GUINT i = 0; i < tricontact.m_point_count; i++)
 		{

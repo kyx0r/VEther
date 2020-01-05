@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -71,7 +71,7 @@ public:
 		DBG_MAX_DEBUG_DRAW_MODE
 	};
 
-	virtual ~btIDebugDraw(){};
+	virtual ~btIDebugDraw() {};
 
 	virtual DefaultColors getDefaultColors() const
 	{
@@ -144,13 +144,13 @@ public:
 			for (j = 0; j < 3; j++)
 			{
 				pa = btVector3(edgecoord[0] * halfExtents[0], edgecoord[1] * halfExtents[1],
-							   edgecoord[2] * halfExtents[2]);
+				               edgecoord[2] * halfExtents[2]);
 				pa += center;
 
 				int othercoord = j % 3;
 				edgecoord[othercoord] *= -1.f;
 				pb = btVector3(edgecoord[0] * halfExtents[0], edgecoord[1] * halfExtents[1],
-							   edgecoord[2] * halfExtents[2]);
+				               edgecoord[2] * halfExtents[2]);
 				pb += center;
 
 				drawLine(pa, pb, color);
@@ -169,7 +169,7 @@ public:
 	}
 
 	virtual void drawArc(const btVector3& center, const btVector3& normal, const btVector3& axis, btScalar radiusA, btScalar radiusB, btScalar minAngle, btScalar maxAngle,
-						 const btVector3& color, bool drawSect, btScalar stepDegrees = btScalar(10.f))
+	                     const btVector3& color, bool drawSect, btScalar stepDegrees = btScalar(10.f))
 	{
 		const btVector3& vx = axis;
 		btVector3 vy = normal.cross(axis);
@@ -194,7 +194,7 @@ public:
 		}
 	}
 	virtual void drawSpherePatch(const btVector3& center, const btVector3& up, const btVector3& axis, btScalar radius,
-								 btScalar minTh, btScalar maxTh, btScalar minPs, btScalar maxPs, const btVector3& color, btScalar stepDegrees = btScalar(10.f), bool drawCenter = true)
+	                             btScalar minTh, btScalar maxTh, btScalar minPs, btScalar maxPs, const btVector3& color, btScalar stepDegrees = btScalar(10.f), bool drawCenter = true)
 	{
 		btVector3 vA[74];
 		btVector3 vB[74];

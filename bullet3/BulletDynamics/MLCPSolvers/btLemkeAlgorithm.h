@@ -4,8 +4,8 @@ Code was converted for the Bullet Continuous Collision Detection and Physics Lib
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -36,24 +36,24 @@ public:
 
 	/* GETTER / SETTER */
 	/**
-   * \brief return info of solution process
-   */
+	* \brief return info of solution process
+	*/
 	int getInfo()
 	{
 		return info;
 	}
 
 	/**
-   * \brief get the number of steps until the solution was found
-   */
+	* \brief get the number of steps until the solution was found
+	*/
 	int getSteps(void)
 	{
 		return steps;
 	}
 
 	/**
-   * \brief set system with Matrix M and vector q
-   */
+	* \brief set system with Matrix M and vector q
+	*/
 	void setSystem(const btMatrixXu& M_, const btVectorXu& q_)
 	{
 		m_M = M_;
@@ -62,8 +62,8 @@ public:
 	/***************************************************/
 
 	/**
-   * \brief solve algorithm adapted from : Fast Implementation of Lemke’s Algorithm for Rigid Body Contact Simulation (John E. Lloyd)
-   */
+	* \brief solve algorithm adapted from : Fast Implementation of Lemke’s Algorithm for Rigid Body Contact Simulation (John E. Lloyd)
+	*/
 	btVectorXu solve(unsigned int maxloops = 0);
 
 	virtual ~btLemkeAlgorithm()
@@ -81,21 +81,21 @@ protected:
 	btVectorXu m_q;
 
 	/**
-   * \brief number of steps until the Lemke algorithm found a solution
-   */
+	* \brief number of steps until the Lemke algorithm found a solution
+	*/
 	unsigned int steps;
 
 	/**
-   * \brief define level of debug output
-   */
+	* \brief define level of debug output
+	*/
 	int DEBUGLEVEL;
 
 	/**
-   * \brief did the algorithm find a solution
-   *
-   * -1 : not successful
-   *  0 : successful
-   */
+	* \brief did the algorithm find a solution
+	*
+	* -1 : not successful
+	*  0 : successful
+	*/
 	int info;
 };
 

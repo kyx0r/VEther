@@ -34,7 +34,8 @@ public:
 	bChunkPtr4() {}
 	int code;
 	int len;
-	union {
+	union
+	{
 		int m_uniqueInt;
 	};
 	int dna_nr;
@@ -47,7 +48,8 @@ class bChunkPtr8
 public:
 	bChunkPtr8() {}
 	int code, len;
-	union {
+	union
+	{
 		b3Long64 oldPrev;
 		int m_uniqueInts[2];
 	};

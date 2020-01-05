@@ -40,19 +40,19 @@
 void _glfwInitTimerPOSIX(void)
 {
 #if defined(CLOCK_MONOTONIC)
-    struct timespec ts;
+	struct timespec ts;
 
-    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
-    {
-        _glfw.timer.posix.monotonic = GLFW_TRUE;
-        _glfw.timer.posix.frequency = 1000000000;
-    }
-    else
+	if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
+	{
+		_glfw.timer.posix.monotonic = GLFW_TRUE;
+		_glfw.timer.posix.frequency = 1000000000;
+	}
+	else
 #endif
-    {
-        _glfw.timer.posix.monotonic = GLFW_FALSE;
-        _glfw.timer.posix.frequency = 1000000;
-    }
+	{
+		_glfw.timer.posix.monotonic = GLFW_FALSE;
+		_glfw.timer.posix.frequency = 1000000;
+	}
 }
 
 
@@ -63,23 +63,23 @@ void _glfwInitTimerPOSIX(void)
 uint64_t _glfwPlatformGetTimerValue(void)
 {
 #if defined(CLOCK_MONOTONIC)
-    if (_glfw.timer.posix.monotonic)
-    {
-        struct timespec ts;
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        return (uint64_t) ts.tv_sec * (uint64_t) 1000000000 + (uint64_t) ts.tv_nsec;
-    }
-    else
+	if (_glfw.timer.posix.monotonic)
+	{
+		struct timespec ts;
+		clock_gettime(CLOCK_MONOTONIC, &ts);
+		return (uint64_t) ts.tv_sec * (uint64_t) 1000000000 + (uint64_t) ts.tv_nsec;
+	}
+	else
 #endif
-    {
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        return (uint64_t) tv.tv_sec * (uint64_t) 1000000 + (uint64_t) tv.tv_usec;
-    }
+	{
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		return (uint64_t) tv.tv_sec * (uint64_t) 1000000 + (uint64_t) tv.tv_usec;
+	}
 }
 
 uint64_t _glfwPlatformGetTimerFrequency(void)
 {
-    return _glfw.timer.posix.frequency;
+	return _glfw.timer.posix.frequency;
 }
 

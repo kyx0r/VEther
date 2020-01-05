@@ -33,7 +33,7 @@ email: projectileman@yahoo.com
 #define MAX_COINCIDENT 8
 
 void gim_contact_array::merge_contacts(
-	const gim_contact_array& contacts, bool normal_contact_average)
+    const gim_contact_array& contacts, bool normal_contact_average)
 {
 	clear();
 
@@ -96,7 +96,8 @@ void gim_contact_array::merge_contacts(
 			}
 		}
 		else
-		{  //add new contact
+		{
+			//add new contact
 
 			if (normal_contact_average && coincident_count > 0)
 			{

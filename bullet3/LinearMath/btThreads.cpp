@@ -3,8 +3,8 @@ Copyright (c) 2003-2014 Erwin Coumans  http://bullet.googlecode.com
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -471,8 +471,14 @@ class btTaskSchedulerSequential : public btITaskScheduler
 {
 public:
 	btTaskSchedulerSequential() : btITaskScheduler("Sequential") {}
-	virtual int getMaxNumThreads() const BT_OVERRIDE { return 1; }
-	virtual int getNumThreads() const BT_OVERRIDE { return 1; }
+	virtual int getMaxNumThreads() const BT_OVERRIDE
+	{
+		return 1;
+	}
+	virtual int getNumThreads() const BT_OVERRIDE
+	{
+		return 1;
+	}
 	virtual void setNumThreads(int numThreads) BT_OVERRIDE {}
 	virtual void parallelFor(int iBegin, int iEnd, int grainSize, const btIParallelForBody& body) BT_OVERRIDE
 	{
@@ -525,7 +531,7 @@ public:
 	{
 		BT_PROFILE("parallelFor_OpenMP");
 		btPushThreadsAreRunning();
-#pragma omp parallel for schedule(static, 1)
+		#pragma omp parallel for schedule(static, 1)
 		for (int i = iBegin; i < iEnd; i += grainSize)
 		{
 			BT_PROFILE("OpenMP_forJob");
@@ -538,11 +544,11 @@ public:
 		BT_PROFILE("parallelFor_OpenMP");
 		btPushThreadsAreRunning();
 		btScalar sum = btScalar(0);
-#pragma omp parallel for schedule(static, 1) reduction(+ \
-													   : sum)
+		#pragma omp parallel for schedule(static, 1) reduction(+ \
+: sum)
 		for (int i = iBegin; i < iEnd; i += grainSize)
-		{
-			BT_PROFILE("OpenMP_sumJob");
+	{
+		BT_PROFILE("OpenMP_sumJob");
 			sum += body.sumLoop(i, (std::min)(i + grainSize, iEnd));
 		}
 		btPopThreadsAreRunning();
@@ -616,8 +622,8 @@ public:
 		ForBodyAdapter tbbBody(&body);
 		btPushThreadsAreRunning();
 		tbb::parallel_for(tbb::blocked_range<int>(iBegin, iEnd, grainSize),
-						  tbbBody,
-						  tbb::simple_partitioner());
+		                  tbbBody,
+		                  tbb::simple_partitioner());
 		btPopThreadsAreRunning();
 	}
 	struct SumBodyAdapter
@@ -627,7 +633,10 @@ public:
 
 		SumBodyAdapter(const btIParallelSumBody* body) : mBody(body), mSum(btScalar(0)) {}
 		SumBodyAdapter(const SumBodyAdapter& src, tbb::split) : mBody(src.mBody), mSum(btScalar(0)) {}
-		void join(const SumBodyAdapter& src) { mSum += src.mSum; }
+		void join(const SumBodyAdapter& src)
+		{
+			mSum += src.mSum;
+		}
 		void operator()(const tbb::blocked_range<int>& range)
 		{
 			BT_PROFILE("TBB_sumJob");
@@ -714,9 +723,9 @@ public:
 		btPushThreadsAreRunning();
 		// note: MSVC 2010 doesn't support partitioner args, so avoid them
 		concurrency::parallel_for(iBegin,
-								  iEnd,
-								  grainSize,
-								  pplBody);
+		                          iEnd,
+		                          grainSize,
+		                          pplBody);
 		btPopThreadsAreRunning();
 	}
 	struct SumBodyAdapter
@@ -733,7 +742,10 @@ public:
 			mSum->local() += mBody->sumLoop(i, (std::min)(i + mGrainSize, mIndexEnd));
 		}
 	};
-	static btScalar sumFunc(btScalar a, btScalar b) { return a + b; }
+	static btScalar sumFunc(btScalar a, btScalar b)
+	{
+		return a + b;
+	}
 	virtual btScalar parallelSum(int iBegin, int iEnd, int grainSize, const btIParallelSumBody& body) BT_OVERRIDE
 	{
 		BT_PROFILE("parallelSum_PPL");
@@ -742,9 +754,9 @@ public:
 		btPushThreadsAreRunning();
 		// note: MSVC 2010 doesn't support partitioner args, so avoid them
 		concurrency::parallel_for(iBegin,
-								  iEnd,
-								  grainSize,
-								  pplBody);
+		                          iEnd,
+		                          grainSize,
+		                          pplBody);
 		btPopThreadsAreRunning();
 		return m_sum.combine(sumFunc);
 	}

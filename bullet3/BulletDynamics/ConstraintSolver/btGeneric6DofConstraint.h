@@ -142,7 +142,7 @@ public:
 	btVector3 m_normalCFM;     //!< Constraint force mixing factor
 	btVector3 m_stopERP;       //!< Error tolerance factor when joint is at limit
 	btVector3 m_stopCFM;       //!< Constraint force mixing factor when joint is at limit
-							   //!@}
+	//!@}
 	bool m_enableMotor[3];
 	btVector3 m_targetVelocity;     //!< target motor velocity
 	btVector3 m_maxMotorForce;      //!< max force on motor
@@ -193,11 +193,11 @@ public:
 
 	//! Test limit
 	/*!
-    - free means upper < lower,
-    - locked means upper == lower
-    - limited means upper > lower
-    - limitIndex: first 3 are linear, next 3 are angular
-    */
+	- free means upper < lower,
+	- locked means upper == lower
+	- limited means upper > lower
+	- limitIndex: first 3 are linear, next 3 are angular
+	*/
 	inline bool isLimited(int limitIndex) const
 	{
 		return (m_upperLimit[limitIndex] >= m_lowerLimit[limitIndex]);
@@ -210,13 +210,13 @@ public:
 	int testLimitValue(int limitIndex, btScalar test_value);
 
 	btScalar solveLinearAxis(
-		btScalar timeStep,
-		btScalar jacDiagABInv,
-		btRigidBody& body1, const btVector3& pointInA,
-		btRigidBody& body2, const btVector3& pointInB,
-		int limit_index,
-		const btVector3& axis_normal_on_a,
-		const btVector3& anchorPos);
+	    btScalar timeStep,
+	    btScalar jacDiagABInv,
+	    btRigidBody& body1, const btVector3& pointInA,
+	    btRigidBody& body2, const btVector3& pointInB,
+	    int limit_index,
+	    const btVector3& axis_normal_on_a,
+	    const btVector3& anchorPos);
 };
 
 enum bt6DofFlags
@@ -264,7 +264,8 @@ This brings support for limit parameters and motors. </li>
 
 */
 ATTRIBUTE_ALIGNED16(class)
-btGeneric6DofConstraint : public btTypedConstraint
+btGeneric6DofConstraint :
+public btTypedConstraint
 {
 protected:
 	//! relative_frames
@@ -323,8 +324,8 @@ protected:
 	int setLinearLimits(btConstraintInfo2 * info, int row, const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB);
 
 	void buildLinearJacobian(
-		btJacobianEntry & jacLinear, const btVector3& normalWorld,
-		const btVector3& pivotAInW, const btVector3& pivotBInW);
+	    btJacobianEntry & jacLinear, const btVector3& normalWorld,
+	    const btVector3& pivotAInW, const btVector3& pivotBInW);
 
 	void buildAngularJacobian(btJacobianEntry & jacAngular, const btVector3& jointAxisW);
 
@@ -354,8 +355,8 @@ public:
 
 	//! Gets the global transform of the offset for body A
 	/*!
-    \sa btGeneric6DofConstraint.getFrameOffsetA, btGeneric6DofConstraint.getFrameOffsetB, btGeneric6DofConstraint.calculateAngleInfo.
-    */
+	\sa btGeneric6DofConstraint.getFrameOffsetA, btGeneric6DofConstraint.getFrameOffsetB, btGeneric6DofConstraint.calculateAngleInfo.
+	*/
 	const btTransform& getCalculatedTransformA() const
 	{
 		return m_calculatedTransformA;
@@ -363,8 +364,8 @@ public:
 
 	//! Gets the global transform of the offset for body B
 	/*!
-    \sa btGeneric6DofConstraint.getFrameOffsetA, btGeneric6DofConstraint.getFrameOffsetB, btGeneric6DofConstraint.calculateAngleInfo.
-    */
+	\sa btGeneric6DofConstraint.getFrameOffsetA, btGeneric6DofConstraint.getFrameOffsetB, btGeneric6DofConstraint.calculateAngleInfo.
+	*/
 	const btTransform& getCalculatedTransformB() const
 	{
 		return m_calculatedTransformB;
@@ -505,11 +506,11 @@ public:
 
 	//! Test limit
 	/*!
-    - free means upper < lower,
-    - locked means upper == lower
-    - limited means upper > lower
-    - limitIndex: first 3 are linear, next 3 are angular
-    */
+	- free means upper < lower,
+	- locked means upper == lower
+	- limited means upper > lower
+	- limitIndex: first 3 are linear, next 3 are angular
+	*/
 	bool isLimited(int limitIndex) const
 	{
 		if (limitIndex < 3)
@@ -522,15 +523,21 @@ public:
 	virtual void calcAnchorPos(void);  // overridable
 
 	int get_limit_motor_info2(btRotationalLimitMotor * limot,
-							  const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB,
-							  btConstraintInfo2* info, int row, btVector3& ax1, int rotational, int rotAllowed = false);
+	                          const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB,
+	                          btConstraintInfo2* info, int row, btVector3& ax1, int rotational, int rotAllowed = false);
 
 	// access for UseFrameOffset
 	bool getUseFrameOffset() const { return m_useOffsetForConstraintFrame; }
-	void setUseFrameOffset(bool frameOffsetOnOff) { m_useOffsetForConstraintFrame = frameOffsetOnOff; }
+	void setUseFrameOffset(bool frameOffsetOnOff)
+	{
+		m_useOffsetForConstraintFrame = frameOffsetOnOff;
+	}
 
 	bool getUseLinearReferenceFrameA() const { return m_useLinearReferenceFrameA; }
-	void setUseLinearReferenceFrameA(bool linearReferenceFrameA) { m_useLinearReferenceFrameA = linearReferenceFrameA; }
+	void setUseLinearReferenceFrameA(bool linearReferenceFrameA)
+	{
+		m_useLinearReferenceFrameA = linearReferenceFrameA;
+	}
 
 	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5).
 	///If no axis is provided, it uses the default axis for this constraint.

@@ -45,8 +45,8 @@ SIMD_FORCE_INLINE void bt_edge_plane(const btVector3 &e1, const btVector3 &e2, c
 /*! Finds the closest point(cp) to (v) on a segment (e1,e2)
  */
 SIMD_FORCE_INLINE void bt_closest_point_on_segment(
-	btVector3 &cp, const btVector3 &v,
-	const btVector3 &e1, const btVector3 &e2)
+    btVector3 &cp, const btVector3 &v,
+    const btVector3 &e1, const btVector3 &e2)
 {
 	btVector3 n = e2 - e1;
 	cp = v - e1;
@@ -74,12 +74,12 @@ SIMD_FORCE_INLINE void bt_closest_point_on_segment(
 */
 
 SIMD_FORCE_INLINE int bt_line_plane_collision(
-	const btVector4 &plane,
-	const btVector3 &vDir,
-	const btVector3 &vPoint,
-	btVector3 &pout,
-	btScalar &tparam,
-	btScalar tmin, btScalar tmax)
+    const btVector4 &plane,
+    const btVector3 &vDir,
+    const btVector3 &vPoint,
+    btVector3 &pout,
+    btScalar &tparam,
+    btScalar tmin, btScalar tmax)
 {
 	btScalar _dotdir = vDir.dot(plane);
 
@@ -109,12 +109,12 @@ SIMD_FORCE_INLINE int bt_line_plane_collision(
 
 //! Find closest points on segments
 SIMD_FORCE_INLINE void bt_segment_collision(
-	const btVector3 &vA1,
-	const btVector3 &vA2,
-	const btVector3 &vB1,
-	const btVector3 &vB2,
-	btVector3 &vPointA,
-	btVector3 &vPointB)
+    const btVector3 &vA1,
+    const btVector3 &vA2,
+    const btVector3 &vB1,
+    const btVector3 &vB2,
+    btVector3 &vPointA,
+    btVector3 &vPointB)
 {
 	btVector3 AD = vA2 - vA1;
 	btVector3 BD = vB2 - vB1;

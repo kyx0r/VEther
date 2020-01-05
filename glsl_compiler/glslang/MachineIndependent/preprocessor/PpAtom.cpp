@@ -87,95 +87,100 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PpContext.h"
 #include "PpTokens.h"
 
-namespace {
+namespace
+{
 
 using namespace glslang;
 
-const struct {
-    int val;
-    const char* str;
-} tokens[] = {
+const struct
+{
+	int val;
+	const char* str;
+} tokens[] =
+{
 
-    { PPAtomAddAssign,      "+=" },
-    { PPAtomSubAssign,      "-=" },
-    { PPAtomMulAssign,      "*=" },
-    { PPAtomDivAssign,      "/=" },
-    { PPAtomModAssign,      "%=" },
+	{ PPAtomAddAssign,      "+=" },
+	{ PPAtomSubAssign,      "-=" },
+	{ PPAtomMulAssign,      "*=" },
+	{ PPAtomDivAssign,      "/=" },
+	{ PPAtomModAssign,      "%=" },
 
-    { PpAtomRight,          ">>" },
-    { PpAtomLeft,           "<<" },
-    { PpAtomAnd,            "&&" },
-    { PpAtomOr,             "||" },
-    { PpAtomXor,            "^^" },
+	{ PpAtomRight,          ">>" },
+	{ PpAtomLeft,           "<<" },
+	{ PpAtomAnd,            "&&" },
+	{ PpAtomOr,             "||" },
+	{ PpAtomXor,            "^^" },
 
-    { PpAtomRightAssign,    ">>=" },
-    { PpAtomLeftAssign,     "<<=" },
-    { PpAtomAndAssign,      "&=" },
-    { PpAtomOrAssign,       "|=" },
-    { PpAtomXorAssign,      "^=" },
+	{ PpAtomRightAssign,    ">>=" },
+	{ PpAtomLeftAssign,     "<<=" },
+	{ PpAtomAndAssign,      "&=" },
+	{ PpAtomOrAssign,       "|=" },
+	{ PpAtomXorAssign,      "^=" },
 
-    { PpAtomEQ,             "==" },
-    { PpAtomNE,             "!=" },
-    { PpAtomGE,             ">=" },
-    { PpAtomLE,             "<=" },
+	{ PpAtomEQ,             "==" },
+	{ PpAtomNE,             "!=" },
+	{ PpAtomGE,             ">=" },
+	{ PpAtomLE,             "<=" },
 
-    { PpAtomDecrement,      "--" },
-    { PpAtomIncrement,      "++" },
+	{ PpAtomDecrement,      "--" },
+	{ PpAtomIncrement,      "++" },
 
-    { PpAtomColonColon,     "::" },
+	{ PpAtomColonColon,     "::" },
 
-    { PpAtomDefine,         "define" },
-    { PpAtomUndef,          "undef" },
-    { PpAtomIf,             "if" },
-    { PpAtomElif,           "elif" },
-    { PpAtomElse,           "else" },
-    { PpAtomEndif,          "endif" },
-    { PpAtomIfdef,          "ifdef" },
-    { PpAtomIfndef,         "ifndef" },
-    { PpAtomLine,           "line" },
-    { PpAtomPragma,         "pragma" },
-    { PpAtomError,          "error" },
+	{ PpAtomDefine,         "define" },
+	{ PpAtomUndef,          "undef" },
+	{ PpAtomIf,             "if" },
+	{ PpAtomElif,           "elif" },
+	{ PpAtomElse,           "else" },
+	{ PpAtomEndif,          "endif" },
+	{ PpAtomIfdef,          "ifdef" },
+	{ PpAtomIfndef,         "ifndef" },
+	{ PpAtomLine,           "line" },
+	{ PpAtomPragma,         "pragma" },
+	{ PpAtomError,          "error" },
 
-    { PpAtomVersion,        "version" },
-    { PpAtomCore,           "core" },
-    { PpAtomCompatibility,  "compatibility" },
-    { PpAtomEs,             "es" },
-    { PpAtomExtension,      "extension" },
+	{ PpAtomVersion,        "version" },
+	{ PpAtomCore,           "core" },
+	{ PpAtomCompatibility,  "compatibility" },
+	{ PpAtomEs,             "es" },
+	{ PpAtomExtension,      "extension" },
 
-    { PpAtomLineMacro,       "__LINE__" },
-    { PpAtomFileMacro,       "__FILE__" },
-    { PpAtomVersionMacro,    "__VERSION__" },
+	{ PpAtomLineMacro,       "__LINE__" },
+	{ PpAtomFileMacro,       "__FILE__" },
+	{ PpAtomVersionMacro,    "__VERSION__" },
 
-    { PpAtomInclude,         "include" },
+	{ PpAtomInclude,         "include" },
 };
 
 } // end anonymous namespace
 
-namespace glslang {
+namespace glslang
+{
 
 //
 // Initialize the atom table.
 //
 TStringAtomMap::TStringAtomMap()
 {
-    badToken.assign("<bad token>");
+	badToken.assign("<bad token>");
 
-    // Add single character tokens to the atom table:
-    const char* s = "~!%^&*()-+=|,.<>/?;:[]{}#\\";
-    char t[2];
+	// Add single character tokens to the atom table:
+	const char* s = "~!%^&*()-+=|,.<>/?;:[]{}#\\";
+	char t[2];
 
-    t[1] = '\0';
-    while (*s) {
-        t[0] = *s;
-        addAtomFixed(t, s[0]);
-        s++;
-    }
+	t[1] = '\0';
+	while (*s)
+	{
+		t[0] = *s;
+		addAtomFixed(t, s[0]);
+		s++;
+	}
 
-    // Add multiple character scanner tokens :
-    for (size_t ii = 0; ii < sizeof(tokens)/sizeof(tokens[0]); ii++)
-        addAtomFixed(tokens[ii].str, tokens[ii].val);
+	// Add multiple character scanner tokens :
+	for (size_t ii = 0; ii < sizeof(tokens)/sizeof(tokens[0]); ii++)
+		addAtomFixed(tokens[ii].str, tokens[ii].val);
 
-    nextAtom = PpAtomLast;
+	nextAtom = PpAtomLast;
 }
 
 } // end namespace glslang

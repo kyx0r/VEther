@@ -99,11 +99,11 @@ bool btBatchedConstraints::validate(btConstraintArray* constraints, const btAlig
 }
 
 static void debugDrawSingleBatch(const btBatchedConstraints* bc,
-								 btConstraintArray* constraints,
-								 const btAlignedObjectArray<btSolverBody>& bodies,
-								 int iBatch,
-								 const btVector3& color,
-								 const btVector3& offset)
+                                 btConstraintArray* constraints,
+                                 const btAlignedObjectArray<btSolverBody>& bodies,
+                                 int iBatch,
+                                 const btVector3& color,
+                                 const btVector3& offset)
 {
 	if (bc && bc->m_debugDrawer && iBatch < bc->m_batches.size())
 	{
@@ -122,12 +122,12 @@ static void debugDrawSingleBatch(const btBatchedConstraints* bc,
 }
 
 static void debugDrawPhase(const btBatchedConstraints* bc,
-						   btConstraintArray* constraints,
-						   const btAlignedObjectArray<btSolverBody>& bodies,
-						   int iPhase,
-						   const btVector3& color0,
-						   const btVector3& color1,
-						   const btVector3& offset)
+                           btConstraintArray* constraints,
+                           const btAlignedObjectArray<btSolverBody>& bodies,
+                           int iPhase,
+                           const btVector3& color0,
+                           const btVector3& color1,
+                           const btVector3& offset)
 {
 	BT_PROFILE("debugDrawPhase");
 	if (bc && bc->m_debugDrawer && iPhase < bc->m_phases.size())
@@ -143,8 +143,8 @@ static void debugDrawPhase(const btBatchedConstraints* bc,
 }
 
 static void debugDrawAllBatches(const btBatchedConstraints* bc,
-								btConstraintArray* constraints,
-								const btAlignedObjectArray<btSolverBody>& bodies)
+                                btConstraintArray* constraints,
+                                const btAlignedObjectArray<btSolverBody>& bodies)
 {
 	BT_PROFILE("debugDrawAllBatches");
 	if (bc && bc->m_debugDrawer && bc->m_phases.size() > 0)
@@ -437,11 +437,11 @@ inline bool BatchCompare(const btBatchedConstraints::Range& a, const btBatchedCo
 }
 
 static void writeOutConstraintIndicesForRangeOfBatches(btBatchedConstraints* bc,
-													   const int* constraintBatchIds,
-													   int numConstraints,
-													   int* constraintIdPerBatch,
-													   int batchBegin,
-													   int batchEnd)
+        const int* constraintBatchIds,
+        int numConstraints,
+        int* constraintIdPerBatch,
+        int batchBegin,
+        int batchEnd)
 {
 	BT_PROFILE("writeOutConstraintIndicesForRangeOfBatches");
 	for (int iCon = 0; iCon < numConstraints; ++iCon)
@@ -478,20 +478,20 @@ struct WriteOutConstraintIndicesLoop : public btIParallelForBody
 		int batchBegin = iBegin * m_maxNumBatchesPerPhase;
 		int batchEnd = iEnd * m_maxNumBatchesPerPhase;
 		writeOutConstraintIndicesForRangeOfBatches(m_batchedConstraints,
-												   m_constraintBatchIds,
-												   m_numConstraints,
-												   m_constraintIdPerBatch,
-												   batchBegin,
-												   batchEnd);
+		        m_constraintBatchIds,
+		        m_numConstraints,
+		        m_constraintIdPerBatch,
+		        batchBegin,
+		        batchEnd);
 	}
 };
 
 static void writeOutConstraintIndicesMt(btBatchedConstraints* bc,
-										const int* constraintBatchIds,
-										int numConstraints,
-										int* constraintIdPerBatch,
-										int maxNumBatchesPerPhase,
-										int numPhases)
+                                        const int* constraintBatchIds,
+                                        int numConstraints,
+                                        int* constraintIdPerBatch,
+                                        int maxNumBatchesPerPhase,
+                                        int numPhases)
 {
 	BT_PROFILE("writeOutConstraintIndicesMt");
 	bool inParallel = true;
@@ -528,12 +528,12 @@ static void writeGrainSizes(btBatchedConstraints* bc)
 }
 
 static void writeOutBatches(btBatchedConstraints* bc,
-							const int* constraintBatchIds,
-							int numConstraints,
-							const btBatchInfo* batches,
-							int* batchWork,
-							int maxNumBatchesPerPhase,
-							int numPhases)
+                            const int* constraintBatchIds,
+                            int numConstraints,
+                            const btBatchInfo* batches,
+                            int* batchWork,
+                            int maxNumBatchesPerPhase,
+                            int numPhases)
 {
 	BT_PROFILE("writeOutBatches");
 	typedef btBatchedConstraints::Range Range;
@@ -616,7 +616,10 @@ class PreallocatedMemoryHelper
 	int m_numChunks;
 
 public:
-	PreallocatedMemoryHelper() { m_numChunks = 0; }
+	PreallocatedMemoryHelper()
+	{
+		m_numChunks = 0;
+	}
 	void addChunk(void** ptr, size_t sz)
 	{
 		btAssert(m_numChunks < N);
@@ -651,11 +654,11 @@ public:
 };
 
 static btVector3 findMaxDynamicConstraintExtent(
-	btVector3* bodyPositions,
-	bool* bodyDynamicFlags,
-	btBatchedConstraintInfo* conInfos,
-	int numConstraints,
-	int numBodies)
+    btVector3* bodyPositions,
+    bool* bodyDynamicFlags,
+    btBatchedConstraintInfo* conInfos,
+    int numConstraints,
+    int numBodies)
 {
 	BT_PROFILE("findMaxDynamicConstraintExtent");
 	btVector3 consExtent = btVector3(1, 1, 1) * 0.001;
@@ -680,8 +683,14 @@ struct btIntVec3
 {
 	int m_ints[3];
 
-	SIMD_FORCE_INLINE const int& operator[](int i) const { return m_ints[i]; }
-	SIMD_FORCE_INLINE int& operator[](int i) { return m_ints[i]; }
+	SIMD_FORCE_INLINE const int& operator[](int i) const
+	{
+		return m_ints[i];
+	}
+	SIMD_FORCE_INLINE int& operator[](int i)
+	{
+		return m_ints[i];
+	}
 };
 
 struct AssignConstraintsToGridBatchesParams
@@ -814,13 +823,13 @@ to 4. With fewer phases, there are more constraints per phase and this makes it 
 */
 //
 static void setupSpatialGridBatchesMt(
-	btBatchedConstraints* batchedConstraints,
-	btAlignedObjectArray<char>* scratchMemory,
-	btConstraintArray* constraints,
-	const btAlignedObjectArray<btSolverBody>& bodies,
-	int minBatchSize,
-	int maxBatchSize,
-	bool use2DGrid)
+    btBatchedConstraints* batchedConstraints,
+    btAlignedObjectArray<char>* scratchMemory,
+    btConstraintArray* constraints,
+    const btAlignedObjectArray<btSolverBody>& bodies,
+    int minBatchSize,
+    int maxBatchSize,
+    bool use2DGrid)
 {
 	BT_PROFILE("setupSpatialGridBatchesMt");
 	const int numPhases = 8;
@@ -1034,8 +1043,8 @@ static void setupSpatialGridBatchesMt(
 }
 
 static void setupSingleBatch(
-	btBatchedConstraints* bc,
-	int numConstraints)
+    btBatchedConstraints* bc,
+    int numConstraints)
 {
 	BT_PROFILE("setupSingleBatch");
 	typedef btBatchedConstraints::Range Range;
@@ -1061,12 +1070,12 @@ static void setupSingleBatch(
 }
 
 void btBatchedConstraints::setup(
-	btConstraintArray* constraints,
-	const btAlignedObjectArray<btSolverBody>& bodies,
-	BatchingMethod batchingMethod,
-	int minBatchSize,
-	int maxBatchSize,
-	btAlignedObjectArray<char>* scratchMemory)
+    btConstraintArray* constraints,
+    const btAlignedObjectArray<btSolverBody>& bodies,
+    BatchingMethod batchingMethod,
+    int minBatchSize,
+    int maxBatchSize,
+    btAlignedObjectArray<char>* scratchMemory)
 {
 	if (constraints->size() >= minBatchSize * 4)
 	{

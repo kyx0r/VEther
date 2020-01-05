@@ -5,7 +5,7 @@ namespace btInverseDynamics
 MultiBodyTree::MultiBodyImpl::MultiBodyImpl(int num_bodies_, int num_dofs_)
 	: m_num_bodies(num_bodies_), m_num_dofs(num_dofs_)
 #if (defined BT_ID_HAVE_MAT3X) && (defined BT_ID_WITH_JACOBIANS)
-	  ,
+	,
 	  m_m3x(3, m_num_dofs)
 #endif
 {
@@ -27,16 +27,16 @@ const char *MultiBodyTree::MultiBodyImpl::jointTypeToString(const JointType &typ
 {
 	switch (type)
 	{
-		case FIXED:
-			return "fixed";
-		case REVOLUTE:
-			return "revolute";
-		case PRISMATIC:
-			return "prismatic";
-		case FLOATING:
-			return "floating";
-		case SPHERICAL:
-			return "spherical";
+	case FIXED:
+		return "fixed";
+	case REVOLUTE:
+		return "revolute";
+	case PRISMATIC:
+		return "prismatic";
+	case FLOATING:
+		return "floating";
+	case SPHERICAL:
+		return "spherical";
 	}
 	return "error: invalid";
 }
@@ -66,32 +66,32 @@ void MultiBodyTree::MultiBodyImpl::printTreeData()
 
 		id_printf("mass = %f\n", body.m_mass);
 		id_printf("mass * com = [%f %f %f]\n", body.m_body_mass_com(0), body.m_body_mass_com(1),
-				  body.m_body_mass_com(2));
+		          body.m_body_mass_com(2));
 		id_printf(
-			"I_o= [%f %f %f;\n"
-			"	  %f %f %f;\n"
-			"	  %f %f %f]\n",
-			body.m_body_I_body(0, 0), body.m_body_I_body(0, 1), body.m_body_I_body(0, 2),
-			body.m_body_I_body(1, 0), body.m_body_I_body(1, 1), body.m_body_I_body(1, 2),
-			body.m_body_I_body(2, 0), body.m_body_I_body(2, 1), body.m_body_I_body(2, 2));
+		    "I_o= [%f %f %f;\n"
+		    "	  %f %f %f;\n"
+		    "	  %f %f %f]\n",
+		    body.m_body_I_body(0, 0), body.m_body_I_body(0, 1), body.m_body_I_body(0, 2),
+		    body.m_body_I_body(1, 0), body.m_body_I_body(1, 1), body.m_body_I_body(1, 2),
+		    body.m_body_I_body(2, 0), body.m_body_I_body(2, 1), body.m_body_I_body(2, 2));
 
 		id_printf("parent_pos_parent_body_ref= [%f %f %f]\n", body.m_parent_pos_parent_body_ref(0),
-				  body.m_parent_pos_parent_body_ref(1), body.m_parent_pos_parent_body_ref(2));
+		          body.m_parent_pos_parent_body_ref(1), body.m_parent_pos_parent_body_ref(2));
 	}
 }
 int MultiBodyTree::MultiBodyImpl::bodyNumDoFs(const JointType &type) const
 {
 	switch (type)
 	{
-		case FIXED:
-			return 0;
-		case REVOLUTE:
-		case PRISMATIC:
-			return 1;
-		case FLOATING:
-			return 6;
-		case SPHERICAL:
-			return 3;
+	case FIXED:
+		return 0;
+	case REVOLUTE:
+	case PRISMATIC:
+		return 1;
+	case FLOATING:
+		return 6;
+	case SPHERICAL:
+		return 3;
 	}
 	bt_id_error_message("unknown joint type %d\n", type);
 	return 0;
@@ -111,9 +111,9 @@ void MultiBodyTree::MultiBodyImpl::printTree(int index, int indentation)
 		int child_index = m_child_indices[index][i];
 		indent(indentation);
 		id_printf("body %.2d[%s]: %.2d is child no. %d (qi= %d .. %d) \n", index,
-				  jointTypeToString(m_body_list[index].m_joint_type), child_index, (count++) + 1,
-				  m_body_list[index].m_q_index,
-				  m_body_list[index].m_q_index + bodyNumDoFs(m_body_list[index].m_joint_type));
+		          jointTypeToString(m_body_list[index].m_joint_type), child_index, (count++) + 1,
+		          m_body_list[index].m_q_index,
+		          m_body_list[index].m_q_index + bodyNumDoFs(m_body_list[index].m_joint_type));
 		// first grandchild
 		printTree(child_index, indentation);
 	}
@@ -136,32 +136,32 @@ int MultiBodyTree::MultiBodyImpl::generateIndexSets()
 		body.m_q_index = -1;
 		switch (body.m_joint_type)
 		{
-			case REVOLUTE:
-				m_body_revolute_list.push_back(i);
-				body.m_q_index = q_index;
-				q_index++;
-				break;
-			case PRISMATIC:
-				m_body_prismatic_list.push_back(i);
-				body.m_q_index = q_index;
-				q_index++;
-				break;
-			case FIXED:
-				// do nothing
-				break;
-			case FLOATING:
-				m_body_floating_list.push_back(i);
-				body.m_q_index = q_index;
-				q_index += 6;
-				break;
-			case SPHERICAL:
-				m_body_spherical_list.push_back(i);
-				body.m_q_index = q_index;
-				q_index += 3;
-				break;
-			default:
-				bt_id_error_message("unsupported joint type %d\n", body.m_joint_type);
-				return -1;
+		case REVOLUTE:
+			m_body_revolute_list.push_back(i);
+			body.m_q_index = q_index;
+			q_index++;
+			break;
+		case PRISMATIC:
+			m_body_prismatic_list.push_back(i);
+			body.m_q_index = q_index;
+			q_index++;
+			break;
+		case FIXED:
+			// do nothing
+			break;
+		case FLOATING:
+			m_body_floating_list.push_back(i);
+			body.m_q_index = q_index;
+			q_index += 6;
+			break;
+		case SPHERICAL:
+			m_body_spherical_list.push_back(i);
+			body.m_q_index = q_index;
+			q_index += 3;
+			break;
+		default:
+			bt_id_error_message("unsupported joint type %d\n", body.m_joint_type);
+			return -1;
 		}
 	}
 	// sanity check
@@ -191,8 +191,8 @@ int MultiBodyTree::MultiBodyImpl::generateIndexSets()
 			{
 				// should never happen
 				bt_id_error_message(
-					"building index sets. parent_index[%zu]= %d, but m_parent_index.size()= %d\n",
-					child, parent, static_cast<int>(m_parent_index.size()));
+				    "building index sets. parent_index[%zu]= %d, but m_parent_index.size()= %d\n",
+				    child, parent, static_cast<int>(m_parent_index.size()));
 			}
 			return -1;
 		}
@@ -209,57 +209,57 @@ void MultiBodyTree::MultiBodyImpl::calculateStaticData()
 		RigidBody &body = m_body_list[i];
 		switch (body.m_joint_type)
 		{
-			case REVOLUTE:
-				body.m_parent_vel_rel(0) = 0;
-				body.m_parent_vel_rel(1) = 0;
-				body.m_parent_vel_rel(2) = 0;
-				body.m_parent_acc_rel(0) = 0;
-				body.m_parent_acc_rel(1) = 0;
-				body.m_parent_acc_rel(2) = 0;
-				body.m_parent_pos_parent_body = body.m_parent_pos_parent_body_ref;
-				break;
-			case PRISMATIC:
-				body.m_body_T_parent = body.m_body_T_parent_ref;
-				body.m_parent_Jac_JT = body.m_body_T_parent_ref.transpose() * body.m_Jac_JT;
-				body.m_body_ang_vel_rel(0) = 0;
-				body.m_body_ang_vel_rel(1) = 0;
-				body.m_body_ang_vel_rel(2) = 0;
-				body.m_body_ang_acc_rel(0) = 0;
-				body.m_body_ang_acc_rel(1) = 0;
-				body.m_body_ang_acc_rel(2) = 0;
-				break;
-			case FIXED:
-				body.m_parent_pos_parent_body = body.m_parent_pos_parent_body_ref;
-				body.m_body_T_parent = body.m_body_T_parent_ref;
-				body.m_body_ang_vel_rel(0) = 0;
-				body.m_body_ang_vel_rel(1) = 0;
-				body.m_body_ang_vel_rel(2) = 0;
-				body.m_parent_vel_rel(0) = 0;
-				body.m_parent_vel_rel(1) = 0;
-				body.m_parent_vel_rel(2) = 0;
-				body.m_body_ang_acc_rel(0) = 0;
-				body.m_body_ang_acc_rel(1) = 0;
-				body.m_body_ang_acc_rel(2) = 0;
-				body.m_parent_acc_rel(0) = 0;
-				body.m_parent_acc_rel(1) = 0;
-				body.m_parent_acc_rel(2) = 0;
-				break;
-			case FLOATING:
-				// no static data
-				break;
-			case SPHERICAL:
-				//todo: review
-				body.m_parent_pos_parent_body = body.m_parent_pos_parent_body_ref;
-				body.m_parent_vel_rel(0) = 0;
-				body.m_parent_vel_rel(1) = 0;
-				body.m_parent_vel_rel(2) = 0;
-				body.m_parent_acc_rel(0) = 0;
-				body.m_parent_acc_rel(1) = 0;
-				body.m_parent_acc_rel(2) = 0;
-				break;
+		case REVOLUTE:
+			body.m_parent_vel_rel(0) = 0;
+			body.m_parent_vel_rel(1) = 0;
+			body.m_parent_vel_rel(2) = 0;
+			body.m_parent_acc_rel(0) = 0;
+			body.m_parent_acc_rel(1) = 0;
+			body.m_parent_acc_rel(2) = 0;
+			body.m_parent_pos_parent_body = body.m_parent_pos_parent_body_ref;
+			break;
+		case PRISMATIC:
+			body.m_body_T_parent = body.m_body_T_parent_ref;
+			body.m_parent_Jac_JT = body.m_body_T_parent_ref.transpose() * body.m_Jac_JT;
+			body.m_body_ang_vel_rel(0) = 0;
+			body.m_body_ang_vel_rel(1) = 0;
+			body.m_body_ang_vel_rel(2) = 0;
+			body.m_body_ang_acc_rel(0) = 0;
+			body.m_body_ang_acc_rel(1) = 0;
+			body.m_body_ang_acc_rel(2) = 0;
+			break;
+		case FIXED:
+			body.m_parent_pos_parent_body = body.m_parent_pos_parent_body_ref;
+			body.m_body_T_parent = body.m_body_T_parent_ref;
+			body.m_body_ang_vel_rel(0) = 0;
+			body.m_body_ang_vel_rel(1) = 0;
+			body.m_body_ang_vel_rel(2) = 0;
+			body.m_parent_vel_rel(0) = 0;
+			body.m_parent_vel_rel(1) = 0;
+			body.m_parent_vel_rel(2) = 0;
+			body.m_body_ang_acc_rel(0) = 0;
+			body.m_body_ang_acc_rel(1) = 0;
+			body.m_body_ang_acc_rel(2) = 0;
+			body.m_parent_acc_rel(0) = 0;
+			body.m_parent_acc_rel(1) = 0;
+			body.m_parent_acc_rel(2) = 0;
+			break;
+		case FLOATING:
+			// no static data
+			break;
+		case SPHERICAL:
+			//todo: review
+			body.m_parent_pos_parent_body = body.m_parent_pos_parent_body_ref;
+			body.m_parent_vel_rel(0) = 0;
+			body.m_parent_vel_rel(1) = 0;
+			body.m_parent_vel_rel(2) = 0;
+			body.m_parent_acc_rel(0) = 0;
+			body.m_parent_acc_rel(1) = 0;
+			body.m_parent_acc_rel(2) = 0;
+			break;
 		}
 
-			// resize & initialize jacobians to zero.
+		// resize & initialize jacobians to zero.
 #if (defined BT_ID_HAVE_MAT3X) && (defined BT_ID_WITH_JACOBIANS)
 		body.m_body_dot_Jac_T_u(0) = 0.0;
 		body.m_body_dot_Jac_T_u(1) = 0.0;
@@ -276,16 +276,16 @@ void MultiBodyTree::MultiBodyImpl::calculateStaticData()
 }
 
 int MultiBodyTree::MultiBodyImpl::calculateInverseDynamics(const vecx &q, const vecx &u,
-														   const vecx &dot_u, vecx *joint_forces)
+        const vecx &dot_u, vecx *joint_forces)
 {
 	if (q.size() != m_num_dofs || u.size() != m_num_dofs || dot_u.size() != m_num_dofs ||
-		joint_forces->size() != m_num_dofs)
+	        joint_forces->size() != m_num_dofs)
 	{
 		bt_id_error_message(
-			"wrong vector dimension. system has %d DOFs,\n"
-			"but dim(q)= %d, dim(u)= %d, dim(dot_u)= %d, dim(joint_forces)= %d\n",
-			m_num_dofs, static_cast<int>(q.size()), static_cast<int>(u.size()),
-			static_cast<int>(dot_u.size()), static_cast<int>(joint_forces->size()));
+		    "wrong vector dimension. system has %d DOFs,\n"
+		    "but dim(q)= %d, dim(u)= %d, dim(dot_u)= %d, dim(joint_forces)= %d\n",
+		    m_num_dofs, static_cast<int>(q.size()), static_cast<int>(u.size()),
+		    static_cast<int>(dot_u.size()), static_cast<int>(joint_forces->size()));
 		return -1;
 	}
 	// 1. relative kinematics
@@ -300,13 +300,13 @@ int MultiBodyTree::MultiBodyImpl::calculateInverseDynamics(const vecx &q, const 
 		RigidBody &body = m_body_list[i];
 		// 3.4 update dynamic terms (rate of change of angular & linear momentum)
 		body.m_eom_lhs_rotational =
-			body.m_body_I_body * body.m_body_ang_acc + body.m_body_mass_com.cross(body.m_body_acc) +
-			body.m_body_ang_vel.cross(body.m_body_I_body * body.m_body_ang_vel) -
-			body.m_body_moment_user;
+		    body.m_body_I_body * body.m_body_ang_acc + body.m_body_mass_com.cross(body.m_body_acc) +
+		    body.m_body_ang_vel.cross(body.m_body_I_body * body.m_body_ang_vel) -
+		    body.m_body_moment_user;
 		body.m_eom_lhs_translational =
-			body.m_body_ang_acc.cross(body.m_body_mass_com) + body.m_mass * body.m_body_acc +
-			body.m_body_ang_vel.cross(body.m_body_ang_vel.cross(body.m_body_mass_com)) -
-			body.m_body_force_user;
+		    body.m_body_ang_acc.cross(body.m_body_mass_com) + body.m_mass * body.m_body_acc +
+		    body.m_body_ang_vel.cross(body.m_body_ang_vel.cross(body.m_body_mass_com)) -
+		    body.m_body_force_user;
 	}
 
 	// 3. calculate full set of forces at parent joint
@@ -326,14 +326,14 @@ int MultiBodyTree::MultiBodyImpl::calculateInverseDynamics(const vecx &q, const 
 		setZero(sum_f_children);
 		setZero(sum_m_children);
 		for (idArrayIdx child_list_idx = 0; child_list_idx < m_child_indices[body_idx].size();
-			 child_list_idx++)
+		        child_list_idx++)
 		{
 			const RigidBody &child = m_body_list[m_child_indices[body_idx][child_list_idx]];
 			vec3 child_joint_force_in_this_frame =
-				child.m_body_T_parent.transpose() * child.m_force_at_joint;
+			    child.m_body_T_parent.transpose() * child.m_force_at_joint;
 			sum_f_children -= child_joint_force_in_this_frame;
 			sum_m_children -= child.m_body_T_parent.transpose() * child.m_moment_at_joint +
-							  child.m_parent_pos_parent_body.cross(child_joint_force_in_this_frame);
+			                  child.m_parent_pos_parent_body.cross(child_joint_force_in_this_frame);
 		}
 		RigidBody &body = m_body_list[body_idx];
 
@@ -384,15 +384,15 @@ int MultiBodyTree::MultiBodyImpl::calculateInverseDynamics(const vecx &q, const 
 }
 
 int MultiBodyTree::MultiBodyImpl::calculateKinematics(const vecx &q, const vecx &u, const vecx &dot_u,
-													  const KinUpdateType type)
+        const KinUpdateType type)
 {
 	if (q.size() != m_num_dofs || u.size() != m_num_dofs || dot_u.size() != m_num_dofs)
 	{
 		bt_id_error_message(
-			"wrong vector dimension. system has %d DOFs,\n"
-			"but dim(q)= %d, dim(u)= %d, dim(dot_u)= %d\n",
-			m_num_dofs, static_cast<int>(q.size()), static_cast<int>(u.size()),
-			static_cast<int>(dot_u.size()));
+		    "wrong vector dimension. system has %d DOFs,\n"
+		    "but dim(q)= %d, dim(u)= %d, dim(dot_u)= %d\n",
+		    m_num_dofs, static_cast<int>(q.size()), static_cast<int>(u.size()),
+		    static_cast<int>(dot_u.size()));
 		return -1;
 	}
 	if (type != POSITION_ONLY && type != POSITION_VELOCITY && type != POSITION_VELOCITY_ACCELERATION)
@@ -423,11 +423,11 @@ int MultiBodyTree::MultiBodyImpl::calculateKinematics(const vecx &q, const vecx 
 	{
 		RigidBody &body = m_body_list[m_body_prismatic_list[i]];
 		body.m_parent_pos_parent_body =
-			body.m_parent_pos_parent_body_ref + body.m_parent_Jac_JT * q(body.m_q_index);
+		    body.m_parent_pos_parent_body_ref + body.m_parent_Jac_JT * q(body.m_q_index);
 		if (type >= POSITION_VELOCITY)
 		{
 			body.m_parent_vel_rel =
-				body.m_body_T_parent_ref.transpose() * body.m_Jac_JT * u(body.m_q_index);
+			    body.m_body_T_parent_ref.transpose() * body.m_Jac_JT * u(body.m_q_index);
 		}
 		if (type >= POSITION_VELOCITY_ACCELERATION)
 		{
@@ -441,8 +441,8 @@ int MultiBodyTree::MultiBodyImpl::calculateKinematics(const vecx &q, const vecx 
 		RigidBody &body = m_body_list[m_body_floating_list[i]];
 
 		body.m_body_T_parent = transformZ(q(body.m_q_index + 2)) *
-							   transformY(q(body.m_q_index + 1)) *
-							   transformX(q(body.m_q_index));
+		                       transformY(q(body.m_q_index + 1)) *
+		                       transformX(q(body.m_q_index));
 		body.m_parent_pos_parent_body(0) = q(body.m_q_index + 3);
 		body.m_parent_pos_parent_body(1) = q(body.m_q_index + 4);
 		body.m_parent_pos_parent_body(2) = q(body.m_q_index + 5);
@@ -473,7 +473,7 @@ int MultiBodyTree::MultiBodyImpl::calculateKinematics(const vecx &q, const vecx 
 			body.m_parent_acc_rel = body.m_body_T_parent.transpose() * body.m_parent_acc_rel;
 		}
 	}
-	
+
 	for (idArrayIdx i = 0; i < m_body_spherical_list.size(); i++)
 	{
 		//todo: review
@@ -482,14 +482,14 @@ int MultiBodyTree::MultiBodyImpl::calculateKinematics(const vecx &q, const vecx 
 		mat33 T;
 
 		T = transformX(q(body.m_q_index)) *
-				transformY(q(body.m_q_index + 1)) *
-				transformZ(q(body.m_q_index + 2));
+		    transformY(q(body.m_q_index + 1)) *
+		    transformZ(q(body.m_q_index + 2));
 		body.m_body_T_parent = T * body.m_body_T_parent_ref;
-			
+
 		body.m_parent_pos_parent_body(0)=0;
 		body.m_parent_pos_parent_body(1)=0;
 		body.m_parent_pos_parent_body(2)=0;
-		
+
 		body.m_parent_pos_parent_body = body.m_body_T_parent * body.m_parent_pos_parent_body;
 
 		if (type >= POSITION_VELOCITY)
@@ -551,33 +551,33 @@ int MultiBodyTree::MultiBodyImpl::calculateKinematics(const vecx &q, const vecx 
 		// will be required if we add force elements (eg springs between bodies,
 		// or contacts)  not required right now added here for debugging purposes
 		body.m_body_pos =
-			body.m_body_T_parent * (parent.m_body_pos + body.m_parent_pos_parent_body);
+		    body.m_body_T_parent * (parent.m_body_pos + body.m_parent_pos_parent_body);
 		body.m_body_T_world = body.m_body_T_parent * parent.m_body_T_world;
 
 		if (type >= POSITION_VELOCITY)
 		{
 			// 2.2 update absolute velocities
 			body.m_body_ang_vel =
-				body.m_body_T_parent * parent.m_body_ang_vel + body.m_body_ang_vel_rel;
+			    body.m_body_T_parent * parent.m_body_ang_vel + body.m_body_ang_vel_rel;
 
 			body.m_body_vel =
-				body.m_body_T_parent *
-				(parent.m_body_vel + parent.m_body_ang_vel.cross(body.m_parent_pos_parent_body) +
-				 body.m_parent_vel_rel);
+			    body.m_body_T_parent *
+			    (parent.m_body_vel + parent.m_body_ang_vel.cross(body.m_parent_pos_parent_body) +
+			     body.m_parent_vel_rel);
 		}
 		if (type >= POSITION_VELOCITY_ACCELERATION)
 		{
 			// 2.3 update absolute accelerations
 			// NOTE: assumption: dot(J_JR) = 0; true here, but not for general joints
 			body.m_body_ang_acc =
-				body.m_body_T_parent * parent.m_body_ang_acc -
-				body.m_body_ang_vel_rel.cross(body.m_body_T_parent * parent.m_body_ang_vel) +
-				body.m_body_ang_acc_rel;
+			    body.m_body_T_parent * parent.m_body_ang_acc -
+			    body.m_body_ang_vel_rel.cross(body.m_body_T_parent * parent.m_body_ang_vel) +
+			    body.m_body_ang_acc_rel;
 			body.m_body_acc =
-				body.m_body_T_parent *
-				(parent.m_body_acc + parent.m_body_ang_acc.cross(body.m_parent_pos_parent_body) +
-				 parent.m_body_ang_vel.cross(parent.m_body_ang_vel.cross(body.m_parent_pos_parent_body)) +
-				 2.0 * parent.m_body_ang_vel.cross(body.m_parent_vel_rel) + body.m_parent_acc_rel);
+			    body.m_body_T_parent *
+			    (parent.m_body_acc + parent.m_body_ang_acc.cross(body.m_parent_pos_parent_body) +
+			     parent.m_body_ang_vel.cross(parent.m_body_ang_vel.cross(body.m_parent_pos_parent_body)) +
+			     2.0 * parent.m_body_ang_vel.cross(body.m_parent_vel_rel) + body.m_parent_acc_rel);
 		}
 	}
 
@@ -591,45 +591,45 @@ void MultiBodyTree::MultiBodyImpl::addRelativeJacobianComponent(RigidBody &body)
 	const int &idx = body.m_q_index;
 	switch (body.m_joint_type)
 	{
-		case FIXED:
-			break;
-		case REVOLUTE:
-			setMat3xElem(0, idx, body.m_Jac_JR(0), &body.m_body_Jac_R);
-			setMat3xElem(1, idx, body.m_Jac_JR(1), &body.m_body_Jac_R);
-			setMat3xElem(2, idx, body.m_Jac_JR(2), &body.m_body_Jac_R);
-			break;
-		case PRISMATIC:
-			setMat3xElem(0, idx, body.m_body_T_parent_ref(0, 0) * body.m_Jac_JT(0) + body.m_body_T_parent_ref(1, 0) * body.m_Jac_JT(1) + body.m_body_T_parent_ref(2, 0) * body.m_Jac_JT(2),
-						 &body.m_body_Jac_T);
-			setMat3xElem(1, idx, body.m_body_T_parent_ref(0, 1) * body.m_Jac_JT(0) + body.m_body_T_parent_ref(1, 1) * body.m_Jac_JT(1) + body.m_body_T_parent_ref(2, 1) * body.m_Jac_JT(2),
-						 &body.m_body_Jac_T);
-			setMat3xElem(2, idx, body.m_body_T_parent_ref(0, 2) * body.m_Jac_JT(0) + body.m_body_T_parent_ref(1, 2) * body.m_Jac_JT(1) + body.m_body_T_parent_ref(2, 2) * body.m_Jac_JT(2),
-						 &body.m_body_Jac_T);
-			break;
-		case FLOATING:
-			setMat3xElem(0, idx + 0, 1.0, &body.m_body_Jac_R);
-			setMat3xElem(1, idx + 1, 1.0, &body.m_body_Jac_R);
-			setMat3xElem(2, idx + 2, 1.0, &body.m_body_Jac_R);
-			// body_Jac_T = body_T_parent.transpose();
-			setMat3xElem(0, idx + 3, body.m_body_T_parent(0, 0), &body.m_body_Jac_T);
-			setMat3xElem(0, idx + 4, body.m_body_T_parent(1, 0), &body.m_body_Jac_T);
-			setMat3xElem(0, idx + 5, body.m_body_T_parent(2, 0), &body.m_body_Jac_T);
+	case FIXED:
+		break;
+	case REVOLUTE:
+		setMat3xElem(0, idx, body.m_Jac_JR(0), &body.m_body_Jac_R);
+		setMat3xElem(1, idx, body.m_Jac_JR(1), &body.m_body_Jac_R);
+		setMat3xElem(2, idx, body.m_Jac_JR(2), &body.m_body_Jac_R);
+		break;
+	case PRISMATIC:
+		setMat3xElem(0, idx, body.m_body_T_parent_ref(0, 0) * body.m_Jac_JT(0) + body.m_body_T_parent_ref(1, 0) * body.m_Jac_JT(1) + body.m_body_T_parent_ref(2, 0) * body.m_Jac_JT(2),
+		             &body.m_body_Jac_T);
+		setMat3xElem(1, idx, body.m_body_T_parent_ref(0, 1) * body.m_Jac_JT(0) + body.m_body_T_parent_ref(1, 1) * body.m_Jac_JT(1) + body.m_body_T_parent_ref(2, 1) * body.m_Jac_JT(2),
+		             &body.m_body_Jac_T);
+		setMat3xElem(2, idx, body.m_body_T_parent_ref(0, 2) * body.m_Jac_JT(0) + body.m_body_T_parent_ref(1, 2) * body.m_Jac_JT(1) + body.m_body_T_parent_ref(2, 2) * body.m_Jac_JT(2),
+		             &body.m_body_Jac_T);
+		break;
+	case FLOATING:
+		setMat3xElem(0, idx + 0, 1.0, &body.m_body_Jac_R);
+		setMat3xElem(1, idx + 1, 1.0, &body.m_body_Jac_R);
+		setMat3xElem(2, idx + 2, 1.0, &body.m_body_Jac_R);
+		// body_Jac_T = body_T_parent.transpose();
+		setMat3xElem(0, idx + 3, body.m_body_T_parent(0, 0), &body.m_body_Jac_T);
+		setMat3xElem(0, idx + 4, body.m_body_T_parent(1, 0), &body.m_body_Jac_T);
+		setMat3xElem(0, idx + 5, body.m_body_T_parent(2, 0), &body.m_body_Jac_T);
 
-			setMat3xElem(1, idx + 3, body.m_body_T_parent(0, 1), &body.m_body_Jac_T);
-			setMat3xElem(1, idx + 4, body.m_body_T_parent(1, 1), &body.m_body_Jac_T);
-			setMat3xElem(1, idx + 5, body.m_body_T_parent(2, 1), &body.m_body_Jac_T);
+		setMat3xElem(1, idx + 3, body.m_body_T_parent(0, 1), &body.m_body_Jac_T);
+		setMat3xElem(1, idx + 4, body.m_body_T_parent(1, 1), &body.m_body_Jac_T);
+		setMat3xElem(1, idx + 5, body.m_body_T_parent(2, 1), &body.m_body_Jac_T);
 
-			setMat3xElem(2, idx + 3, body.m_body_T_parent(0, 2), &body.m_body_Jac_T);
-			setMat3xElem(2, idx + 4, body.m_body_T_parent(1, 2), &body.m_body_Jac_T);
-			setMat3xElem(2, idx + 5, body.m_body_T_parent(2, 2), &body.m_body_Jac_T);
+		setMat3xElem(2, idx + 3, body.m_body_T_parent(0, 2), &body.m_body_Jac_T);
+		setMat3xElem(2, idx + 4, body.m_body_T_parent(1, 2), &body.m_body_Jac_T);
+		setMat3xElem(2, idx + 5, body.m_body_T_parent(2, 2), &body.m_body_Jac_T);
 
-			break;
-		case SPHERICAL:
-			//todo: review
-			setMat3xElem(0, idx + 0, 1.0, &body.m_body_Jac_R);
-			setMat3xElem(1, idx + 1, 1.0, &body.m_body_Jac_R);
-			setMat3xElem(2, idx + 2, 1.0, &body.m_body_Jac_R);
-			break;
+		break;
+	case SPHERICAL:
+		//todo: review
+		setMat3xElem(0, idx + 0, 1.0, &body.m_body_Jac_R);
+		setMat3xElem(1, idx + 1, 1.0, &body.m_body_Jac_R);
+		setMat3xElem(2, idx + 2, 1.0, &body.m_body_Jac_R);
+		break;
 	}
 }
 
@@ -638,9 +638,9 @@ int MultiBodyTree::MultiBodyImpl::calculateJacobians(const vecx &q, const vecx &
 	if (q.size() != m_num_dofs || u.size() != m_num_dofs)
 	{
 		bt_id_error_message(
-			"wrong vector dimension. system has %d DOFs,\n"
-			"but dim(q)= %d, dim(u)= %d\n",
-			m_num_dofs, static_cast<int>(q.size()), static_cast<int>(u.size()));
+		    "wrong vector dimension. system has %d DOFs,\n"
+		    "but dim(q)= %d, dim(u)= %d\n",
+		    m_num_dofs, static_cast<int>(q.size()), static_cast<int>(u.size()));
 		return -1;
 	}
 	if (type != POSITION_ONLY && type != POSITION_VELOCITY)
@@ -666,11 +666,11 @@ int MultiBodyTree::MultiBodyImpl::calculateJacobians(const vecx &q, const vecx &
 		if (type >= POSITION_VELOCITY)
 		{
 			body.m_body_dot_Jac_R_u = body.m_body_T_parent * parent.m_body_dot_Jac_R_u -
-									  body.m_body_ang_vel_rel.cross(body.m_body_T_parent * parent.m_body_ang_vel);
+			                          body.m_body_ang_vel_rel.cross(body.m_body_T_parent * parent.m_body_ang_vel);
 			body.m_body_dot_Jac_T_u = body.m_body_T_parent *
-									  (parent.m_body_dot_Jac_T_u + parent.m_body_dot_Jac_R_u.cross(body.m_parent_pos_parent_body) +
-									   parent.m_body_ang_vel.cross(parent.m_body_ang_vel.cross(body.m_parent_pos_parent_body)) +
-									   2.0 * parent.m_body_ang_vel.cross(body.m_parent_vel_rel));
+			                          (parent.m_body_dot_Jac_T_u + parent.m_body_dot_Jac_R_u.cross(body.m_parent_pos_parent_body) +
+			                           parent.m_body_ang_vel.cross(parent.m_body_ang_vel.cross(body.m_parent_pos_parent_body)) +
+			                           2.0 * parent.m_body_ang_vel.cross(body.m_parent_vel_rel));
 		}
 	}
 	return 0;
@@ -681,25 +681,25 @@ static inline void setThreeDoFJacobians(const int dof, vec3 &Jac_JR, vec3 &Jac_J
 {
 	switch (dof)
 	{
-		// rotational part
-		case 0:
-			Jac_JR(0) = 1;
-			Jac_JR(1) = 0;
-			Jac_JR(2) = 0;
-			setZero(Jac_JT);
-			break;
-		case 1:
-			Jac_JR(0) = 0;
-			Jac_JR(1) = 1;
-			Jac_JR(2) = 0;
-			setZero(Jac_JT);
-			break;
-		case 2:
-			Jac_JR(0) = 0;
-			Jac_JR(1) = 0;
-			Jac_JR(2) = 1;
-			setZero(Jac_JT);
-			break;
+	// rotational part
+	case 0:
+		Jac_JR(0) = 1;
+		Jac_JR(1) = 0;
+		Jac_JR(2) = 0;
+		setZero(Jac_JT);
+		break;
+	case 1:
+		Jac_JR(0) = 0;
+		Jac_JR(1) = 1;
+		Jac_JR(2) = 0;
+		setZero(Jac_JT);
+		break;
+	case 2:
+		Jac_JR(0) = 0;
+		Jac_JR(1) = 0;
+		Jac_JR(2) = 1;
+		setZero(Jac_JT);
+		break;
 	}
 }
 
@@ -707,44 +707,44 @@ static inline void setSixDoFJacobians(const int dof, vec3 &Jac_JR, vec3 &Jac_JT)
 {
 	switch (dof)
 	{
-		// rotational part
-		case 0:
-			Jac_JR(0) = 1;
-			Jac_JR(1) = 0;
-			Jac_JR(2) = 0;
-			setZero(Jac_JT);
-			break;
-		case 1:
-			Jac_JR(0) = 0;
-			Jac_JR(1) = 1;
-			Jac_JR(2) = 0;
-			setZero(Jac_JT);
-			break;
-		case 2:
-			Jac_JR(0) = 0;
-			Jac_JR(1) = 0;
-			Jac_JR(2) = 1;
-			setZero(Jac_JT);
-			break;
-		// translational part
-		case 3:
-			setZero(Jac_JR);
-			Jac_JT(0) = 1;
-			Jac_JT(1) = 0;
-			Jac_JT(2) = 0;
-			break;
-		case 4:
-			setZero(Jac_JR);
-			Jac_JT(0) = 0;
-			Jac_JT(1) = 1;
-			Jac_JT(2) = 0;
-			break;
-		case 5:
-			setZero(Jac_JR);
-			Jac_JT(0) = 0;
-			Jac_JT(1) = 0;
-			Jac_JT(2) = 1;
-			break;
+	// rotational part
+	case 0:
+		Jac_JR(0) = 1;
+		Jac_JR(1) = 0;
+		Jac_JR(2) = 0;
+		setZero(Jac_JT);
+		break;
+	case 1:
+		Jac_JR(0) = 0;
+		Jac_JR(1) = 1;
+		Jac_JR(2) = 0;
+		setZero(Jac_JT);
+		break;
+	case 2:
+		Jac_JR(0) = 0;
+		Jac_JR(1) = 0;
+		Jac_JR(2) = 1;
+		setZero(Jac_JT);
+		break;
+	// translational part
+	case 3:
+		setZero(Jac_JR);
+		Jac_JT(0) = 1;
+		Jac_JT(1) = 0;
+		Jac_JT(2) = 0;
+		break;
+	case 4:
+		setZero(Jac_JR);
+		Jac_JT(0) = 0;
+		Jac_JT(1) = 1;
+		Jac_JT(2) = 0;
+		break;
+	case 5:
+		setZero(Jac_JR);
+		Jac_JT(0) = 0;
+		Jac_JT(1) = 0;
+		Jac_JT(2) = 1;
+		break;
 	}
 }
 
@@ -752,15 +752,15 @@ static inline int jointNumDoFs(const JointType &type)
 {
 	switch (type)
 	{
-		case FIXED:
-			return 0;
-		case REVOLUTE:
-		case PRISMATIC:
-			return 1;
-		case FLOATING:
-			return 6;
-		case SPHERICAL:
-			return 3;
+	case FIXED:
+		return 0;
+	case REVOLUTE:
+	case PRISMATIC:
+		return 1;
+	case FLOATING:
+		return 6;
+	case SPHERICAL:
+		return 3;
 	}
 	// this should never happen
 	bt_id_error_message("invalid joint type\n");
@@ -770,9 +770,9 @@ static inline int jointNumDoFs(const JointType &type)
 }
 
 int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool update_kinematics,
-													  const bool initialize_matrix,
-													  const bool set_lower_triangular_matrix,
-													  matxx *mass_matrix)
+        const bool initialize_matrix,
+        const bool set_lower_triangular_matrix,
+        matxx *mass_matrix)
 {
 	// This calculates the joint space mass matrix for the multibody system.
 	// The algorithm is essentially an implementation of "method 3"
@@ -783,13 +783,13 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 	// on the origin of the body-fixed frame to avoid re-computing various quantities at the com.
 
 	if (q.size() != m_num_dofs || mass_matrix->rows() != m_num_dofs ||
-		mass_matrix->cols() != m_num_dofs)
+	        mass_matrix->cols() != m_num_dofs)
 	{
 		bt_id_error_message(
-			"Dimension error. System has %d DOFs,\n"
-			"but dim(q)= %d, dim(mass_matrix)= %d x %d\n",
-			m_num_dofs, static_cast<int>(q.size()), static_cast<int>(mass_matrix->rows()),
-			static_cast<int>(mass_matrix->cols()));
+		    "Dimension error. System has %d DOFs,\n"
+		    "but dim(q)= %d, dim(mass_matrix)= %d x %d\n",
+		    m_num_dofs, static_cast<int>(q.size()), static_cast<int>(mass_matrix->rows()),
+		    static_cast<int>(mass_matrix->cols()));
 		return -1;
 	}
 
@@ -823,7 +823,7 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 			RigidBody &body = m_body_list[m_body_prismatic_list[i]];
 			// body.m_body_T_parent= fixed
 			body.m_parent_pos_parent_body =
-				body.m_parent_pos_parent_body_ref + body.m_parent_Jac_JT * q(body.m_q_index);
+			    body.m_parent_pos_parent_body_ref + body.m_parent_Jac_JT * q(body.m_q_index);
 		}
 		// 1.3 fixed joints: nothing to do
 		// 1.4 6dof joints:
@@ -832,8 +832,8 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 			RigidBody &body = m_body_list[m_body_floating_list[i]];
 
 			body.m_body_T_parent = transformZ(q(body.m_q_index + 2)) *
-								   transformY(q(body.m_q_index + 1)) *
-								   transformX(q(body.m_q_index));
+			                       transformY(q(body.m_q_index + 1)) *
+			                       transformX(q(body.m_q_index));
 			body.m_parent_pos_parent_body(0) = q(body.m_q_index + 3);
 			body.m_parent_pos_parent_body(1) = q(body.m_q_index + 4);
 			body.m_parent_pos_parent_body(2) = q(body.m_q_index + 5);
@@ -849,14 +849,14 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 			mat33 T;
 
 			T = transformX(q(body.m_q_index)) *
-				transformY(q(body.m_q_index + 1)) *
-				transformZ(q(body.m_q_index + 2));
+			    transformY(q(body.m_q_index + 1)) *
+			    transformZ(q(body.m_q_index + 2));
 			body.m_body_T_parent = T * body.m_body_T_parent_ref;
 
 			body.m_parent_pos_parent_body(0)=0;
 			body.m_parent_pos_parent_body(1)=0;
 			body.m_parent_pos_parent_body(2)=0;
-			
+
 			body.m_parent_pos_parent_body = body.m_body_T_parent * body.m_parent_pos_parent_body;
 		}
 	}
@@ -876,9 +876,9 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 
 			body.m_subtree_mass += child.m_subtree_mass;
 			body.m_body_subtree_mass_com += body_T_child * child.m_body_subtree_mass_com +
-											child.m_parent_pos_parent_body * child.m_subtree_mass;
+			                                child.m_parent_pos_parent_body * child.m_subtree_mass;
 			body.m_body_subtree_I_body +=
-				body_T_child * child.m_body_subtree_I_body * child.m_body_T_parent;
+			    body_T_child * child.m_body_subtree_I_body * child.m_body_T_parent;
 
 			if (child.m_subtree_mass > 0)
 			{
@@ -890,8 +890,8 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 				mat33 tilde_r_child_com = tildeOperator(r_com);
 				mat33 tilde_r_body_com = tildeOperator(child.m_parent_pos_parent_body + r_com);
 				body.m_body_subtree_I_body +=
-					child.m_subtree_mass *
-					(tilde_r_child_com * tilde_r_child_com - tilde_r_body_com * tilde_r_body_com);
+				    child.m_subtree_mass *
+				    (tilde_r_child_com * tilde_r_child_com - tilde_r_body_com * tilde_r_body_com);
 			}
 		}
 	}
@@ -921,9 +921,9 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 			}
 
 			vec3 body_eom_rot =
-				body.m_body_subtree_I_body * Jac_JR + body.m_body_subtree_mass_com.cross(Jac_JT);
+			    body.m_body_subtree_I_body * Jac_JR + body.m_body_subtree_mass_com.cross(Jac_JT);
 			vec3 body_eom_trans =
-				body.m_subtree_mass * Jac_JT - body.m_body_subtree_mass_com.cross(Jac_JR);
+			    body.m_subtree_mass * Jac_JT - body.m_body_subtree_mass_com.cross(Jac_JR);
 			setMatxxElem(col, col, Jac_JR.dot(body_eom_rot) + Jac_JT.dot(body_eom_trans), mass_matrix);
 
 			// rest of the mass matrix column upwards
@@ -960,7 +960,7 @@ int MultiBodyTree::MultiBodyImpl::calculateMassMatrix(const vecx &q, const bool 
 
 					const int parent_body_q_index_min = parent_body.m_q_index;
 					const int parent_body_q_index_max =
-						parent_body_q_index_min + jointNumDoFs(parent_body.m_joint_type) - 1;
+					    parent_body_q_index_min + jointNumDoFs(parent_body.m_joint_type) - 1;
 					vec3 Jac_JR = parent_body.m_Jac_JR;
 					vec3 Jac_JT = parent_body.m_Jac_JT;
 					for (int row = parent_body_q_index_max; row >= parent_body_q_index_min; row--)
@@ -1059,7 +1059,7 @@ int MultiBodyTree::MultiBodyImpl::getBodyCoM(int body_index, vec3 *world_com) co
 	if (body.m_mass > 0)
 	{
 		*world_com = body.m_body_T_world.transpose() *
-					 (body.m_body_pos + body.m_body_mass_com / body.m_mass);
+		             (body.m_body_pos + body.m_body_mass_com / body.m_mass);
 	}
 	else
 	{
@@ -1083,7 +1083,7 @@ int MultiBodyTree::MultiBodyImpl::getBodyAngularVelocity(int body_index, vec3 *w
 	return 0;
 }
 int MultiBodyTree::MultiBodyImpl::getBodyLinearVelocity(int body_index,
-														vec3 *world_velocity) const
+        vec3 *world_velocity) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	const RigidBody &body = m_body_list[body_index];
@@ -1092,7 +1092,7 @@ int MultiBodyTree::MultiBodyImpl::getBodyLinearVelocity(int body_index,
 }
 
 int MultiBodyTree::MultiBodyImpl::getBodyLinearVelocityCoM(int body_index,
-														   vec3 *world_velocity) const
+        vec3 *world_velocity) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	const RigidBody &body = m_body_list[body_index];
@@ -1109,12 +1109,12 @@ int MultiBodyTree::MultiBodyImpl::getBodyLinearVelocityCoM(int body_index,
 	}
 
 	*world_velocity =
-		body.m_body_T_world.transpose() * (body.m_body_vel + body.m_body_ang_vel.cross(com));
+	    body.m_body_T_world.transpose() * (body.m_body_vel + body.m_body_ang_vel.cross(com));
 	return 0;
 }
 
 int MultiBodyTree::MultiBodyImpl::getBodyAngularAcceleration(int body_index,
-															 vec3 *world_dot_omega) const
+        vec3 *world_dot_omega) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	const RigidBody &body = m_body_list[body_index];
@@ -1122,7 +1122,7 @@ int MultiBodyTree::MultiBodyImpl::getBodyAngularAcceleration(int body_index,
 	return 0;
 }
 int MultiBodyTree::MultiBodyImpl::getBodyLinearAcceleration(int body_index,
-															vec3 *world_acceleration) const
+        vec3 *world_acceleration) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	const RigidBody &body = m_body_list[body_index];
@@ -1138,7 +1138,7 @@ int MultiBodyTree::MultiBodyImpl::getJointType(const int body_index, JointType *
 }
 
 int MultiBodyTree::MultiBodyImpl::getJointTypeStr(const int body_index,
-												  const char **joint_type) const
+        const char **joint_type) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	*joint_type = jointTypeToString(m_body_list[body_index].m_joint_type);
@@ -1191,14 +1191,14 @@ int MultiBodyTree::MultiBodyImpl::setBodyMass(const int body_index, const idScal
 }
 
 int MultiBodyTree::MultiBodyImpl::setBodyFirstMassMoment(const int body_index,
-														 const vec3 &first_mass_moment)
+        const vec3 &first_mass_moment)
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	m_body_list[body_index].m_body_mass_com = first_mass_moment;
 	return 0;
 }
 int MultiBodyTree::MultiBodyImpl::setBodySecondMassMoment(const int body_index,
-														  const mat33 &second_mass_moment)
+        const mat33 &second_mass_moment)
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	m_body_list[body_index].m_body_I_body = second_mass_moment;
@@ -1211,14 +1211,14 @@ int MultiBodyTree::MultiBodyImpl::getBodyMass(const int body_index, idScalar *ma
 	return 0;
 }
 int MultiBodyTree::MultiBodyImpl::getBodyFirstMassMoment(const int body_index,
-														 vec3 *first_mass_moment) const
+        vec3 *first_mass_moment) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	*first_mass_moment = m_body_list[body_index].m_body_mass_com;
 	return 0;
 }
 int MultiBodyTree::MultiBodyImpl::getBodySecondMassMoment(const int body_index,
-														  mat33 *second_mass_moment) const
+        mat33 *second_mass_moment) const
 {
 	CHECK_IF_BODY_INDEX_IS_VALID(body_index);
 	*second_mass_moment = m_body_list[body_index].m_body_I_body;

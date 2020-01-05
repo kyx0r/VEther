@@ -4,8 +4,8 @@ Copyright (c) 2003-2014 Erwin Coumans http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -23,8 +23,8 @@ subject to the following restrictions:
 
 template <typename btConvexTemplate>
 bool btGjkEpaCalcPenDepth(const btConvexTemplate& a, const btConvexTemplate& b,
-						  const btGjkCollisionDescription& colDesc,
-						  btVector3& v, btVector3& wWitnessOnA, btVector3& wWitnessOnB)
+                          const btGjkCollisionDescription& colDesc,
+                          btVector3& v, btVector3& wWitnessOnA, btVector3& wWitnessOnB)
 {
 	(void)v;
 
@@ -93,7 +93,7 @@ int btComputeGjkEpaPenetration(const btConvexTemplate& a, const btConvexTemplate
 		simplexSolver.reset();
 
 		for (;;)
-		//while (true)
+			//while (true)
 		{
 			btVector3 separatingAxisInA = (-m_cachedSeparatingAxis) * localTransA.getBasis();
 			btVector3 separatingAxisInB = m_cachedSeparatingAxis * localTransB.getBasis();
@@ -164,14 +164,14 @@ int btComputeGjkEpaPenetration(const btConvexTemplate& a, const btConvexTemplate
 			btScalar previousSquaredDistance = squaredDistance;
 			squaredDistance = newCachedSeparatingAxis.length2();
 #if 0
-            ///warning: this termination condition leads to some problems in 2d test case see Bullet/Demos/Box2dDemo
-            if (squaredDistance>previousSquaredDistance)
-            {
-                m_degenerateSimplex = 7;
-                squaredDistance = previousSquaredDistance;
-                checkSimplex = false;
-                break;
-            }
+			///warning: this termination condition leads to some problems in 2d test case see Bullet/Demos/Box2dDemo
+			if (squaredDistance>previousSquaredDistance)
+			{
+				m_degenerateSimplex = 7;
+				squaredDistance = previousSquaredDistance;
+				checkSimplex = false;
+				break;
+			}
 #endif  //
 
 			//redundant m_simplexSolver->compute_points(pointOnA, pointOnB);
@@ -195,10 +195,10 @@ int btComputeGjkEpaPenetration(const btConvexTemplate& a, const btConvexTemplate
 
 				printf("btGjkPairDetector maxIter exceeded:%i\n", m_curIter);
 				printf("sepAxis=(%f,%f,%f), squaredDistance = %f\n",
-					   m_cachedSeparatingAxis.getX(),
-					   m_cachedSeparatingAxis.getY(),
-					   m_cachedSeparatingAxis.getZ(),
-					   squaredDistance);
+				       m_cachedSeparatingAxis.getX(),
+				       m_cachedSeparatingAxis.getY(),
+				       m_cachedSeparatingAxis.getZ(),
+				       squaredDistance);
 #endif
 
 				break;
@@ -250,7 +250,7 @@ int btComputeGjkEpaPenetration(const btConvexTemplate& a, const btConvexTemplate
 		}
 
 		bool catchDegeneratePenetrationCase =
-			(m_catchDegeneracies && m_degenerateSimplex && ((distance + margin) < 0.01));
+		    (m_catchDegeneracies && m_degenerateSimplex && ((distance + margin) < 0.01));
 
 		//if (checkPenetration && !isValid)
 		if (checkPenetration && (!isValid || catchDegeneratePenetrationCase))
@@ -265,8 +265,8 @@ int btComputeGjkEpaPenetration(const btConvexTemplate& a, const btConvexTemplate
 			m_cachedSeparatingAxis.setZero();
 
 			bool isValid2 = btGjkEpaCalcPenDepth(a, b,
-												 colDesc,
-												 m_cachedSeparatingAxis, tmpPointOnA, tmpPointOnB);
+			                                     colDesc,
+			                                     m_cachedSeparatingAxis, tmpPointOnA, tmpPointOnB);
 
 			if (isValid2)
 			{

@@ -4,8 +4,8 @@ Copyright (c) 2003-2013 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -101,12 +101,12 @@ struct btCompoundCompoundLeafCallback : btDbvt::ICollide
 	btPersistentManifold* m_sharedManifold;
 
 	btCompoundCompoundLeafCallback(const btCollisionObjectWrapper* compound1ObjWrap,
-								   const btCollisionObjectWrapper* compound0ObjWrap,
-								   btDispatcher* dispatcher,
-								   const btDispatcherInfo& dispatchInfo,
-								   btManifoldResult* resultOut,
-								   btHashedSimplePairCache* childAlgorithmsCache,
-								   btPersistentManifold* sharedManifold)
+	                               const btCollisionObjectWrapper* compound0ObjWrap,
+	                               btDispatcher* dispatcher,
+	                               const btDispatcherInfo& dispatchInfo,
+	                               btManifoldResult* resultOut,
+	                               btHashedSimplePairCache* childAlgorithmsCache,
+	                               btPersistentManifold* sharedManifold)
 		: m_numOverlapPairs(0), m_compound0ColObjWrap(compound1ObjWrap), m_compound1ColObjWrap(compound0ObjWrap), m_dispatcher(dispatcher), m_dispatchInfo(dispatchInfo), m_resultOut(resultOut), m_childCollisionAlgorithmCache(childAlgorithmsCache), m_sharedManifold(sharedManifold)
 	{
 	}
@@ -213,7 +213,7 @@ struct btCompoundCompoundLeafCallback : btDbvt::ICollide
 };
 
 static DBVT_INLINE bool MyIntersect(const btDbvtAabbMm& a,
-									const btDbvtAabbMm& b, const btTransform& xform, btScalar distanceThreshold)
+                                    const btDbvtAabbMm& b, const btTransform& xform, btScalar distanceThreshold)
 {
 	btVector3 newmin, newmax;
 	btTransformAabb(b.Mins(), b.Maxs(), 0.f, xform, newmin, newmax);
@@ -224,9 +224,9 @@ static DBVT_INLINE bool MyIntersect(const btDbvtAabbMm& a,
 }
 
 static inline void MycollideTT(const btDbvtNode* root0,
-							   const btDbvtNode* root1,
-							   const btTransform& xform,
-							   btCompoundCompoundLeafCallback* callback, btScalar distanceThreshold)
+                               const btDbvtNode* root1,
+                               const btTransform& xform,
+                               btCompoundCompoundLeafCallback* callback, btScalar distanceThreshold)
 {
 	if (root0 && root1)
 	{
@@ -278,7 +278,8 @@ static inline void MycollideTT(const btDbvtNode* root0,
 					}
 				}
 			}
-		} while (depth);
+		}
+		while (depth);
 	}
 }
 

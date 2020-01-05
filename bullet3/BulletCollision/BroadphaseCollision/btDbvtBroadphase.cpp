@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -173,16 +173,16 @@ btDbvtBroadphase::~btDbvtBroadphase()
 
 //
 btBroadphaseProxy* btDbvtBroadphase::createProxy(const btVector3& aabbMin,
-												 const btVector3& aabbMax,
-												 int /*shapeType*/,
-												 void* userPtr,
-												 int collisionFilterGroup,
-												 int collisionFilterMask,
-												 btDispatcher* /*dispatcher*/)
+        const btVector3& aabbMax,
+        int /*shapeType*/,
+        void* userPtr,
+        int collisionFilterGroup,
+        int collisionFilterMask,
+        btDispatcher* /*dispatcher*/)
 {
 	btDbvtProxy* proxy = new (btAlignedAlloc(sizeof(btDbvtProxy), 16)) btDbvtProxy(aabbMin, aabbMax, userPtr,
-																				   collisionFilterGroup,
-																				   collisionFilterMask);
+	        collisionFilterGroup,
+	        collisionFilterMask);
 
 	btDbvtAabbMm aabb = btDbvtVolume::FromMM(aabbMin, aabbMax);
 
@@ -203,7 +203,7 @@ btBroadphaseProxy* btDbvtBroadphase::createProxy(const btVector3& aabbMin,
 
 //
 void btDbvtBroadphase::destroyProxy(btBroadphaseProxy* absproxy,
-									btDispatcher* dispatcher)
+                                    btDispatcher* dispatcher)
 {
 	btDbvtProxy* proxy = (btDbvtProxy*)absproxy;
 	if (proxy->stage == STAGECOUNT)
@@ -249,7 +249,7 @@ void btDbvtBroadphase::rayTest(const btVector3& rayFrom, const btVector3& rayTo,
 	btAlignedObjectArray<const btDbvtNode*> localStack;
 	//todo(erwincoumans, "why do we get tsan issue here?")
 	if (0)//threadIndex < m_rayTestStacks.size())
-	//if (threadIndex < m_rayTestStacks.size())
+		//if (threadIndex < m_rayTestStacks.size())
 	{
 		// use per-thread preallocated stack if possible to avoid dynamic allocations
 		stack = &m_rayTestStacks[threadIndex];
@@ -261,26 +261,26 @@ void btDbvtBroadphase::rayTest(const btVector3& rayFrom, const btVector3& rayTo,
 #endif
 
 	m_sets[0].rayTestInternal(m_sets[0].m_root,
-							  rayFrom,
-							  rayTo,
-							  rayCallback.m_rayDirectionInverse,
-							  rayCallback.m_signs,
-							  rayCallback.m_lambda_max,
-							  aabbMin,
-							  aabbMax,
-							  *stack,
-							  callback);
+	                          rayFrom,
+	                          rayTo,
+	                          rayCallback.m_rayDirectionInverse,
+	                          rayCallback.m_signs,
+	                          rayCallback.m_lambda_max,
+	                          aabbMin,
+	                          aabbMax,
+	                          *stack,
+	                          callback);
 
 	m_sets[1].rayTestInternal(m_sets[1].m_root,
-							  rayFrom,
-							  rayTo,
-							  rayCallback.m_rayDirectionInverse,
-							  rayCallback.m_signs,
-							  rayCallback.m_lambda_max,
-							  aabbMin,
-							  aabbMax,
-							  *stack,
-							  callback);
+	                          rayFrom,
+	                          rayTo,
+	                          rayCallback.m_rayDirectionInverse,
+	                          rayCallback.m_signs,
+	                          rayCallback.m_lambda_max,
+	                          aabbMin,
+	                          aabbMax,
+	                          *stack,
+	                          callback);
 }
 
 struct BroadphaseAabbTester : btDbvt::ICollide
@@ -309,9 +309,9 @@ void btDbvtBroadphase::aabbTest(const btVector3& aabbMin, const btVector3& aabbM
 
 //
 void btDbvtBroadphase::setAabb(btBroadphaseProxy* absproxy,
-							   const btVector3& aabbMin,
-							   const btVector3& aabbMax,
-							   btDispatcher* /*dispatcher*/)
+                               const btVector3& aabbMin,
+                               const btVector3& aabbMax,
+                               btDispatcher* /*dispatcher*/)
 {
 	btDbvtProxy* proxy = (btDbvtProxy*)absproxy;
 	ATTRIBUTE_ALIGNED16(btDbvtVolume)
@@ -322,16 +322,19 @@ void btDbvtBroadphase::setAabb(btBroadphaseProxy* absproxy,
 	{
 		bool docollide = false;
 		if (proxy->stage == STAGECOUNT)
-		{ /* fixed -> dynamic set	*/
+		{
+			/* fixed -> dynamic set	*/
 			m_sets[1].remove(proxy->leaf);
 			proxy->leaf = m_sets[0].insert(aabb, proxy);
 			docollide = true;
 		}
 		else
-		{ /* dynamic set				*/
+		{
+			/* dynamic set				*/
 			++m_updates_call;
 			if (Intersect(proxy->leaf->volume, aabb))
-			{ /* Moving				*/
+			{
+				/* Moving				*/
 
 				const btVector3 delta = aabbMin - proxy->m_aabbMin;
 				btVector3 velocity(((proxy->m_aabbMax - proxy->m_aabbMin) / 2) * m_prediction);
@@ -339,7 +342,7 @@ void btDbvtBroadphase::setAabb(btBroadphaseProxy* absproxy,
 				if (delta[1] < 0) velocity[1] = -velocity[1];
 				if (delta[2] < 0) velocity[2] = -velocity[2];
 				if (
-					m_sets[0].update(proxy->leaf, aabb, velocity, gDbvtMargin)
+				    m_sets[0].update(proxy->leaf, aabb, velocity, gDbvtMargin)
 
 				)
 				{
@@ -348,7 +351,8 @@ void btDbvtBroadphase::setAabb(btBroadphaseProxy* absproxy,
 				}
 			}
 			else
-			{ /* Teleporting			*/
+			{
+				/* Teleporting			*/
 				m_sets[0].update(proxy->leaf, aabb);
 				++m_updates_done;
 				docollide = true;
@@ -374,22 +378,24 @@ void btDbvtBroadphase::setAabb(btBroadphaseProxy* absproxy,
 
 //
 void btDbvtBroadphase::setAabbForceUpdate(btBroadphaseProxy* absproxy,
-										  const btVector3& aabbMin,
-										  const btVector3& aabbMax,
-										  btDispatcher* /*dispatcher*/)
+        const btVector3& aabbMin,
+        const btVector3& aabbMax,
+        btDispatcher* /*dispatcher*/)
 {
 	btDbvtProxy* proxy = (btDbvtProxy*)absproxy;
 	ATTRIBUTE_ALIGNED16(btDbvtVolume)
 	aabb = btDbvtVolume::FromMM(aabbMin, aabbMax);
 	bool docollide = false;
 	if (proxy->stage == STAGECOUNT)
-	{ /* fixed -> dynamic set	*/
+	{
+		/* fixed -> dynamic set	*/
 		m_sets[1].remove(proxy->leaf);
 		proxy->leaf = m_sets[0].insert(aabb, proxy);
 		docollide = true;
 	}
 	else
-	{ /* dynamic set				*/
+	{
+		/* dynamic set				*/
 		++m_updates_call;
 		/* Teleporting			*/
 		m_sets[0].update(proxy->leaf, aabb);
@@ -428,8 +434,8 @@ void btDbvtBroadphase::calculateOverlappingPairs(btDispatcher* dispatcher)
 		printf("cleanup:   %u%% (%uus)\r\n", (50 + m_profiling.m_cleanup * 100) / total, m_profiling.m_cleanup / DBVT_BP_PROFILING_RATE);
 		printf("total:     %uus\r\n", total / DBVT_BP_PROFILING_RATE);
 		const unsigned long sum = m_profiling.m_ddcollide +
-								  m_profiling.m_fdcollide +
-								  m_profiling.m_cleanup;
+		                          m_profiling.m_fdcollide +
+		                          m_profiling.m_cleanup;
 		printf("leaked: %u%% (%uus)\r\n", 100 - ((50 + sum * 100) / total), (total - sum) / DBVT_BP_PROFILING_RATE);
 		printf("job counts: %u%%\r\n", (m_profiling.m_jobcount * 100) / ((m_sets[0].m_leaves + m_sets[1].m_leaves) * DBVT_BP_PROFILING_RATE));
 		clear(m_profiling);
@@ -524,7 +530,7 @@ void btDbvtBroadphase::collide(btDispatcher* dispatcher)
 		}
 		printf("\n");
 	}
-*/
+	*/
 
 	SPC(m_profiling.m_total);
 	/* optimize				*/
@@ -560,7 +566,8 @@ void btDbvtBroadphase::collide(btDispatcher* dispatcher)
 			current->leaf = m_sets[1].insert(curAabb, current);
 			current->stage = STAGECOUNT;
 			current = next;
-		} while (current);
+		}
+		while (current);
 		m_fixedleft = m_sets[1].m_leaves;
 		m_needcleanup = true;
 	}
@@ -651,7 +658,7 @@ void btDbvtBroadphase::getBroadphaseAabb(btVector3& aabbMin, btVector3& aabbMax)
 	if (!m_sets[0].empty())
 		if (!m_sets[1].empty())
 			Merge(m_sets[0].m_root->volume,
-				  m_sets[1].m_root->volume, bounds);
+			      m_sets[1].m_root->volume, bounds);
 		else
 			bounds = m_sets[0].m_root->volume;
 	else if (!m_sets[1].empty())
@@ -723,15 +730,21 @@ struct btBroadphaseBenchmark
 		{
 			time += speed;
 			center[0] = btCos(time * (btScalar)2.17) * amplitude +
-						btSin(time) * amplitude / 2;
+			            btSin(time) * amplitude / 2;
 			center[1] = btCos(time * (btScalar)1.38) * amplitude +
-						btSin(time) * amplitude;
+			            btSin(time) * amplitude;
 			center[2] = btSin(time * (btScalar)0.777) * amplitude;
 			pbi->setAabb(proxy, center - extents, center + extents, 0);
 		}
 	};
-	static int UnsignedRand(int range = RAND_MAX - 1) { return (rand() % (range + 1)); }
-	static btScalar UnitRand() { return (UnsignedRand(16384) / (btScalar)16384); }
+	static int UnsignedRand(int range = RAND_MAX - 1)
+	{
+		return (rand() % (range + 1));
+	}
+	static btScalar UnitRand()
+	{
+		return (UnsignedRand(16384) / (btScalar)16384);
+	}
 	static void OutputTime(const char* name, btClock& c, unsigned count = 0)
 	{
 		const unsigned long us = c.getTimeMicroseconds();
@@ -747,11 +760,11 @@ struct btBroadphaseBenchmark
 void btDbvtBroadphase::benchmark(btBroadphaseInterface* pbi)
 {
 	static const btBroadphaseBenchmark::Experiment experiments[] =
-		{
-			{"1024o.10%", 1024, 10, 0, 8192, (btScalar)0.005, (btScalar)100},
-			/*{"4096o.10%",4096,10,0,8192,(btScalar)0.005,(btScalar)100},
+	{
+		{"1024o.10%", 1024, 10, 0, 8192, (btScalar)0.005, (btScalar)100},
+		/*{"4096o.10%",4096,10,0,8192,(btScalar)0.005,(btScalar)100},
 		{"8192o.10%",8192,10,0,8192,(btScalar)0.005,(btScalar)100},*/
-		};
+	};
 	static const int nexperiments = sizeof(experiments) / sizeof(experiments[0]);
 	btAlignedObjectArray<btBroadphaseBenchmark::Object*> objects;
 	btClock wallclock;

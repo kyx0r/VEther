@@ -185,11 +185,11 @@ public:
 
 	//! Test limit
 	/*!
-    - free means upper < lower,
-    - locked means upper == lower
-    - limited means upper > lower
-    - limitIndex: first 3 are linear, next 3 are angular
-    */
+	- free means upper < lower,
+	- locked means upper == lower
+	- limited means upper > lower
+	- limitIndex: first 3 are linear, next 3 are angular
+	*/
 	inline bool isLimited(int limitIndex)
 	{
 		return (m_upperLimit[limitIndex] >= m_lowerLimit[limitIndex]);
@@ -202,13 +202,13 @@ public:
 	int testLimitValue(int limitIndex, b3Scalar test_value);
 
 	b3Scalar solveLinearAxis(
-		b3Scalar timeStep,
-		b3Scalar jacDiagABInv,
-		b3RigidBodyData& body1, const b3Vector3& pointInA,
-		b3RigidBodyData& body2, const b3Vector3& pointInB,
-		int limit_index,
-		const b3Vector3& axis_normal_on_a,
-		const b3Vector3& anchorPos);
+	    b3Scalar timeStep,
+	    b3Scalar jacDiagABInv,
+	    b3RigidBodyData& body1, const b3Vector3& pointInA,
+	    b3RigidBodyData& body2, const b3Vector3& pointInB,
+	    int limit_index,
+	    const b3Vector3& axis_normal_on_a,
+	    const b3Vector3& anchorPos);
 };
 
 enum b36DofFlags
@@ -256,7 +256,8 @@ This brings support for limit parameters and motors. </li>
 
 */
 B3_ATTRIBUTE_ALIGNED16(class)
-b3Generic6DofConstraint : public b3TypedConstraint
+b3Generic6DofConstraint :
+public b3TypedConstraint
 {
 protected:
 	//! relative_frames
@@ -336,8 +337,8 @@ public:
 
 	//! Gets the global transform of the offset for body A
 	/*!
-    \sa b3Generic6DofConstraint.getFrameOffsetA, b3Generic6DofConstraint.getFrameOffsetB, b3Generic6DofConstraint.calculateAngleInfo.
-    */
+	\sa b3Generic6DofConstraint.getFrameOffsetA, b3Generic6DofConstraint.getFrameOffsetB, b3Generic6DofConstraint.calculateAngleInfo.
+	*/
 	const b3Transform& getCalculatedTransformA() const
 	{
 		return m_calculatedTransformA;
@@ -345,8 +346,8 @@ public:
 
 	//! Gets the global transform of the offset for body B
 	/*!
-    \sa b3Generic6DofConstraint.getFrameOffsetA, b3Generic6DofConstraint.getFrameOffsetB, b3Generic6DofConstraint.calculateAngleInfo.
-    */
+	\sa b3Generic6DofConstraint.getFrameOffsetA, b3Generic6DofConstraint.getFrameOffsetB, b3Generic6DofConstraint.calculateAngleInfo.
+	*/
 	const b3Transform& getCalculatedTransformB() const
 	{
 		return m_calculatedTransformB;
@@ -481,11 +482,11 @@ public:
 
 	//! Test limit
 	/*!
-    - free means upper < lower,
-    - locked means upper == lower
-    - limited means upper > lower
-    - limitIndex: first 3 are linear, next 3 are angular
-    */
+	- free means upper < lower,
+	- locked means upper == lower
+	- limited means upper > lower
+	- limitIndex: first 3 are linear, next 3 are angular
+	*/
 	bool isLimited(int limitIndex)
 	{
 		if (limitIndex < 3)
@@ -498,12 +499,18 @@ public:
 	virtual void calcAnchorPos(const b3RigidBodyData* bodies);  // overridable
 
 	int get_limit_motor_info2(b3RotationalLimitMotor * limot,
-							  const b3Transform& transA, const b3Transform& transB, const b3Vector3& linVelA, const b3Vector3& linVelB, const b3Vector3& angVelA, const b3Vector3& angVelB,
-							  b3ConstraintInfo2* info, int row, b3Vector3& ax1, int rotational, int rotAllowed = false);
+	                          const b3Transform& transA, const b3Transform& transB, const b3Vector3& linVelA, const b3Vector3& linVelB, const b3Vector3& angVelA, const b3Vector3& angVelB,
+	                          b3ConstraintInfo2* info, int row, b3Vector3& ax1, int rotational, int rotAllowed = false);
 
 	// access for UseFrameOffset
-	bool getUseFrameOffset() { return m_useOffsetForConstraintFrame; }
-	void setUseFrameOffset(bool frameOffsetOnOff) { m_useOffsetForConstraintFrame = frameOffsetOnOff; }
+	bool getUseFrameOffset()
+	{
+		return m_useOffsetForConstraintFrame;
+	}
+	void setUseFrameOffset(bool frameOffsetOnOff)
+	{
+		m_useOffsetForConstraintFrame = frameOffsetOnOff;
+	}
 
 	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5).
 	///If no axis is provided, it uses the default axis for this constraint.

@@ -69,7 +69,7 @@ void b3HashedOverlappingPairCache::cleanProxyFromPairs(int proxy, b3Dispatcher* 
 		virtual bool processOverlap(b3BroadphasePair& pair)
 		{
 			if ((pair.x == m_cleanProxy) ||
-				(pair.y == m_cleanProxy))
+			        (pair.y == m_cleanProxy))
 			{
 				m_pairCache->cleanOverlappingPair(pair, m_dispatcher);
 			}
@@ -96,7 +96,7 @@ void b3HashedOverlappingPairCache::removeOverlappingPairsContainingProxy(int pro
 		virtual bool processOverlap(b3BroadphasePair& pair)
 		{
 			return ((pair.x == m_obsoleteProxy) ||
-					(pair.y == m_obsoleteProxy));
+			        (pair.y == m_obsoleteProxy));
 		}
 	};
 
@@ -113,7 +113,7 @@ b3BroadphasePair* b3HashedOverlappingPairCache::findPair(int proxy0, int proxy1)
 	int proxyId1 = proxy0;
 	int proxyId2 = proxy1;
 
-	/*if (proxyId1 > proxyId2) 
+	/*if (proxyId1 > proxyId2)
 		b3Swap(proxyId1, proxyId2);*/
 
 	int hash = static_cast<int>(getHash(static_cast<unsigned int>(proxyId1), static_cast<unsigned int>(proxyId2)) & (m_overlappingPairArray.capacity() - 1));
@@ -169,7 +169,7 @@ void b3HashedOverlappingPairCache::growTables()
 			const b3BroadphasePair& pair = m_overlappingPairArray[i];
 			int proxyId1 = pair.x;
 			int proxyId2 = pair.y;
-			/*if (proxyId1 > proxyId2) 
+			/*if (proxyId1 > proxyId2)
 				b3Swap(proxyId1, proxyId2);*/
 			int hashValue = static_cast<int>(getHash(static_cast<unsigned int>(proxyId1), static_cast<unsigned int>(proxyId2)) & (m_overlappingPairArray.capacity() - 1));  // New hash value with new mask
 			m_next[i] = m_hashTable[hashValue];
@@ -185,7 +185,7 @@ b3BroadphasePair* b3HashedOverlappingPairCache::internalAddPair(int proxy0, int 
 	int proxyId1 = proxy0;
 	int proxyId2 = proxy1;
 
-	/*if (proxyId1 > proxyId2) 
+	/*if (proxyId1 > proxyId2)
 		b3Swap(proxyId1, proxyId2);*/
 
 	int hash = static_cast<int>(getHash(static_cast<unsigned int>(proxyId1), static_cast<unsigned int>(proxyId2)) & (m_overlappingPairArray.capacity() - 1));  // New hash value with new mask
@@ -242,7 +242,7 @@ void* b3HashedOverlappingPairCache::removeOverlappingPair(int proxy0, int proxy1
 	int proxyId1 = proxy0;
 	int proxyId2 = proxy1;
 
-	/*if (proxyId1 > proxyId2) 
+	/*if (proxyId1 > proxyId2)
 		b3Swap(proxyId1, proxyId2);*/
 
 	int hash = static_cast<int>(getHash(static_cast<unsigned int>(proxyId1), static_cast<unsigned int>(proxyId2)) & (m_overlappingPairArray.capacity() - 1));
@@ -473,8 +473,8 @@ void b3SortedOverlappingPairCache::processAllOverlappingPairs(b3OverlapCallback*
 }
 
 b3SortedOverlappingPairCache::b3SortedOverlappingPairCache() : m_blockedForChanges(false),
-															   m_hasDeferredRemoval(true),
-															   m_overlapFilterCallback(0)
+	m_hasDeferredRemoval(true),
+	m_overlapFilterCallback(0)
 
 {
 	int initialAllocatedSize = 2;
@@ -517,7 +517,7 @@ void b3SortedOverlappingPairCache::cleanProxyFromPairs(int proxy, b3Dispatcher* 
 		virtual bool processOverlap(b3BroadphasePair& pair)
 		{
 			if ((pair.x == m_cleanProxy) ||
-				(pair.y == m_cleanProxy))
+			        (pair.y == m_cleanProxy))
 			{
 				m_pairCache->cleanOverlappingPair(pair, m_dispatcher);
 			}
@@ -544,7 +544,7 @@ void b3SortedOverlappingPairCache::removeOverlappingPairsContainingProxy(int pro
 		virtual bool processOverlap(b3BroadphasePair& pair)
 		{
 			return ((pair.x == m_obsoleteProxy) ||
-					(pair.y == m_obsoleteProxy));
+			        (pair.y == m_obsoleteProxy));
 		}
 	};
 

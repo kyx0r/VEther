@@ -50,7 +50,7 @@ void btMultiBodyJointMotor::finalizeMultiDof()
 }
 
 btMultiBodyJointMotor::btMultiBodyJointMotor(btMultiBody* body, int link, int linkDoF, btScalar desiredVelocity, btScalar maxMotorImpulse)
-	//:btMultiBodyConstraint(body,0,link,-1,1,true),
+//:btMultiBodyConstraint(body,0,link,-1,1,true),
 	: btMultiBodyConstraint(body, body, link, body->getLink(link).m_parent, 1, true),
 	  m_desiredVelocity(desiredVelocity),
 	  m_desiredPosition(0),
@@ -104,8 +104,8 @@ int btMultiBodyJointMotor::getIslandIdB() const
 }
 
 void btMultiBodyJointMotor::createConstraintRows(btMultiBodyConstraintArray& constraintRows,
-												 btMultiBodyJacobianData& data,
-												 const btContactSolverInfo& infoGlobal)
+        btMultiBodyJacobianData& data,
+        const btContactSolverInfo& infoGlobal)
 {
 	// only positions need to be updated -- data.m_jacobians and force
 	// directions were set in the ctor and never change.
@@ -153,30 +153,30 @@ void btMultiBodyJointMotor::createConstraintRows(btMultiBodyConstraintArray& con
 			btAssert((m_bodyA->getLink(m_linkA).m_jointType == btMultibodyLink::eRevolute) || (m_bodyA->getLink(m_linkA).m_jointType == btMultibodyLink::ePrismatic));
 			switch (m_bodyA->getLink(m_linkA).m_jointType)
 			{
-				case btMultibodyLink::eRevolute:
-				{
-					constraintRow.m_contactNormal1.setZero();
-					constraintRow.m_contactNormal2.setZero();
-					btVector3 revoluteAxisInWorld = quatRotate(m_bodyA->getLink(m_linkA).m_cachedWorldTransform.getRotation(), m_bodyA->getLink(m_linkA).m_axes[0].m_topVec);
-					constraintRow.m_relpos1CrossNormal = revoluteAxisInWorld;
-					constraintRow.m_relpos2CrossNormal = -revoluteAxisInWorld;
+			case btMultibodyLink::eRevolute:
+			{
+				constraintRow.m_contactNormal1.setZero();
+				constraintRow.m_contactNormal2.setZero();
+				btVector3 revoluteAxisInWorld = quatRotate(m_bodyA->getLink(m_linkA).m_cachedWorldTransform.getRotation(), m_bodyA->getLink(m_linkA).m_axes[0].m_topVec);
+				constraintRow.m_relpos1CrossNormal = revoluteAxisInWorld;
+				constraintRow.m_relpos2CrossNormal = -revoluteAxisInWorld;
 
-					break;
-				}
-				case btMultibodyLink::ePrismatic:
-				{
-					btVector3 prismaticAxisInWorld = quatRotate(m_bodyA->getLink(m_linkA).m_cachedWorldTransform.getRotation(), m_bodyA->getLink(m_linkA).m_axes[0].m_bottomVec);
-					constraintRow.m_contactNormal1 = prismaticAxisInWorld;
-					constraintRow.m_contactNormal2 = -prismaticAxisInWorld;
-					constraintRow.m_relpos1CrossNormal.setZero();
-					constraintRow.m_relpos2CrossNormal.setZero();
+				break;
+			}
+			case btMultibodyLink::ePrismatic:
+			{
+				btVector3 prismaticAxisInWorld = quatRotate(m_bodyA->getLink(m_linkA).m_cachedWorldTransform.getRotation(), m_bodyA->getLink(m_linkA).m_axes[0].m_bottomVec);
+				constraintRow.m_contactNormal1 = prismaticAxisInWorld;
+				constraintRow.m_contactNormal2 = -prismaticAxisInWorld;
+				constraintRow.m_relpos1CrossNormal.setZero();
+				constraintRow.m_relpos2CrossNormal.setZero();
 
-					break;
-				}
-				default:
-				{
-					btAssert(0);
-				}
+				break;
+			}
+			default:
+			{
+				btAssert(0);
+			}
 			};
 		}
 	}

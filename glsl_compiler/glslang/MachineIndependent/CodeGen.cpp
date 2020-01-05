@@ -39,12 +39,13 @@
 //
 // Here is where real machine specific high-level data would be defined.
 //
-class TGenericCompiler : public TCompiler {
+class TGenericCompiler : public TCompiler
+{
 public:
-    TGenericCompiler(EShLanguage l, int dOptions) : TCompiler(l, infoSink), debugOptions(dOptions) { }
-    virtual bool compile(TIntermNode* root, int version = 0, EProfile profile = ENoProfile);
-    TInfoSink infoSink;
-    int debugOptions;
+	TGenericCompiler(EShLanguage l, int dOptions) : TCompiler(l, infoSink), debugOptions(dOptions) { }
+	virtual bool compile(TIntermNode* root, int version = 0, EProfile profile = ENoProfile);
+	TInfoSink infoSink;
+	int debugOptions;
 };
 
 //
@@ -54,7 +55,7 @@ public:
 //
 TCompiler* ConstructCompiler(EShLanguage language, int debugOptions)
 {
-    return new TGenericCompiler(language, debugOptions);
+	return new TGenericCompiler(language, debugOptions);
 }
 
 //
@@ -62,7 +63,7 @@ TCompiler* ConstructCompiler(EShLanguage language, int debugOptions)
 //
 void DeleteCompiler(TCompiler* compiler)
 {
-    delete compiler;
+	delete compiler;
 }
 
 //
@@ -70,7 +71,7 @@ void DeleteCompiler(TCompiler* compiler)
 //
 bool TGenericCompiler::compile(TIntermNode* /*root*/, int /*version*/, EProfile /*profile*/)
 {
-    haveValidObjectCode = true;
+	haveValidObjectCode = true;
 
-    return haveValidObjectCode;
+	return haveValidObjectCode;
 }

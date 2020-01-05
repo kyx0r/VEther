@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -39,15 +39,15 @@ void btPoint2PointConstraint::buildJacobian()
 		{
 			normal[i] = 1;
 			new (&m_jac[i]) btJacobianEntry(
-				m_rbA.getCenterOfMassTransform().getBasis().transpose(),
-				m_rbB.getCenterOfMassTransform().getBasis().transpose(),
-				m_rbA.getCenterOfMassTransform() * m_pivotInA - m_rbA.getCenterOfMassPosition(),
-				m_rbB.getCenterOfMassTransform() * m_pivotInB - m_rbB.getCenterOfMassPosition(),
-				normal,
-				m_rbA.getInvInertiaDiagLocal(),
-				m_rbA.getInvMass(),
-				m_rbB.getInvInertiaDiagLocal(),
-				m_rbB.getInvMass());
+			    m_rbA.getCenterOfMassTransform().getBasis().transpose(),
+			    m_rbB.getCenterOfMassTransform().getBasis().transpose(),
+			    m_rbA.getCenterOfMassTransform() * m_pivotInA - m_rbA.getCenterOfMassPosition(),
+			    m_rbB.getCenterOfMassTransform() * m_pivotInB - m_rbB.getCenterOfMassPosition(),
+			    normal,
+			    m_rbA.getInvInertiaDiagLocal(),
+			    m_rbA.getInvMass(),
+			    m_rbB.getInvInertiaDiagLocal(),
+			    m_rbB.getInvMass());
 			normal[i] = 0;
 		}
 	}
@@ -159,18 +159,18 @@ void btPoint2PointConstraint::setParam(int num, btScalar value, int axis)
 	{
 		switch (num)
 		{
-			case BT_CONSTRAINT_ERP:
-			case BT_CONSTRAINT_STOP_ERP:
-				m_erp = value;
-				m_flags |= BT_P2P_FLAGS_ERP;
-				break;
-			case BT_CONSTRAINT_CFM:
-			case BT_CONSTRAINT_STOP_CFM:
-				m_cfm = value;
-				m_flags |= BT_P2P_FLAGS_CFM;
-				break;
-			default:
-				btAssertConstrParams(0);
+		case BT_CONSTRAINT_ERP:
+		case BT_CONSTRAINT_STOP_ERP:
+			m_erp = value;
+			m_flags |= BT_P2P_FLAGS_ERP;
+			break;
+		case BT_CONSTRAINT_CFM:
+		case BT_CONSTRAINT_STOP_CFM:
+			m_cfm = value;
+			m_flags |= BT_P2P_FLAGS_CFM;
+			break;
+		default:
+			btAssertConstrParams(0);
 		}
 	}
 }
@@ -187,18 +187,18 @@ btScalar btPoint2PointConstraint::getParam(int num, int axis) const
 	{
 		switch (num)
 		{
-			case BT_CONSTRAINT_ERP:
-			case BT_CONSTRAINT_STOP_ERP:
-				btAssertConstrParams(m_flags & BT_P2P_FLAGS_ERP);
-				retVal = m_erp;
-				break;
-			case BT_CONSTRAINT_CFM:
-			case BT_CONSTRAINT_STOP_CFM:
-				btAssertConstrParams(m_flags & BT_P2P_FLAGS_CFM);
-				retVal = m_cfm;
-				break;
-			default:
-				btAssertConstrParams(0);
+		case BT_CONSTRAINT_ERP:
+		case BT_CONSTRAINT_STOP_ERP:
+			btAssertConstrParams(m_flags & BT_P2P_FLAGS_ERP);
+			retVal = m_erp;
+			break;
+		case BT_CONSTRAINT_CFM:
+		case BT_CONSTRAINT_STOP_CFM:
+			btAssertConstrParams(m_flags & BT_P2P_FLAGS_CFM);
+			retVal = m_cfm;
+			break;
+		default:
+			btAssertConstrParams(0);
 		}
 	}
 	return retVal;

@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -144,7 +144,7 @@ btScalar btConvex2dConvex2dAlgorithm::calculateTimeOfImpact(btCollisionObject* c
 	btScalar squareMot1 = (col1->getInterpolationWorldTransform().getOrigin() - col1->getWorldTransform().getOrigin()).length2();
 
 	if (squareMot0 < col0->getCcdSquareMotionThreshold() &&
-		squareMot1 < col1->getCcdSquareMotionThreshold())
+	        squareMot1 < col1->getCcdSquareMotionThreshold())
 		return resultFraction;
 
 	//An adhoc way of testing the Continuous Collision Detection algorithms
@@ -165,7 +165,7 @@ btScalar btConvex2dConvex2dAlgorithm::calculateTimeOfImpact(btCollisionObject* c
 		btGjkConvexCast ccd1(convex0, &sphere1, &voronoiSimplex);
 		//ContinuousConvexCollision ccd(min0,min1,&voronoiSimplex,0);
 		if (ccd1.calcTimeOfImpact(col0->getWorldTransform(), col0->getInterpolationWorldTransform(),
-								  col1->getWorldTransform(), col1->getInterpolationWorldTransform(), result))
+		                          col1->getWorldTransform(), col1->getInterpolationWorldTransform(), result))
 		{
 			//store result.m_fraction in both bodies
 
@@ -192,7 +192,7 @@ btScalar btConvex2dConvex2dAlgorithm::calculateTimeOfImpact(btCollisionObject* c
 		btGjkConvexCast ccd1(&sphere0, convex1, &voronoiSimplex);
 		//ContinuousConvexCollision ccd(min0,min1,&voronoiSimplex,0);
 		if (ccd1.calcTimeOfImpact(col0->getWorldTransform(), col0->getInterpolationWorldTransform(),
-								  col1->getWorldTransform(), col1->getInterpolationWorldTransform(), result))
+		                          col1->getWorldTransform(), col1->getInterpolationWorldTransform(), result))
 		{
 			//store result.m_fraction in both bodies
 

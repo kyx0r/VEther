@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -42,9 +42,9 @@ btCompoundShapeChild
 SIMD_FORCE_INLINE bool operator==(const btCompoundShapeChild& c1, const btCompoundShapeChild& c2)
 {
 	return (c1.m_transform == c2.m_transform &&
-			c1.m_childShape == c2.m_childShape &&
-			c1.m_childShapeType == c2.m_childShapeType &&
-			c1.m_childMargin == c2.m_childMargin);
+	        c1.m_childShape == c2.m_childShape &&
+	        c1.m_childShapeType == c2.m_childShapeType &&
+	        c1.m_childMargin == c2.m_childMargin);
 }
 
 /// The btCompoundShape allows to store multiple other btCollisionShapes
@@ -53,7 +53,8 @@ SIMD_FORCE_INLINE bool operator==(const btCompoundShapeChild& c1, const btCompou
 /// @todo: This aabb tree can also be use to speed up ray tests on btCompoundShape, see http://code.google.com/p/bullet/issues/detail?id=25
 /// Currently, removal of child shapes is only supported when disabling the aabb tree (pass 'false' in the constructor of btCompoundShape)
 ATTRIBUTE_ALIGNED16(class)
-btCompoundShape : public btCollisionShape
+btCompoundShape :
+public btCollisionShape
 {
 protected:
 	btAlignedObjectArray<btCompoundShapeChild> m_children;
@@ -117,7 +118,7 @@ public:
 	///getAabb's default implementation is brute force, expected derived classes to implement a fast dedicated version
 	virtual void getAabb(const btTransform& t, btVector3& aabbMin, btVector3& aabbMax) const;
 
-	/** Re-calculate the local Aabb. Is called at the end of removeChildShapes. 
+	/** Re-calculate the local Aabb. Is called at the end of removeChildShapes.
 	Use this yourself if you modify the children or their transforms. */
 	virtual void recalculateLocalAabb();
 

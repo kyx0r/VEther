@@ -54,7 +54,8 @@ subject to the following restrictions:
 ///  The task scheduler can and should ensure that the result of any parallelSum operation is deterministic.
 ///
 ATTRIBUTE_ALIGNED16(class)
-btSequentialImpulseConstraintSolverMt : public btSequentialImpulseConstraintSolver
+btSequentialImpulseConstraintSolverMt :
+public btSequentialImpulseConstraintSolver
 {
 public:
 	virtual void solveGroupCacheFriendlySplitImpulseIterations(btCollisionObject * *bodies, int numBodies, btPersistentManifold** manifoldPtr, int numManifolds, btTypedConstraint** constraints, int numConstraints, const btContactSolverInfo& infoGlobal, btIDebugDraw* debugDrawer) BT_OVERRIDE;

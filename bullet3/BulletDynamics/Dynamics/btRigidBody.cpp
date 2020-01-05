@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -49,7 +49,7 @@ void btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 	m_gravity_acceleration.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_totalForce.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	m_totalTorque.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0)),
-		setDamping(constructionInfo.m_linearDamping, constructionInfo.m_angularDamping);
+	                       setDamping(constructionInfo.m_linearDamping, constructionInfo.m_angularDamping);
 
 	m_linearSleepingThreshold = constructionInfo.m_linearSleepingThreshold;
 	m_angularSleepingThreshold = constructionInfo.m_angularSleepingThreshold;
@@ -160,7 +160,7 @@ void btRigidBody::applyDamping(btScalar timeStep)
 		//Additional damping can help avoiding lowpass jitter motion, help stability for ragdolls etc.
 		//Such damping is undesirable, so once the overall simulation quality of the rigid body dynamics system has improved, this should become obsolete
 		if ((m_angularVelocity.length2() < m_additionalAngularDampingThresholdSqr) &&
-			(m_linearVelocity.length2() < m_additionalLinearDampingThresholdSqr))
+		        (m_linearVelocity.length2() < m_additionalLinearDampingThresholdSqr))
 		{
 			m_angularVelocity *= m_additionalDampingFactor;
 			m_linearVelocity *= m_additionalDampingFactor;
@@ -208,10 +208,10 @@ void btRigidBody::applyGravity()
 
 void btRigidBody::clearGravity()
 {
-    if (isStaticOrKinematicObject())
-        return;
-    
-    applyCentralForce(-m_gravity);
+	if (isStaticOrKinematicObject())
+		return;
+
+	applyCentralForce(-m_gravity);
 }
 
 void btRigidBody::proceedToTransform(const btTransform& newTrans)
@@ -236,8 +236,8 @@ void btRigidBody::setMassProps(btScalar mass, const btVector3& inertia)
 	m_gravity = mass * m_gravity_acceleration;
 
 	m_invInertiaLocal.setValue(inertia.x() != btScalar(0.0) ? btScalar(1.0) / inertia.x() : btScalar(0.0),
-							   inertia.y() != btScalar(0.0) ? btScalar(1.0) / inertia.y() : btScalar(0.0),
-							   inertia.z() != btScalar(0.0) ? btScalar(1.0) / inertia.z() : btScalar(0.0));
+	                           inertia.y() != btScalar(0.0) ? btScalar(1.0) / inertia.y() : btScalar(0.0),
+	                           inertia.z() != btScalar(0.0) ? btScalar(1.0) / inertia.z() : btScalar(0.0));
 
 	m_invMass = m_linearFactor * m_inverseMass;
 }
@@ -252,20 +252,20 @@ btVector3 btRigidBody::getLocalInertia() const
 	btVector3 inertiaLocal;
 	const btVector3 inertia = m_invInertiaLocal;
 	inertiaLocal.setValue(inertia.x() != btScalar(0.0) ? btScalar(1.0) / inertia.x() : btScalar(0.0),
-						  inertia.y() != btScalar(0.0) ? btScalar(1.0) / inertia.y() : btScalar(0.0),
-						  inertia.z() != btScalar(0.0) ? btScalar(1.0) / inertia.z() : btScalar(0.0));
+	                      inertia.y() != btScalar(0.0) ? btScalar(1.0) / inertia.y() : btScalar(0.0),
+	                      inertia.z() != btScalar(0.0) ? btScalar(1.0) / inertia.z() : btScalar(0.0));
 	return inertiaLocal;
 }
 
 inline btVector3 evalEulerEqn(const btVector3& w1, const btVector3& w0, const btVector3& T, const btScalar dt,
-							  const btMatrix3x3& I)
+                              const btMatrix3x3& I)
 {
 	const btVector3 w2 = I * w1 + w1.cross(I * w1) * dt - (T * dt + I * w0);
 	return w2;
 }
 
 inline btMatrix3x3 evalEulerEqnDeriv(const btVector3& w1, const btVector3& w0, const btScalar dt,
-									 const btMatrix3x3& I)
+                                     const btMatrix3x3& I)
 {
 	btMatrix3x3 w1x, Iw1x;
 	const btVector3 Iwi = (I * w1);
@@ -300,8 +300,8 @@ btVector3 btRigidBody::computeGyroscopicImpulseImplicit_Body(btScalar step) cons
 	btVector3 omegab = quatRotate(q.inverse(), omega1);
 	btMatrix3x3 Ib;
 	Ib.setValue(idl.x(), 0, 0,
-				0, idl.y(), 0,
-				0, 0, idl.z());
+	            0, idl.y(), 0,
+	            0, 0, idl.z());
 
 	btVector3 ibo = Ib * omegab;
 
@@ -340,7 +340,7 @@ btVector3 btRigidBody::computeGyroscopicImpulseImplicit_World(btScalar step) con
 	btMatrix3x3 I;
 
 	I = m_worldTransform.getBasis().scaled(inertiaLocal) *
-		m_worldTransform.getBasis().transpose();
+	    m_worldTransform.getBasis().transpose();
 
 	// use newtons method to find implicit solution for new angular velocity (w')
 	// f(w') = -(T*step + Iw) + Iw' + w' + w'xIw'*step = 0

@@ -139,10 +139,10 @@ unsigned long long int btClock::getTimeMilliseconds()
 	LARGE_INTEGER currentTime;
 	QueryPerformanceCounter(&currentTime);
 	LONGLONG elapsedTime = currentTime.QuadPart -
-						   m_data->mStartTime.QuadPart;
+	                       m_data->mStartTime.QuadPart;
 	// Compute the number of millisecond ticks elapsed.
 	unsigned long msecTicks = (unsigned long)(1000 * elapsedTime /
-											  m_data->mClockFrequency.QuadPart);
+	                          m_data->mClockFrequency.QuadPart);
 
 	return msecTicks;
 #else
@@ -161,7 +161,7 @@ unsigned long long int btClock::getTimeMilliseconds()
 	struct timeval currentTime;
 	gettimeofday(&currentTime, 0);
 	return (currentTime.tv_sec - m_data->mStartTime.tv_sec) * 1000 +
-		   (currentTime.tv_usec - m_data->mStartTime.tv_usec) / 1000;
+	       (currentTime.tv_usec - m_data->mStartTime.tv_usec) / 1000;
 #endif  //__CELLOS_LV2__
 #endif
 }
@@ -176,7 +176,7 @@ unsigned long long int btClock::getTimeMicroseconds()
 
 	QueryPerformanceCounter(&currentTime);
 	elapsedTime.QuadPart = currentTime.QuadPart -
-						   m_data->mStartTime.QuadPart;
+	                       m_data->mStartTime.QuadPart;
 	elapsedTime.QuadPart *= 1000000;
 	elapsedTime.QuadPart /= m_data->mClockFrequency.QuadPart;
 
@@ -197,7 +197,7 @@ unsigned long long int btClock::getTimeMicroseconds()
 	struct timeval currentTime;
 	gettimeofday(&currentTime, 0);
 	return (currentTime.tv_sec - m_data->mStartTime.tv_sec) * 1000000 +
-		   (currentTime.tv_usec - m_data->mStartTime.tv_usec);
+	       (currentTime.tv_usec - m_data->mStartTime.tv_usec);
 #endif  //__CELLOS_LV2__
 #endif
 }
@@ -210,7 +210,7 @@ unsigned long long int btClock::getTimeNanoseconds()
 
 	QueryPerformanceCounter(&currentTime);
 	elapsedTime.QuadPart = currentTime.QuadPart -
-						   m_data->mStartTime.QuadPart;
+	                       m_data->mStartTime.QuadPart;
 	elapsedTime.QuadPart *= 1000000000;
 	elapsedTime.QuadPart /= m_data->mClockFrequency.QuadPart;
 
@@ -254,7 +254,7 @@ unsigned long long int btClock::getTimeNanoseconds()
 	struct timeval currentTime;
 	gettimeofday(&currentTime, 0);
 	return (currentTime.tv_sec - m_data->mStartTime.tv_sec) * 1e9 +
-		   (currentTime.tv_usec - m_data->mStartTime.tv_usec) * 1000;
+	       (currentTime.tv_usec - m_data->mStartTime.tv_usec) * 1000;
 #endif  //BT_LINUX_REALTIME
 
 #endif  //__APPLE__
@@ -301,14 +301,14 @@ inline float Profile_Get_Tick_Rate(void)
  * efficiency reasons.                                                                         *
  *=============================================================================================*/
 CProfileNode::CProfileNode(const char* name, CProfileNode* parent) : Name(name),
-																	 TotalCalls(0),
-																	 TotalTime(0),
-																	 StartTime(0),
-																	 RecursionCounter(0),
-																	 Parent(parent),
-																	 Child(NULL),
-																	 Sibling(NULL),
-																	 m_userPtr(0)
+	TotalCalls(0),
+	TotalTime(0),
+	StartTime(0),
+	RecursionCounter(0),
+	Parent(parent),
+	Child(NULL),
+	Sibling(NULL),
+	m_userPtr(0)
 {
 	Reset();
 }
@@ -449,7 +449,8 @@ void CProfileIterator::Enter_Parent(void)
 **
 ***************************************************************************************************/
 
-CProfileNode gRoots[BT_QUICKPROF_MAX_THREAD_COUNT] = {
+CProfileNode gRoots[BT_QUICKPROF_MAX_THREAD_COUNT] =
+{
 	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL),
 	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL),
 	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL),
@@ -465,74 +466,75 @@ CProfileNode gRoots[BT_QUICKPROF_MAX_THREAD_COUNT] = {
 	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL),
 	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL),
 	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL),
-	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL)};
+	CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL), CProfileNode("Root", NULL)
+};
 
 CProfileNode* gCurrentNodes[BT_QUICKPROF_MAX_THREAD_COUNT] =
-	{
-		&gRoots[0],
-		&gRoots[1],
-		&gRoots[2],
-		&gRoots[3],
-		&gRoots[4],
-		&gRoots[5],
-		&gRoots[6],
-		&gRoots[7],
-		&gRoots[8],
-		&gRoots[9],
-		&gRoots[10],
-		&gRoots[11],
-		&gRoots[12],
-		&gRoots[13],
-		&gRoots[14],
-		&gRoots[15],
-		&gRoots[16],
-		&gRoots[17],
-		&gRoots[18],
-		&gRoots[19],
-		&gRoots[20],
-		&gRoots[21],
-		&gRoots[22],
-		&gRoots[23],
-		&gRoots[24],
-		&gRoots[25],
-		&gRoots[26],
-		&gRoots[27],
-		&gRoots[28],
-		&gRoots[29],
-		&gRoots[30],
-		&gRoots[31],
-		&gRoots[32],
-		&gRoots[33],
-		&gRoots[34],
-		&gRoots[35],
-		&gRoots[36],
-		&gRoots[37],
-		&gRoots[38],
-		&gRoots[39],
-		&gRoots[40],
-		&gRoots[41],
-		&gRoots[42],
-		&gRoots[43],
-		&gRoots[44],
-		&gRoots[45],
-		&gRoots[46],
-		&gRoots[47],
-		&gRoots[48],
-		&gRoots[49],
-		&gRoots[50],
-		&gRoots[51],
-		&gRoots[52],
-		&gRoots[53],
-		&gRoots[54],
-		&gRoots[55],
-		&gRoots[56],
-		&gRoots[57],
-		&gRoots[58],
-		&gRoots[59],
-		&gRoots[60],
-		&gRoots[61],
-		&gRoots[62],
-		&gRoots[63],
+{
+	&gRoots[0],
+	&gRoots[1],
+	&gRoots[2],
+	&gRoots[3],
+	&gRoots[4],
+	&gRoots[5],
+	&gRoots[6],
+	&gRoots[7],
+	&gRoots[8],
+	&gRoots[9],
+	&gRoots[10],
+	&gRoots[11],
+	&gRoots[12],
+	&gRoots[13],
+	&gRoots[14],
+	&gRoots[15],
+	&gRoots[16],
+	&gRoots[17],
+	&gRoots[18],
+	&gRoots[19],
+	&gRoots[20],
+	&gRoots[21],
+	&gRoots[22],
+	&gRoots[23],
+	&gRoots[24],
+	&gRoots[25],
+	&gRoots[26],
+	&gRoots[27],
+	&gRoots[28],
+	&gRoots[29],
+	&gRoots[30],
+	&gRoots[31],
+	&gRoots[32],
+	&gRoots[33],
+	&gRoots[34],
+	&gRoots[35],
+	&gRoots[36],
+	&gRoots[37],
+	&gRoots[38],
+	&gRoots[39],
+	&gRoots[40],
+	&gRoots[41],
+	&gRoots[42],
+	&gRoots[43],
+	&gRoots[44],
+	&gRoots[45],
+	&gRoots[46],
+	&gRoots[47],
+	&gRoots[48],
+	&gRoots[49],
+	&gRoots[50],
+	&gRoots[51],
+	&gRoots[52],
+	&gRoots[53],
+	&gRoots[54],
+	&gRoots[55],
+	&gRoots[56],
+	&gRoots[57],
+	&gRoots[58],
+	&gRoots[59],
+	&gRoots[60],
+	&gRoots[61],
+	&gRoots[62],
+	&gRoots[63],
 };
 
 int CProfileManager::FrameCounter = 0;
@@ -714,24 +716,24 @@ void btLeaveProfileZoneDefault()
 
 // clang-format off
 #if defined(_WIN32) && (defined(__MINGW32__) || defined(__MINGW64__))
-  #define BT_HAVE_TLS 1
+#define BT_HAVE_TLS 1
 #elif __APPLE__ && !TARGET_OS_IPHONE
-  // TODO: Modern versions of iOS support TLS now with updated version checking.
-  #define BT_HAVE_TLS 1
+// TODO: Modern versions of iOS support TLS now with updated version checking.
+#define BT_HAVE_TLS 1
 #elif __linux__
-  #define BT_HAVE_TLS 1
+#define BT_HAVE_TLS 1
 #endif
 
 // __thread is broken on Andorid clang until r12b. See
 // https://github.com/android-ndk/ndk/issues/8
 #if defined(__ANDROID__) && defined(__clang__)
-  #if __has_include(<android/ndk-version.h>)
-    #include <android/ndk-version.h>
-  #endif  // __has_include(<android/ndk-version.h>)
-  #if defined(__NDK_MAJOR__) && \
+#if __has_include(<android/ndk-version.h>)
+#include <android/ndk-version.h>
+#endif  // __has_include(<android/ndk-version.h>)
+#if defined(__NDK_MAJOR__) && \
     ((__NDK_MAJOR__ < 12) || ((__NDK_MAJOR__ == 12) && (__NDK_MINOR__ < 1)))
-    #undef BT_HAVE_TLS
-  #endif
+#undef BT_HAVE_TLS
+#endif
 #endif  // defined(__ANDROID__) && defined(__clang__)
 // clang-format on
 

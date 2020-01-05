@@ -271,26 +271,26 @@ void btGeneric6DofSpring2Constraint::calculateAngleInfo()
 	btMatrix3x3 relative_frame = m_calculatedTransformA.getBasis().inverse() * m_calculatedTransformB.getBasis();
 	switch (m_rotateOrder)
 	{
-		case RO_XYZ:
-			matrixToEulerXYZ(relative_frame, m_calculatedAxisAngleDiff);
-			break;
-		case RO_XZY:
-			matrixToEulerXZY(relative_frame, m_calculatedAxisAngleDiff);
-			break;
-		case RO_YXZ:
-			matrixToEulerYXZ(relative_frame, m_calculatedAxisAngleDiff);
-			break;
-		case RO_YZX:
-			matrixToEulerYZX(relative_frame, m_calculatedAxisAngleDiff);
-			break;
-		case RO_ZXY:
-			matrixToEulerZXY(relative_frame, m_calculatedAxisAngleDiff);
-			break;
-		case RO_ZYX:
-			matrixToEulerZYX(relative_frame, m_calculatedAxisAngleDiff);
-			break;
-		default:
-			btAssert(false);
+	case RO_XYZ:
+		matrixToEulerXYZ(relative_frame, m_calculatedAxisAngleDiff);
+		break;
+	case RO_XZY:
+		matrixToEulerXZY(relative_frame, m_calculatedAxisAngleDiff);
+		break;
+	case RO_YXZ:
+		matrixToEulerYXZ(relative_frame, m_calculatedAxisAngleDiff);
+		break;
+	case RO_YZX:
+		matrixToEulerYZX(relative_frame, m_calculatedAxisAngleDiff);
+		break;
+	case RO_ZXY:
+		matrixToEulerZXY(relative_frame, m_calculatedAxisAngleDiff);
+		break;
+	case RO_ZYX:
+		matrixToEulerZYX(relative_frame, m_calculatedAxisAngleDiff);
+		break;
+	default:
+		btAssert(false);
 	}
 	// in euler angle mode we do not actually constrain the angular velocity
 	// along the axes axis[0] and axis[2] (although we do use axis[1]) :
@@ -308,99 +308,99 @@ void btGeneric6DofSpring2Constraint::calculateAngleInfo()
 	// to the components of w and set that to 0.
 	switch (m_rotateOrder)
 	{
-		case RO_XYZ:
-		{
-			//Is this the "line of nodes" calculation choosing planes YZ (B coordinate system) and xy (A coordinate system)? (http://en.wikipedia.org/wiki/Euler_angles)
-			//The two planes are non-homologous, so this is a Tait Bryan angle formalism and not a proper Euler
-			//Extrinsic rotations are equal to the reversed order intrinsic rotations so the above xyz extrinsic rotations (axes are fixed) are the same as the zy'x" intrinsic rotations (axes are refreshed after each rotation)
-			//that is why xy and YZ planes are chosen (this will describe a zy'x" intrinsic rotation) (see the figure on the left at http://en.wikipedia.org/wiki/Euler_angles under Tait Bryan angles)
-			// x' = Nperp = N.cross(axis2)
-			// y' = N = axis2.cross(axis0)
-			// z' = z
-			//
-			// x" = X
-			// y" = y'
-			// z" = ??
-			//in other words:
-			//first rotate around z
-			//second rotate around y'= z.cross(X)
-			//third rotate around x" = X
-			//Original XYZ extrinsic rotation order.
-			//Planes: xy and YZ normals: z, X.  Plane intersection (N) is z.cross(X)
-			btVector3 axis0 = m_calculatedTransformB.getBasis().getColumn(0);
-			btVector3 axis2 = m_calculatedTransformA.getBasis().getColumn(2);
-			m_calculatedAxis[1] = axis2.cross(axis0);
-			m_calculatedAxis[0] = m_calculatedAxis[1].cross(axis2);
-			m_calculatedAxis[2] = axis0.cross(m_calculatedAxis[1]);
-			break;
-		}
-		case RO_XZY:
-		{
-			//planes: xz,ZY normals: y, X
-			//first rotate around y
-			//second rotate around z'= y.cross(X)
-			//third rotate around x" = X
-			btVector3 axis0 = m_calculatedTransformB.getBasis().getColumn(0);
-			btVector3 axis1 = m_calculatedTransformA.getBasis().getColumn(1);
-			m_calculatedAxis[2] = axis0.cross(axis1);
-			m_calculatedAxis[0] = axis1.cross(m_calculatedAxis[2]);
-			m_calculatedAxis[1] = m_calculatedAxis[2].cross(axis0);
-			break;
-		}
-		case RO_YXZ:
-		{
-			//planes: yx,XZ normals: z, Y
-			//first rotate around z
-			//second rotate around x'= z.cross(Y)
-			//third rotate around y" = Y
-			btVector3 axis1 = m_calculatedTransformB.getBasis().getColumn(1);
-			btVector3 axis2 = m_calculatedTransformA.getBasis().getColumn(2);
-			m_calculatedAxis[0] = axis1.cross(axis2);
-			m_calculatedAxis[1] = axis2.cross(m_calculatedAxis[0]);
-			m_calculatedAxis[2] = m_calculatedAxis[0].cross(axis1);
-			break;
-		}
-		case RO_YZX:
-		{
-			//planes: yz,ZX normals: x, Y
-			//first rotate around x
-			//second rotate around z'= x.cross(Y)
-			//third rotate around y" = Y
-			btVector3 axis0 = m_calculatedTransformA.getBasis().getColumn(0);
-			btVector3 axis1 = m_calculatedTransformB.getBasis().getColumn(1);
-			m_calculatedAxis[2] = axis0.cross(axis1);
-			m_calculatedAxis[0] = axis1.cross(m_calculatedAxis[2]);
-			m_calculatedAxis[1] = m_calculatedAxis[2].cross(axis0);
-			break;
-		}
-		case RO_ZXY:
-		{
-			//planes: zx,XY normals: y, Z
-			//first rotate around y
-			//second rotate around x'= y.cross(Z)
-			//third rotate around z" = Z
-			btVector3 axis1 = m_calculatedTransformA.getBasis().getColumn(1);
-			btVector3 axis2 = m_calculatedTransformB.getBasis().getColumn(2);
-			m_calculatedAxis[0] = axis1.cross(axis2);
-			m_calculatedAxis[1] = axis2.cross(m_calculatedAxis[0]);
-			m_calculatedAxis[2] = m_calculatedAxis[0].cross(axis1);
-			break;
-		}
-		case RO_ZYX:
-		{
-			//planes: zy,YX normals: x, Z
-			//first rotate around x
-			//second rotate around y' = x.cross(Z)
-			//third rotate around z" = Z
-			btVector3 axis0 = m_calculatedTransformA.getBasis().getColumn(0);
-			btVector3 axis2 = m_calculatedTransformB.getBasis().getColumn(2);
-			m_calculatedAxis[1] = axis2.cross(axis0);
-			m_calculatedAxis[0] = m_calculatedAxis[1].cross(axis2);
-			m_calculatedAxis[2] = axis0.cross(m_calculatedAxis[1]);
-			break;
-		}
-		default:
-			btAssert(false);
+	case RO_XYZ:
+	{
+		//Is this the "line of nodes" calculation choosing planes YZ (B coordinate system) and xy (A coordinate system)? (http://en.wikipedia.org/wiki/Euler_angles)
+		//The two planes are non-homologous, so this is a Tait Bryan angle formalism and not a proper Euler
+		//Extrinsic rotations are equal to the reversed order intrinsic rotations so the above xyz extrinsic rotations (axes are fixed) are the same as the zy'x" intrinsic rotations (axes are refreshed after each rotation)
+		//that is why xy and YZ planes are chosen (this will describe a zy'x" intrinsic rotation) (see the figure on the left at http://en.wikipedia.org/wiki/Euler_angles under Tait Bryan angles)
+		// x' = Nperp = N.cross(axis2)
+		// y' = N = axis2.cross(axis0)
+		// z' = z
+		//
+		// x" = X
+		// y" = y'
+		// z" = ??
+		//in other words:
+		//first rotate around z
+		//second rotate around y'= z.cross(X)
+		//third rotate around x" = X
+		//Original XYZ extrinsic rotation order.
+		//Planes: xy and YZ normals: z, X.  Plane intersection (N) is z.cross(X)
+		btVector3 axis0 = m_calculatedTransformB.getBasis().getColumn(0);
+		btVector3 axis2 = m_calculatedTransformA.getBasis().getColumn(2);
+		m_calculatedAxis[1] = axis2.cross(axis0);
+		m_calculatedAxis[0] = m_calculatedAxis[1].cross(axis2);
+		m_calculatedAxis[2] = axis0.cross(m_calculatedAxis[1]);
+		break;
+	}
+	case RO_XZY:
+	{
+		//planes: xz,ZY normals: y, X
+		//first rotate around y
+		//second rotate around z'= y.cross(X)
+		//third rotate around x" = X
+		btVector3 axis0 = m_calculatedTransformB.getBasis().getColumn(0);
+		btVector3 axis1 = m_calculatedTransformA.getBasis().getColumn(1);
+		m_calculatedAxis[2] = axis0.cross(axis1);
+		m_calculatedAxis[0] = axis1.cross(m_calculatedAxis[2]);
+		m_calculatedAxis[1] = m_calculatedAxis[2].cross(axis0);
+		break;
+	}
+	case RO_YXZ:
+	{
+		//planes: yx,XZ normals: z, Y
+		//first rotate around z
+		//second rotate around x'= z.cross(Y)
+		//third rotate around y" = Y
+		btVector3 axis1 = m_calculatedTransformB.getBasis().getColumn(1);
+		btVector3 axis2 = m_calculatedTransformA.getBasis().getColumn(2);
+		m_calculatedAxis[0] = axis1.cross(axis2);
+		m_calculatedAxis[1] = axis2.cross(m_calculatedAxis[0]);
+		m_calculatedAxis[2] = m_calculatedAxis[0].cross(axis1);
+		break;
+	}
+	case RO_YZX:
+	{
+		//planes: yz,ZX normals: x, Y
+		//first rotate around x
+		//second rotate around z'= x.cross(Y)
+		//third rotate around y" = Y
+		btVector3 axis0 = m_calculatedTransformA.getBasis().getColumn(0);
+		btVector3 axis1 = m_calculatedTransformB.getBasis().getColumn(1);
+		m_calculatedAxis[2] = axis0.cross(axis1);
+		m_calculatedAxis[0] = axis1.cross(m_calculatedAxis[2]);
+		m_calculatedAxis[1] = m_calculatedAxis[2].cross(axis0);
+		break;
+	}
+	case RO_ZXY:
+	{
+		//planes: zx,XY normals: y, Z
+		//first rotate around y
+		//second rotate around x'= y.cross(Z)
+		//third rotate around z" = Z
+		btVector3 axis1 = m_calculatedTransformA.getBasis().getColumn(1);
+		btVector3 axis2 = m_calculatedTransformB.getBasis().getColumn(2);
+		m_calculatedAxis[0] = axis1.cross(axis2);
+		m_calculatedAxis[1] = axis2.cross(m_calculatedAxis[0]);
+		m_calculatedAxis[2] = m_calculatedAxis[0].cross(axis1);
+		break;
+	}
+	case RO_ZYX:
+	{
+		//planes: zy,YX normals: x, Z
+		//first rotate around x
+		//second rotate around y' = x.cross(Z)
+		//third rotate around z" = Z
+		btVector3 axis0 = m_calculatedTransformA.getBasis().getColumn(0);
+		btVector3 axis2 = m_calculatedTransformB.getBasis().getColumn(2);
+		m_calculatedAxis[1] = axis2.cross(axis0);
+		m_calculatedAxis[0] = m_calculatedAxis[1].cross(axis2);
+		m_calculatedAxis[2] = axis0.cross(m_calculatedAxis[1]);
+		break;
+	}
+	default:
+		btAssert(false);
 	}
 
 	m_calculatedAxis[0].normalize();
@@ -494,7 +494,8 @@ int btGeneric6DofSpring2Constraint::setLinearLimits(btConstraintInfo2* info, int
 	for (int i = 0; i < 3; i++)
 	{
 		if (m_linearLimits.m_currentLimit[i] || m_linearLimits.m_enableMotor[i] || m_linearLimits.m_enableSpring[i])
-		{  // re-use rotational motor code
+		{
+			// re-use rotational motor code
 			limot.m_bounce = m_linearLimits.m_bounce[i];
 			limot.m_currentLimit = m_linearLimits.m_currentLimit[i];
 			limot.m_currentPosition = m_linearLimits.m_currentLinearDiff[i];
@@ -526,13 +527,13 @@ int btGeneric6DofSpring2Constraint::setLinearLimits(btConstraintInfo2* info, int
 			int rotAllowed = 1;  // rotations around orthos to current axis (it is used only when one of the body is static)
 #define D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION 1.0e-3
 			bool indx1Violated = m_angularLimits[indx1].m_currentLimit == 1 ||
-								 m_angularLimits[indx1].m_currentLimit == 2 ||
-								 (m_angularLimits[indx1].m_currentLimit == 3 && (m_angularLimits[indx1].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx1].m_currentLimitError > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION)) ||
-								 (m_angularLimits[indx1].m_currentLimit == 4 && (m_angularLimits[indx1].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx1].m_currentLimitErrorHi > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION));
+			                     m_angularLimits[indx1].m_currentLimit == 2 ||
+			                     (m_angularLimits[indx1].m_currentLimit == 3 && (m_angularLimits[indx1].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx1].m_currentLimitError > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION)) ||
+			                     (m_angularLimits[indx1].m_currentLimit == 4 && (m_angularLimits[indx1].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx1].m_currentLimitErrorHi > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION));
 			bool indx2Violated = m_angularLimits[indx2].m_currentLimit == 1 ||
-								 m_angularLimits[indx2].m_currentLimit == 2 ||
-								 (m_angularLimits[indx2].m_currentLimit == 3 && (m_angularLimits[indx2].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx2].m_currentLimitError > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION)) ||
-								 (m_angularLimits[indx2].m_currentLimit == 4 && (m_angularLimits[indx2].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx2].m_currentLimitErrorHi > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION));
+			                     m_angularLimits[indx2].m_currentLimit == 2 ||
+			                     (m_angularLimits[indx2].m_currentLimit == 3 && (m_angularLimits[indx2].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx2].m_currentLimitError > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION)) ||
+			                     (m_angularLimits[indx2].m_currentLimit == 4 && (m_angularLimits[indx2].m_currentLimitError < -D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION || m_angularLimits[indx2].m_currentLimitErrorHi > D6_LIMIT_ERROR_THRESHOLD_FOR_ROTATION));
 			if (indx1Violated && indx2Violated)
 			{
 				rotAllowed = 0;
@@ -551,38 +552,38 @@ int btGeneric6DofSpring2Constraint::setAngularLimits(btConstraintInfo2* info, in
 	int cIdx[] = {0, 1, 2};
 	switch (m_rotateOrder)
 	{
-		case RO_XYZ:
-			cIdx[0] = 0;
-			cIdx[1] = 1;
-			cIdx[2] = 2;
-			break;
-		case RO_XZY:
-			cIdx[0] = 0;
-			cIdx[1] = 2;
-			cIdx[2] = 1;
-			break;
-		case RO_YXZ:
-			cIdx[0] = 1;
-			cIdx[1] = 0;
-			cIdx[2] = 2;
-			break;
-		case RO_YZX:
-			cIdx[0] = 1;
-			cIdx[1] = 2;
-			cIdx[2] = 0;
-			break;
-		case RO_ZXY:
-			cIdx[0] = 2;
-			cIdx[1] = 0;
-			cIdx[2] = 1;
-			break;
-		case RO_ZYX:
-			cIdx[0] = 2;
-			cIdx[1] = 1;
-			cIdx[2] = 0;
-			break;
-		default:
-			btAssert(false);
+	case RO_XYZ:
+		cIdx[0] = 0;
+		cIdx[1] = 1;
+		cIdx[2] = 2;
+		break;
+	case RO_XZY:
+		cIdx[0] = 0;
+		cIdx[1] = 2;
+		cIdx[2] = 1;
+		break;
+	case RO_YXZ:
+		cIdx[0] = 1;
+		cIdx[1] = 0;
+		cIdx[2] = 2;
+		break;
+	case RO_YZX:
+		cIdx[0] = 1;
+		cIdx[1] = 2;
+		cIdx[2] = 0;
+		break;
+	case RO_ZXY:
+		cIdx[0] = 2;
+		cIdx[1] = 0;
+		cIdx[2] = 1;
+		break;
+	case RO_ZYX:
+		cIdx[0] = 2;
+		cIdx[1] = 1;
+		cIdx[2] = 0;
+		break;
+	default:
+		btAssert(false);
 	}
 
 	for (int ii = 0; ii < 3; ii++)
@@ -668,9 +669,9 @@ void btGeneric6DofSpring2Constraint::calculateJacobi(btRotationalLimitMotor2* li
 }
 
 int btGeneric6DofSpring2Constraint::get_limit_motor_info2(
-	btRotationalLimitMotor2* limot,
-	const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB,
-	btConstraintInfo2* info, int row, btVector3& ax1, int rotational, int rotAllowed)
+    btRotationalLimitMotor2* limot,
+    const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB,
+    btConstraintInfo2* info, int row, btVector3& ax1, int rotational, int rotAllowed)
 {
 	int count = 0;
 	int srow = row * info->rowskip;
@@ -743,10 +744,10 @@ int btGeneric6DofSpring2Constraint::get_limit_motor_info2(
 		calculateJacobi(limot, transA, transB, info, srow, ax1, rotational, rotAllowed);
 		btScalar tag_vel = rotational ? limot->m_targetVelocity : -limot->m_targetVelocity;
 		btScalar mot_fact = getMotorFactor(limot->m_currentPosition,
-										   limot->m_loLimit,
-										   limot->m_hiLimit,
-										   tag_vel,
-										   info->fps * limot->m_motorERP);
+		                                   limot->m_loLimit,
+		                                   limot->m_hiLimit,
+		                                   tag_vel,
+		                                   info->fps * limot->m_motorERP);
 		info->m_constraintError[srow] = mot_fact * limot->m_targetVelocity;
 		info->m_lowerLimit[srow] = -limot->m_maxMotorForce / info->fps;
 		info->m_upperLimit[srow] = limot->m_maxMotorForce / info->fps;
@@ -843,8 +844,9 @@ int btGeneric6DofSpring2Constraint::get_limit_motor_info2(
 			if (m_rbB.getInvMass()) mB = mB * rrB + 1 / (m_rbB.getInvInertiaTensorWorld() * ax1).length();
 		}
 		btScalar m;
-		if (m_rbA.getInvMass() == 0) m = mB; else
-		if (m_rbB.getInvMass() == 0) m = mA; else
+		if (m_rbA.getInvMass() == 0) m = mB;
+		else if (m_rbB.getInvMass() == 0) m = mA;
+		else
 			m = mA*mB / (mA + mB);
 		btScalar angularfreq = btSqrt(ks / m);
 
@@ -907,48 +909,48 @@ void btGeneric6DofSpring2Constraint::setParam(int num, btScalar value, int axis)
 	{
 		switch (num)
 		{
-			case BT_CONSTRAINT_STOP_ERP:
-				m_linearLimits.m_stopERP[axis] = value;
-				m_flags |= BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			case BT_CONSTRAINT_STOP_CFM:
-				m_linearLimits.m_stopCFM[axis] = value;
-				m_flags |= BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			case BT_CONSTRAINT_ERP:
-				m_linearLimits.m_motorERP[axis] = value;
-				m_flags |= BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			case BT_CONSTRAINT_CFM:
-				m_linearLimits.m_motorCFM[axis] = value;
-				m_flags |= BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			default:
-				btAssertConstrParams(0);
+		case BT_CONSTRAINT_STOP_ERP:
+			m_linearLimits.m_stopERP[axis] = value;
+			m_flags |= BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		case BT_CONSTRAINT_STOP_CFM:
+			m_linearLimits.m_stopCFM[axis] = value;
+			m_flags |= BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		case BT_CONSTRAINT_ERP:
+			m_linearLimits.m_motorERP[axis] = value;
+			m_flags |= BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		case BT_CONSTRAINT_CFM:
+			m_linearLimits.m_motorCFM[axis] = value;
+			m_flags |= BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		default:
+			btAssertConstrParams(0);
 		}
 	}
 	else if ((axis >= 3) && (axis < 6))
 	{
 		switch (num)
 		{
-			case BT_CONSTRAINT_STOP_ERP:
-				m_angularLimits[axis - 3].m_stopERP = value;
-				m_flags |= BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			case BT_CONSTRAINT_STOP_CFM:
-				m_angularLimits[axis - 3].m_stopCFM = value;
-				m_flags |= BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			case BT_CONSTRAINT_ERP:
-				m_angularLimits[axis - 3].m_motorERP = value;
-				m_flags |= BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			case BT_CONSTRAINT_CFM:
-				m_angularLimits[axis - 3].m_motorCFM = value;
-				m_flags |= BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
-				break;
-			default:
-				btAssertConstrParams(0);
+		case BT_CONSTRAINT_STOP_ERP:
+			m_angularLimits[axis - 3].m_stopERP = value;
+			m_flags |= BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		case BT_CONSTRAINT_STOP_CFM:
+			m_angularLimits[axis - 3].m_stopCFM = value;
+			m_flags |= BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		case BT_CONSTRAINT_ERP:
+			m_angularLimits[axis - 3].m_motorERP = value;
+			m_flags |= BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		case BT_CONSTRAINT_CFM:
+			m_angularLimits[axis - 3].m_motorCFM = value;
+			m_flags |= BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2);
+			break;
+		default:
+			btAssertConstrParams(0);
 		}
 	}
 	else
@@ -965,48 +967,48 @@ btScalar btGeneric6DofSpring2Constraint::getParam(int num, int axis) const
 	{
 		switch (num)
 		{
-			case BT_CONSTRAINT_STOP_ERP:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_linearLimits.m_stopERP[axis];
-				break;
-			case BT_CONSTRAINT_STOP_CFM:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_linearLimits.m_stopCFM[axis];
-				break;
-			case BT_CONSTRAINT_ERP:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_linearLimits.m_motorERP[axis];
-				break;
-			case BT_CONSTRAINT_CFM:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_linearLimits.m_motorCFM[axis];
-				break;
-			default:
-				btAssertConstrParams(0);
+		case BT_CONSTRAINT_STOP_ERP:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_linearLimits.m_stopERP[axis];
+			break;
+		case BT_CONSTRAINT_STOP_CFM:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_linearLimits.m_stopCFM[axis];
+			break;
+		case BT_CONSTRAINT_ERP:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_linearLimits.m_motorERP[axis];
+			break;
+		case BT_CONSTRAINT_CFM:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_linearLimits.m_motorCFM[axis];
+			break;
+		default:
+			btAssertConstrParams(0);
 		}
 	}
 	else if ((axis >= 3) && (axis < 6))
 	{
 		switch (num)
 		{
-			case BT_CONSTRAINT_STOP_ERP:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_angularLimits[axis - 3].m_stopERP;
-				break;
-			case BT_CONSTRAINT_STOP_CFM:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_angularLimits[axis - 3].m_stopCFM;
-				break;
-			case BT_CONSTRAINT_ERP:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_angularLimits[axis - 3].m_motorERP;
-				break;
-			case BT_CONSTRAINT_CFM:
-				btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
-				retVal = m_angularLimits[axis - 3].m_motorCFM;
-				break;
-			default:
-				btAssertConstrParams(0);
+		case BT_CONSTRAINT_STOP_ERP:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_angularLimits[axis - 3].m_stopERP;
+			break;
+		case BT_CONSTRAINT_STOP_CFM:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_STOP2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_angularLimits[axis - 3].m_stopCFM;
+			break;
+		case BT_CONSTRAINT_ERP:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_ERP_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_angularLimits[axis - 3].m_motorERP;
+			break;
+		case BT_CONSTRAINT_CFM:
+			btAssertConstrParams(m_flags & (BT_6DOF_FLAGS_CFM_MOTO2 << (axis * BT_6DOF_FLAGS_AXIS_SHIFT2)));
+			retVal = m_angularLimits[axis - 3].m_motorCFM;
+			break;
+		default:
+			btAssertConstrParams(0);
 		}
 	}
 	else
@@ -1025,8 +1027,8 @@ void btGeneric6DofSpring2Constraint::setAxis(const btVector3& axis1, const btVec
 	btTransform frameInW;
 	frameInW.setIdentity();
 	frameInW.getBasis().setValue(xAxis[0], yAxis[0], zAxis[0],
-								 xAxis[1], yAxis[1], zAxis[1],
-								 xAxis[2], yAxis[2], zAxis[2]);
+	                             xAxis[1], yAxis[1], zAxis[1],
+	                             xAxis[2], yAxis[2], zAxis[2]);
 
 	// now get constraint frame in local coordinate systems
 	m_frameInA = m_rbA.getCenterOfMassTransform().inverse() * frameInW;

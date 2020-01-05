@@ -100,8 +100,8 @@ int btMultiBodyPoint2Point::getIslandIdB() const
 }
 
 void btMultiBodyPoint2Point::createConstraintRows(btMultiBodyConstraintArray& constraintRows,
-												  btMultiBodyJacobianData& data,
-												  const btContactSolverInfo& infoGlobal)
+        btMultiBodyJacobianData& data,
+        const btContactSolverInfo& infoGlobal)
 {
 	//	int i=1;
 	int numDim = BTMBP2PCONSTRAINT_DIM;
@@ -157,10 +157,10 @@ void btMultiBodyPoint2Point::createConstraintRows(btMultiBodyConstraintArray& co
 #ifndef BTMBP2PCONSTRAINT_BLOCK_ANGULAR_MOTION_TEST
 
 		fillMultiBodyConstraint(constraintRow, data, 0, 0, btVector3(0, 0, 0),
-								contactNormalOnB, pivotAworld, pivotBworld,  //sucks but let it be this way "for the time being"
-								posError,
-								infoGlobal,
-								-m_maxAppliedImpulse, m_maxAppliedImpulse);
+		                        contactNormalOnB, pivotAworld, pivotBworld,  //sucks but let it be this way "for the time being"
+		                        posError,
+		                        infoGlobal,
+		                        -m_maxAppliedImpulse, m_maxAppliedImpulse);
 		//@todo: support the case of btMultiBody versus btRigidBody,
 		//see btPoint2PointConstraint::getInfo2NonVirtual
 #else
@@ -175,10 +175,10 @@ void btMultiBodyPoint2Point::createConstraintRows(btMultiBodyConstraintArray& co
 		m_bodyA->filConstraintJacobianMultiDof(m_linkA, pivotAworld, normalAng, normalLin, jac1, data.scratch_r, data.scratch_v, data.scratch_m);
 
 		fillMultiBodyConstraint(constraintRow, data, jac1, 0,
-								dummy, dummy, dummy,  //sucks but let it be this way "for the time being"
-								posError,
-								infoGlobal,
-								-m_maxAppliedImpulse, m_maxAppliedImpulse);
+		                        dummy, dummy, dummy,  //sucks but let it be this way "for the time being"
+		                        posError,
+		                        infoGlobal,
+		                        -m_maxAppliedImpulse, m_maxAppliedImpulse);
 #endif
 	}
 }

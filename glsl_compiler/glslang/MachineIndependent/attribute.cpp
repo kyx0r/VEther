@@ -38,109 +38,110 @@
 #include "../Include/intermediate.h"
 #include "ParseHelper.h"
 
-namespace glslang {
+namespace glslang
+{
 
 // extract integers out of attribute arguments stored in attribute aggregate
-bool TAttributeArgs::getInt(int& value, int argNum) const 
+bool TAttributeArgs::getInt(int& value, int argNum) const
 {
-    const TConstUnion* intConst = getConstUnion(EbtInt, argNum);
+	const TConstUnion* intConst = getConstUnion(EbtInt, argNum);
 
-    if (intConst == nullptr)
-        return false;
+	if (intConst == nullptr)
+		return false;
 
-    value = intConst->getIConst();
-    return true;
+	value = intConst->getIConst();
+	return true;
 }
 
 // extract strings out of attribute arguments stored in attribute aggregate.
 // convert to lower case if converToLower is true (for case-insensitive compare convenience)
-bool TAttributeArgs::getString(TString& value, int argNum, bool convertToLower) const 
+bool TAttributeArgs::getString(TString& value, int argNum, bool convertToLower) const
 {
-    const TConstUnion* stringConst = getConstUnion(EbtString, argNum);
+	const TConstUnion* stringConst = getConstUnion(EbtString, argNum);
 
-    if (stringConst == nullptr)
-        return false;
+	if (stringConst == nullptr)
+		return false;
 
-    value = *stringConst->getSConst();
+	value = *stringConst->getSConst();
 
-    // Convenience.
-    if (convertToLower)
-        std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+	// Convenience.
+	if (convertToLower)
+		std::transform(value.begin(), value.end(), value.begin(), ::tolower);
 
-    return true;
+	return true;
 }
 
 // How many arguments were supplied?
 int TAttributeArgs::size() const
 {
-    return args == nullptr ? 0 : (int)args->getSequence().size();
+	return args == nullptr ? 0 : (int)args->getSequence().size();
 }
 
 // Helper to get attribute const union.  Returns nullptr on failure.
 const TConstUnion* TAttributeArgs::getConstUnion(TBasicType basicType, int argNum) const
 {
-    if (args == nullptr)
-        return nullptr;
+	if (args == nullptr)
+		return nullptr;
 
-    if (argNum >= (int)args->getSequence().size())
-        return nullptr;
+	if (argNum >= (int)args->getSequence().size())
+		return nullptr;
 
-    const TConstUnion* constVal = &args->getSequence()[argNum]->getAsConstantUnion()->getConstArray()[0];
-    if (constVal == nullptr || constVal->getType() != basicType)
-        return nullptr;
+	const TConstUnion* constVal = &args->getSequence()[argNum]->getAsConstantUnion()->getConstArray()[0];
+	if (constVal == nullptr || constVal->getType() != basicType)
+		return nullptr;
 
-    return constVal;
+	return constVal;
 }
 
 // Implementation of TParseContext parts of attributes
 TAttributeType TParseContext::attributeFromName(const TString& name) const
 {
-    if (name == "branch" || name == "dont_flatten")
-        return EatBranch;
-    else if (name == "flatten")
-        return EatFlatten;
-    else if (name == "unroll")
-        return EatUnroll;
-    else if (name == "loop" || name == "dont_unroll")
-        return EatLoop;
-    else if (name == "dependency_infinite")
-        return EatDependencyInfinite;
-    else if (name == "dependency_length")
-        return EatDependencyLength;
-    else
-        return EatNone;
+	if (name == "branch" || name == "dont_flatten")
+		return EatBranch;
+	else if (name == "flatten")
+		return EatFlatten;
+	else if (name == "unroll")
+		return EatUnroll;
+	else if (name == "loop" || name == "dont_unroll")
+		return EatLoop;
+	else if (name == "dependency_infinite")
+		return EatDependencyInfinite;
+	else if (name == "dependency_length")
+		return EatDependencyLength;
+	else
+		return EatNone;
 }
 
 // Make an initial leaf for the grammar from a no-argument attribute
 TAttributes* TParseContext::makeAttributes(const TString& identifier) const
 {
-    TAttributes *attributes = nullptr;
-    attributes = NewPoolObject(attributes);
-    TAttributeArgs args = { attributeFromName(identifier), nullptr };
-    attributes->push_back(args);
-    return attributes;
+	TAttributes *attributes = nullptr;
+	attributes = NewPoolObject(attributes);
+	TAttributeArgs args = { attributeFromName(identifier), nullptr };
+	attributes->push_back(args);
+	return attributes;
 }
 
 // Make an initial leaf for the grammar from a one-argument attribute
 TAttributes* TParseContext::makeAttributes(const TString& identifier, TIntermNode* node) const
 {
-    TAttributes *attributes = nullptr;
-    attributes = NewPoolObject(attributes);
+	TAttributes *attributes = nullptr;
+	attributes = NewPoolObject(attributes);
 
-    // for now, node is always a simple single expression, but other code expects
-    // a list, so make it so
-    TIntermAggregate* agg = intermediate.makeAggregate(node);
-    TAttributeArgs args = { attributeFromName(identifier), agg };
-    attributes->push_back(args);
-    return attributes;
+	// for now, node is always a simple single expression, but other code expects
+	// a list, so make it so
+	TIntermAggregate* agg = intermediate.makeAggregate(node);
+	TAttributeArgs args = { attributeFromName(identifier), agg };
+	attributes->push_back(args);
+	return attributes;
 }
 
 // Merge two sets of attributes into a single set.
 // The second argument is destructively consumed.
 TAttributes* TParseContext::mergeAttributes(TAttributes* attr1, TAttributes* attr2) const
 {
-    attr1->splice(attr1->end(), *attr2);
-    return attr1;
+	attr1->splice(attr1->end(), *attr2);
+	return attr1;
 }
 
 //
@@ -148,28 +149,31 @@ TAttributes* TParseContext::mergeAttributes(TAttributes* attr1, TAttributes* att
 //
 void TParseContext::handleSelectionAttributes(const TAttributes& attributes, TIntermNode* node)
 {
-    TIntermSelection* selection = node->getAsSelectionNode();
-    if (selection == nullptr)
-        return;
+	TIntermSelection* selection = node->getAsSelectionNode();
+	if (selection == nullptr)
+		return;
 
-    for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-        if (it->size() > 0) {
-            warn(node->getLoc(), "attribute with arguments not recognized, skipping", "", "");
-            continue;
-        }
+	for (auto it = attributes.begin(); it != attributes.end(); ++it)
+	{
+		if (it->size() > 0)
+		{
+			warn(node->getLoc(), "attribute with arguments not recognized, skipping", "", "");
+			continue;
+		}
 
-        switch (it->name) {
-        case EatFlatten:
-            selection->setFlatten();
-            break;
-        case EatBranch:
-            selection->setDontFlatten();
-            break;
-        default:
-            warn(node->getLoc(), "attribute does not apply to a selection", "", "");
-            break;
-        }
-    }
+		switch (it->name)
+		{
+		case EatFlatten:
+			selection->setFlatten();
+			break;
+		case EatBranch:
+			selection->setDontFlatten();
+			break;
+		default:
+			warn(node->getLoc(), "attribute does not apply to a selection", "", "");
+			break;
+		}
+	}
 }
 
 //
@@ -177,28 +181,31 @@ void TParseContext::handleSelectionAttributes(const TAttributes& attributes, TIn
 //
 void TParseContext::handleSwitchAttributes(const TAttributes& attributes, TIntermNode* node)
 {
-    TIntermSwitch* selection = node->getAsSwitchNode();
-    if (selection == nullptr)
-        return;
+	TIntermSwitch* selection = node->getAsSwitchNode();
+	if (selection == nullptr)
+		return;
 
-    for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-        if (it->size() > 0) {
-            warn(node->getLoc(), "attribute with arguments not recognized, skipping", "", "");
-            continue;
-        }
+	for (auto it = attributes.begin(); it != attributes.end(); ++it)
+	{
+		if (it->size() > 0)
+		{
+			warn(node->getLoc(), "attribute with arguments not recognized, skipping", "", "");
+			continue;
+		}
 
-        switch (it->name) {
-        case EatFlatten:
-            selection->setFlatten();
-            break;
-        case EatBranch:
-            selection->setDontFlatten();
-            break;
-        default:
-            warn(node->getLoc(), "attribute does not apply to a switch", "", "");
-            break;
-        }
-    }
+		switch (it->name)
+		{
+		case EatFlatten:
+			selection->setFlatten();
+			break;
+		case EatBranch:
+			selection->setDontFlatten();
+			break;
+		default:
+			warn(node->getLoc(), "attribute does not apply to a switch", "", "");
+			break;
+		}
+	}
 }
 
 //
@@ -206,51 +213,58 @@ void TParseContext::handleSwitchAttributes(const TAttributes& attributes, TInter
 //
 void TParseContext::handleLoopAttributes(const TAttributes& attributes, TIntermNode* node)
 {
-    TIntermLoop* loop = node->getAsLoopNode();
-    if (loop == nullptr) {
-        // the actual loop might be part of a sequence
-        TIntermAggregate* agg = node->getAsAggregate();
-        if (agg == nullptr)
-            return;
-        for (auto it = agg->getSequence().begin(); it != agg->getSequence().end(); ++it) {
-            loop = (*it)->getAsLoopNode();
-            if (loop != nullptr)
-                break;
-        }
-        if (loop == nullptr)
-            return;
-    }
+	TIntermLoop* loop = node->getAsLoopNode();
+	if (loop == nullptr)
+	{
+		// the actual loop might be part of a sequence
+		TIntermAggregate* agg = node->getAsAggregate();
+		if (agg == nullptr)
+			return;
+		for (auto it = agg->getSequence().begin(); it != agg->getSequence().end(); ++it)
+		{
+			loop = (*it)->getAsLoopNode();
+			if (loop != nullptr)
+				break;
+		}
+		if (loop == nullptr)
+			return;
+	}
 
-    for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-        if (it->name != EatDependencyLength && it->size() > 0) {
-            warn(node->getLoc(), "attribute with arguments not recognized, skipping", "", "");
-            continue;
-        }
+	for (auto it = attributes.begin(); it != attributes.end(); ++it)
+	{
+		if (it->name != EatDependencyLength && it->size() > 0)
+		{
+			warn(node->getLoc(), "attribute with arguments not recognized, skipping", "", "");
+			continue;
+		}
 
-        int value;
-        switch (it->name) {
-        case EatUnroll:
-            loop->setUnroll();
-            break;
-        case EatLoop:
-            loop->setDontUnroll();
-            break;
-        case EatDependencyInfinite:
-            loop->setLoopDependency(TIntermLoop::dependencyInfinite);
-            break;
-        case EatDependencyLength:
-            if (it->size() == 1 && it->getInt(value)) {
-                if (value <= 0)
-                    error(node->getLoc(), "must be positive", "dependency_length", "");
-                loop->setLoopDependency(value);
-            } else
-                warn(node->getLoc(), "expected a single integer argument", "dependency_length", "");
-            break;
-        default:
-            warn(node->getLoc(), "attribute does not apply to a loop", "", "");
-            break;
-        }
-    }
+		int value;
+		switch (it->name)
+		{
+		case EatUnroll:
+			loop->setUnroll();
+			break;
+		case EatLoop:
+			loop->setDontUnroll();
+			break;
+		case EatDependencyInfinite:
+			loop->setLoopDependency(TIntermLoop::dependencyInfinite);
+			break;
+		case EatDependencyLength:
+			if (it->size() == 1 && it->getInt(value))
+			{
+				if (value <= 0)
+					error(node->getLoc(), "must be positive", "dependency_length", "");
+				loop->setLoopDependency(value);
+			}
+			else
+				warn(node->getLoc(), "expected a single integer argument", "dependency_length", "");
+			break;
+		default:
+			warn(node->getLoc(), "attribute does not apply to a loop", "", "");
+			break;
+		}
+	}
 }
 
 

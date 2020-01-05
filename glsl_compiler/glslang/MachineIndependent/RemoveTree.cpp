@@ -37,72 +37,74 @@
 #include "../Include/intermediate.h"
 #include "RemoveTree.h"
 
-namespace glslang {
+namespace glslang
+{
 
 //
 // Code to recursively delete the intermediate tree.
 //
-struct TRemoveTraverser : TIntermTraverser {
-    TRemoveTraverser() : TIntermTraverser(false, false, true, false) {}
+struct TRemoveTraverser : TIntermTraverser
+{
+	TRemoveTraverser() : TIntermTraverser(false, false, true, false) {}
 
-    virtual void visitSymbol(TIntermSymbol* node)
-    {
-        delete node;
-    }
+	virtual void visitSymbol(TIntermSymbol* node)
+	{
+		delete node;
+	}
 
-    virtual bool visitBinary(TVisit /* visit*/ , TIntermBinary* node)
-    {
-        delete node;
+	virtual bool visitBinary(TVisit /* visit*/, TIntermBinary* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool visitUnary(TVisit /* visit */, TIntermUnary* node)
-    {
-        delete node;
+	virtual bool visitUnary(TVisit /* visit */, TIntermUnary* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool visitAggregate(TVisit /* visit*/ , TIntermAggregate* node)
-    {
-        delete node;
+	virtual bool visitAggregate(TVisit /* visit*/, TIntermAggregate* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool visitSelection(TVisit /* visit*/ , TIntermSelection* node)
-    {
-        delete node;
+	virtual bool visitSelection(TVisit /* visit*/, TIntermSelection* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool visitSwitch(TVisit /* visit*/ , TIntermSwitch* node)
-    {
-        delete node;
+	virtual bool visitSwitch(TVisit /* visit*/, TIntermSwitch* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual void visitConstantUnion(TIntermConstantUnion* node)
-    {
-        delete node;
-    }
+	virtual void visitConstantUnion(TIntermConstantUnion* node)
+	{
+		delete node;
+	}
 
-    virtual bool visitLoop(TVisit /* visit*/ , TIntermLoop* node)
-    {
-        delete node;
+	virtual bool visitLoop(TVisit /* visit*/, TIntermLoop* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool visitBranch(TVisit /* visit*/ , TIntermBranch* node)
-    {
-        delete node;
+	virtual bool visitBranch(TVisit /* visit*/, TIntermBranch* node)
+	{
+		delete node;
 
-        return true;
-    }
+		return true;
+	}
 };
 
 //
@@ -110,9 +112,9 @@ struct TRemoveTraverser : TIntermTraverser {
 //
 void RemoveAllTreeNodes(TIntermNode* root)
 {
-    TRemoveTraverser it;
+	TRemoveTraverser it;
 
-    root->traverse(&it);
+	root->traverse(&it);
 }
 
 } // end namespace glslang

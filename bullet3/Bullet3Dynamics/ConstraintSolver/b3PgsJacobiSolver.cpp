@@ -4,8 +4,8 @@ Copyright (c) 2003-2012 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -153,7 +153,7 @@ void b3PgsJacobiSolver::solveContacts(int numBodies, b3RigidBodyData* bodies, b3
 	infoGlobal.m_splitImpulse = false;
 	infoGlobal.m_timeStep = 1.f / 60.f;
 	infoGlobal.m_numIterations = 4;  //4;
-									 //	infoGlobal.m_solverMode|=B3_SOLVER_USE_2_FRICTION_DIRECTIONS|B3_SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS|B3_SOLVER_DISABLE_VELOCITY_DEPENDENT_FRICTION_DIRECTION;
+	//	infoGlobal.m_solverMode|=B3_SOLVER_USE_2_FRICTION_DIRECTIONS|B3_SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS|B3_SOLVER_DISABLE_VELOCITY_DEPENDENT_FRICTION_DIRECTION;
 	//infoGlobal.m_solverMode|=B3_SOLVER_USE_2_FRICTION_DIRECTIONS|B3_SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS;
 	infoGlobal.m_solverMode |= B3_SOLVER_USE_2_FRICTION_DIRECTIONS;
 
@@ -168,13 +168,13 @@ void b3PgsJacobiSolver::solveContacts(int numBodies, b3RigidBodyData* bodies, b3
 
 /// b3PgsJacobiSolver Sequentially applies impulses
 b3Scalar b3PgsJacobiSolver::solveGroup(b3RigidBodyData* bodies,
-									   b3InertiaData* inertias,
-									   int numBodies,
-									   b3Contact4* manifoldPtr,
-									   int numManifolds,
-									   b3TypedConstraint** constraints,
-									   int numConstraints,
-									   const b3ContactSolverInfo& infoGlobal)
+                                       b3InertiaData* inertias,
+                                       int numBodies,
+                                       b3Contact4* manifoldPtr,
+                                       int numManifolds,
+                                       b3TypedConstraint** constraints,
+                                       int numConstraints,
+                                       const b3ContactSolverInfo& infoGlobal)
 {
 	B3_PROFILE("solveGroup");
 	//you need to provide at least some bodies
@@ -317,9 +317,9 @@ void b3PgsJacobiSolver::resolveSingleConstraintRowLowerLimit(b3SolverBody& body1
 }
 
 void b3PgsJacobiSolver::resolveSplitPenetrationImpulseCacheFriendly(
-	b3SolverBody& body1,
-	b3SolverBody& body2,
-	const b3SolverConstraint& c)
+    b3SolverBody& body1,
+    b3SolverBody& body2,
+    const b3SolverConstraint& c)
 {
 	if (c.m_rhsPenetration)
 	{
@@ -540,14 +540,14 @@ b3SolverConstraint& b3PgsJacobiSolver::addFrictionConstraint(b3RigidBodyData* bo
 	b3SolverConstraint& solverConstraint = m_tmpSolverContactFrictionConstraintPool.expandNonInitializing();
 	solverConstraint.m_frictionIndex = frictionIndex;
 	setupFrictionConstraint(bodies, inertias, solverConstraint, normalAxis, solverBodyIdA, solverBodyIdB, cp, rel_pos1, rel_pos2,
-							colObj0, colObj1, relaxation, desiredVelocity, cfmSlip);
+	                        colObj0, colObj1, relaxation, desiredVelocity, cfmSlip);
 	return solverConstraint;
 }
 
 void b3PgsJacobiSolver::setupRollingFrictionConstraint(b3RigidBodyData* bodies, b3InertiaData* inertias, b3SolverConstraint& solverConstraint, const b3Vector3& normalAxis1, int solverBodyIdA, int solverBodyIdB,
-													   b3ContactPoint& cp, const b3Vector3& rel_pos1, const b3Vector3& rel_pos2,
-													   b3RigidBodyData* colObj0, b3RigidBodyData* colObj1, b3Scalar relaxation,
-													   b3Scalar desiredVelocity, b3Scalar cfmSlip)
+        b3ContactPoint& cp, const b3Vector3& rel_pos1, const b3Vector3& rel_pos2,
+        b3RigidBodyData* colObj0, b3RigidBodyData* colObj1, b3Scalar relaxation,
+        b3Scalar desiredVelocity, b3Scalar cfmSlip)
 
 {
 	b3Vector3 normalAxis = b3MakeVector3(0, 0, 0);
@@ -611,7 +611,7 @@ b3SolverConstraint& b3PgsJacobiSolver::addRollingFrictionConstraint(b3RigidBodyD
 	b3SolverConstraint& solverConstraint = m_tmpSolverContactRollingFrictionConstraintPool.expandNonInitializing();
 	solverConstraint.m_frictionIndex = frictionIndex;
 	setupRollingFrictionConstraint(bodies, inertias, solverConstraint, normalAxis, solverBodyIdA, solverBodyIdB, cp, rel_pos1, rel_pos2,
-								   colObj0, colObj1, relaxation, desiredVelocity, cfmSlip);
+	                               colObj0, colObj1, relaxation, desiredVelocity, cfmSlip);
 	return solverConstraint;
 }
 
@@ -652,10 +652,10 @@ int b3PgsJacobiSolver::getOrInitSolverBody(int bodyIndex, b3RigidBodyData* bodie
 #include <stdio.h>
 
 void b3PgsJacobiSolver::setupContactConstraint(b3RigidBodyData* bodies, b3InertiaData* inertias, b3SolverConstraint& solverConstraint,
-											   int solverBodyIdA, int solverBodyIdB,
-											   b3ContactPoint& cp, const b3ContactSolverInfo& infoGlobal,
-											   b3Vector3& vel, b3Scalar& rel_vel, b3Scalar& relaxation,
-											   b3Vector3& rel_pos1, b3Vector3& rel_pos2)
+        int solverBodyIdA, int solverBodyIdB,
+        b3ContactPoint& cp, const b3ContactSolverInfo& infoGlobal,
+        b3Vector3& vel, b3Scalar& rel_vel, b3Scalar& relaxation,
+        b3Vector3& rel_pos1, b3Vector3& rel_pos2)
 {
 	const b3Vector3& pos1 = cp.getPositionWorldOnA();
 	const b3Vector3& pos2 = cp.getPositionWorldOnB();
@@ -804,8 +804,8 @@ void b3PgsJacobiSolver::setupContactConstraint(b3RigidBodyData* bodies, b3Inerti
 }
 
 void b3PgsJacobiSolver::setFrictionConstraintImpulse(b3RigidBodyData* bodies, b3InertiaData* inertias, b3SolverConstraint& solverConstraint,
-													 int solverBodyIdA, int solverBodyIdB,
-													 b3ContactPoint& cp, const b3ContactSolverInfo& infoGlobal)
+        int solverBodyIdA, int solverBodyIdB,
+        b3ContactPoint& cp, const b3ContactSolverInfo& infoGlobal)
 {
 	b3SolverBody* bodyA = &m_tmpSolverBodyPool[solverBodyIdA];
 	b3SolverBody* bodyB = &m_tmpSolverBodyPool[solverBodyIdB];
@@ -1152,7 +1152,7 @@ b3Scalar b3PgsJacobiSolver::solveGroupCacheFriendlySetup(b3RigidBodyData* bodies
 					info2.m_J2linearAxis = 0;
 					info2.m_J2angularAxis = currentConstraintRow->m_relpos2CrossNormal;
 					info2.rowskip = sizeof(b3SolverConstraint) / sizeof(b3Scalar);  //check this
-																					///the size of b3SolverConstraint needs be a multiple of b3Scalar
+					///the size of b3SolverConstraint needs be a multiple of b3Scalar
 					b3Assert(info2.rowskip * sizeof(b3Scalar) == sizeof(b3SolverConstraint));
 					info2.m_constraintError = &currentConstraintRow->m_rhs;
 					currentConstraintRow->m_cfm = infoGlobal.m_globalCfm;
@@ -1536,7 +1536,7 @@ b3Scalar b3PgsJacobiSolver::solveGroupCacheFriendlyIterations(b3TypedConstraint*
 		int maxIterations = m_maxOverrideNumSolverIterations > infoGlobal.m_numIterations ? m_maxOverrideNumSolverIterations : infoGlobal.m_numIterations;
 
 		for (int iteration = 0; iteration < maxIterations; iteration++)
-		//for ( int iteration = maxIterations-1  ; iteration >= 0;iteration--)
+			//for ( int iteration = maxIterations-1  ; iteration >= 0;iteration--)
 		{
 			solveSingleIteration(iteration, constraints, numConstraints, infoGlobal);
 

@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -249,12 +249,12 @@ void btPersistentManifold::refreshContactPoints(const btTransform& trA, const bt
 	int i;
 #ifdef DEBUG_PERSISTENCY
 	printf("refreshContactPoints posA = (%f,%f,%f) posB = (%f,%f,%f)\n",
-		   trA.getOrigin().getX(),
-		   trA.getOrigin().getY(),
-		   trA.getOrigin().getZ(),
-		   trB.getOrigin().getX(),
-		   trB.getOrigin().getY(),
-		   trB.getOrigin().getZ());
+	       trA.getOrigin().getX(),
+	       trA.getOrigin().getY(),
+	       trA.getOrigin().getZ(),
+	       trB.getOrigin().getX(),
+	       trB.getOrigin().getY(),
+	       trB.getOrigin().getZ());
 #endif  //DEBUG_PERSISTENCY
 	/// first refresh worldspace positions and distance
 	for (i = getNumContacts() - 1; i >= 0; i--)

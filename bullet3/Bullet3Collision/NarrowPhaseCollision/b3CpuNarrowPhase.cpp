@@ -65,14 +65,14 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		int collidableIndexB = bodies[bodyIndexB].m_collidableIdx;
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_SPHERE &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_CONVEX_HULL)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_CONVEX_HULL)
 		{
 			//			computeContactSphereConvex(i,bodyIndexA,bodyIndexB,collidableIndexA,collidableIndexB,&bodies[0],
 			//				&m_data->m_collidablesCPU[0],&hostConvexData[0],&hostVertices[0],&hostIndices[0],&hostFaces[0],&hostContacts[0],nContacts,maxContactCapacity);
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_CONVEX_HULL &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_SPHERE)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_SPHERE)
 		{
 			//			computeContactSphereConvex(i,bodyIndexB,bodyIndexA,collidableIndexB,collidableIndexA,&bodies[0],
 			//				&m_data->m_collidablesCPU[0],&hostConvexData[0],&hostVertices[0],&hostIndices[0],&hostFaces[0],&hostContacts[0],nContacts,maxContactCapacity);
@@ -80,7 +80,7 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_CONVEX_HULL &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_PLANE)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_PLANE)
 		{
 			//			computeContactPlaneConvex(i,bodyIndexB,bodyIndexA,collidableIndexB,collidableIndexA,&bodies[0],
 			//			&m_data->m_collidablesCPU[0],&hostConvexData[0],&hostVertices[0],&hostIndices[0],&hostFaces[0],&hostContacts[0],nContacts,maxContactCapacity);
@@ -88,7 +88,7 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_PLANE &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_CONVEX_HULL)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_CONVEX_HULL)
 		{
 			//			computeContactPlaneConvex(i,bodyIndexA,bodyIndexB,collidableIndexA,collidableIndexB,&bodies[0],
 			//			&m_data->m_collidablesCPU[0],&hostConvexData[0],&hostVertices[0],&hostIndices[0],&hostFaces[0],&hostContacts[0],nContacts,maxContactCapacity);
@@ -96,7 +96,7 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_COMPOUND_OF_CONVEX_HULLS &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_COMPOUND_OF_CONVEX_HULLS)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_COMPOUND_OF_CONVEX_HULLS)
 		{
 			//			computeContactCompoundCompound(i,bodyIndexB,bodyIndexA,collidableIndexB,collidableIndexA,&bodies[0],
 			//			&m_data->m_collidablesCPU[0],&hostConvexData[0],&cpuChildShapes[0], hostAabbsWorldSpace,hostAabbsLocalSpace,hostVertices,hostUniqueEdges,hostIndices,hostFaces,&hostContacts[0],
@@ -105,7 +105,7 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_COMPOUND_OF_CONVEX_HULLS &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_PLANE)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_PLANE)
 		{
 			//			computeContactPlaneCompound(i,bodyIndexB,bodyIndexA,collidableIndexB,collidableIndexA,&bodies[0],
 			//			&m_data->m_collidablesCPU[0],&hostConvexData[0],&cpuChildShapes[0], &hostVertices[0],&hostIndices[0],&hostFaces[0],&hostContacts[0],nContacts,maxContactCapacity);
@@ -113,7 +113,7 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_PLANE &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_COMPOUND_OF_CONVEX_HULLS)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_COMPOUND_OF_CONVEX_HULLS)
 		{
 			//			computeContactPlaneCompound(i,bodyIndexA,bodyIndexB,collidableIndexA,collidableIndexB,&bodies[0],
 			//			&m_data->m_collidablesCPU[0],&hostConvexData[0],&cpuChildShapes[0],&hostVertices[0],&hostIndices[0],&hostFaces[0],&hostContacts[0],nContacts,maxContactCapacity);
@@ -121,13 +121,13 @@ void b3CpuNarrowPhase::computeContacts(b3AlignedObjectArray<b3Int4>& pairs, b3Al
 		}
 
 		if (m_data->m_collidablesCPU[collidableIndexA].m_shapeType == SHAPE_CONVEX_HULL &&
-			m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_CONVEX_HULL)
+		        m_data->m_collidablesCPU[collidableIndexB].m_shapeType == SHAPE_CONVEX_HULL)
 		{
 			//printf("pairs[i].z=%d\n",pairs[i].z);
 			//int contactIndex = computeContactConvexConvex2(i,bodyIndexA,bodyIndexB,collidableIndexA,collidableIndexB,bodies,
 			//		m_data->m_collidablesCPU,hostConvexData,hostVertices,hostUniqueEdges,hostIndices,hostFaces,hostContacts,nContacts,maxContactCapacity,oldHostContacts);
 			int contactIndex = b3ContactConvexConvexSAT(i, bodyIndexA, bodyIndexB, collidableIndexA, collidableIndexB, bodies,
-														m_data->m_collidablesCPU, m_data->m_convexPolyhedra, m_data->m_convexVertices, m_data->m_uniqueEdges, m_data->m_convexIndices, m_data->m_convexFaces, m_data->m_contacts, numContacts, maxContactCapacity);
+			                   m_data->m_collidablesCPU, m_data->m_convexPolyhedra, m_data->m_convexVertices, m_data->m_uniqueEdges, m_data->m_convexIndices, m_data->m_convexFaces, m_data->m_contacts, numContacts, maxContactCapacity);
 
 			if (contactIndex >= 0)
 			{
@@ -261,9 +261,9 @@ int b3CpuNarrowPhase::registerConvexHullShapeInternal(b3ConvexUtility* convexPtr
 	for (i = 0; i < convexPtr->m_faces.size(); i++)
 	{
 		m_data->m_convexFaces[convex.m_faceOffset + i].m_plane = b3MakeVector3(convexPtr->m_faces[i].m_plane[0],
-																			   convexPtr->m_faces[i].m_plane[1],
-																			   convexPtr->m_faces[i].m_plane[2],
-																			   convexPtr->m_faces[i].m_plane[3]);
+		        convexPtr->m_faces[i].m_plane[1],
+		        convexPtr->m_faces[i].m_plane[2],
+		        convexPtr->m_faces[i].m_plane[3]);
 
 		int indexOffset = m_data->m_convexIndices.size();
 		int numIndices = convexPtr->m_faces[i].m_indices.size();

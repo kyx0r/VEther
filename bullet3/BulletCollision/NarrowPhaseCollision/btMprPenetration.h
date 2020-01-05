@@ -4,7 +4,7 @@
  * Copyright (c)2012 Daniel Fiser <danfis@danfis.cz>
  *
  *  This file was ported from mpr.c file, part of libccd.
- *  The Minkoski Portal Refinement implementation was ported 
+ *  The Minkoski Portal Refinement implementation was ported
  *  to OpenCL by Erwin Coumans for the Bullet 3 Physics library.
  *  The original MPR idea and implementation is by Gary Snethen
  *  in XenoCollide, see http://github.com/erwincoumans/xenocollide
@@ -95,8 +95,8 @@ inline void btMprSimplexSetSize(btMprSimplex_t *s, int size)
 inline void btPrintPortalVertex(_btMprSimplex_t *portal, int index)
 {
 	printf("portal[%d].v = %f,%f,%f, v1=%f,%f,%f, v2=%f,%f,%f\n", index, portal->ps[index].v.x(), portal->ps[index].v.y(), portal->ps[index].v.z(),
-		   portal->ps[index].v1.x(), portal->ps[index].v1.y(), portal->ps[index].v1.z(),
-		   portal->ps[index].v2.x(), portal->ps[index].v2.y(), portal->ps[index].v2.z());
+	       portal->ps[index].v1.x(), portal->ps[index].v1.y(), portal->ps[index].v1.z(),
+	       portal->ps[index].v2.x(), portal->ps[index].v2.y(), portal->ps[index].v2.z());
 }
 #endif  //DEBUG_MPR
 
@@ -223,15 +223,15 @@ inline void btPortalDir(const btMprSimplex_t *portal, btVector3 *dir)
 	btVector3 v2v1, v3v1;
 
 	btMprVec3Sub2(&v2v1, &btMprSimplexPoint(portal, 2)->v,
-				  &btMprSimplexPoint(portal, 1)->v);
+	              &btMprSimplexPoint(portal, 1)->v);
 	btMprVec3Sub2(&v3v1, &btMprSimplexPoint(portal, 3)->v,
-				  &btMprSimplexPoint(portal, 1)->v);
+	              &btMprSimplexPoint(portal, 1)->v);
 	btMprVec3Cross(dir, &v2v1, &v3v1);
 	btMprVec3Normalize(dir);
 }
 
 inline int portalEncapsulesOrigin(const btMprSimplex_t *portal,
-								  const btVector3 *dir)
+                                  const btVector3 *dir)
 {
 	float dot;
 	dot = btMprVec3Dot(dir, &btMprSimplexPoint(portal, 1)->v);
@@ -239,8 +239,8 @@ inline int portalEncapsulesOrigin(const btMprSimplex_t *portal,
 }
 
 inline int portalReachTolerance(const btMprSimplex_t *portal,
-								const btMprSupport_t *v4,
-								const btVector3 *dir)
+                                const btMprSupport_t *v4,
+                                const btVector3 *dir)
 {
 	float dv1, dv2, dv3, dv4;
 	float dot1, dot2, dot3;
@@ -263,8 +263,8 @@ inline int portalReachTolerance(const btMprSimplex_t *portal,
 }
 
 inline int portalCanEncapsuleOrigin(const btMprSimplex_t *portal,
-									const btMprSupport_t *v4,
-									const btVector3 *dir)
+                                    const btMprSupport_t *v4,
+                                    const btVector3 *dir)
 {
 	float dot;
 	dot = btMprVec3Dot(&v4->v, dir);
@@ -272,7 +272,7 @@ inline int portalCanEncapsuleOrigin(const btMprSimplex_t *portal,
 }
 
 inline void btExpandPortal(btMprSimplex_t *portal,
-						   const btMprSupport_t *v4)
+                           const btMprSupport_t *v4)
 {
 	float dot;
 	btVector3 v4v0;
@@ -306,8 +306,8 @@ inline void btExpandPortal(btMprSimplex_t *portal,
 }
 template <typename btConvexTemplate>
 inline void btMprSupport(const btConvexTemplate &a, const btConvexTemplate &b,
-						 const btMprCollisionDescription &colDesc,
-						 const btVector3 &dir, btMprSupport_t *supp)
+                         const btMprCollisionDescription &colDesc,
+                         const btVector3 &dir, btMprSupport_t *supp)
 {
 	btVector3 separatingAxisInA = dir * a.getWorldTransform().getBasis();
 	btVector3 separatingAxisInB = -dir * b.getWorldTransform().getBasis();
@@ -322,8 +322,8 @@ inline void btMprSupport(const btConvexTemplate &a, const btConvexTemplate &b,
 
 template <typename btConvexTemplate>
 static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b,
-							const btMprCollisionDescription &colDesc,
-							btMprSimplex_t *portal)
+                            const btMprCollisionDescription &colDesc,
+                            btMprSimplex_t *portal)
 {
 	btVector3 dir, va, vb;
 	float dot;
@@ -364,7 +364,7 @@ static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b
 
 	// vertex 2
 	btMprVec3Cross(&dir, &btMprSimplexPoint(portal, 0)->v,
-				   &btMprSimplexPoint(portal, 1)->v);
+	               &btMprSimplexPoint(portal, 1)->v);
 	if (btMprIsZero(btMprVec3Len2(&dir)))
 	{
 		if (btMprVec3Eq(&btMprSimplexPoint(portal, 1)->v, org))
@@ -390,9 +390,9 @@ static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b
 
 	// vertex 3 direction
 	btMprVec3Sub2(&va, &btMprSimplexPoint(portal, 1)->v,
-				  &btMprSimplexPoint(portal, 0)->v);
+	              &btMprSimplexPoint(portal, 0)->v);
 	btMprVec3Sub2(&vb, &btMprSimplexPoint(portal, 2)->v,
-				  &btMprSimplexPoint(portal, 0)->v);
+	              &btMprSimplexPoint(portal, 0)->v);
 	btMprVec3Cross(&dir, &va, &vb);
 	btMprVec3Normalize(&dir);
 
@@ -417,7 +417,7 @@ static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b
 		// test if origin is outside (v1, v0, v3) - set v2 as v3 and
 		// continue
 		btMprVec3Cross(&va, &btMprSimplexPoint(portal, 1)->v,
-					   &btMprSimplexPoint(portal, 3)->v);
+		               &btMprSimplexPoint(portal, 3)->v);
 		dot = btMprVec3Dot(&va, &btMprSimplexPoint(portal, 0)->v);
 		if (dot < 0.f && !btMprIsZero(dot))
 		{
@@ -430,7 +430,7 @@ static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b
 			// test if origin is outside (v3, v0, v2) - set v1 as v3 and
 			// continue
 			btMprVec3Cross(&va, &btMprSimplexPoint(portal, 3)->v,
-						   &btMprSimplexPoint(portal, 2)->v);
+			               &btMprSimplexPoint(portal, 2)->v);
 			dot = btMprVec3Dot(&va, &btMprSimplexPoint(portal, 0)->v);
 			if (dot < 0.f && !btMprIsZero(dot))
 			{
@@ -442,9 +442,9 @@ static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b
 		if (cont)
 		{
 			btMprVec3Sub2(&va, &btMprSimplexPoint(portal, 1)->v,
-						  &btMprSimplexPoint(portal, 0)->v);
+			              &btMprSimplexPoint(portal, 0)->v);
 			btMprVec3Sub2(&vb, &btMprSimplexPoint(portal, 2)->v,
-						  &btMprSimplexPoint(portal, 0)->v);
+			              &btMprSimplexPoint(portal, 0)->v);
 			btMprVec3Cross(&dir, &va, &vb);
 			btMprVec3Normalize(&dir);
 		}
@@ -459,13 +459,13 @@ static int btDiscoverPortal(const btConvexTemplate &a, const btConvexTemplate &b
 
 template <typename btConvexTemplate>
 static int btRefinePortal(const btConvexTemplate &a, const btConvexTemplate &b, const btMprCollisionDescription &colDesc,
-						  btMprSimplex_t *portal)
+                          btMprSimplex_t *portal)
 {
 	btVector3 dir;
 	btMprSupport_t v4;
 
 	for (int i = 0; i < BT_MPR_MAX_ITERATIONS; i++)
-	//while (1)
+		//while (1)
 	{
 		// compute direction outside the portal (from v0 through v1,v2,v3
 		// face)
@@ -508,19 +508,19 @@ static void btFindPos(const btMprSimplex_t *portal, btVector3 *pos)
 
 	// use barycentric coordinates of tetrahedron to find origin
 	btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 1)->v,
-				   &btMprSimplexPoint(portal, 2)->v);
+	               &btMprSimplexPoint(portal, 2)->v);
 	b[0] = btMprVec3Dot(&vec, &btMprSimplexPoint(portal, 3)->v);
 
 	btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 3)->v,
-				   &btMprSimplexPoint(portal, 2)->v);
+	               &btMprSimplexPoint(portal, 2)->v);
 	b[1] = btMprVec3Dot(&vec, &btMprSimplexPoint(portal, 0)->v);
 
 	btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 0)->v,
-				   &btMprSimplexPoint(portal, 1)->v);
+	               &btMprSimplexPoint(portal, 1)->v);
 	b[2] = btMprVec3Dot(&vec, &btMprSimplexPoint(portal, 3)->v);
 
 	btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 2)->v,
-				   &btMprSimplexPoint(portal, 1)->v);
+	               &btMprSimplexPoint(portal, 1)->v);
 	b[3] = btMprVec3Dot(&vec, &btMprSimplexPoint(portal, 0)->v);
 
 	sum = b[0] + b[1] + b[2] + b[3];
@@ -530,13 +530,13 @@ static void btFindPos(const btMprSimplex_t *portal, btVector3 *pos)
 		b[0] = 0.f;
 
 		btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 2)->v,
-					   &btMprSimplexPoint(portal, 3)->v);
+		               &btMprSimplexPoint(portal, 3)->v);
 		b[1] = btMprVec3Dot(&vec, &dir);
 		btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 3)->v,
-					   &btMprSimplexPoint(portal, 1)->v);
+		               &btMprSimplexPoint(portal, 1)->v);
 		b[2] = btMprVec3Dot(&vec, &dir);
 		btMprVec3Cross(&vec, &btMprSimplexPoint(portal, 1)->v,
-					   &btMprSimplexPoint(portal, 2)->v);
+		               &btMprSimplexPoint(portal, 2)->v);
 		b[3] = btMprVec3Dot(&vec, &dir);
 
 		sum = b[1] + b[2] + b[3];
@@ -575,9 +575,9 @@ inline float btMprVec3Dist2(const btVector3 *a, const btVector3 *b)
 }
 
 inline float _btMprVec3PointSegmentDist2(const btVector3 *P,
-										 const btVector3 *x0,
-										 const btVector3 *b,
-										 btVector3 *witness)
+        const btVector3 *x0,
+        const btVector3 *b,
+        btVector3 *witness)
 {
 	// The computation comes from solving equation of segment:
 	//      S(t) = x0 + t.d
@@ -640,9 +640,9 @@ inline float _btMprVec3PointSegmentDist2(const btVector3 *P,
 }
 
 inline float btMprVec3PointTriDist2(const btVector3 *P,
-									const btVector3 *x0, const btVector3 *B,
-									const btVector3 *C,
-									btVector3 *witness)
+                                    const btVector3 *x0, const btVector3 *B,
+                                    const btVector3 *C,
+                                    btVector3 *witness)
 {
 	// Computation comes from analytic expression for triangle (x0, B, C)
 	//      T(s, t) = x0 + s.d1 + t.d2, where d1 = B - x0 and d2 = C - x0 and
@@ -728,9 +728,9 @@ inline float btMprVec3PointTriDist2(const btVector3 *P,
 
 template <typename btConvexTemplate>
 static void btFindPenetr(const btConvexTemplate &a, const btConvexTemplate &b,
-						 const btMprCollisionDescription &colDesc,
-						 btMprSimplex_t *portal,
-						 float *depth, btVector3 *pdir, btVector3 *pos)
+                         const btMprCollisionDescription &colDesc,
+                         btMprSimplex_t *portal,
+                         float *depth, btVector3 *pdir, btVector3 *pos)
 {
 	btVector3 dir;
 	btMprSupport_t v4;
@@ -741,7 +741,7 @@ static void btFindPenetr(const btConvexTemplate &a, const btConvexTemplate &b,
 
 	iterations = 1UL;
 	for (int i = 0; i < BT_MPR_MAX_ITERATIONS; i++)
-	//while (1)
+		//while (1)
 	{
 		// compute portal direction and obtain next support point
 		btPortalDir(portal, &dir);
@@ -791,7 +791,7 @@ static void btFindPenetrTouch(btMprSimplex_t *portal, float *depth, btVector3 *d
 }
 
 static void btFindPenetrSegment(btMprSimplex_t *portal,
-								float *depth, btVector3 *dir, btVector3 *pos)
+                                float *depth, btVector3 *dir, btVector3 *pos)
 {
 	// Origin lies on v0-v1 segment.
 	// Depth is distance to v1, direction also and position must be
@@ -811,8 +811,8 @@ static void btFindPenetrSegment(btMprSimplex_t *portal,
 
 template <typename btConvexTemplate>
 inline int btMprPenetration(const btConvexTemplate &a, const btConvexTemplate &b,
-							const btMprCollisionDescription &colDesc,
-							float *depthOut, btVector3 *dirOut, btVector3 *posOut)
+                            const btMprCollisionDescription &colDesc,
+                            float *depthOut, btVector3 *dirOut, btVector3 *posOut)
 {
 	btMprSimplex_t portal;
 
@@ -823,40 +823,40 @@ inline int btMprPenetration(const btConvexTemplate &a, const btConvexTemplate &b
 
 	switch (result)
 	{
-		case 0:
-		{
-			// Phase 2: Portal refinement
+	case 0:
+	{
+		// Phase 2: Portal refinement
 
-			result = btRefinePortal(a, b, colDesc, &portal);
-			if (result < 0)
-				return -1;
+		result = btRefinePortal(a, b, colDesc, &portal);
+		if (result < 0)
+			return -1;
 
-			// Phase 3. Penetration info
-			btFindPenetr(a, b, colDesc, &portal, depthOut, dirOut, posOut);
+		// Phase 3. Penetration info
+		btFindPenetr(a, b, colDesc, &portal, depthOut, dirOut, posOut);
 
-			break;
-		}
-		case 1:
-		{
-			// Touching contact on portal's v1.
-			btFindPenetrTouch(&portal, depthOut, dirOut, posOut);
-			result = 0;
-			break;
-		}
-		case 2:
-		{
-			btFindPenetrSegment(&portal, depthOut, dirOut, posOut);
-			result = 0;
-			break;
-		}
-		default:
-		{
-			//if (res < 0)
-			//{
-			// Origin isn't inside portal - no collision.
-			result = -1;
-			//}
-		}
+		break;
+	}
+	case 1:
+	{
+		// Touching contact on portal's v1.
+		btFindPenetrTouch(&portal, depthOut, dirOut, posOut);
+		result = 0;
+		break;
+	}
+	case 2:
+	{
+		btFindPenetrSegment(&portal, depthOut, dirOut, posOut);
+		result = 0;
+		break;
+	}
+	default:
+	{
+		//if (res < 0)
+		//{
+		// Origin isn't inside portal - no collision.
+		result = -1;
+		//}
+	}
 	};
 
 	return result;

@@ -51,7 +51,7 @@ enum JointType
 ///	 - PRISMATIC: force  [N], along joint axis
 ///	 - FLOATING:  moment vector [Nm] and force vector [N], both in body-fixed frame
 ///				  (in that order)
-///  - SPHERICAL: moment vector [Nm] 
+///  - SPHERICAL: moment vector [Nm]
 /// TODO - force element interface (friction, springs, dampers, etc)
 ///	  - gears and motor inertia
 class MultiBodyTree
@@ -107,9 +107,9 @@ public:
 	/// @param user_int pointer to user integer
 	/// @return 0 on success, -1 on error
 	int addBody(int body_index, int parent_index, JointType joint_type,
-				const vec3& parent_r_parent_body_ref, const mat33& body_T_parent_ref,
-				const vec3& body_axis_of_motion, idScalar mass, const vec3& body_r_body_com,
-				const mat33& body_I_body, const int user_int, void* user_ptr);
+	            const vec3& parent_r_parent_body_ref, const mat33& body_T_parent_ref,
+	            const vec3& body_axis_of_motion, idScalar mass, const vec3& body_r_body_com,
+	            const mat33& body_I_body, const int user_int, void* user_ptr);
 	/// set policy for invalid mass properties
 	/// @param flag if true, invalid mass properties are accepted,
 	///		the default is false
@@ -135,7 +135,7 @@ public:
 	///		stored. dim(joint_forces) = dim(u)
 	/// @return 0 on success, -1 on error
 	int calculateInverseDynamics(const vecx& q, const vecx& u, const vecx& dot_u,
-								 vecx* joint_forces);
+	                             vecx* joint_forces);
 	/// Calculate joint space mass matrix
 	/// @param q generalized coordinates
 	/// @param initialize_matrix if true, initialize mass matrix with zero.
@@ -147,8 +147,8 @@ public:
 	/// @param mass_matrix matrix for storing the output (should be dim(q)xdim(q))
 	/// @return -1 on error, 0 on success
 	int calculateMassMatrix(const vecx& q, const bool update_kinematics,
-							const bool initialize_matrix, const bool set_lower_triangular_matrix,
-							matxx* mass_matrix);
+	                        const bool initialize_matrix, const bool set_lower_triangular_matrix,
+	                        matxx* mass_matrix);
 
 	/// Calculate joint space mass matrix.
 	/// This version will update kinematics, initialize all mass_matrix elements to zero and

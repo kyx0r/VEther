@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -157,18 +157,18 @@ void btTriangleConvexcastCallback::processTriangle(btVector3* triangle, int part
 			{
 				/* btContinuousConvexCast's normal is already in world space */
 				/*
-#ifdef USE_SUBSIMPLEX_CONVEX_CAST
+				#ifdef USE_SUBSIMPLEX_CONVEX_CAST
 				//rotate normal into worldspace
 				castResult.m_normal = m_convexShapeFrom.getBasis() * castResult.m_normal;
-#endif //USE_SUBSIMPLEX_CONVEX_CAST
-*/
+				#endif //USE_SUBSIMPLEX_CONVEX_CAST
+				*/
 				castResult.m_normal.normalize();
 
 				reportHit(castResult.m_normal,
-						  castResult.m_hitPoint,
-						  castResult.m_fraction,
-						  partId,
-						  triangleIndex);
+				          castResult.m_hitPoint,
+				          castResult.m_fraction,
+				          partId,
+				          triangleIndex);
 			}
 		}
 	}

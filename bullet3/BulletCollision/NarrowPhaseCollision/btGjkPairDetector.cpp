@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -185,7 +185,7 @@ inline void btVec3Cross(btVector3 *d, const btVector3 *a, const btVector3 *b)
 }
 
 inline void btTripleCross(const btVector3 *a, const btVector3 *b,
-						  const btVector3 *c, btVector3 *d)
+                          const btVector3 *c, btVector3 *d)
 {
 	btVector3 e;
 	btVec3Cross(&e, a, b);
@@ -268,9 +268,9 @@ inline int ccdSign(btScalar val)
 }
 
 inline btScalar btVec3PointSegmentDist2(const btVector3 *P,
-										const btVector3 *x0,
-										const btVector3 *b,
-										btVector3 *witness)
+                                        const btVector3 *x0,
+                                        const btVector3 *b,
+                                        btVector3 *witness)
 {
 	// The computation comes from solving equation of segment:
 	//      S(t) = x0 + t.d
@@ -333,9 +333,9 @@ inline btScalar btVec3PointSegmentDist2(const btVector3 *P,
 }
 
 btScalar btVec3PointTriDist2(const btVector3 *P,
-							 const btVector3 *x0, const btVector3 *B,
-							 const btVector3 *C,
-							 btVector3 *witness)
+                             const btVector3 *x0, const btVector3 *B,
+                             const btVector3 *C,
+                             btVector3 *witness)
 {
 	// Computation comes from analytic expression for triangle (x0, B, C)
 	//      T(s, t) = x0 + s.d1 + t.d2, where d1 = B - x0 and d2 = C - x0 and
@@ -652,7 +652,8 @@ static int btDoSimplex4(btSimplex *simplex, btVector3 *dir)
 		btSimplexSetSize(simplex, 3);
 	}
 	else
-	{  // (!AD_O)
+	{
+		// (!AD_O)
 		btSimplexSet(simplex, 0, C);
 		btSimplexSet(simplex, 1, B);
 		btSimplexSet(simplex, 2, A);
@@ -675,7 +676,8 @@ static int btDoSimplex(btSimplex *simplex, btVector3 *dir)
 		return btDoSimplex3(simplex, dir);
 	}
 	else
-	{  // btSimplexSize(simplex) == 4
+	{
+		// btSimplexSize(simplex) == 4
 		// tetrahedron - this is the only shape which can encapsule origin
 		// so btDoSimplex4() also contains test on it
 		return btDoSimplex4(simplex, dir);
@@ -837,7 +839,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 		if (1)
 		{
 			for (;;)
-			//while (true)
+				//while (true)
 			{
 				btVector3 separatingAxisInA = (-m_cachedSeparatingAxis) * localTransA.getBasis();
 				btVector3 separatingAxisInB = m_cachedSeparatingAxis * localTransB.getBasis();
@@ -945,12 +947,12 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 
 					printf("btGjkPairDetector maxIter exceeded:%i\n", m_curIter);
 					printf("sepAxis=(%f,%f,%f), squaredDistance = %f, shapeTypeA=%i,shapeTypeB=%i\n",
-						   m_cachedSeparatingAxis.getX(),
-						   m_cachedSeparatingAxis.getY(),
-						   m_cachedSeparatingAxis.getZ(),
-						   squaredDistance,
-						   m_minkowskiA->getShapeType(),
-						   m_minkowskiB->getShapeType());
+					       m_cachedSeparatingAxis.getX(),
+					       m_cachedSeparatingAxis.getY(),
+					       m_cachedSeparatingAxis.getZ(),
+					       squaredDistance,
+					       m_minkowskiA->getShapeType(),
+					       m_minkowskiB->getShapeType());
 
 #endif
 					break;
@@ -1004,7 +1006,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 		}
 
 		bool catchDegeneratePenetrationCase =
-			(m_catchDegeneracies && m_penetrationDepthSolver && m_degenerateSimplex && ((distance + margin) < gGjkEpaPenetrationTolerance));
+		    (m_catchDegeneracies && m_penetrationDepthSolver && m_degenerateSimplex && ((distance + margin) < gGjkEpaPenetrationTolerance));
 
 		//if (checkPenetration && !isValid)
 		if ((checkPenetration && (!isValid || catchDegeneratePenetrationCase)) || (status == 0))
@@ -1020,11 +1022,11 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 				m_cachedSeparatingAxis.setZero();
 
 				bool isValid2 = m_penetrationDepthSolver->calcPenDepth(
-					*m_simplexSolver,
-					m_minkowskiA, m_minkowskiB,
-					localTransA, localTransB,
-					m_cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
-					debugDraw);
+				                    *m_simplexSolver,
+				                    m_minkowskiA, m_minkowskiB,
+				                    localTransA, localTransB,
+				                    m_cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
+				                    debugDraw);
 
 				if (m_cachedSeparatingAxis.length2())
 				{
@@ -1172,9 +1174,9 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 		}
 
 		output.addContactPoint(
-			normalInB,
-			pointOnB + positionOffset,
-			distance);
+		    normalInB,
+		    pointOnB + positionOffset,
+		    distance);
 	}
 	else
 	{

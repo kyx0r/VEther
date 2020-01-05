@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -113,15 +113,15 @@ void btBvhTriangleMeshShape::performRaycast(btTriangleCallback* callback, const 
 			PHY_ScalarType indicestype;
 
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
-				&vertexbase,
-				numverts,
-				type,
-				stride,
-				&indexbase,
-				indexstride,
-				numfaces,
-				indicestype,
-				nodeSubPart);
+			    &vertexbase,
+			    numverts,
+			    type,
+			    stride,
+			    &indexbase,
+			    indexstride,
+			    numfaces,
+			    indicestype,
+			    nodeSubPart);
 
 			unsigned int* gfxbase = (unsigned int*)(indexbase + nodeTriangleIndex * indexstride);
 			btAssert(indicestype == PHY_INTEGER || indicestype == PHY_SHORT);
@@ -182,15 +182,15 @@ void btBvhTriangleMeshShape::performConvexcast(btTriangleCallback* callback, con
 			PHY_ScalarType indicestype;
 
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
-				&vertexbase,
-				numverts,
-				type,
-				stride,
-				&indexbase,
-				indexstride,
-				numfaces,
-				indicestype,
-				nodeSubPart);
+			    &vertexbase,
+			    numverts,
+			    type,
+			    stride,
+			    &indexbase,
+			    indexstride,
+			    numfaces,
+			    indicestype,
+			    nodeSubPart);
 
 			unsigned int* gfxbase = (unsigned int*)(indexbase + nodeTriangleIndex * indexstride);
 			btAssert(indicestype == PHY_INTEGER || indicestype == PHY_SHORT);
@@ -262,15 +262,15 @@ void btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback, c
 			PHY_ScalarType indicestype;
 
 			m_meshInterface->getLockedReadOnlyVertexIndexBase(
-				&vertexbase,
-				numverts,
-				type,
-				stride,
-				&indexbase,
-				indexstride,
-				numfaces,
-				indicestype,
-				nodeSubPart);
+			    &vertexbase,
+			    numverts,
+			    type,
+			    stride,
+			    &indexbase,
+			    indexstride,
+			    numfaces,
+			    indicestype,
+			    nodeSubPart);
 
 			unsigned int* gfxbase = (unsigned int*)(indexbase + nodeTriangleIndex * indexstride);
 			btAssert(indicestype == PHY_INTEGER || indicestype == PHY_SHORT || indicestype == PHY_UCHAR);
@@ -288,18 +288,18 @@ void btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback, c
 					float* graphicsbase = (float*)(vertexbase + graphicsindex * stride);
 
 					m_triangle[j] = btVector3(
-						graphicsbase[0] * meshScaling.getX(),
-						graphicsbase[1] * meshScaling.getY(),
-						graphicsbase[2] * meshScaling.getZ());
+					                    graphicsbase[0] * meshScaling.getX(),
+					                    graphicsbase[1] * meshScaling.getY(),
+					                    graphicsbase[2] * meshScaling.getZ());
 				}
 				else
 				{
 					double* graphicsbase = (double*)(vertexbase + graphicsindex * stride);
 
 					m_triangle[j] = btVector3(
-						btScalar(graphicsbase[0]) * meshScaling.getX(),
-						btScalar(graphicsbase[1]) * meshScaling.getY(),
-						btScalar(graphicsbase[2]) * meshScaling.getZ());
+					                    btScalar(graphicsbase[0]) * meshScaling.getX(),
+					                    btScalar(graphicsbase[1]) * meshScaling.getY(),
+					                    btScalar(graphicsbase[2]) * meshScaling.getZ());
 				}
 #ifdef DEBUG_TRIANGLE_MESH
 				printf("triangle vertices:%f,%f,%f\n", triangle[j].x(), triangle[j].y(), triangle[j].z());

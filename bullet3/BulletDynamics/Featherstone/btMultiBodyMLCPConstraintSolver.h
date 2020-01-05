@@ -138,25 +138,25 @@ protected:
 
 	// Documentation inherited
 	btScalar solveGroupCacheFriendlySetup(
-		btCollisionObject** bodies,
-		int numBodies,
-		btPersistentManifold** manifoldPtr,
-		int numManifolds,
-		btTypedConstraint** constraints,
-		int numConstraints,
-		const btContactSolverInfo& infoGlobal,
-		btIDebugDraw* debugDrawer) BT_OVERRIDE;
+	    btCollisionObject** bodies,
+	    int numBodies,
+	    btPersistentManifold** manifoldPtr,
+	    int numManifolds,
+	    btTypedConstraint** constraints,
+	    int numConstraints,
+	    const btContactSolverInfo& infoGlobal,
+	    btIDebugDraw* debugDrawer) BT_OVERRIDE;
 
 	// Documentation inherited
 	btScalar solveGroupCacheFriendlyIterations(
-		btCollisionObject** bodies,
-		int numBodies,
-		btPersistentManifold** manifoldPtr,
-		int numManifolds,
-		btTypedConstraint** constraints,
-		int numConstraints,
-		const btContactSolverInfo& infoGlobal,
-		btIDebugDraw* debugDrawer) ;
+	    btCollisionObject** bodies,
+	    int numBodies,
+	    btPersistentManifold** manifoldPtr,
+	    int numManifolds,
+	    btTypedConstraint** constraints,
+	    int numConstraints,
+	    const btContactSolverInfo& infoGlobal,
+	    btIDebugDraw* debugDrawer) ;
 
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR()

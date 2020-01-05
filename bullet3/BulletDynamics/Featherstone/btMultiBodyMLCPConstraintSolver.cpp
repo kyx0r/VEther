@@ -34,11 +34,11 @@ struct btJointNode1
 
 // Helper function to compute a delta velocity in the constraint space.
 static btScalar computeDeltaVelocityInConstraintSpace(
-	const btVector3& angularDeltaVelocity,
-	const btVector3& contactNormal,
-	btScalar invMass,
-	const btVector3& angularJacobian,
-	const btVector3& linearJacobian)
+    const btVector3& angularDeltaVelocity,
+    const btVector3& contactNormal,
+    btScalar invMass,
+    const btVector3& angularJacobian,
+    const btVector3& linearJacobian)
 {
 	return angularDeltaVelocity.dot(angularJacobian) + contactNormal.dot(linearJacobian) * invMass;
 }
@@ -46,9 +46,9 @@ static btScalar computeDeltaVelocityInConstraintSpace(
 // Faster version of computeDeltaVelocityInConstraintSpace that can be used when contactNormal and linearJacobian are
 // identical.
 static btScalar computeDeltaVelocityInConstraintSpace(
-	const btVector3& angularDeltaVelocity,
-	btScalar invMass,
-	const btVector3& angularJacobian)
+    const btVector3& angularDeltaVelocity,
+    btScalar invMass,
+    const btVector3& angularJacobian)
 {
 	return angularDeltaVelocity.dot(angularJacobian) + invMass;
 }
@@ -64,9 +64,9 @@ static btScalar computeDeltaVelocityInConstraintSpace(const btScalar* deltaVeloc
 }
 
 static btScalar computeConstraintMatrixDiagElementMultiBody(
-	const btAlignedObjectArray<btSolverBody>& solverBodyPool,
-	const btMultiBodyJacobianData& data,
-	const btMultiBodySolverConstraint& constraint)
+    const btAlignedObjectArray<btSolverBody>& solverBodyPool,
+    const btMultiBodyJacobianData& data,
+    const btMultiBodySolverConstraint& constraint)
 {
 	btScalar ret = 0;
 
@@ -87,9 +87,9 @@ static btScalar computeConstraintMatrixDiagElementMultiBody(
 		const btSolverBody* solverBodyA = &solverBodyPool[solverBodyIdA];
 		const btScalar invMassA = solverBodyA->m_originalBody ? solverBodyA->m_originalBody->getInvMass() : 0.0;
 		ret += computeDeltaVelocityInConstraintSpace(
-			constraint.m_relpos1CrossNormal,
-			invMassA,
-			constraint.m_angularComponentA);
+		           constraint.m_relpos1CrossNormal,
+		           invMassA,
+		           constraint.m_angularComponentA);
 	}
 
 	if (multiBodyB)
@@ -106,19 +106,19 @@ static btScalar computeConstraintMatrixDiagElementMultiBody(
 		const btSolverBody* solverBodyB = &solverBodyPool[solverBodyIdB];
 		const btScalar invMassB = solverBodyB->m_originalBody ? solverBodyB->m_originalBody->getInvMass() : 0.0;
 		ret += computeDeltaVelocityInConstraintSpace(
-			constraint.m_relpos2CrossNormal,
-			invMassB,
-			constraint.m_angularComponentB);
+		           constraint.m_relpos2CrossNormal,
+		           invMassB,
+		           constraint.m_angularComponentB);
 	}
 
 	return ret;
 }
 
 static btScalar computeConstraintMatrixOffDiagElementMultiBody(
-	const btAlignedObjectArray<btSolverBody>& solverBodyPool,
-	const btMultiBodyJacobianData& data,
-	const btMultiBodySolverConstraint& constraint,
-	const btMultiBodySolverConstraint& offDiagConstraint)
+    const btAlignedObjectArray<btSolverBody>& solverBodyPool,
+    const btMultiBodyJacobianData& data,
+    const btMultiBodySolverConstraint& constraint,
+    const btMultiBodySolverConstraint& offDiagConstraint)
 {
 	btScalar offDiagA = btScalar(0);
 
@@ -162,10 +162,10 @@ static btScalar computeConstraintMatrixOffDiagElementMultiBody(
 			const btSolverBody* solverBodyA = &solverBodyPool[solverBodyIdA];
 			const btScalar invMassA = solverBodyA->m_originalBody ? solverBodyA->m_originalBody->getInvMass() : 0.0;
 			offDiagA += computeDeltaVelocityInConstraintSpace(
-				offDiagConstraint.m_relpos1CrossNormal,
-				offDiagConstraint.m_contactNormal1,
-				invMassA, constraint.m_angularComponentA,
-				constraint.m_contactNormal1);
+			                offDiagConstraint.m_relpos1CrossNormal,
+			                offDiagConstraint.m_contactNormal1,
+			                invMassA, constraint.m_angularComponentA,
+			                constraint.m_contactNormal1);
 		}
 		else if (offDiagSolverBodyIdA == solverBodyIdB)
 		{
@@ -173,11 +173,11 @@ static btScalar computeConstraintMatrixOffDiagElementMultiBody(
 			const btSolverBody* solverBodyB = &solverBodyPool[solverBodyIdB];
 			const btScalar invMassB = solverBodyB->m_originalBody ? solverBodyB->m_originalBody->getInvMass() : 0.0;
 			offDiagA += computeDeltaVelocityInConstraintSpace(
-				offDiagConstraint.m_relpos1CrossNormal,
-				offDiagConstraint.m_contactNormal1,
-				invMassB,
-				constraint.m_angularComponentB,
-				constraint.m_contactNormal2);
+			                offDiagConstraint.m_relpos1CrossNormal,
+			                offDiagConstraint.m_contactNormal1,
+			                invMassB,
+			                constraint.m_angularComponentB,
+			                constraint.m_contactNormal2);
 		}
 	}
 
@@ -212,10 +212,10 @@ static btScalar computeConstraintMatrixOffDiagElementMultiBody(
 			const btSolverBody* solverBodyA = &solverBodyPool[solverBodyIdA];
 			const btScalar invMassA = solverBodyA->m_originalBody ? solverBodyA->m_originalBody->getInvMass() : 0.0;
 			offDiagA += computeDeltaVelocityInConstraintSpace(
-				offDiagConstraint.m_relpos2CrossNormal,
-				offDiagConstraint.m_contactNormal2,
-				invMassA, constraint.m_angularComponentA,
-				constraint.m_contactNormal1);
+			                offDiagConstraint.m_relpos2CrossNormal,
+			                offDiagConstraint.m_contactNormal2,
+			                invMassA, constraint.m_angularComponentA,
+			                constraint.m_contactNormal1);
 		}
 		else if (offDiagSolverBodyIdB == solverBodyIdB)
 		{
@@ -223,10 +223,10 @@ static btScalar computeConstraintMatrixOffDiagElementMultiBody(
 			const btSolverBody* solverBodyB = &solverBodyPool[solverBodyIdB];
 			const btScalar invMassB = solverBodyB->m_originalBody ? solverBodyB->m_originalBody->getInvMass() : 0.0;
 			offDiagA += computeDeltaVelocityInConstraintSpace(
-				offDiagConstraint.m_relpos2CrossNormal,
-				offDiagConstraint.m_contactNormal2,
-				invMassB, constraint.m_angularComponentB,
-				constraint.m_contactNormal2);
+			                offDiagConstraint.m_relpos2CrossNormal,
+			                offDiagConstraint.m_contactNormal2,
+			                invMassB, constraint.m_angularComponentB,
+			                constraint.m_contactNormal2);
 		}
 	}
 
@@ -461,7 +461,7 @@ void btMultiBodyMLCPConstraintSolver::createMLCPFastRigidBody(const btContactSol
 						size_t ofsother = (m_allConstraintPtrArray[cr0]->m_solverBodyIdB == sbA) ? 8 * numRowsOther : 0;
 						//printf("%d joint i %d and j0: %d: ",count++,i,j0);
 						m_A.multiplyAdd2_p8r(JinvMrow,
-											 Jptr + 2 * 8 * (size_t)ofs[j0] + ofsother, numRows, numRowsOther, row__, ofs[j0]);
+						                     Jptr + 2 * 8 * (size_t)ofs[j0] + ofsother, numRows, numRowsOther, row__, ofs[j0]);
 					}
 					startJointNodeA = jointNodeArray[startJointNodeA].nextJointNodeIndex;
 				}
@@ -479,7 +479,7 @@ void btMultiBodyMLCPConstraintSolver::createMLCPFastRigidBody(const btContactSol
 						int numRowsOther = cj1 < m_tmpSolverNonContactConstraintPool.size() ? m_tmpConstraintSizesPool[j1].m_numConstraintRows : numContactRows;
 						size_t ofsother = (m_allConstraintPtrArray[cj1]->m_solverBodyIdB == sbB) ? 8 * numRowsOther : 0;
 						m_A.multiplyAdd2_p8r(JinvMrow + 8 * (size_t)numRows,
-											 Jptr + 2 * 8 * (size_t)ofs[j1] + ofsother, numRows, numRowsOther, row__, ofs[j1]);
+						                     Jptr + 2 * 8 * (size_t)ofs[j1] + ofsother, numRows, numRowsOther, row__, ofs[j1]);
 					}
 					startJointNodeB = jointNodeArray[startJointNodeB].nextJointNodeIndex;
 				}
@@ -689,18 +689,18 @@ bool btMultiBodyMLCPConstraintSolver::solveMLCP(const btContactSolverInfo& infoG
 }
 
 btScalar btMultiBodyMLCPConstraintSolver::solveGroupCacheFriendlySetup(
-	btCollisionObject** bodies,
-	int numBodies,
-	btPersistentManifold** manifoldPtr,
-	int numManifolds,
-	btTypedConstraint** constraints,
-	int numConstraints,
-	const btContactSolverInfo& infoGlobal,
-	btIDebugDraw* debugDrawer)
+    btCollisionObject** bodies,
+    int numBodies,
+    btPersistentManifold** manifoldPtr,
+    int numManifolds,
+    btTypedConstraint** constraints,
+    int numConstraints,
+    const btContactSolverInfo& infoGlobal,
+    btIDebugDraw* debugDrawer)
 {
 	// 1. Setup for rigid-bodies
 	btMultiBodyConstraintSolver::solveGroupCacheFriendlySetup(
-		bodies, numBodies, manifoldPtr, numManifolds, constraints, numConstraints, infoGlobal, debugDrawer);
+	    bodies, numBodies, manifoldPtr, numManifolds, constraints, numConstraints, infoGlobal, debugDrawer);
 
 	// 2. Setup for multi-bodies
 	//   a. Collect all different kinds of constraint as pointers into one array, m_allConstraintPtrArray

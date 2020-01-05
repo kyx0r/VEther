@@ -24,12 +24,12 @@ subject to the following restrictions:
 
 btMultiBodySphericalJointMotor::btMultiBodySphericalJointMotor(btMultiBody* body, int link, btScalar maxMotorImpulse)
 	: btMultiBodyConstraint(body, body, link, body->getLink(link).m_parent, 3, true),
-	m_desiredVelocity(0, 0, 0),
-	m_desiredPosition(0,0,0,1),
-	m_kd(1.),
-	m_kp(0.2),
-	m_erp(1),
-	m_rhsClamp(SIMD_INFINITY)
+	  m_desiredVelocity(0, 0, 0),
+	  m_desiredPosition(0,0,0,1),
+	  m_kd(1.),
+	  m_kp(0.2),
+	  m_erp(1),
+	  m_rhsClamp(SIMD_INFINITY)
 {
 
 	m_maxAppliedImpulse = maxMotorImpulse;
@@ -93,8 +93,8 @@ int btMultiBodySphericalJointMotor::getIslandIdB() const
 }
 
 void btMultiBodySphericalJointMotor::createConstraintRows(btMultiBodyConstraintArray& constraintRows,
-												 btMultiBodyJacobianData& data,
-												 const btContactSolverInfo& infoGlobal)
+        btMultiBodyJacobianData& data,
+        const btContactSolverInfo& infoGlobal)
 {
 	// only positions need to be updated -- data.m_jacobians and force
 	// directions were set in the ctor and never change.
@@ -107,7 +107,7 @@ void btMultiBodySphericalJointMotor::createConstraintRows(btMultiBodyConstraintA
 	//don't crash
 	if (m_numDofsFinalized != m_jacSizeBoth)
 		return;
-	
+
 
 	if (m_maxAppliedImpulse == 0.f)
 		return;
@@ -115,16 +115,16 @@ void btMultiBodySphericalJointMotor::createConstraintRows(btMultiBodyConstraintA
 	const btScalar posError = 0;
 	const btVector3 dummy(0, 0, 0);
 
-	
+
 	btVector3 axis[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0), btVector3(0, 0, 1) };
-	
+
 	btQuaternion desiredQuat = m_desiredPosition;
 	btQuaternion currentQuat(m_bodyA->getJointPosMultiDof(m_linkA)[0],
-		m_bodyA->getJointPosMultiDof(m_linkA)[1],
-		m_bodyA->getJointPosMultiDof(m_linkA)[2],
-		m_bodyA->getJointPosMultiDof(m_linkA)[3]);
+	                         m_bodyA->getJointPosMultiDof(m_linkA)[1],
+	                         m_bodyA->getJointPosMultiDof(m_linkA)[2],
+	                         m_bodyA->getJointPosMultiDof(m_linkA)[3]);
 
-btQuaternion relRot = currentQuat.inverse() * desiredQuat;
+	btQuaternion relRot = currentQuat.inverse() * desiredQuat;
 	btVector3 angleDiff;
 	btGeneric6DofSpring2Constraint::matrixToEulerXYZ(btMatrix3x3(relRot), angleDiff);
 
@@ -135,10 +135,10 @@ btQuaternion relRot = currentQuat.inverse() * desiredQuat;
 		btMultiBodySolverConstraint& constraintRow = constraintRows.expandNonInitializing();
 
 		int dof = row;
-		
+
 		btScalar currentVelocity = m_bodyA->getJointVelMultiDof(m_linkA)[dof];
 		btScalar desiredVelocity = this->m_desiredVelocity[row];
-		
+
 		btScalar velocityError = desiredVelocity - currentVelocity;
 
 		btMatrix3x3 frameAworld;
@@ -149,23 +149,23 @@ btQuaternion relRot = currentQuat.inverse() * desiredQuat;
 			btAssert(m_bodyA->getLink(m_linkA).m_jointType == btMultibodyLink::eSpherical);
 			switch (m_bodyA->getLink(m_linkA).m_jointType)
 			{
-				case btMultibodyLink::eSpherical:
-				{
-					btVector3 constraintNormalAng = frameAworld.getColumn(row % 3);
-					posError = m_kp*angleDiff[row % 3];
-					fillMultiBodyConstraint(constraintRow, data, 0, 0, constraintNormalAng,
-						btVector3(0,0,0), dummy, dummy,
-						posError,
-						infoGlobal,
-						-m_maxAppliedImpulse, m_maxAppliedImpulse, true);
-					constraintRow.m_orgConstraint = this;
-					constraintRow.m_orgDofIndex = row;
-					break;
-				}
-				default:
-				{
-					btAssert(0);
-				}
+			case btMultibodyLink::eSpherical:
+			{
+				btVector3 constraintNormalAng = frameAworld.getColumn(row % 3);
+				posError = m_kp*angleDiff[row % 3];
+				fillMultiBodyConstraint(constraintRow, data, 0, 0, constraintNormalAng,
+				                        btVector3(0,0,0), dummy, dummy,
+				                        posError,
+				                        infoGlobal,
+				                        -m_maxAppliedImpulse, m_maxAppliedImpulse, true);
+				constraintRow.m_orgConstraint = this;
+				constraintRow.m_orgDofIndex = row;
+				break;
+			}
+			default:
+			{
+				btAssert(0);
+			}
 			};
 		}
 	}

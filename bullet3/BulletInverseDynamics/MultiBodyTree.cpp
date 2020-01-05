@@ -88,15 +88,27 @@ int MultiBodyTree::getBodyAxisOfMotion(const int body_index, vec3 *axis) const
 	return m_impl->getBodyAxisOfMotion(body_index, axis);
 }
 
-void MultiBodyTree::printTree() { m_impl->printTree(); }
-void MultiBodyTree::printTreeData() { m_impl->printTreeData(); }
+void MultiBodyTree::printTree()
+{
+	m_impl->printTree();
+}
+void MultiBodyTree::printTreeData()
+{
+	m_impl->printTreeData();
+}
 
-int MultiBodyTree::numBodies() const { return m_impl->m_num_bodies; }
+int MultiBodyTree::numBodies() const
+{
+	return m_impl->m_num_bodies;
+}
 
-int MultiBodyTree::numDoFs() const { return m_impl->m_num_dofs; }
+int MultiBodyTree::numDoFs() const
+{
+	return m_impl->m_num_dofs;
+}
 
 int MultiBodyTree::calculateInverseDynamics(const vecx &q, const vecx &u, const vecx &dot_u,
-											vecx *joint_forces)
+        vecx *joint_forces)
 {
 	if (false == m_is_finalized)
 	{
@@ -112,8 +124,8 @@ int MultiBodyTree::calculateInverseDynamics(const vecx &q, const vecx &u, const 
 }
 
 int MultiBodyTree::calculateMassMatrix(const vecx &q, const bool update_kinematics,
-									   const bool initialize_matrix,
-									   const bool set_lower_triangular_matrix, matxx *mass_matrix)
+                                       const bool initialize_matrix,
+                                       const bool set_lower_triangular_matrix, matxx *mass_matrix)
 {
 	if (false == m_is_finalized)
 	{
@@ -121,8 +133,8 @@ int MultiBodyTree::calculateMassMatrix(const vecx &q, const bool update_kinemati
 		return -1;
 	}
 	if (-1 ==
-		m_impl->calculateMassMatrix(q, update_kinematics, initialize_matrix,
-									set_lower_triangular_matrix, mass_matrix))
+	        m_impl->calculateMassMatrix(q, update_kinematics, initialize_matrix,
+	                                    set_lower_triangular_matrix, mass_matrix))
 	{
 		bt_id_error_message("error in mass matrix calculation\n");
 		return -1;
@@ -147,7 +159,7 @@ int MultiBodyTree::calculateKinematics(const vecx &q, const vecx &u, const vecx 
 		return -1;
 	}
 	if (-1 == m_impl->calculateKinematics(q, u, dot_u,
-										  MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY_ACCELERATION))
+	                                      MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY_ACCELERATION))
 	{
 		bt_id_error_message("error in kinematics calculation\n");
 		return -1;
@@ -165,7 +177,7 @@ int MultiBodyTree::calculatePositionKinematics(const vecx &q)
 		return -1;
 	}
 	if (-1 == m_impl->calculateKinematics(q, q, q,
-										  MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY))
+	                                      MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY))
 	{
 		bt_id_error_message("error in kinematics calculation\n");
 		return -1;
@@ -181,7 +193,7 @@ int MultiBodyTree::calculatePositionAndVelocityKinematics(const vecx &q, const v
 		return -1;
 	}
 	if (-1 == m_impl->calculateKinematics(q, u, u,
-										  MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY))
+	                                      MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY))
 	{
 		bt_id_error_message("error in kinematics calculation\n");
 		return -1;
@@ -198,7 +210,7 @@ int MultiBodyTree::calculateJacobians(const vecx &q, const vecx &u)
 		return -1;
 	}
 	if (-1 == m_impl->calculateJacobians(q, u,
-										 MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY))
+	                                     MultiBodyTree::MultiBodyImpl::POSITION_VELOCITY))
 	{
 		bt_id_error_message("error in jacobian calculation\n");
 		return -1;
@@ -214,7 +226,7 @@ int MultiBodyTree::calculateJacobians(const vecx &q)
 		return -1;
 	}
 	if (-1 == m_impl->calculateJacobians(q, q,
-										 MultiBodyTree::MultiBodyImpl::POSITION_ONLY))
+	                                     MultiBodyTree::MultiBodyImpl::POSITION_ONLY))
 	{
 		bt_id_error_message("error in jacobian calculation\n");
 		return -1;
@@ -245,10 +257,10 @@ int MultiBodyTree::getBodyJacobianRot(const int body_index, mat3x *world_jac_rot
 #endif
 
 int MultiBodyTree::addBody(int body_index, int parent_index, JointType joint_type,
-						   const vec3 &parent_r_parent_body_ref, const mat33 &body_T_parent_ref,
-						   const vec3 &body_axis_of_motion_, idScalar mass,
-						   const vec3 &body_r_body_com, const mat33 &body_I_body,
-						   const int user_int, void *user_ptr)
+                           const vec3 &parent_r_parent_body_ref, const mat33 &body_T_parent_ref,
+                           const vec3 &body_axis_of_motion_, idScalar mass,
+                           const vec3 &body_r_body_com, const mat33 &body_I_body,
+                           const int user_int, void *user_ptr)
 {
 	if (body_index < 0)
 	{
@@ -258,34 +270,34 @@ int MultiBodyTree::addBody(int body_index, int parent_index, JointType joint_typ
 	vec3 body_axis_of_motion(body_axis_of_motion_);
 	switch (joint_type)
 	{
-		case REVOLUTE:
-		case PRISMATIC:
-			// check if axis is unit vector
-			if (!isUnitVector(body_axis_of_motion))
+	case REVOLUTE:
+	case PRISMATIC:
+		// check if axis is unit vector
+		if (!isUnitVector(body_axis_of_motion))
+		{
+			bt_id_warning_message(
+			    "axis of motion not a unit axis ([%f %f %f]), will use normalized vector\n",
+			    body_axis_of_motion(0), body_axis_of_motion(1), body_axis_of_motion(2));
+			idScalar length = BT_ID_SQRT(BT_ID_POW(body_axis_of_motion(0), 2) +
+			                             BT_ID_POW(body_axis_of_motion(1), 2) +
+			                             BT_ID_POW(body_axis_of_motion(2), 2));
+			if (length < BT_ID_SQRT(std::numeric_limits<idScalar>::min()))
 			{
-				bt_id_warning_message(
-					"axis of motion not a unit axis ([%f %f %f]), will use normalized vector\n",
-					body_axis_of_motion(0), body_axis_of_motion(1), body_axis_of_motion(2));
-				idScalar length = BT_ID_SQRT(BT_ID_POW(body_axis_of_motion(0), 2) +
-											 BT_ID_POW(body_axis_of_motion(1), 2) +
-											 BT_ID_POW(body_axis_of_motion(2), 2));
-				if (length < BT_ID_SQRT(std::numeric_limits<idScalar>::min()))
-				{
-					bt_id_error_message("axis of motion vector too short (%e)\n", length);
-					return -1;
-				}
-				body_axis_of_motion = (1.0 / length) * body_axis_of_motion;
+				bt_id_error_message("axis of motion vector too short (%e)\n", length);
+				return -1;
 			}
-			break;
-		case FIXED:
-			break;
-		case FLOATING:
-			break;
-		case SPHERICAL:
-			break;
-		default:
-			bt_id_error_message("unknown joint type %d\n", joint_type);
-			return -1;
+			body_axis_of_motion = (1.0 / length) * body_axis_of_motion;
+		}
+		break;
+	case FIXED:
+		break;
+	case FLOATING:
+		break;
+	case SPHERICAL:
+		break;
+	default:
+		bt_id_error_message("unknown joint type %d\n", joint_type);
+		return -1;
 	}
 
 	// sanity check for mass properties. Zero mass is OK.
@@ -315,8 +327,8 @@ int MultiBodyTree::addBody(int body_index, int parent_index, JointType joint_typ
 	}
 
 	return m_init_cache->addBody(body_index, parent_index, joint_type, parent_r_parent_body_ref,
-								 body_T_parent_ref, body_axis_of_motion, mass, body_r_body_com,
-								 body_I_body, user_int, user_ptr);
+	                             body_T_parent_ref, body_axis_of_motion, mass, body_r_body_com,
+	                             body_I_body, user_int, user_ptr);
 }
 
 int MultiBodyTree::getParentIndex(const int body_index, int *parent_index) const
@@ -414,54 +426,54 @@ int MultiBodyTree::finalize()
 		// matrices.
 		switch (rigid_body.m_joint_type)
 		{
-			case REVOLUTE:
-				rigid_body.m_Jac_JR(0) = joint.m_child_axis_of_motion(0);
-				rigid_body.m_Jac_JR(1) = joint.m_child_axis_of_motion(1);
-				rigid_body.m_Jac_JR(2) = joint.m_child_axis_of_motion(2);
-				rigid_body.m_Jac_JT(0) = 0.0;
-				rigid_body.m_Jac_JT(1) = 0.0;
-				rigid_body.m_Jac_JT(2) = 0.0;
-				break;
-			case PRISMATIC:
-				rigid_body.m_Jac_JR(0) = 0.0;
-				rigid_body.m_Jac_JR(1) = 0.0;
-				rigid_body.m_Jac_JR(2) = 0.0;
-				rigid_body.m_Jac_JT(0) = joint.m_child_axis_of_motion(0);
-				rigid_body.m_Jac_JT(1) = joint.m_child_axis_of_motion(1);
-				rigid_body.m_Jac_JT(2) = joint.m_child_axis_of_motion(2);
-				break;
-			case FIXED:
-				// NOTE/TODO: dimension really should be zero ..
-				rigid_body.m_Jac_JR(0) = 0.0;
-				rigid_body.m_Jac_JR(1) = 0.0;
-				rigid_body.m_Jac_JR(2) = 0.0;
-				rigid_body.m_Jac_JT(0) = 0.0;
-				rigid_body.m_Jac_JT(1) = 0.0;
-				rigid_body.m_Jac_JT(2) = 0.0;
-				break;
-			case SPHERICAL:
-				// NOTE/TODO: this is not really correct.
-				// the Jacobians should be 3x3 matrices here !
-				rigid_body.m_Jac_JR(0) = 0.0;
-				rigid_body.m_Jac_JR(1) = 0.0;
-				rigid_body.m_Jac_JR(2) = 0.0;
-				rigid_body.m_Jac_JT(0) = 0.0;
-				rigid_body.m_Jac_JT(1) = 0.0;
-				rigid_body.m_Jac_JT(2) = 0.0;
-				break;
-			case FLOATING:
-				// NOTE/TODO: this is not really correct.
-				// the Jacobians should be 3x3 matrices here !
-				rigid_body.m_Jac_JR(0) = 0.0;
-				rigid_body.m_Jac_JR(1) = 0.0;
-				rigid_body.m_Jac_JR(2) = 0.0;
-				rigid_body.m_Jac_JT(0) = 0.0;
-				rigid_body.m_Jac_JT(1) = 0.0;
-				rigid_body.m_Jac_JT(2) = 0.0;
-				break;
-			default:
-				bt_id_error_message("unsupported joint type %d\n", rigid_body.m_joint_type);
-				return -1;
+		case REVOLUTE:
+			rigid_body.m_Jac_JR(0) = joint.m_child_axis_of_motion(0);
+			rigid_body.m_Jac_JR(1) = joint.m_child_axis_of_motion(1);
+			rigid_body.m_Jac_JR(2) = joint.m_child_axis_of_motion(2);
+			rigid_body.m_Jac_JT(0) = 0.0;
+			rigid_body.m_Jac_JT(1) = 0.0;
+			rigid_body.m_Jac_JT(2) = 0.0;
+			break;
+		case PRISMATIC:
+			rigid_body.m_Jac_JR(0) = 0.0;
+			rigid_body.m_Jac_JR(1) = 0.0;
+			rigid_body.m_Jac_JR(2) = 0.0;
+			rigid_body.m_Jac_JT(0) = joint.m_child_axis_of_motion(0);
+			rigid_body.m_Jac_JT(1) = joint.m_child_axis_of_motion(1);
+			rigid_body.m_Jac_JT(2) = joint.m_child_axis_of_motion(2);
+			break;
+		case FIXED:
+			// NOTE/TODO: dimension really should be zero ..
+			rigid_body.m_Jac_JR(0) = 0.0;
+			rigid_body.m_Jac_JR(1) = 0.0;
+			rigid_body.m_Jac_JR(2) = 0.0;
+			rigid_body.m_Jac_JT(0) = 0.0;
+			rigid_body.m_Jac_JT(1) = 0.0;
+			rigid_body.m_Jac_JT(2) = 0.0;
+			break;
+		case SPHERICAL:
+			// NOTE/TODO: this is not really correct.
+			// the Jacobians should be 3x3 matrices here !
+			rigid_body.m_Jac_JR(0) = 0.0;
+			rigid_body.m_Jac_JR(1) = 0.0;
+			rigid_body.m_Jac_JR(2) = 0.0;
+			rigid_body.m_Jac_JT(0) = 0.0;
+			rigid_body.m_Jac_JT(1) = 0.0;
+			rigid_body.m_Jac_JT(2) = 0.0;
+			break;
+		case FLOATING:
+			// NOTE/TODO: this is not really correct.
+			// the Jacobians should be 3x3 matrices here !
+			rigid_body.m_Jac_JR(0) = 0.0;
+			rigid_body.m_Jac_JR(1) = 0.0;
+			rigid_body.m_Jac_JR(2) = 0.0;
+			rigid_body.m_Jac_JT(0) = 0.0;
+			rigid_body.m_Jac_JT(1) = 0.0;
+			rigid_body.m_Jac_JT(2) = 0.0;
+			break;
+		default:
+			bt_id_error_message("unsupported joint type %d\n", rigid_body.m_joint_type);
+			return -1;
 		}
 	}
 
@@ -533,7 +545,10 @@ int MultiBodyTree::getBodySecondMassMoment(const int body_index, mat33 *second_m
 	return m_impl->getBodySecondMassMoment(body_index, second_mass_moment);
 }
 
-void MultiBodyTree::clearAllUserForcesAndMoments() { m_impl->clearAllUserForcesAndMoments(); }
+void MultiBodyTree::clearAllUserForcesAndMoments()
+{
+	m_impl->clearAllUserForcesAndMoments();
+}
 
 int MultiBodyTree::addUserForce(const int body_index, const vec3 &body_force)
 {

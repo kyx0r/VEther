@@ -4,8 +4,8 @@ btConeTwistConstraint is Copyright (c) 2007 Starbreeze Studios
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -55,7 +55,8 @@ enum btConeTwistFlags
 
 ///btConeTwistConstraint can be used to simulate ragdoll joints (upper arm, leg etc)
 ATTRIBUTE_ALIGNED16(class)
-btConeTwistConstraint : public btTypedConstraint
+btConeTwistConstraint :
+public btTypedConstraint
 {
 #ifdef IN_PARALLELL_SOLVER
 public:
@@ -120,10 +121,10 @@ protected:
 	void init();
 
 	void computeConeLimitInfo(const btQuaternion& qCone,                                           // in
-							  btScalar& swingAngle, btVector3& vSwingAxis, btScalar& swingLimit);  // all outs
+	                          btScalar& swingAngle, btVector3& vSwingAxis, btScalar& swingLimit);  // all outs
 
 	void computeTwistLimitInfo(const btQuaternion& qTwist,                    // in
-							   btScalar& twistAngle, btVector3& vTwistAxis);  // all outs
+	                           btScalar& twistAngle, btVector3& vTwistAxis);  // all outs
 
 	void adjustSwingAxisToUseEllipseNormal(btVector3 & vSwingAxis) const;
 
@@ -171,24 +172,24 @@ public:
 	{
 		switch (limitIndex)
 		{
-			case 3:
-			{
-				m_twistSpan = limitValue;
-				break;
-			}
-			case 4:
-			{
-				m_swingSpan2 = limitValue;
-				break;
-			}
-			case 5:
-			{
-				m_swingSpan1 = limitValue;
-				break;
-			}
-			default:
-			{
-			}
+		case 3:
+		{
+			m_twistSpan = limitValue;
+			break;
+		}
+		case 4:
+		{
+			m_swingSpan2 = limitValue;
+			break;
+		}
+		case 5:
+		{
+			m_swingSpan1 = limitValue;
+			break;
+		}
+		default:
+		{
+		}
 		};
 	}
 
@@ -196,26 +197,26 @@ public:
 	{
 		switch (limitIndex)
 		{
-			case 3:
-			{
-				return m_twistSpan;
-				break;
-			}
-			case 4:
-			{
-				return m_swingSpan2;
-				break;
-			}
-			case 5:
-			{
-				return m_swingSpan1;
-				break;
-			}
-			default:
-			{
-				btAssert(0 && "Invalid limitIndex specified for btConeTwistConstraint");
-				return 0.0;
-			}
+		case 3:
+		{
+			return m_twistSpan;
+			break;
+		}
+		case 4:
+		{
+			return m_swingSpan2;
+			break;
+		}
+		case 5:
+		{
+			return m_swingSpan1;
+			break;
+		}
+		default:
+		{
+			btAssert(0 && "Invalid limitIndex specified for btConeTwistConstraint");
+			return 0.0;
+		}
 		};
 	}
 
@@ -290,12 +291,21 @@ public:
 	{
 		return m_twistAngle;
 	}
-	bool isPastSwingLimit() { return m_solveSwingLimit; }
+	bool isPastSwingLimit()
+	{
+		return m_solveSwingLimit;
+	}
 
 	btScalar getDamping() const { return m_damping; }
-	void setDamping(btScalar damping) { m_damping = damping; }
+	void setDamping(btScalar damping)
+	{
+		m_damping = damping;
+	}
 
-	void enableMotor(bool b) { m_bMotorEnabled = b; }
+	void enableMotor(bool b)
+	{
+		m_bMotorEnabled = b;
+	}
 	bool isMotorEnabled() const { return m_bMotorEnabled; }
 	btScalar getMaxMotorImpulse() const { return m_maxMotorImpulse; }
 	bool isMaxMotorImpulseNormalized() const { return m_bNormalizedMotorStrength; }
@@ -310,8 +320,14 @@ public:
 		m_bNormalizedMotorStrength = true;
 	}
 
-	btScalar getFixThresh() { return m_fixThresh; }
-	void setFixThresh(btScalar fixThresh) { m_fixThresh = fixThresh; }
+	btScalar getFixThresh()
+	{
+		return m_fixThresh;
+	}
+	void setFixThresh(btScalar fixThresh)
+	{
+		m_fixThresh = fixThresh;
+	}
 
 	// setMotorTarget:
 	// q: the desired rotation of bodyA wrt bodyB.

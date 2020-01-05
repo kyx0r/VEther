@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -69,17 +69,17 @@ void btCylinderShape::calculateLocalInertia(btScalar mass, btVector3& inertia) c
 
 	switch (m_upAxis)  // get indices of radius and height of cylinder
 	{
-		case 0:  // cylinder is aligned along x
-			idxRadius = 1;
-			idxHeight = 0;
-			break;
-		case 2:  // cylinder is aligned along z
-			idxRadius = 0;
-			idxHeight = 2;
-			break;
-		default:  // cylinder is aligned along y
-			idxRadius = 0;
-			idxHeight = 1;
+	case 0:  // cylinder is aligned along x
+		idxRadius = 1;
+		idxHeight = 0;
+		break;
+	case 2:  // cylinder is aligned along z
+		idxRadius = 0;
+		idxHeight = 2;
+		break;
+	default:  // cylinder is aligned along y
+		idxRadius = 0;
+		idxHeight = 1;
 	}
 
 	// calculate squares
@@ -92,14 +92,14 @@ void btCylinderShape::calculateLocalInertia(btScalar mass, btVector3& inertia) c
 
 	switch (m_upAxis)  // set diagonal elements of inertia tensor
 	{
-		case 0:  // cylinder is aligned along x
-			inertia.setValue(t2, t1, t1);
-			break;
-		case 2:  // cylinder is aligned along z
-			inertia.setValue(t1, t1, t2);
-			break;
-		default:  // cylinder is aligned along y
-			inertia.setValue(t1, t2, t1);
+	case 0:  // cylinder is aligned along x
+		inertia.setValue(t2, t1, t1);
+		break;
+	case 2:  // cylinder is aligned along z
+		inertia.setValue(t1, t1, t2);
+		break;
+	default:  // cylinder is aligned along y
+		inertia.setValue(t1, t2, t1);
 	}
 #else   //USE_BOX_INERTIA_APPROXIMATION
 	//approximation of box shape
@@ -110,8 +110,8 @@ void btCylinderShape::calculateLocalInertia(btScalar mass, btVector3& inertia) c
 	btScalar lz = btScalar(2.) * (halfExtents.z());
 
 	inertia.setValue(mass / (btScalar(12.0)) * (ly * ly + lz * lz),
-					 mass / (btScalar(12.0)) * (lx * lx + lz * lz),
-					 mass / (btScalar(12.0)) * (lx * lx + ly * ly));
+	                 mass / (btScalar(12.0)) * (lx * lx + lz * lz),
+	                 mass / (btScalar(12.0)) * (lx * lx + ly * ly));
 #endif  //USE_BOX_INERTIA_APPROXIMATION
 }
 

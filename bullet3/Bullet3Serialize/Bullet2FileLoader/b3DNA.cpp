@@ -585,23 +585,29 @@ void bDNA::dumpTypeDefinitions()
 
 #if 0
 	/* dump out display of types and their sizes */
-	for (i=0; i<bf->types_count; ++i) {
+	for (i=0; i<bf->types_count; ++i)
+	{
 		/* if (!bf->types[i].is_struct)*/
 		{
 			printf("%3d: sizeof(%s%s)=%d",
-				i,
-				bf->types[i].is_struct ? "struct " : "atomic ",
-				bf->types[i].name, bf->types[i].size);
-			if (bf->types[i].is_struct) {
+			       i,
+			       bf->types[i].is_struct ? "struct " : "atomic ",
+			       bf->types[i].name, bf->types[i].size);
+			if (bf->types[i].is_struct)
+			{
 				int j;
 				printf(", %d fields: { ", bf->types[i].fieldtypes_count);
-				for (j=0; j<bf->types[i].fieldtypes_count; ++j) {
+				for (j=0; j<bf->types[i].fieldtypes_count; ++j)
+				{
 					printf("%s %s",
-						bf->types[bf->types[i].fieldtypes[j]].name,
-						bf->names[bf->types[i].fieldnames[j]]);
-					if (j == bf->types[i].fieldtypes_count-1) {
+					       bf->types[bf->types[i].fieldtypes[j]].name,
+					       bf->names[bf->types[i].fieldnames[j]]);
+					if (j == bf->types[i].fieldtypes_count-1)
+					{
 						printf(";}");
-					} else {
+					}
+					else
+					{
 						printf("; ");
 					}
 				}

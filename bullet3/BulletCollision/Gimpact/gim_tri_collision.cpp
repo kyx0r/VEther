@@ -60,15 +60,15 @@ public:
 
 	//! if returns false, the faces are paralele
 	SIMD_FORCE_INLINE bool compute_intervals(
-		const GREAL &D0,
-		const GREAL &D1,
-		const GREAL &D2,
-		const GREAL &D0D1,
-		const GREAL &D0D2,
-		GREAL &scale_edge0,
-		GREAL &scale_edge1,
-		GUINT &edge_index0,
-		GUINT &edge_index1)
+	    const GREAL &D0,
+	    const GREAL &D1,
+	    const GREAL &D2,
+	    const GREAL &D0D1,
+	    const GREAL &D0D2,
+	    GREAL &scale_edge0,
+	    GREAL &scale_edge1,
+	    GUINT &edge_index0,
+	    GUINT &edge_index1)
 	{
 		if (D0D1 > 0.0f)
 		{
@@ -106,10 +106,10 @@ public:
 	/*!
 	*/
 	SIMD_FORCE_INLINE GUINT clip_triangle(
-		const btVector4 &tri_plane,
-		const btVector3 *tripoints,
-		const btVector3 *srcpoints,
-		btVector3 *clip_points)
+	    const btVector4 &tri_plane,
+	    const btVector3 *tripoints,
+	    const btVector3 *srcpoints,
+	    btVector3 *clip_points)
 	{
 		// edge 0
 
@@ -118,7 +118,7 @@ public:
 		EDGE_PLANE(tripoints[0], tripoints[1], tri_plane, edgeplane);
 
 		GUINT clipped_count = PLANE_CLIP_TRIANGLE3D(
-			edgeplane, srcpoints[0], srcpoints[1], srcpoints[2], temp_points);
+		                          edgeplane, srcpoints[0], srcpoints[1], srcpoints[2], temp_points);
 
 		if (clipped_count == 0) return 0;
 
@@ -127,7 +127,7 @@ public:
 		EDGE_PLANE(tripoints[1], tripoints[2], tri_plane, edgeplane);
 
 		clipped_count = PLANE_CLIP_POLYGON3D(
-			edgeplane, temp_points, clipped_count, temp_points1);
+		                    edgeplane, temp_points, clipped_count, temp_points1);
 
 		if (clipped_count == 0) return 0;
 
@@ -136,7 +136,7 @@ public:
 		EDGE_PLANE(tripoints[2], tripoints[0], tri_plane, edgeplane);
 
 		clipped_count = PLANE_CLIP_POLYGON3D(
-			edgeplane, temp_points1, clipped_count, clip_points);
+		                    edgeplane, temp_points1, clipped_count, clip_points);
 
 		return clipped_count;
 
@@ -149,8 +149,8 @@ public:
 		GUINT clipped_count= PLANE_CLIP_TRIANGLE_GENERIC(
 			0,srcpoints[0],srcpoints[1],srcpoints[2],temp_points,
 			DISTANCE_EDGE(tripoints[0],tripoints[1],i0,i1));
-		
-		
+
+
 		if(clipped_count == 0) return 0;
 
 		// edge 1
@@ -169,7 +169,7 @@ public:
 	}
 
 	SIMD_FORCE_INLINE void sort_isect(
-		GREAL &isect0, GREAL &isect1, GUINT &e0, GUINT &e1, btVector3 &vec0, btVector3 &vec1)
+	    GREAL &isect0, GREAL &isect1, GUINT &e0, GUINT &e1, btVector3 &vec0, btVector3 &vec1)
 	{
 		if (isect1 < isect0)
 		{
@@ -212,14 +212,14 @@ public:
 		GUINT tu_e0, tu_e1;              //edge indices
 		GREAL tu_scale_e0, tu_scale_e1;  //edge scale
 		if (!compute_intervals(du[0], du[1], du[2],
-							   du0du1, du0du2, tu_scale_e0, tu_scale_e1, tu_e0, tu_e1)) return 0;
+		                       du0du1, du0du2, tu_scale_e0, tu_scale_e1, tu_e0, tu_e1)) return 0;
 
 		// Compute interval for triangle 2
 		GUINT tv_e0, tv_e1;              //edge indices
 		GREAL tv_scale_e0, tv_scale_e1;  //edge scale
 
 		if (!compute_intervals(dv[0], dv[1], dv[2],
-							   dv0dv1, dv0dv2, tv_scale_e0, tv_scale_e1, tv_e0, tv_e1)) return 0;
+		                       dv0dv1, dv0dv2, tv_scale_e0, tv_scale_e1, tv_e0, tv_e1)) return 0;
 
 		//proyected vertices
 		btVector3 up_e0 = tu_vertices[tu_e0].lerp(tu_vertices[(tu_e0 + 1) % 3], tu_scale_e0);
@@ -256,10 +256,10 @@ public:
 			if (isect_u[1] + MIN_EDGE_EDGE_DIS < isect_v[0])  //calc distance between two lines instead
 			{
 				SEGMENT_COLLISION(
-					tu_vertices[tu_e1], tu_vertices[(tu_e1 + 1) % 3],
-					tv_vertices[tv_e0], tv_vertices[(tv_e0 + 1) % 3],
-					closest_point_u,
-					closest_point_v);
+				    tu_vertices[tu_e1], tu_vertices[(tu_e1 + 1) % 3],
+				    tv_vertices[tv_e0], tv_vertices[(tv_e0 + 1) % 3],
+				    closest_point_u,
+				    closest_point_v);
 
 				edge_edge_dir = closest_point_u - closest_point_v;
 				VEC_LENGTH(edge_edge_dir, distances[2]);
@@ -268,7 +268,7 @@ public:
 			else
 			{
 				distances[2] = isect_v[0] - isect_u[1];  //distance negative
-														 //edge_edge_dir *= -1.0f; //normal pointing from V to U
+				//edge_edge_dir *= -1.0f; //normal pointing from V to U
 			}
 		}
 		else
@@ -289,10 +289,10 @@ public:
 			if (isect_v[1] + MIN_EDGE_EDGE_DIS < isect_u[0])  //calc distance between two lines instead
 			{
 				SEGMENT_COLLISION(
-					tu_vertices[tu_e0], tu_vertices[(tu_e0 + 1) % 3],
-					tv_vertices[tv_e1], tv_vertices[(tv_e1 + 1) % 3],
-					closest_point_u,
-					closest_point_v);
+				    tu_vertices[tu_e0], tu_vertices[(tu_e0 + 1) % 3],
+				    tv_vertices[tv_e1], tv_vertices[(tv_e1 + 1) % 3],
+				    closest_point_u,
+				    closest_point_v);
 
 				edge_edge_dir = closest_point_u - closest_point_v;
 				VEC_LENGTH(edge_edge_dir, distances[2]);
@@ -301,7 +301,7 @@ public:
 			else
 			{
 				distances[2] = isect_u[0] - isect_v[1];  //distance negative
-														 //edge_edge_dir *= -1.0f; //normal pointing from V to U
+				//edge_edge_dir *= -1.0f; //normal pointing from V to U
 			}
 		}
 		return 3;
@@ -309,15 +309,15 @@ public:
 
 	//! collides by two sides
 	SIMD_FORCE_INLINE bool triangle_collision(
-		const btVector3 &u0,
-		const btVector3 &u1,
-		const btVector3 &u2,
-		GREAL margin_u,
-		const btVector3 &v0,
-		const btVector3 &v1,
-		const btVector3 &v2,
-		GREAL margin_v,
-		GIM_TRIANGLE_CONTACT_DATA &contacts)
+	    const btVector3 &u0,
+	    const btVector3 &u1,
+	    const btVector3 &u2,
+	    GREAL margin_u,
+	    const btVector3 &v0,
+	    const btVector3 &v1,
+	    const btVector3 &v2,
+	    GREAL margin_v,
+	    GIM_TRIANGLE_CONTACT_DATA &contacts)
 	{
 		margin = margin_u + margin_v;
 
@@ -544,7 +544,7 @@ public:
 
 		margin = margin_u + margin_v;
 
-		
+
 		tu_vertices[0] = u0;
 		tu_vertices[1] = u1;
 		tu_vertices[2] = u2;
@@ -608,12 +608,12 @@ public:
 };*/
 
 bool GIM_TRIANGLE::collide_triangle_hard_test(
-	const GIM_TRIANGLE &other,
-	GIM_TRIANGLE_CONTACT_DATA &contact_data) const
+    const GIM_TRIANGLE &other,
+    GIM_TRIANGLE_CONTACT_DATA &contact_data) const
 {
 	GIM_TRIANGLE_CALCULATION_CACHE calc_cache;
 	return calc_cache.triangle_collision(
-		m_vertices[0], m_vertices[1], m_vertices[2], m_margin,
-		other.m_vertices[0], other.m_vertices[1], other.m_vertices[2], other.m_margin,
-		contact_data);
+	           m_vertices[0], m_vertices[1], m_vertices[2], m_margin,
+	           other.m_vertices[0], other.m_vertices[1], other.m_vertices[2], other.m_margin,
+	           contact_data);
 }

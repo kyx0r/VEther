@@ -4,8 +4,8 @@ Copyright (c) 2011 Advanced Micro Devices, Inc.  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -173,13 +173,13 @@ bool TestInternalObjects(const btTransform& trans0, const btTransform& trans1, c
 #endif  //TEST_INTERNAL_OBJECTS
 
 SIMD_FORCE_INLINE void btSegmentsClosestPoints(
-	btVector3& ptsVector,
-	btVector3& offsetA,
-	btVector3& offsetB,
-	btScalar& tA, btScalar& tB,
-	const btVector3& translation,
-	const btVector3& dirA, btScalar hlenA,
-	const btVector3& dirB, btScalar hlenB)
+    btVector3& ptsVector,
+    btVector3& offsetA,
+    btVector3& offsetB,
+    btScalar& tA, btScalar& tB,
+    const btVector3& translation,
+    const btVector3& dirA, btScalar hlenA,
+    const btVector3& dirB, btScalar hlenB)
 {
 	// compute the parameters of the closest points on each line segment
 
@@ -377,9 +377,9 @@ bool btPolyhedralContactClipping::findSeparatingAxis(const btConvexPolyhedron& h
 		btScalar hlenA = 1e30f;
 
 		btSegmentsClosestPoints(ptsVector, offsetA, offsetB, tA, tB,
-								translation,
-								dirA, hlenA,
-								dirB, hlenB);
+		                        translation,
+		                        dirA, hlenA,
+		                        dirB, hlenB);
 
 		btScalar nlSqrt = ptsVector.length2();
 		if (nlSqrt > SIMD_EPSILON)

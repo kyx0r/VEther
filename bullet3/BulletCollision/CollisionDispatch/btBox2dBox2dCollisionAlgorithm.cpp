@@ -4,8 +4,8 @@ Bullet Continuous Collision Detection and Physics Library
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -92,7 +92,7 @@ struct ClipVertex
 int b2_maxManifoldPoints = 2;
 
 static int ClipSegmentToLine(ClipVertex vOut[2], ClipVertex vIn[2],
-							 const btVector3& normal, btScalar offset)
+                             const btVector3& normal, btScalar offset)
 {
 	// Start with no output points
 	int numOut = 0;
@@ -127,7 +127,7 @@ static int ClipSegmentToLine(ClipVertex vOut[2], ClipVertex vIn[2],
 
 // Find the separation between poly1 and poly2 for a give edge normal on poly1.
 static btScalar EdgeSeparation(const btBox2dShape* poly1, const btTransform& xf1, int edge1,
-							   const btBox2dShape* poly2, const btTransform& xf2)
+                               const btBox2dShape* poly2, const btTransform& xf2)
 {
 	const btVector3* vertices1 = poly1->getVertices();
 	const btVector3* normals1 = poly1->getNormals();
@@ -156,8 +156,8 @@ static btScalar EdgeSeparation(const btBox2dShape* poly1, const btTransform& xf1
 
 // Find the max separation between poly1 and poly2 using edge normals from poly1.
 static btScalar FindMaxSeparation(int* edgeIndex,
-								  const btBox2dShape* poly1, const btTransform& xf1,
-								  const btBox2dShape* poly2, const btTransform& xf2)
+                                  const btBox2dShape* poly1, const btTransform& xf1,
+                                  const btBox2dShape* poly2, const btTransform& xf2)
 {
 	int count1 = poly1->getVertexCount();
 	const btVector3* normals1 = poly1->getNormals();
@@ -247,8 +247,8 @@ static btScalar FindMaxSeparation(int* edgeIndex,
 }
 
 static void FindIncidentEdge(ClipVertex c[2],
-							 const btBox2dShape* poly1, const btTransform& xf1, int edge1,
-							 const btBox2dShape* poly2, const btTransform& xf2)
+                             const btBox2dShape* poly1, const btTransform& xf1, int edge1,
+                             const btBox2dShape* poly2, const btTransform& xf2)
 {
 	const btVector3* normals1 = poly1->getNormals();
 
@@ -297,8 +297,8 @@ static void FindIncidentEdge(ClipVertex c[2],
 
 // The normal points from 1 to 2
 void b2CollidePolygons(btManifoldResult* manifold,
-					   const btBox2dShape* polyA, const btTransform& xfA,
-					   const btBox2dShape* polyB, const btTransform& xfB)
+                       const btBox2dShape* polyA, const btTransform& xfA,
+                       const btBox2dShape* polyB, const btTransform& xfB)
 {
 	int edgeA = 0;
 	btScalar separationA = FindMaxSeparation(&edgeA, polyA, xfA, polyB, xfB);

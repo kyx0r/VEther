@@ -164,20 +164,21 @@ void btMultiBodyFixedConstraint::createConstraintRows(btMultiBodyConstraintArray
 			constraintNormalLin[i] = 1;
 			posError = (pivotAworld - pivotBworld).dot(constraintNormalLin);
 			fillMultiBodyConstraint(constraintRow, data, 0, 0, constraintNormalAng,
-									constraintNormalLin, pivotAworld, pivotBworld,
-									posError,
-									infoGlobal,
-									-m_maxAppliedImpulse, m_maxAppliedImpulse);
+			                        constraintNormalLin, pivotAworld, pivotBworld,
+			                        posError,
+			                        infoGlobal,
+			                        -m_maxAppliedImpulse, m_maxAppliedImpulse);
 		}
 		else
-		{  //i>=3
+		{
+			//i>=3
 			constraintNormalAng = frameAworld.getColumn(i % 3);
 			posError = angleDiff[i % 3];
 			fillMultiBodyConstraint(constraintRow, data, 0, 0, constraintNormalAng,
-									constraintNormalLin, pivotAworld, pivotBworld,
-									posError,
-									infoGlobal,
-									-m_maxAppliedImpulse, m_maxAppliedImpulse, true);
+			                        constraintNormalLin, pivotAworld, pivotBworld,
+			                        posError,
+			                        infoGlobal,
+			                        -m_maxAppliedImpulse, m_maxAppliedImpulse, true);
 		}
 	}
 }

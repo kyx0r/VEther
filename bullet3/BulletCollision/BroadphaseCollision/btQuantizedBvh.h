@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -147,7 +147,7 @@ public:
 class btNodeOverlapCallback
 {
 public:
-	virtual ~btNodeOverlapCallback(){};
+	virtual ~btNodeOverlapCallback() {};
 
 	virtual void processNode(int subPart, int triangleIndex) = 0;
 };
@@ -314,7 +314,10 @@ public:
 
 	///***************************************** expert/internal use only *************************
 	void setQuantizationValues(const btVector3& bvhAabbMin, const btVector3& bvhAabbMax, btScalar quantizationMargin = btScalar(1.0));
-	QuantizedNodeArray& getLeafNodeArray() { return m_quantizedLeafNodes; }
+	QuantizedNodeArray& getLeafNodeArray()
+	{
+		return m_quantizedLeafNodes;
+	}
 	///buildInternal is expert use only: assumes that setQuantizationValues and LeafNodeArray are initialized
 	void buildInternal();
 	///***************************************** expert/internal use only *************************
@@ -402,9 +405,9 @@ public:
 	{
 		btVector3 vecOut;
 		vecOut.setValue(
-			(btScalar)(vecIn[0]) / (m_bvhQuantization.getX()),
-			(btScalar)(vecIn[1]) / (m_bvhQuantization.getY()),
-			(btScalar)(vecIn[2]) / (m_bvhQuantization.getZ()));
+		    (btScalar)(vecIn[0]) / (m_bvhQuantization.getX()),
+		    (btScalar)(vecIn[1]) / (m_bvhQuantization.getY()),
+		    (btScalar)(vecIn[2]) / (m_bvhQuantization.getZ()));
 		vecOut += m_bvhAabbMin;
 		return vecOut;
 	}
@@ -514,7 +517,7 @@ struct	btQuantizedBvhFloatData
 	btBvhSubtreeInfoData	*m_subTreeInfoPtr;
 	int					m_traversalMode;
 	int					m_numSubtreeHeaders;
-	
+
 };
 
 struct	btQuantizedBvhDoubleData

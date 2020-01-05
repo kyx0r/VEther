@@ -269,7 +269,8 @@ enum bt6DofFlags2
 #define BT_6DOF_FLAGS_AXIS_SHIFT2 4  // bits per axis
 
 ATTRIBUTE_ALIGNED16(class)
-btGeneric6DofSpring2Constraint : public btTypedConstraint
+btGeneric6DofSpring2Constraint :
+public btTypedConstraint
 {
 protected:
 	btTransform m_frameInA;
@@ -309,8 +310,8 @@ protected:
 
 	void calculateJacobi(btRotationalLimitMotor2 * limot, const btTransform& transA, const btTransform& transB, btConstraintInfo2* info, int srow, btVector3& ax1, int rotational, int rotAllowed);
 	int get_limit_motor_info2(btRotationalLimitMotor2 * limot,
-							  const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB,
-							  btConstraintInfo2* info, int row, btVector3& ax1, int rotational, int rotAllowed = false);
+	                          const btTransform& transA, const btTransform& transB, const btVector3& linVelA, const btVector3& linVelB, const btVector3& angVelA, const btVector3& angVelB,
+	                          btConstraintInfo2* info, int row, btVector3& ax1, int rotational, int rotAllowed = false);
 
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
@@ -324,8 +325,14 @@ public:
 	virtual int calculateSerializeBufferSize() const;
 	virtual const char* serialize(void* dataBuffer, btSerializer* serializer) const;
 
-	btRotationalLimitMotor2* getRotationalLimitMotor(int index) { return &m_angularLimits[index]; }
-	btTranslationalLimitMotor2* getTranslationalLimitMotor() { return &m_linearLimits; }
+	btRotationalLimitMotor2* getRotationalLimitMotor(int index)
+	{
+		return &m_angularLimits[index];
+	}
+	btTranslationalLimitMotor2* getTranslationalLimitMotor()
+	{
+		return &m_linearLimits;
+	}
 
 	// Calculates the global transform for the joint offset for body A an B, and also calculates the angle differences between the bodies.
 	void calculateTransforms(const btTransform& transA, const btTransform& transB);
@@ -339,8 +346,14 @@ public:
 	const btTransform& getFrameOffsetA() const { return m_frameInA; }
 	const btTransform& getFrameOffsetB() const { return m_frameInB; }
 
-	btTransform& getFrameOffsetA() { return m_frameInA; }
-	btTransform& getFrameOffsetB() { return m_frameInB; }
+	btTransform& getFrameOffsetA()
+	{
+		return m_frameInA;
+	}
+	btTransform& getFrameOffsetB()
+	{
+		return m_frameInB;
+	}
 
 	// Get the rotation axis in global coordinates ( btGeneric6DofSpring2Constraint::calculateTransforms() must be called previously )
 	btVector3 getAxis(int axis_index) const { return m_calculatedAxis[axis_index]; }
@@ -353,10 +366,22 @@ public:
 
 	void setFrames(const btTransform& frameA, const btTransform& frameB);
 
-	void setLinearLowerLimit(const btVector3& linearLower) { m_linearLimits.m_lowerLimit = linearLower; }
-	void getLinearLowerLimit(btVector3 & linearLower) { linearLower = m_linearLimits.m_lowerLimit; }
-	void setLinearUpperLimit(const btVector3& linearUpper) { m_linearLimits.m_upperLimit = linearUpper; }
-	void getLinearUpperLimit(btVector3 & linearUpper) { linearUpper = m_linearLimits.m_upperLimit; }
+	void setLinearLowerLimit(const btVector3& linearLower)
+	{
+		m_linearLimits.m_lowerLimit = linearLower;
+	}
+	void getLinearLowerLimit(btVector3 & linearLower)
+	{
+		linearLower = m_linearLimits.m_lowerLimit;
+	}
+	void setLinearUpperLimit(const btVector3& linearUpper)
+	{
+		m_linearLimits.m_upperLimit = linearUpper;
+	}
+	void getLinearUpperLimit(btVector3 & linearUpper)
+	{
+		linearUpper = m_linearLimits.m_upperLimit;
+	}
 
 	void setAngularLowerLimit(const btVector3& angularLower)
 	{
@@ -449,8 +474,14 @@ public:
 		return m_angularLimits[limitIndex - 3].isLimited();
 	}
 
-	void setRotationOrder(RotateOrder order) { m_rotateOrder = order; }
-	RotateOrder getRotationOrder() { return m_rotateOrder; }
+	void setRotationOrder(RotateOrder order)
+	{
+		m_rotateOrder = order;
+	}
+	RotateOrder getRotationOrder()
+	{
+		return m_rotateOrder;
+	}
 
 	void setAxis(const btVector3& axis1, const btVector3& axis2);
 

@@ -43,13 +43,13 @@ void setLinearAndAngular(b3Float4ConstArg n, b3Float4ConstArg r0, b3Float4ConstA
 }
 
 float calcRelVel(b3Float4ConstArg l0, b3Float4ConstArg l1, b3Float4ConstArg a0, b3Float4ConstArg a1, b3Float4ConstArg linVel0,
-				 b3Float4ConstArg angVel0, b3Float4ConstArg linVel1, b3Float4ConstArg angVel1)
+                 b3Float4ConstArg angVel0, b3Float4ConstArg linVel1, b3Float4ConstArg angVel1)
 {
 	return b3Dot3F4(l0, linVel0) + b3Dot3F4(a0, angVel0) + b3Dot3F4(l1, linVel1) + b3Dot3F4(a1, angVel1);
 }
 
 float calcJacCoeff(b3Float4ConstArg linear0, b3Float4ConstArg linear1, b3Float4ConstArg angular0, b3Float4ConstArg angular1,
-				   float invMass0, const b3Mat3x3* invInertia0, float invMass1, const b3Mat3x3* invInertia1)
+                   float invMass0, const b3Mat3x3* invInertia0, float invMass1, const b3Mat3x3* invInertia1)
 {
 	//	linear0,1 are normlized
 	float jmj0 = invMass0;  //b3Dot3F4(linear0, linear0)*invMass0;
@@ -60,9 +60,9 @@ float calcJacCoeff(b3Float4ConstArg linear0, b3Float4ConstArg linear1, b3Float4C
 }
 
 void setConstraint4(b3Float4ConstArg posA, b3Float4ConstArg linVelA, b3Float4ConstArg angVelA, float invMassA, b3Mat3x3ConstArg invInertiaA,
-					b3Float4ConstArg posB, b3Float4ConstArg linVelB, b3Float4ConstArg angVelB, float invMassB, b3Mat3x3ConstArg invInertiaB,
-					__global struct b3Contact4Data* src, float dt, float positionDrift, float positionConstraintCoeff,
-					b3ContactConstraint4_t* dstC)
+                    b3Float4ConstArg posB, b3Float4ConstArg linVelB, b3Float4ConstArg angVelB, float invMassB, b3Mat3x3ConstArg invInertiaB,
+                    __global struct b3Contact4Data* src, float dt, float positionDrift, float positionConstraintCoeff,
+                    b3ContactConstraint4_t* dstC)
 {
 	dstC->m_bodyA = abs(src->m_bodyAPtrAndSignBit);
 	dstC->m_bodyB = abs(src->m_bodyBPtrAndSignBit);
@@ -93,10 +93,10 @@ void setConstraint4(b3Float4ConstArg posA, b3Float4ConstArg linVelA, b3Float4Con
 			setLinearAndAngular(src->m_worldNormalOnB, r0, r1, &linear, &angular0, &angular1);
 
 			dstC->m_jacCoeffInv[ic] = calcJacCoeff(linear, -linear, angular0, angular1,
-												   invMassA, &invInertiaA, invMassB, &invInertiaB);
+			                                       invMassA, &invInertiaA, invMassB, &invInertiaB);
 
 			relVelN = calcRelVel(linear, -linear, angular0, angular1,
-								 linVelA, angVelA, linVelB, angVelB);
+			                     linVelA, angVelA, linVelB, angVelB);
 
 			float e = 0.f;  //src->getRestituitionCoeff();
 			if (relVelN * relVelN < 0.004f) e = 0.f;
@@ -109,7 +109,8 @@ void setConstraint4(b3Float4ConstArg posA, b3Float4ConstArg linVelA, b3Float4Con
 	}
 
 	if (src->m_worldNormalOnB.w > 0)  //npoints
-	{                                 //	prepare friction
+	{
+		//	prepare friction
 		b3Float4 center = b3MakeFloat4(0.f, 0.f, 0.f, 0.f);
 		for (int i = 0; i < src->m_worldNormalOnB.w; i++)
 			center += src->m_worldPosB[i];
@@ -128,7 +129,7 @@ void setConstraint4(b3Float4ConstArg posA, b3Float4ConstArg linVelA, b3Float4Con
 			setLinearAndAngular(tangent[i], r[0], r[1], &linear, &angular0, &angular1);
 
 			dstC->m_fJacCoeffInv[i] = calcJacCoeff(linear, -linear, angular0, angular1,
-												   invMassA, &invInertiaA, invMassB, &invInertiaB);
+			                                       invMassA, &invInertiaA, invMassB, &invInertiaB);
 			dstC->m_fAppliedRambdaDt[i] = 0.f;
 		}
 		dstC->m_center = center;
