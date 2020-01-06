@@ -24,7 +24,7 @@ PROGS = $(patsubst ./src/%.cpp, ./build/%.o,$(SRCS))
 
 LIBRARY_PATHS = -L ./lib
 
-INCLUDE_PATHS = -I ./include -I ./glfw/include -I .
+INCLUDE_PATHS = -I ./include -I ./glfw/include -I . 
 
 #LINKER_FLAGS specifies the libraries we're linking against 
 LINKER_FLAGS = -static-libgcc -static-libstdc++ 
@@ -76,12 +76,22 @@ all_flto: SHARED_FLAGS = -flto -O3 -m32 -s -Wall -Wextra -fno-align-functions -f
 
 all_flto: glsl_m32
 	$(MAKE) all -C ./glfw
+	$(MAKE) all -C ./bullet3
 	$(MAKE) all -C ./src
 	$(CC) -flto -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
 
 #all_sl <- any other system.	
 all_sl: VEther
-	$(CC) -O3 main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
+	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
+
+all_u:
+	$(MAKE) all -C ./glsl_compiler
+	$(MAKE) all -C ./glfw
+	$(MAKE) all -C ./bullet3
+	$(CC) -c $(SHARED_FLAGS) $(INCLUDE_PATHS) -I ./bullet3 -I ./src -o ./lib/vether.o vether.cpp 
+	ar -cvr ./lib/libVEther.a ./lib/vether.o
+	gcc-ranlib ./lib/libVEther.a
+	$(CC) main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(_UNIX) -o $(OBJ_NAME)	
 
 debug:
 	objcopy --only-keep-debug $(OBJ_NAME) main.debug
@@ -104,5 +114,9 @@ c:
 etags:
 	 find . \( -name "*[tT]est*" -o -name "CVS" -o -name "*#*" -o -name "html" -o -name "*~" -o -name "*.ca*" \) -prune -o \( -iname "*.c" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h"  -o -iname "*.hh" \) -exec etags -a {} \;
 
-default:
+.SILENT default:
 	echo "Please specify the target."
+	echo "all_slwin = incremental build for windows"
+	echo "all_flto = 32 bit lto build for windows"
+	echo "all_sl = incrementail build for *nix"
+	echo "all_u = uniform build for *nix"

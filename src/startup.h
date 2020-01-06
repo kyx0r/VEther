@@ -1,3 +1,6 @@
+#ifndef __STARTUP_H__
+#define __STARTUP_H__
+
 #include <cstdio>
 #include <cstring>
 #include <limits>
@@ -29,7 +32,6 @@
 #include <GLFW/glfw3native.h> //<- this header allows me to access the low level window handles. 
 #include <vulkan.h>
 //------------------
-#pragma once
 #include "vulkan_decl.h"
 
 #define DEBUG
@@ -114,3 +116,4 @@ inline bool SetQueue(QueueInfo *array, uint32_t family, float *_Priorities, int 
 //--------------------
 
 } //namespace startup
+#endif

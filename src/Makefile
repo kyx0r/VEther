@@ -1,16 +1,13 @@
 
 SRCS=$(wildcard *.cpp)
-
 OBJS=$(SRCS:.cpp=.o)
-
 LINK_OBJS:= $(addprefix ../lib/,$(OBJS))
-
 PROGS = $(patsubst %.cpp,../lib/%.o,$(SRCS))
 
 CXX = g++
 LIBNAME = VEther
 LIBPATH = ../lib
-CXXFLAGS = -fPIC -DPIC -I ../include -I ../ -I ../glfw/include $(SHARED_FLAGS)
+CXXFLAGS = -fPIC -DPIC -I ../include -I ../ -I ../glfw/include -I ../bullet3 $(SHARED_FLAGS)
 
 all : $(PROGS) genlib
 ../lib/%.o: %.cpp

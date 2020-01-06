@@ -1,11 +1,20 @@
 #include "entity.h"
-#include "flog.h"
 #include "window.h"
 #include "zone.h"
 #include "control.h"
 
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include <btBulletDynamicsCommon.h>
+#include "flog.h"
+
 cam_ent_t cam;
 mesh_ent_t* meshes;
+btDiscreteDynamicsWorld* dynamicsWorld;
+
+static btBroadphaseInterface* broadphase;
+static btDefaultCollisionConfiguration* collisionConfiguration;
+static btCollisionDispatcher* dispatcher;
+static btSequentialImpulseConstraintSolver* solver;
 
 static char* smeshes[][1] =
 {
@@ -143,6 +152,20 @@ void MoveTo(int id, vec3_t pos)
 
 		error("mesh ent id %d not found!", id);
 	}
+}
+
+void InitPhysics()
+{
+	broadphase = new btDbvtBroadphase();
+	collisionConfiguration = new btDefaultCollisionConfiguration();
+	dispatcher = new btCollisionDispatcher(collisionConfiguration);
+
+	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
+
+	solver = new btSequentialImpulseConstraintSolver();
+	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+
+	dynamicsWorld->setGravity(btVector3(0, -10, 0));
 }
 
 } //namespace entity

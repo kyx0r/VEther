@@ -420,10 +420,6 @@ void UIThread()
 
 		if(quit)
 		{
-
-			run_threads[1] = false;
-			lk.unlock();
-			cvx[1].notify_one();
 			return;
 		}
 		mu_Command* cmd = nullptr;
@@ -496,10 +492,6 @@ void Main3DThread()
 		cvx[0].wait(lk, [] {return run_threads[0];});
 		if(quit)
 		{
-
-			run_threads[0] = false;
-			lk.unlock();
-			cvx[0].notify_one();
 			return;
 		}
 		VkCommandBufferInheritanceInfo cbii;
@@ -575,6 +567,7 @@ void PreDraw()
 	//fov setup.
 	entity::InitCamera();
 	entity::InitMeshes();
+	entity::InitPhysics();
 
 	for(int i = 0; i<100; i++)
 	{
@@ -654,6 +647,13 @@ void AwakeWorkers()
 			run_threads[i] = true;
 		}
 		cvx[i].notify_one();
+	}
+}
+
+void WaitForWorkers()
+{
+	for(uint8_t i = 0; i<ARRAYSIZE(mtx); i++)
+	{
 		std::unique_lock<std::mutex> post_lk(mtx[i]);
 		cvx[i].wait(post_lk, [&] {return !run_threads[i];});
 	}
@@ -694,6 +694,8 @@ inline uint8_t Draw()
 	render::StartRenderPass(render_area, &clearColor[0], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS, 0, image_index);
 
 	AwakeWorkers();
+
+	WaitForWorkers();
 
 	control::SetCommandBuffer(current_cmd_buffer_index);
 	vkCmdExecuteCommands(command_buffer, 2, &scommand_buffers[0]);

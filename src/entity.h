@@ -1,3 +1,6 @@
+#ifndef __ENTITY_H__
+#define __ENTITY_H__
+
 #include "startup.h"
 #include "mathlib.h"
 #include "render.h"
@@ -76,5 +79,7 @@ void InitMeshes();
 mesh_ent_t* GetMesh(int id, mesh_ent_t** last);
 void InstanceMesh(int id);
 void MoveTo(int id, vec3_t pos);
+void InitPhysics();
 
 } //namespace entity
+#endif

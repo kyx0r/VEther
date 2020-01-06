@@ -1,7 +1,8 @@
+
+#include "../glsl_compiler/StandAlone/StandAlone.h"
 #include "shaders.h"
 #include "zone.h"
 #include "render.h"
-#include "../glsl_compiler/StandAlone/StandAlone.h"
 #include "flog.h"
 /* {
 GVAR: logical_device -> startup.cpp

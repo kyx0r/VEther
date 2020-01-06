@@ -4,8 +4,9 @@ LIBNAME = bullet3
 LIBPATH = ../lib
 CXXFLAGS = $(SHARED_FLAGS) -fPIC -I . -I.. 
 
-dirwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call dirwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
-BulletCollision=$(call dirwildcard,.,*.cpp)
+#dirwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call dirwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+#BulletCollision=$(call dirwildcard,.,*.cpp)
+BulletCollision=$(wildcard ./*.cpp)
 
 OBJS=$(BulletCollision:.cpp=.o)
 

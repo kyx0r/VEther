@@ -1,3 +1,5 @@
+#ifndef __WINDOW_H__
+#define __WINDOW_H__
 #include "startup.h"
 
 extern GLFWwindow* _window;
@@ -30,3 +32,4 @@ void PreDraw();
 void mainLoop();
 
 } //namespace window
+#endif
