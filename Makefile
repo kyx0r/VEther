@@ -99,7 +99,7 @@ debug:
 clean_f:
 	find . -type f -name '*.orig' -delete
 
-clean_o:
+clean:
 	$(MAKE) clean -C ./glsl_compiler
 	$(MAKE) clean -C ./src
 	$(MAKE) clean -C ./glfw
@@ -114,9 +114,18 @@ c:
 etags:
 	 find . \( -name "*[tT]est*" -o -name "CVS" -o -name "*#*" -o -name "html" -o -name "*~" -o -name "*.ca*" \) -prune -o \( -iname "*.c" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h"  -o -iname "*.hh" \) -exec etags -a {} \;
 
-.SILENT default:
+print:
 	echo "Please specify the target."
-	echo "all_slwin = incremental build for windows"
-	echo "all_flto = 32 bit lto build for windows"
-	echo "all_sl = incrementail build for *nix"
-	echo "all_u = uniform build for *nix"
+	echo "make all_slwin = incremental build for windows"
+	echo "make all_flto = 32 bit lto build for windows"
+	echo "make all_sl = incrementail build for *nix"
+	echo "make all_u = uniform build for *nix"
+	echo "make c = clean everything in ./src (because headers are not recompiled automatically with sl builds)"
+	echo "make clean = remove all build files"
+	echo "make format = use astyle to format all code"
+	echo "make clean_f = remove .orig files created by astyle"
+	echo "make etags = recursive etags generation"
+
+default:
+	$(MAKE) print -s
+	
