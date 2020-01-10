@@ -2,9 +2,6 @@
 #include "window.h"
 #include "zone.h"
 #include "control.h"
-
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
-#include <btBulletDynamicsCommon.h>
 #include "flog.h"
 
 cam_ent_t cam;
@@ -156,6 +153,8 @@ void MoveTo(int id, vec3_t pos)
 
 void InitPhysics()
 {
+
+	btAlignedAllocSetCustom((btAllocFunc*) Bt_alloc, (btFreeFunc*) Bt_free);
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
 	dispatcher = new btCollisionDispatcher(collisionConfiguration);

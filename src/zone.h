@@ -63,6 +63,8 @@ typedef struct cache_user_s
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope);
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope);
 void VEtherFree(void* pusd, void* ptr);
+void* Bt_alloc(size_t size);
+void Bt_free(void* ptr);
 
 namespace zone
 {

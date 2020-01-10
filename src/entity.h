@@ -6,6 +6,9 @@
 #include "render.h"
 #include "obj_parse.h"
 
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include <btBulletDynamicsCommon.h>
+
 typedef struct cam_ent_t
 {
 	vec3_t pos;

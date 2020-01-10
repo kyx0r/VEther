@@ -83,6 +83,20 @@ void VEtherFree(void* pusd, void* ptr)
 	return;
 }
 
+void* Bt_alloc(size_t size)
+{
+	void* p = zone::Z_TagMalloc(size, 1, 8, 0);
+	ASSERT(p,"Bt_alloc failed.");
+	return p;
+}
+
+void Bt_free(void* ptr)
+{
+	zone::Z_Free(ptr, 0);
+	return;
+}
+
+
 namespace zone
 {
 
