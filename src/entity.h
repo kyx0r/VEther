@@ -65,8 +65,12 @@ typedef struct mesh_ent_t
 	UniformMatrix* mat;
 	unsigned char* vertex_data;
 	uint32_t* index_data;
-	float speed;
 	float scale;
+	btTriangleMesh* collisionMesh;
+	btGImpactMeshShape* collisionShape;
+	btRigidBody* rigidBody;
+	btScalar mass;
+	btVector3 inertia;
 	struct mesh_ent_t* next;
 	struct mesh_ent_t* prev;
 	struct mesh_ent_t* parent;
@@ -83,6 +87,6 @@ mesh_ent_t* GetMesh(int id, mesh_ent_t** last);
 void InstanceMesh(int id);
 void MoveTo(int id, vec3_t pos);
 void InitPhysics();
-
+void StepPhysics();
 } //namespace entity
 #endif

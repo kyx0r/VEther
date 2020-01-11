@@ -63,6 +63,11 @@ void InitCamera()
 	cam.zoom = 45.0f;
 }
 
+void RegisterCollisionModel(btTriangleMesh* collisionMesh)
+{
+	
+}
+
 void InitMeshes()
 {
 	meshes = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
@@ -81,6 +86,29 @@ void InitMeshes()
 		IdentityMatrix(head->mat->proj);
 		IdentityMatrix(head->mat->model);
 		IdentityMatrix(head->mat->view);
+		head->collisionMesh = new btTriangleMesh(true, false); //32 bit indexes, 3 component
+		for(uint64_t c = 0; c<head->obj.renderables->vertex_count / 24; c+=24)
+		{
+			float* coord = &head->obj.renderables->vertices[c];
+			btVector3 v1 = btVector3(coord[c], coord[c+1], coord[c+2]);
+			btVector3 v2 = btVector3(coord[c+8], coord[c+9], coord[c+10]);
+			btVector3 v3 = btVector3(coord[c+16], coord[c+17], coord[c+18]);
+			head->collisionMesh->addTriangle(v1, v2, v3);
+		}
+		head->collisionShape = new btGImpactMeshShape(head->collisionMesh);
+		head->collisionShape->setLocalScaling(btVector3(1, 1, 1));
+		head->collisionShape->setMargin(0.0f);
+		head->collisionShape->updateBound();
+		btTransform transform;
+		transform.setIdentity();
+		btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
+		head->collisionShape->calculateLocalInertia(100.f, inertia);
+		btDefaultMotionState* motionState = new btDefaultMotionState(transform);
+		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(100.f, motionState, head->collisionShape, inertia);
+		head->rigidBody = new btRigidBody(rigidBodyCI);
+		dynamicsWorld->addRigidBody(head->rigidBody);
+		head->rigidBody->setFriction(1.0f);
+
 		head->next = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
 		head->next->prev = head;
 		head = head->next;
@@ -146,14 +174,12 @@ void MoveTo(int id, vec3_t pos)
 	}
 	else
 	{
-
 		error("mesh ent id %d not found!", id);
 	}
 }
 
 void InitPhysics()
 {
-
 	btAlignedAllocSetCustom((btAllocFunc*) Bt_alloc, (btFreeFunc*) Bt_free);
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -165,6 +191,11 @@ void InitPhysics()
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+}
+
+void StepPhysics()
+{
+	dynamicsWorld->stepSimulation((realtime / (1.0f / frametime)), 0);
 }
 
 } //namespace entity

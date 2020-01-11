@@ -356,13 +356,15 @@ bool CreateVulkanInstance(uint32_t count, const char** exts)
 
 	//define custom vulkan allocators
 	//allocators = nullptr;
-	allocators->pUserData = nullptr;
-	allocators->pfnAllocation = (PFN_vkAllocationFunction)&VEtherAlloc;
-	allocators->pfnReallocation = (PFN_vkReallocationFunction)&VEtherRealloc;
-	allocators->pfnFree = (PFN_vkFreeFunction)&VEtherFree;
-	allocators->pfnInternalAllocation = nullptr;
-	allocators->pfnInternalFree = nullptr;
-
+	if(allocators)
+	{
+		allocators->pUserData = nullptr;
+		allocators->pfnAllocation = (PFN_vkAllocationFunction)&VEtherAlloc;
+		allocators->pfnReallocation = (PFN_vkReallocationFunction)&VEtherRealloc;
+		allocators->pfnFree = (PFN_vkFreeFunction)&VEtherFree;
+		allocators->pfnInternalAllocation = nullptr;
+		allocators->pfnInternalFree = nullptr;
+	}
 	VkResult result = VK_SUCCESS;
 	result = vkCreateInstance(&instance_create_info, allocators, &instance);
 	if(result != VK_SUCCESS)

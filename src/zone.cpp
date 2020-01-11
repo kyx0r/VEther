@@ -603,29 +603,6 @@ void *Z_TagMalloc (int size, int tag, int align, uint8_t zoneid)
 
 /*
 ========================
-Z_CheckHeap
-========================
-*/
-static void Z_CheckHeap (uint8_t zoneid)
-{
-	memblock_t	*block;
-
-	for (block = mainzone[zoneid]->blocklist.next ; ; block = block->next)
-	{
-		if (block->next == &mainzone[zoneid]->blocklist)
-			break;			// all blocks have been hit
-		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
-			printf ("Z_CheckHeap: block size does not touch the next block\n");
-		if ( block->next->prev != block)
-			printf ("Z_CheckHeap: next block doesn't have proper back link\n");
-		if (!block->tag && !block->next->tag)
-			printf ("Z_CheckHeap: two consecutive free blocks\n");
-	}
-}
-
-
-/*
-========================
 Z_Malloc
 ========================
 */
@@ -635,7 +612,7 @@ void *Z_Malloc (int size, uint8_t zoneid)
 
 	//Z_CheckHeap ();
 
-	buf = Z_TagMalloc (size, 1, 8, zoneid);
+	buf = Z_TagMalloc (size, 1, 8, 2);
 	if (!buf)
 	{
 		fatal("Z_Malloc: failed on allocation of %i bytes", size);
@@ -657,8 +634,9 @@ void *Z_Realloc(void *ptr, int size, int align, uint8_t zoneid)
 	memblock_t *block;
 
 	if (!ptr)
+	{
 		return Z_Malloc (size, zoneid);
-
+	}
 	block = (memblock_t *) ((unsigned char *) ptr - sizeof (memblock_t));
 	if (block->id != ZONEID)
 	{
@@ -673,7 +651,7 @@ void *Z_Realloc(void *ptr, int size, int align, uint8_t zoneid)
 	old_ptr = ptr;
 
 	Z_Free (ptr, zoneid);
-	ptr = Z_TagMalloc (size, 1, align);
+	ptr = Z_TagMalloc (size, 1, align, zoneid);
 	if (!ptr)
 	{
 		fatal("Z_Realloc: failed on allocation of %i bytes", size);

@@ -22,6 +22,7 @@ extern int32_t xm;
 extern int32_t ym;
 extern double frametime;
 extern double lastfps;
+extern double realtime;
 //------------------------
 
 namespace window

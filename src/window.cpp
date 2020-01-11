@@ -45,6 +45,7 @@ int32_t xm = 0;
 int32_t ym = 0;
 double frametime;
 double lastfps;
+double realtime = 0;
 mu_Context* ctx;
 //}
 
@@ -519,8 +520,8 @@ void Main3DThread()
 		MatrixMultiply(m, c);
 		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 
-		static double rands[101] = {};
-		for(int i = 0; i<101; i++)
+		static double rands[2] = {};
+		for(int i = 0; i<2; i++)
 		{
 			if(!rands[i])
 			{
@@ -566,10 +567,10 @@ void PreDraw()
 
 	//fov setup.
 	entity::InitCamera();
-	entity::InitMeshes();
 	entity::InitPhysics();
+	entity::InitMeshes();
 
-	for(int i = 0; i<100; i++)
+	for(int i = 0; i<1; i++)
 	{
 		entity::InstanceMesh(0);
 	}
@@ -694,7 +695,7 @@ inline uint8_t Draw()
 	render::StartRenderPass(render_area, &clearColor[0], VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS, 0, image_index);
 
 	AwakeWorkers();
-
+	entity::StepPhysics();
 	WaitForWorkers();
 
 	control::SetCommandBuffer(current_cmd_buffer_index);
@@ -735,7 +736,6 @@ void mainLoop()
 {
 	double time2 = 0;
 	double maxfps;
-	double realtime = 0;
 	double oldrealtime = 0;
 	double oldtime = 0;
 	double deltatime = 0;
