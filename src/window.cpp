@@ -520,16 +520,14 @@ void Main3DThread()
 		MatrixMultiply(m, c);
 		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 
-		static double rands[2] = {};
-		for(int i = 0; i<2; i++)
-		{
-			if(!rands[i])
-			{
-				rands[i] = Drand(0.5f, 3.0f);
-			}
-			vec3_t v = {float(sin(time1)*rands[i]), (float)i, float(cos(time1)*rands[i])};
-			entity::MoveTo(i, v);
-		}
+		mesh_ent_t* head = entity::GetMesh(0, nullptr);
+		btTransform transform;
+		head->rigidBody->getMotionState()->getWorldTransform(transform);
+		btVector3 origin = transform.getOrigin();
+
+		vec3_t pos = {origin.getX(), 10.f, origin.getZ()};
+		entity::MoveTo(0, pos);
+
 		draw::Meshes();
 		draw::SkyDome();
 

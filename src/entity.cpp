@@ -155,6 +155,29 @@ void InstanceMesh(int id)
 		IdentityMatrix(head->mat->proj);
 		IdentityMatrix(head->mat->model);
 		IdentityMatrix(head->mat->view);
+		head->collisionMesh = new btTriangleMesh(true, false); //32 bit indexes, 3 component
+		for(uint64_t c = 0; c<head->obj.renderables->vertex_count / 24; c+=24)
+		{
+			float* coord = &head->obj.renderables->vertices[c];
+			btVector3 v1 = btVector3(coord[c], coord[c+1], coord[c+2]);
+			btVector3 v2 = btVector3(coord[c+8], coord[c+9], coord[c+10]);
+			btVector3 v3 = btVector3(coord[c+16], coord[c+17], coord[c+18]);
+			head->collisionMesh->addTriangle(v1, v2, v3);
+		}
+		head->collisionShape = new btGImpactMeshShape(head->collisionMesh);
+		head->collisionShape->setLocalScaling(btVector3(1, 1, 1));
+		head->collisionShape->setMargin(0.0f);
+		head->collisionShape->updateBound();
+		btTransform transform;
+		transform.setIdentity();
+		btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
+		head->collisionShape->calculateLocalInertia(100.f, inertia);
+		btDefaultMotionState* motionState = new btDefaultMotionState(transform);
+		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(100.f, motionState, head->collisionShape, inertia);
+		head->rigidBody = new btRigidBody(rigidBodyCI);
+		dynamicsWorld->addRigidBody(head->rigidBody);
+		head->rigidBody->setFriction(1.0f);
+
 		head->next = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
 		head->next->prev = head;
 	}
@@ -170,7 +193,11 @@ void MoveTo(int id, vec3_t pos)
 	mesh_ent_t* copy = GetMesh(id, nullptr);
 	if(copy)
 	{
-		TranslationMatrix(copy->mat->model, pos[0], pos[1], pos[2]);
+		btTransform transform;
+		copy->rigidBody->getMotionState()->getWorldTransform(transform);
+		transform.setOrigin(btVector3(pos[0], pos[1], pos[2]));
+		copy->rigidBody->getMotionState()->setWorldTransform(transform);
+		copy->rigidBody->setCenterOfMassTransform(transform);
 	}
 	else
 	{
@@ -190,7 +217,7 @@ void InitPhysics()
 	solver = new btSequentialImpulseConstraintSolver();
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+	dynamicsWorld->setGravity(btVector3(0, 1, 0));
 }
 
 void StepPhysics()

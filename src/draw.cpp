@@ -115,6 +115,11 @@ void Meshes()
 	mesh_ent_t* head = meshes;
 	while(head->vertex_data != nullptr)
 	{
+		btTransform transform; //update position
+		head->rigidBody->getMotionState()->getWorldTransform(transform);
+		btVector3 origin = transform.getOrigin();
+		TranslationMatrix(head->mat->model, origin.getX(), origin.getY(), origin.getZ());
+
 		vkCmdBindVertexBuffers(command_buffer, 0, 1, &head->buffer[0], &head->buffer_offset[0]);
 		vkCmdBindIndexBuffer(command_buffer, head->buffer[1], head->buffer_offset[1], VK_INDEX_TYPE_UINT32);
 		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
