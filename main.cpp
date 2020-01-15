@@ -150,6 +150,7 @@ int main(int argc, char *lpCmdLine[])
 	window::PreDraw();
 
 #ifdef DEBUG
+	startup::CreateQueryPool(128);
 	p("Startup time: %f", glfwGetTime()-init);
 #endif
 

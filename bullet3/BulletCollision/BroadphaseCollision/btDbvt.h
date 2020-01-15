@@ -640,8 +640,8 @@ DBVT_INLINE btScalar btDbvtAabbMm::ProjectMinimum(const btVector3& v, unsigned s
 {
 	const btVector3* b[] = {&mx, &mi};
 	const btVector3 _p(b[(signs >> 0) & 1]->x(),
-	                  b[(signs >> 1) & 1]->y(),
-	                  b[(signs >> 2) & 1]->z());
+	                   b[(signs >> 1) & 1]->y(),
+	                   b[(signs >> 2) & 1]->z());
 	return (btDot(_p, v));
 }
 

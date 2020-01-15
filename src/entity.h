@@ -84,8 +84,9 @@ void InitCamera();
 void ViewMatrix(float matrix[16]);
 void InitMeshes();
 mesh_ent_t* GetMesh(int id, mesh_ent_t** last);
-void InstanceMesh(int id);
+mesh_ent_t* InstanceMesh(int id);
 void MoveTo(int id, vec3_t pos);
+void SetPosition(mesh_ent_t* copy, vec3_t pos);
 void InitPhysics();
 void StepPhysics();
 } //namespace entity

@@ -63,6 +63,8 @@ static std::mutex mtx[2]; //locking
 static std::condition_variable cvx[2]; //signaling
 static bool run_threads[2] = {};
 static bool quit = false;
+static double frameCpuAvg = 0;
+static double frameGpuAvg = 0;
 
 namespace window
 {
@@ -124,9 +126,18 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 			trace("Quiting cleanly");
 			glfwSetWindowShouldClose(_window, true);
 			break;
-		case GLFW_KEY_M:
-			if(!ctx->focus)
+		case GLFW_KEY_BACKSPACE:
+			mu_input_keydown(ctx, 8);
+			break;
+		case GLFW_KEY_ENTER:
+			mu_input_keydown(ctx, 16);
+			break;
+		}
+		if(!ctx->focus)
+		{
+			switch(key)
 			{
+			case GLFW_KEY_M:
 				if(!mfocus)
 				{
 					info("Mouse focused.");
@@ -139,44 +150,49 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 					glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 					mfocus = false;
 				}
+				break;
+			case GLFW_KEY_E:
+				mesh_ent_t* target = entity::InstanceMesh(0);
+				vec3_t pos = {cam.pos[0], cam.pos[1], cam.pos[2]};
+				entity::SetPosition(target, pos);
+				target->rigidBody->setLinearVelocity(btVector3(cam.front[0], cam.front[1], cam.front[2]));
+				//spawn and shoot the model at index 0 for fun, test things ...
+				break;
+
 			}
-			break;
-		case GLFW_KEY_BACKSPACE:
-			mu_input_keydown(ctx, 8);
-			break;
-		case GLFW_KEY_ENTER:
-			mu_input_keydown(ctx, 16);
-			break;
 		}
 	}
 }
 
 void processInput()
 {
-	float velocity = cam.speed * frametime;
-	if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
+	if(!ctx->focus)
 	{
-		cam.pos[0] += cam.front[0] * velocity;
-		cam.pos[1] += cam.front[1] * velocity;
-		cam.pos[2] += cam.front[2] * velocity;
-	}
-	if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		cam.pos[0] -= cam.front[0] * velocity;
-		cam.pos[1] -= cam.front[1] * velocity;
-		cam.pos[2] -= cam.front[2] * velocity;
-	}
-	if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		cam.pos[0] -= cam.right[0] * velocity;
-		cam.pos[1] -= cam.right[1] * velocity;
-		cam.pos[2] -= cam.right[2] * velocity;
-	}
-	if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		cam.pos[0] += cam.right[0] * velocity;
-		cam.pos[1] += cam.right[1] * velocity;
-		cam.pos[2] += cam.right[2] * velocity;
+		float velocity = cam.speed * frametime;
+		if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			cam.pos[0] += cam.front[0] * velocity;
+			cam.pos[1] += cam.front[1] * velocity;
+			cam.pos[2] += cam.front[2] * velocity;
+		}
+		if (glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			cam.pos[0] -= cam.front[0] * velocity;
+			cam.pos[1] -= cam.front[1] * velocity;
+			cam.pos[2] -= cam.front[2] * velocity;
+		}
+		if (glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			cam.pos[0] -= cam.right[0] * velocity;
+			cam.pos[1] -= cam.right[1] * velocity;
+			cam.pos[2] -= cam.right[2] * velocity;
+		}
+		if (glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			cam.pos[0] += cam.right[0] * velocity;
+			cam.pos[1] += cam.right[1] * velocity;
+			cam.pos[2] += cam.right[2] * velocity;
+		}
 	}
 }
 
@@ -520,14 +536,6 @@ void Main3DThread()
 		MatrixMultiply(m, c);
 		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
 
-		mesh_ent_t* head = entity::GetMesh(0, nullptr);
-		btTransform transform;
-		head->rigidBody->getMotionState()->getWorldTransform(transform);
-		btVector3 origin = transform.getOrigin();
-
-		vec3_t pos = {origin.getX(), 10.f, origin.getZ()};
-		entity::MoveTo(0, pos);
-
 		draw::Meshes();
 		draw::SkyDome();
 
@@ -658,11 +666,29 @@ void WaitForWorkers()
 	}
 }
 
+void DebugTimingInTitle()
+{
+	uint64_t queryResults[2];
+	VK_CHECK(vkGetQueryPoolResults(logical_device, queryPool, 0, ARRAYSIZE(queryResults),
+	                               sizeof(queryResults), queryResults, sizeof(queryResults[0]), VK_QUERY_RESULT_64_BIT));
+
+	double frameGpuBegin = double(queryResults[0]) * device_properties.limits.timestampPeriod * 1e-6;
+	double frameGpuEnd = double(queryResults[1]) * device_properties.limits.timestampPeriod * 1e-6;
+
+	double frameCpuEnd = glfwGetTime() * 1000;
+
+	frameCpuAvg = frameCpuAvg * 0.95 + (frameCpuEnd - (time1*1000)) * 0.05;
+	frameGpuAvg = frameGpuAvg * 0.95 + (frameGpuEnd - frameGpuBegin) * 0.05;
+
+	char title[256];
+	sprintf(title, "cpu: %.2f ms; gpu: %.2f ms; ", frameCpuAvg, frameGpuAvg);
+	glfwSetWindowTitle(_window, title);
+}
+
 inline uint8_t Draw()
 {
 	VkResult result;
 
-	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);
 	vkResetFences(logical_device, 1, &Fence_one);
 	uint8_t ret = swapchain::AcquireSwapchainImage(_swapchain, AcquiredSemaphore, VK_NULL_HANDLE, image_index);
 
@@ -680,6 +706,11 @@ inline uint8_t Draw()
 	entity::UpdateCamera();
 
 	control::BeginCommandBufferRecordingOperation(0, nullptr);
+
+#ifdef DEBUG
+	vkCmdResetQueryPool(command_buffer, queryPool, 0, 128);
+	vkCmdWriteTimestamp(command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, queryPool, 0);
+#endif
 
 	VkRect2D render_area = {};
 	render_area.extent.width = window_width;
@@ -705,7 +736,9 @@ inline uint8_t Draw()
 
 	vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                     0, 0, nullptr, 0, nullptr, 1, &image_memory_barrier_before_present);
-
+#ifdef DEBUG
+	vkCmdWriteTimestamp(command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, queryPool, 1);
+#endif
 	VK_CHECK(vkEndCommandBuffer(command_buffer));
 
 	VK_CHECK(vkQueueSubmit(GraphicsQueue, 1, &submit_info, Fence_one));
@@ -715,6 +748,10 @@ inline uint8_t Draw()
 
 	result = vkQueuePresentKHR(GraphicsQueue, &present_info);
 
+	vkWaitForFences(logical_device, 1, &Fence_one, VK_TRUE, UINT64_MAX);
+#ifdef DEBUG
+	DebugTimingInTitle();
+#endif
 	switch(result)
 	{
 	case VK_SUCCESS:
@@ -801,6 +838,7 @@ c:
 	quit = true;
 	AwakeWorkers();
 	VK_CHECK(vkDeviceWaitIdle(logical_device));
+	vkDestroyQueryPool(logical_device, queryPool, allocators);
 	control::FreeCommandBuffers(NUM_COMMAND_BUFFERS);
 	render::DestroyDepthBuffer();
 	control::DestroyCommandPool();

@@ -135,6 +135,10 @@ PFN_vkCmdSetBlendConstants vkCmdSetBlendConstants;
 PFN_vkCmdExecuteCommands vkCmdExecuteCommands;
 PFN_vkCmdClearAttachments vkCmdClearAttachments;
 PFN_vkInvalidateMappedMemoryRanges vkInvalidateMappedMemoryRanges;
+PFN_vkCreateQueryPool vkCreateQueryPool;
+PFN_vkCmdWriteTimestamp vkCmdWriteTimestamp;
+PFN_vkCmdResetQueryPool vkCmdResetQueryPool;
+PFN_vkGetQueryPoolResults vkGetQueryPoolResults;
 //---
 
 //DEVICE_LEVEL_VULKAN_FUNCTION_FROM_EXTENSION

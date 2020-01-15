@@ -16,6 +16,8 @@ VkInstance instance;
 VkPhysicalDevice target_device = VK_NULL_HANDLE;
 VkDevice logical_device;
 VkAllocationCallbacks* allocators = &allocator;
+VkQueryPool queryPool = 0;
+VkPhysicalDeviceProperties device_properties;
 uint32_t max2DTex_size = 0;
 uint32_t queue_families_count = 0;
 //}
@@ -27,7 +29,6 @@ static const char** desired_extensions = nullptr;
 static VkExtensionProperties* available_extensions = nullptr;
 static VkPhysicalDevice* available_devices = nullptr;
 static VkPhysicalDeviceFeatures device_features;
-static VkPhysicalDeviceProperties device_properties;
 
 #ifdef DEBUG
 static int d_layers_count = 1;
@@ -561,6 +562,17 @@ bool LoadDeviceLevelFunctions()
   }
 #include "vulkan_functions_list.inl"
 	return true;
+}
+
+void CreateQueryPool(int queryCount)
+{
+	VkQueryPoolCreateInfo createInfo;
+	createInfo.pNext = nullptr;
+	createInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+	createInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
+	createInfo.queryCount = queryCount;
+	createInfo.pipelineStatistics = 0;
+	VK_CHECK(vkCreateQueryPool(logical_device, &createInfo, allocators, &queryPool));
 }
 
 void ReleaseVulkanLoaderLibrary()

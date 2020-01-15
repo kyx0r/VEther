@@ -67,13 +67,13 @@ btTriangleIndexVertexArray :
 public btStridingMeshInterface
 {
 protected:
-	IndexedMeshArray m_indexedMeshes;
 	int m_pad[2];
 	mutable int m_hasAabb;  // using int instead of bool to maintain alignment
 	mutable btVector3 m_aabbMin;
 	mutable btVector3 m_aabbMax;
 
 public:
+	IndexedMeshArray m_indexedMeshes;
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	btTriangleIndexVertexArray() : m_hasAabb(0)
