@@ -16,7 +16,7 @@ static btSequentialImpulseConstraintSolver* solver;
 
 static char* smeshes[][1] =
 {
-//	{"./res/kitty.obj"},
+	{"./res/kitty.obj"},
 	{"./res/cube.obj"},
 };
 
@@ -99,7 +99,7 @@ void InitMeshes()
 //
 
 
-		fastObjMesh* obj = fast_obj_read(smeshes[i][0]);
+		fastObjMesh* obj = fast_obj_read(smeshes[1][0]);
 		float* vertices1 = obj->positions;
 		for(uint32_t c = 3; c<obj->position_count*3; c+=9)
 		{

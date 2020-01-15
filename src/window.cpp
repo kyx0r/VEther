@@ -65,6 +65,7 @@ static bool run_threads[2] = {};
 static bool quit = false;
 static double frameCpuAvg = 0;
 static double frameGpuAvg = 0;
+static float mvp[16];
 
 namespace window
 {
@@ -138,6 +139,7 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 			switch(key)
 			{
 			case GLFW_KEY_M:
+
 				if(!mfocus)
 				{
 					info("Mouse focused.");
@@ -255,6 +257,22 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		else
 		{
 			mu_input_mousedown(ctx, xm, ym, 1);
+			p("%lf, %lf", xm_norm, ym_norm);
+			mesh_ent_t* m = entity::GetMesh(0, nullptr);
+			btTransform transform;
+			m->rigidBody->getMotionState()->getWorldTransform(transform);
+			btVector3 origin = transform.getOrigin();
+			p("%f %f", origin.getX(), origin.getY());
+			//float inv_mvp[16];
+			float pos[16];
+			//InvertMatrix(mvp, inv_mvp);
+			//TranslationMatrix(pos, origin.getX(), origin.getY(), origin.getZ());
+			//MatrixMultiply(pos, mvp);
+			//PrintMatrix(mvp);
+			//PrintMatrix(inv_mvp);
+			TranslationMatrix(pos, xm_norm, ym_norm, 0);
+			MatrixMultiply(pos, mvp);
+			PrintMatrix(pos);
 		}
 		break;
 	case GLFW_RELEASE:
@@ -529,12 +547,11 @@ void Main3DThread()
 
 		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
-		float m[16];
 		float c[16];
-		Perspective(m, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
+		Perspective(mvp, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
 		entity::ViewMatrix(c);
-		MatrixMultiply(m, c);
-		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &m);
+		MatrixMultiply(mvp, c);
+		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &mvp);
 
 		draw::Meshes();
 		draw::SkyDome();
@@ -810,7 +827,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 10.0)
+		if (realtime-stamp > 60.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;

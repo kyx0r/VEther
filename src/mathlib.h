@@ -132,6 +132,7 @@ void RotationMatrix(float matrix[16], float angle, float x, float y, float z);
 void TranslationMatrix(float matrix[16], float x, float y, float z);
 void ScaleMatrix(float matrix[16], float x, float y, float z);
 void IdentityMatrix(float matrix[16]);
+void InvertMatrix(float m[16], float invOut[16]);
 void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up);
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)	\

@@ -1338,15 +1338,17 @@ void Memory_Init (void *buf, int size)
 	hunk_high_used = 0;
 
 	Cache_Init();
-	mainzone[0] = (memzone_t *) Hunk_AllocName (32*zonesize, "mainzone");
 	zsizes[0] = 32*zonesize;
-	Memory_InitZone (mainzone[0], 32*zonesize);
-	mainzone[1] = (memzone_t *) Hunk_AllocName (16*zonesize, "newzone");
+	mainzone[0] = (memzone_t *) Hunk_AllocName (zsizes[0], "mainzone");
+	Memory_InitZone (mainzone[0], zsizes[0]);
+
 	zsizes[1] = 16*zonesize;
-	Memory_InitZone (mainzone[1], 16*zonesize);
-	mainzone[2] = (memzone_t *) Hunk_AllocName (16*zonesize, "vulkanzone");
+	mainzone[1] = (memzone_t *) Hunk_AllocName (zsizes[1], "newzone");
+	Memory_InitZone (mainzone[1], zsizes[1]);
+
 	zsizes[2] = 16*zonesize;
-	Memory_InitZone (mainzone[2], 16*zonesize);
+	mainzone[2] = (memzone_t *) Hunk_AllocName (zsizes[2], "vulkanzone");
+	Memory_InitZone (mainzone[2], zsizes[2]);
 }
 
 } //namespace zone
