@@ -83,64 +83,14 @@ void InitMeshes()
 		IdentityMatrix(head->mat->proj);
 		IdentityMatrix(head->mat->model);
 		IdentityMatrix(head->mat->view);
-		head->collisionMesh = new btTriangleMesh(true, false); //32 bit indexes, 3 component
-		p("%d", head->obj.renderables->vertex_count );
 
-		p("%d", head->obj.renderables->index_count );
-
-//		for(uint32_t c = 0; c<ARRAYSIZE(vertices1) / 9; c+=9)
-//		{
-//			btVector3 v0, v1, v2;
-//			v0 = btVector3(vertices1[c], vertices1[c+1], vertices1[c+2]);
-//			v1 = btVector3(vertices1[c+3], vertices1[c+4], vertices1[c+5]);
-//			v2 = btVector3(vertices1[c+6], vertices1[c+7], vertices1[c+8]);
-//			head->collisionMesh->addTriangle(v0, v1, v2);
-//		}
-//
-
-
-		fastObjMesh* obj = fast_obj_read(smeshes[1][0]);
-		float* vertices1 = obj->positions;
-		for(uint32_t c = 3; c<obj->position_count*3; c+=9)
-		{
-			btVector3 v0, v1, v2;
-			v0 = btVector3(vertices1[c], vertices1[c+1], vertices1[c+2]);
-			v1 = btVector3(vertices1[c+3], vertices1[c+4], vertices1[c+5]);
-			v2 = btVector3(vertices1[c+6], vertices1[c+7], vertices1[c+8]);
-			head->collisionMesh->addTriangle(v0, v1, v2, true);
-		}
-
-
-//		head->collisionMesh->m_indexedMeshes[0].m_numTriangles = head->obj.renderables->vertex_count / 3;
-//		for(uint32_t c = 0; c<head->obj.renderables->index_count; c++)
-//		{
-//			head->collisionMesh->m_32bitIndices.push_back(head->index_data[c]);
-//		}
-//
-//		head->collisionMesh->m_indexedMeshes[0].m_triangleIndexBase = (unsigned char*)&head->collisionMesh->m_32bitIndices[0];
-//
-//		uint32_t ci = 0;
-//		for(uint32_t c = 0; c<head->obj.renderables->vertex_count / 3; c+=3)
-//		{
-//			float* coord = &head->obj.renderables->vertices[ci];
-//			head->collisionMesh->m_3componentVertices.push_back(coord[ci]);
-//			head->collisionMesh->m_3componentVertices.push_back(coord[ci+1]);
-//			head->collisionMesh->m_3componentVertices.push_back(coord[ci+2]);
-//			head->collisionMesh->m_indexedMeshes[0].m_numVertices++;
-//			ci+=8;
-//		}
-
-		head->collisionMesh->m_indexedMeshes[0].m_vertexBase = (unsigned char*)&head->collisionMesh->m_3componentVertices[0];
-		head->collisionShape = new btGImpactMeshShape(head->collisionMesh);
-		head->collisionShape->setLocalScaling(btVector3(1, 1, 1));
-		head->collisionShape->setMargin(0.0f);
-		head->collisionShape->updateBound();
+		head->colShape = new btSphereShape(head->obj.renderables->max_vert);
 		btTransform transform;
 		transform.setIdentity();
 		btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
-		head->collisionShape->calculateLocalInertia(100.f, inertia);
+		head->colShape->calculateLocalInertia(100.f, inertia);
 		btDefaultMotionState* motionState = new btDefaultMotionState(transform);
-		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(100.f, motionState, head->collisionShape, inertia);
+		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(100.f, motionState, head->colShape, inertia);
 		head->rigidBody = new btRigidBody(rigidBodyCI);
 		dynamicsWorld->addRigidBody(head->rigidBody);
 		head->rigidBody->setFriction(1.0f);
@@ -193,12 +143,13 @@ mesh_ent_t* InstanceMesh(int id)
 		IdentityMatrix(head->mat->view);
 		head->collisionMesh = copy->collisionMesh;
 		head->collisionShape = copy->collisionShape;
+		head->colShape = copy->colShape;
 		btTransform transform;
 		transform.setIdentity();
 		btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
-		head->collisionShape->calculateLocalInertia(100.f, inertia);
+		head->colShape->calculateLocalInertia(100.f, inertia);
 		btDefaultMotionState* motionState = new btDefaultMotionState(transform);
-		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(100.f, motionState, head->collisionShape, inertia);
+		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(100.f, motionState, head->colShape, inertia);
 		head->rigidBody = new btRigidBody(rigidBodyCI);
 		dynamicsWorld->addRigidBody(head->rigidBody);
 		head->rigidBody->setFriction(1.0f);
@@ -252,7 +203,7 @@ void InitPhysics()
 
 void StepPhysics()
 {
-	dynamicsWorld->stepSimulation((realtime / (1.0f / frametime)), 0);
+	dynamicsWorld->stepSimulation(frametime, 0);
 }
 
 } //namespace entity

@@ -37,6 +37,7 @@ struct ParsedOBJRenderable
 	int flags;
 	unsigned int vertex_count;
 	unsigned int floats_per_vertex;
+	float max_vert;
 	float *vertices;
 	unsigned int index_count;
 	int *indices;

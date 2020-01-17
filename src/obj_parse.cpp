@@ -2,10 +2,12 @@
 #include "zone.h"
 #include "flog.h"
 #include<setjmp.h>
-
+#include "mathlib.h"
 #ifdef OBJ_PARSE_IMPLEMENTATION
 
 jmp_buf OBJFatal;
+double sum;
+uint64_t nverts;
 
 OBJParserArena
 OBJParserArenaInit(void *memory, unsigned int memory_size)
@@ -524,6 +526,8 @@ LoadOBJ(char *filename)
 {
 	int mark = zone::Hunk_LowMark();
 	int size;
+	sum = 0.0f;
+	nverts = 0;
 	OBJParseInfo info = {};
 	ParsedOBJ obj = {};
 	obj.mark = zone::Hunk_HighMark();
@@ -1429,6 +1433,8 @@ ParseOBJ(OBJParseInfo *info)
 					final_vertex_buffer[(geometry_group_position_index)*8+0] = position[0];
 					final_vertex_buffer[(geometry_group_position_index)*8+1] = position[1];
 					final_vertex_buffer[(geometry_group_position_index)*8+2] = position[2];
+					sum+= fabs(position[0]) + fabs(position[1]) + fabs(position[2]);
+					nverts++;
 					final_vertex_buffer[(geometry_group_position_index)*8+3] = uv[0];
 					final_vertex_buffer[(geometry_group_position_index)*8+4] = uv[1];
 					final_vertex_buffer[(geometry_group_position_index)*8+5] = normal[0];
@@ -1448,6 +1454,7 @@ ParseOBJ(OBJParseInfo *info)
 			renderable->floats_per_vertex = 8;
 			renderable->indices = final_index_buffer;
 			renderable->index_count = final_index_buffer_write_number;
+			renderable->max_vert = sum / nverts;
 		}
 
 	}

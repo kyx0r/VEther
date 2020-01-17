@@ -68,6 +68,7 @@ typedef struct mesh_ent_t
 	float scale;
 	btTriangleMesh* collisionMesh;
 	btGImpactMeshShape* collisionShape;
+	btCollisionShape* colShape;
 	btRigidBody* rigidBody;
 	btScalar mass;
 	btVector3 inertia;
