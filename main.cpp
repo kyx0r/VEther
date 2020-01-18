@@ -8,6 +8,7 @@
 #include "src/cvar.h"
 #include "src/flog.h"
 #include "src/zone.h"
+#include <meshoptimizer.h>
 
 #define number_of_queues 1 // <- change this if more queues needed
 
@@ -59,6 +60,7 @@ int main(int argc, char *lpCmdLine[])
 #endif
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
+	meshopt_setAllocator(Bt_alloc, Bt_free);
 
 	Cvar_Init();
 

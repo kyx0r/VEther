@@ -130,6 +130,8 @@ typedef struct
 	unsigned int                group_count;
 	fastObjGroup*               groups;
 
+	float maxvert[3];
+
 } fastObjMesh;
 
 

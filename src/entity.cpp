@@ -87,6 +87,18 @@ size_t TriangulateObj(fastObjMesh* obj, std::vector<Vertex_>& vertices)
 			v.pos[0] = obj->positions[gi.p * 3 + 0];
 			v.pos[1] = obj->positions[gi.p * 3 + 1];
 			v.pos[2] = obj->positions[gi.p * 3 + 2];
+			if(v.pos[0] > obj->maxvert[0])
+			{
+				obj->maxvert[0] = v.pos[0];
+			}
+			if(v.pos[1] > obj->maxvert[1])
+			{
+				obj->maxvert[1] = v.pos[1];
+			}
+			if(v.pos[2] > obj->maxvert[2])
+			{
+				obj->maxvert[2] = v.pos[2];
+			}
 			v.color[0] = obj->normals[gi.n * 3 + 0];
 			v.color[1] = obj->normals[gi.n * 3 + 1];
 			v.color[2] = obj->normals[gi.n * 3 + 2];
@@ -144,8 +156,8 @@ void InitMeshes()
 		IdentityMatrix(head->mat->proj);
 		IdentityMatrix(head->mat->model);
 		IdentityMatrix(head->mat->view);
-
-		head->colShape = new btSphereShape(0.50f);
+		float approx_bound = (head->obj->maxvert[0] + head->obj->maxvert[1] + head->obj->maxvert[2])/3;
+		head->colShape = new btSphereShape(approx_bound);
 		btTransform transform;
 		transform.setIdentity();
 		btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
