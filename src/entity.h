@@ -4,10 +4,11 @@
 #include "startup.h"
 #include "mathlib.h"
 #include "render.h"
-#include "obj_parse.h"
+#include "fast_obj.h"
 
 #include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include <btBulletDynamicsCommon.h>
+#include <meshoptimizer.h>
 
 typedef struct cam_ent_t
 {
@@ -57,7 +58,8 @@ typedef struct sky_ent_t
 typedef struct mesh_ent_t
 {
 	uint8_t id;
-	ParsedOBJ obj;
+//	ParsedOBJ obj;
+	fastObjMesh* obj;
 	VkBuffer buffer[4];
 	VkDeviceSize buffer_offset[2];
 	VkDescriptorSet dset[2];
@@ -65,6 +67,8 @@ typedef struct mesh_ent_t
 	UniformMatrix* mat;
 	unsigned char* vertex_data;
 	uint32_t* index_data;
+	uint32_t vertex_count;
+	uint32_t index_count;
 	float scale;
 	btTriangleMesh* collisionMesh;
 	btGImpactMeshShape* collisionShape;

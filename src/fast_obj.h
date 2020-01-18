@@ -138,7 +138,6 @@ void                            fast_obj_destroy(fastObjMesh* mesh);
 
 #endif
 
-#define FAST_OBJ_IMPLEMENTATION
 #ifdef FAST_OBJ_IMPLEMENTATION
 
 #include <stdio.h>

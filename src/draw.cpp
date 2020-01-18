@@ -4,7 +4,6 @@
 #include "atlas.h"
 #include "flog.h"
 #include "entity.h"
-#include "obj_parse.h"
 
 /* {
 GVAR: logical_device -> startup.cpp
@@ -124,7 +123,7 @@ void Meshes()
 		vkCmdBindIndexBuffer(command_buffer, head->buffer[1], head->buffer_offset[1], VK_INDEX_TYPE_UINT32);
 		vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
 		vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &head->dset[0], 1, &head->uniform_offset[0]);
-		vkCmdDrawIndexed(command_buffer, head->obj.renderables->index_count, 1, 0, 0, 0);
+		vkCmdDrawIndexed(command_buffer, head->index_count, 1, 0, 0, 0);
 		head = head->next;
 	}
 }

@@ -24,7 +24,7 @@ PROGS = $(patsubst ./src/%.cpp, ./build/%.o,$(SRCS))
 
 LIBRARY_PATHS = -L ./lib
 
-INCLUDE_PATHS = -I ./include -I ./glfw/include -I . 
+INCLUDE_PATHS = -I ./include -I ./glfw/include -I . -I ./meshoptimizer/src
 
 #LINKER_FLAGS specifies the libraries we're linking against 
 LINKER_FLAGS = -static-libgcc -static-libstdc++ 
@@ -35,7 +35,7 @@ WINAPI+= -lcomctl32 -luuid -lrpcrt4 -ladvapi32 -lwsock32 -lshlwapi -lversion -ld
 
 _UNIX = -lpthread -lX11 -lxcb -lXau -lXext -lXdmcp -lpthread -ldl
 
-VETHER = -lVEther -lglfw -lglslang -lbullet3
+VETHER = -lVEther -lglfw -lglslang -lbullet3 -lmeshoptimizer
  
 #OBJ_NAME specifies the name of our exectuable 
 OBJ_NAME = vether.exe 
@@ -60,6 +60,7 @@ VEther:
 	$(MAKE) all -C ./glsl_compiler
 	$(MAKE) all -C ./glfw
 	$(MAKE) all -C ./bullet3
+	$(MAKE) all -C ./meshoptimizer
 	$(MAKE) all -C ./src
 
 #Building a static lib out of src files. Benefits - faster compile time. Makes project modular.
@@ -77,6 +78,7 @@ all_flto: SHARED_FLAGS = -flto -O3 -m32 -s -Wall -Wextra -fno-align-functions -f
 all_flto: glsl_m32
 	$(MAKE) all -C ./glfw
 	$(MAKE) all -C ./bullet3
+	$(MAKE) all -C ./meshoptimizer
 	$(MAKE) all -C ./src
 	$(CC) -flto -static main.cpp $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(VETHER) $(SHARED_FLAGS) $(LINKER_FLAGS) $(WINAPI) -o $(OBJ_NAME)
 
@@ -88,6 +90,7 @@ all_u:
 	$(MAKE) all -C ./glsl_compiler
 	$(MAKE) all -C ./glfw
 	$(MAKE) all -C ./bullet3
+	$(MAKE) all -C ./meshoptimizer
 	$(CC) -c $(SHARED_FLAGS) $(INCLUDE_PATHS) -I ./bullet3 -I ./src -o ./lib/vether.o vether.cpp 
 	ar -cvr ./lib/libVEther.a ./lib/vether.o
 	gcc-ranlib ./lib/libVEther.a
@@ -104,6 +107,7 @@ clean:
 	$(MAKE) clean -C ./src
 	$(MAKE) clean -C ./glfw
 	$(MAKE) clean -C ./bullet3
+	$(MAKE) clean -C ./meshoptimizer
 	find . -type f -name '*.o' -delete
 
 c:

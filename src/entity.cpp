@@ -3,7 +3,7 @@
 #include "zone.h"
 #include "control.h"
 #include "flog.h"
-#include "fast_obj.h"
+#include <vector>
 
 cam_ent_t cam;
 mesh_ent_t* meshes;
@@ -65,6 +65,43 @@ void InitCamera()
 	cam.zoom = 45.0f;
 }
 
+size_t TriangulateObj(fastObjMesh* obj, std::vector<Vertex_>& vertices) 
+{
+	size_t vertex_offset = 0;
+	size_t index_offset = 0;
+	for (unsigned int i = 0; i < obj->face_count; ++i)
+	{
+		for (unsigned int j = 0; j < obj->face_vertices[i]; ++j)
+		{
+			fastObjIndex gi = obj->indices[index_offset + j];
+			// triangulate polygon on the fly; offset-3 is always the first polygon vertex
+			if (j >= 3)
+			{
+				vertices[vertex_offset + 0] = vertices[vertex_offset - 3];
+				vertices[vertex_offset + 1] = vertices[vertex_offset - 1];
+				vertex_offset += 2;
+			}
+
+			Vertex_& v = vertices[vertex_offset++];
+
+			v.pos[0] = obj->positions[gi.p * 3 + 0];
+			v.pos[1] = obj->positions[gi.p * 3 + 1];
+			v.pos[2] = obj->positions[gi.p * 3 + 2];
+			v.color[0] = obj->normals[gi.n * 3 + 0];
+			v.color[1] = obj->normals[gi.n * 3 + 1];
+			v.color[2] = obj->normals[gi.n * 3 + 2];
+			v.tex_coord[0] = meshopt_quantizeHalf(obj->texcoords[gi.t * 2 + 0]);
+			v.tex_coord[1] = meshopt_quantizeHalf(obj->texcoords[gi.t * 2 + 1]);
+		}
+
+		index_offset += obj->face_vertices[i];
+	}
+
+
+	fast_obj_destroy(obj);
+	return vertex_offset;
+}
+
 void InitMeshes()
 {
 	meshes = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
@@ -72,19 +109,43 @@ void InitMeshes()
 	for(uint8_t i = 0; i<ARRAYSIZE(smeshes); i++)
 	{
 		head->id = i;
-		head->obj = LoadOBJ(smeshes[i][0]);
-		head->vertex_data = control::VertexBufferDigress(head->obj.renderables->vertex_count * sizeof(Vertex_), &head->buffer[0], &head->buffer_offset[0]);
-		head->index_data = (uint32_t*) control::IndexBufferDigress(
-		                       head->obj.renderables->index_count * sizeof(uint32_t), &head->buffer[1], &head->buffer_offset[1]);
-		head->mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &head->buffer[3], &head->uniform_offset[0], &head->dset[0], 0);
+		head->obj = fast_obj_read(smeshes[i][0]);
+		size_t index_count = 0;
+		for (unsigned int i = 0; i < head->obj->face_count; ++i)
+		{
+			index_count += 3 * (head->obj->face_vertices[i] - 2);
+		}
 
-		zone::Q_memcpy(head->vertex_data, head->obj.renderables->vertices, head->obj.renderables->vertex_count * sizeof(Vertex_));
-		zone::Q_memcpy(head->index_data, head->obj.renderables->indices, head->obj.renderables->index_count * sizeof(uint32_t));
+		std::vector<Vertex_> triangle_vertices(index_count);
+		size_t offs = TriangulateObj(head->obj, triangle_vertices); 
+		ASSERT(offs == index_count, "");
+
+		std::vector<uint32_t> remap(index_count);
+		size_t vertex_count = meshopt_generateVertexRemap(remap.data(), 0, index_count, triangle_vertices.data(), index_count, sizeof(Vertex_));
+
+		std::vector<Vertex_> vertices(vertex_count);
+		std::vector<uint32_t> indices(index_count);
+
+		meshopt_remapVertexBuffer(vertices.data(), triangle_vertices.data(), index_count, sizeof(Vertex_), remap.data());
+		meshopt_remapIndexBuffer(indices.data(), 0, index_count, remap.data());
+
+		meshopt_optimizeVertexCache(indices.data(), indices.data(), index_count, vertex_count);
+		meshopt_optimizeVertexFetch(vertices.data(), indices.data(), index_count, vertices.data(), vertex_count, sizeof(Vertex_));
+
+		head->mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &head->buffer[3], &head->uniform_offset[0], &head->dset[0], 0);
+		head->vertex_data = control::VertexBufferDigress(vertices.size()*sizeof(Vertex_), &head->buffer[0], &head->buffer_offset[0]);
+		head->index_data = (uint32_t*) control::IndexBufferDigress(indices.size()*sizeof(uint32_t), &head->buffer[1], &head->buffer_offset[1]);
+
+		head->vertex_count = vertices.size();
+		head->index_count = indices.size();
+		zone::Q_memcpy(head->vertex_data, vertices.data(), head->vertex_count*sizeof(Vertex_));
+		zone::Q_memcpy(head->index_data, indices.data(), head->index_count*sizeof(uint32_t));
+
 		IdentityMatrix(head->mat->proj);
 		IdentityMatrix(head->mat->model);
 		IdentityMatrix(head->mat->view);
 
-		head->colShape = new btSphereShape(head->obj.renderables->max_vert);
+		head->colShape = new btSphereShape(0.50f);
 		btTransform transform;
 		transform.setIdentity();
 		btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
@@ -134,6 +195,8 @@ mesh_ent_t* InstanceMesh(int id)
 		head->obj = copy->obj;
 		head->vertex_data = copy->vertex_data;
 		head->index_data = copy->index_data;
+		head->vertex_count = copy->vertex_count;
+		head->index_count = copy->index_count;
 		zone::Q_memcpy(&head->buffer[0], &copy->buffer[0], sizeof(head->buffer));
 		zone::Q_memcpy(&head->dset[0], &copy->dset[0], sizeof(head->dset));
 		zone::Q_memcpy(&head->buffer_offset[0], &copy->buffer_offset[0], sizeof(head->buffer_offset));

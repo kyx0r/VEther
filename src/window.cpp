@@ -157,7 +157,7 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 				mesh_ent_t* target = entity::InstanceMesh(0);
 				vec3_t pos = {cam.pos[0], cam.pos[1], cam.pos[2]};
 				entity::SetPosition(target, pos);
-				target->rigidBody->setLinearVelocity(btVector3(cam.front[0], cam.front[1], cam.front[2]));
+				target->rigidBody->setLinearVelocity(btVector3(cam.front[0]*5, cam.front[1]*5, cam.front[2]*5));
 				//spawn and shoot the model at index 0 for fun, test things ...
 				break;
 
