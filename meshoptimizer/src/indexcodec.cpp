@@ -23,15 +23,17 @@ const unsigned char kIndexHeader = 0xe0;
 typedef unsigned int VertexFifo[16];
 typedef unsigned int EdgeFifo[16][2];
 
-static const unsigned int kTriangleIndexOrder[3][3] = {
-    {0, 1, 2},
-    {1, 2, 0},
-    {2, 0, 1},
+static const unsigned int kTriangleIndexOrder[3][3] =
+{
+	{0, 1, 2},
+	{1, 2, 0},
+	{2, 0, 1},
 };
 
-static const unsigned char kCodeAuxEncodingTable[16] = {
-    0x00, 0x76, 0x87, 0x56, 0x67, 0x78, 0xa9, 0x86, 0x65, 0x89, 0x68, 0x98, 0x01, 0x69,
-    0, 0, // last two entries aren't used for encoding
+static const unsigned char kCodeAuxEncodingTable[16] =
+{
+	0x00, 0x76, 0x87, 0x56, 0x67, 0x78, 0xa9, 0x86, 0x65, 0x89, 0x68, 0x98, 0x01, 0x69,
+	0, 0, // last two entries aren't used for encoding
 };
 
 static int rotateTriangle(unsigned int a, unsigned int b, unsigned int c, unsigned int next)
@@ -94,7 +96,8 @@ static void encodeVByte(unsigned char*& data, unsigned int v)
 	{
 		*data++ = (v & 127) | (v > 127 ? 128 : 0);
 		v >>= 7;
-	} while (v);
+	}
+	while (v);
 }
 
 static unsigned int decodeVByte(const unsigned char*& data)

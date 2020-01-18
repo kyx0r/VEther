@@ -59,7 +59,8 @@ struct Mesh
 	std::vector<unsigned int> indices;
 };
 
-union Triangle {
+union Triangle
+{
 	Vertex v[3];
 	char data[sizeof(Vertex) * 3];
 };
@@ -90,16 +91,16 @@ Mesh parseObj(const char* path, double& reindex)
 			fastObjIndex gi = obj->indices[index_offset + j];
 
 			Vertex v =
-			    {
-			        obj->positions[gi.p * 3 + 0],
-			        obj->positions[gi.p * 3 + 1],
-			        obj->positions[gi.p * 3 + 2],
-			        obj->normals[gi.n * 3 + 0],
-			        obj->normals[gi.n * 3 + 1],
-			        obj->normals[gi.n * 3 + 2],
-			        obj->texcoords[gi.t * 2 + 0],
-			        obj->texcoords[gi.t * 2 + 1],
-			    };
+			{
+				obj->positions[gi.p * 3 + 0],
+				obj->positions[gi.p * 3 + 1],
+				obj->positions[gi.p * 3 + 2],
+				obj->normals[gi.n * 3 + 0],
+				obj->normals[gi.n * 3 + 1],
+				obj->normals[gi.n * 3 + 2],
+				obj->texcoords[gi.t * 2 + 0],
+				obj->texcoords[gi.t * 2 + 1],
+			};
 
 			// triangulate polygon on the fly; offset-3 is always the first polygon vertex
 			if (j >= 3)
@@ -921,10 +922,11 @@ void processDeinterleaved(const char* path)
 
 	double start = timestamp();
 
-	meshopt_Stream streams[] = {
-	    {&unindexed_pos[0], sizeof(float) * 3, sizeof(float) * 3},
-	    {&unindexed_nrm[0], sizeof(float) * 3, sizeof(float) * 3},
-	    {&unindexed_uv[0], sizeof(float) * 2, sizeof(float) * 2},
+	meshopt_Stream streams[] =
+	{
+		{&unindexed_pos[0], sizeof(float) * 3, sizeof(float) * 3},
+		{&unindexed_nrm[0], sizeof(float) * 3, sizeof(float) * 3},
+		{&unindexed_uv[0], sizeof(float) * 2, sizeof(float) * 2},
 	};
 
 	std::vector<unsigned int> remap(total_indices);

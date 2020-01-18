@@ -31,100 +31,100 @@
 
 typedef struct
 {
-    /* Texture name from .mtl file */
-    char*                       name;
+	/* Texture name from .mtl file */
+	char*                       name;
 
-    /* Resolved path to texture */
-    char*                       path;
+	/* Resolved path to texture */
+	char*                       path;
 
 } fastObjTexture;
 
 
 typedef struct
 {
-    /* Material name */
-    char*                       name;
+	/* Material name */
+	char*                       name;
 
-    /* Parameters */
-    float                       Ka[3];  /* Ambient */
-    float                       Kd[3];  /* Diffuse */
-    float                       Ks[3];  /* Specular */
-    float                       Ke[3];  /* Emission */
-    float                       Kt[3];  /* Transmittance */
-    float                       Ns;     /* Shininess */
-    float                       Ni;     /* Index of refraction */
-    float                       Tf[3];  /* Transmission filter */
-    float                       d;      /* Disolve (alpha) */
-    int                         illum;  /* Illumination model */
+	/* Parameters */
+	float                       Ka[3];  /* Ambient */
+	float                       Kd[3];  /* Diffuse */
+	float                       Ks[3];  /* Specular */
+	float                       Ke[3];  /* Emission */
+	float                       Kt[3];  /* Transmittance */
+	float                       Ns;     /* Shininess */
+	float                       Ni;     /* Index of refraction */
+	float                       Tf[3];  /* Transmission filter */
+	float                       d;      /* Disolve (alpha) */
+	int                         illum;  /* Illumination model */
 
-    /* Texture maps */
-    fastObjTexture              map_Ka;
-    fastObjTexture              map_Kd;
-    fastObjTexture              map_Ks;
-    fastObjTexture              map_Ke;
-    fastObjTexture              map_Kt;
-    fastObjTexture              map_Ns;
-    fastObjTexture              map_Ni;
-    fastObjTexture              map_d;
-    fastObjTexture              map_bump;
-    
+	/* Texture maps */
+	fastObjTexture              map_Ka;
+	fastObjTexture              map_Kd;
+	fastObjTexture              map_Ks;
+	fastObjTexture              map_Ke;
+	fastObjTexture              map_Kt;
+	fastObjTexture              map_Ns;
+	fastObjTexture              map_Ni;
+	fastObjTexture              map_d;
+	fastObjTexture              map_bump;
+
 
 } fastObjMaterial;
 
 
 typedef struct
 {
-    unsigned int                p;
-    unsigned int                t;
-    unsigned int                n;
+	unsigned int                p;
+	unsigned int                t;
+	unsigned int                n;
 
 } fastObjIndex;
 
 
 typedef struct
 {
-    /* Group name */
-    char*                       name;
+	/* Group name */
+	char*                       name;
 
-    /* Number of faces */
-    unsigned int                face_count;
+	/* Number of faces */
+	unsigned int                face_count;
 
-    /* First face in fastObjMesh face_* arrays */
-    unsigned int                face_offset;
+	/* First face in fastObjMesh face_* arrays */
+	unsigned int                face_offset;
 
-    /* First index in fastObjMesh indices array */
-    unsigned int                index_offset;
+	/* First index in fastObjMesh indices array */
+	unsigned int                index_offset;
 
 } fastObjGroup;
 
 
 typedef struct
 {
-    /* Vertex data */
-    unsigned int                position_count;
-    float*                      positions;
+	/* Vertex data */
+	unsigned int                position_count;
+	float*                      positions;
 
-    unsigned int                texcoord_count;
-    float*                      texcoords;
+	unsigned int                texcoord_count;
+	float*                      texcoords;
 
-    unsigned int                normal_count;
-    float*                      normals;
+	unsigned int                normal_count;
+	float*                      normals;
 
-    /* Face data: one element for each face */
-    unsigned int                face_count;
-    unsigned int*               face_vertices;
-    unsigned int*               face_materials;
+	/* Face data: one element for each face */
+	unsigned int                face_count;
+	unsigned int*               face_vertices;
+	unsigned int*               face_materials;
 
-    /* Index data: one element for each face vertex */
-    fastObjIndex*               indices;
+	/* Index data: one element for each face vertex */
+	fastObjIndex*               indices;
 
-    /* Materials */
-    unsigned int                material_count;
-    fastObjMaterial*            materials;
+	/* Materials */
+	unsigned int                material_count;
+	fastObjMaterial*            materials;
 
-    /* Mesh groups */
-    unsigned int                group_count;
-    fastObjGroup*               groups;
+	/* Mesh groups */
+	unsigned int                group_count;
+	fastObjGroup*               groups;
 
 } fastObjMesh;
 
@@ -166,20 +166,20 @@ void                            fast_obj_destroy(fastObjMesh* mesh);
 
 typedef struct
 {
-    /* Final mesh */
-    fastObjMesh*                mesh;
+	/* Final mesh */
+	fastObjMesh*                mesh;
 
-    /* Current group */
-    fastObjGroup                group;
+	/* Current group */
+	fastObjGroup                group;
 
-    /* Current material index */
-    unsigned int                material;
+	/* Current material index */
+	unsigned int                material;
 
-    /* Current line in file */
-    unsigned int                line;
+	/* Current line in file */
+	unsigned int                line;
 
-    /* Base path for materials/textures */
-    char*                       base;
+	/* Base path for materials/textures */
+	char*                       base;
 
 } fastObjData;
 
@@ -187,15 +187,15 @@ typedef struct
 static const
 double POWER_10_POS[MAX_POWER] =
 {
-    1.0e0,  1.0e1,  1.0e2,  1.0e3,  1.0e4,  1.0e5,  1.0e6,  1.0e7,  1.0e8,  1.0e9,
-    1.0e10, 1.0e11, 1.0e12, 1.0e13, 1.0e14, 1.0e15, 1.0e16, 1.0e17, 1.0e18, 1.0e19,
+	1.0e0,  1.0e1,  1.0e2,  1.0e3,  1.0e4,  1.0e5,  1.0e6,  1.0e7,  1.0e8,  1.0e9,
+	1.0e10, 1.0e11, 1.0e12, 1.0e13, 1.0e14, 1.0e15, 1.0e16, 1.0e17, 1.0e18, 1.0e19,
 };
 
 static const
 double POWER_10_NEG[MAX_POWER] =
 {
-    1.0e0,   1.0e-1,  1.0e-2,  1.0e-3,  1.0e-4,  1.0e-5,  1.0e-6,  1.0e-7,  1.0e-8,  1.0e-9,
-    1.0e-10, 1.0e-11, 1.0e-12, 1.0e-13, 1.0e-14, 1.0e-15, 1.0e-16, 1.0e-17, 1.0e-18, 1.0e-19,
+	1.0e0,   1.0e-1,  1.0e-2,  1.0e-3,  1.0e-4,  1.0e-5,  1.0e-6,  1.0e-7,  1.0e-8,  1.0e-9,
+	1.0e-10, 1.0e-11, 1.0e-12, 1.0e-13, 1.0e-14, 1.0e-15, 1.0e-16, 1.0e-17, 1.0e-18, 1.0e-19,
 };
 
 
@@ -216,7 +216,7 @@ void* memory_realloc(void* ptr, size_t bytes)
 static
 void memory_dealloc(void* ptr)
 {
-    FAST_OBJ_FREE(ptr);
+	FAST_OBJ_FREE(ptr);
 }
 
 
@@ -237,1168 +237,1168 @@ void memory_dealloc(void* ptr)
 static
 void* array_realloc(void* ptr, unsigned int n, unsigned int b)
 {
-    unsigned int  sz   = array_size(ptr);
-    unsigned int  nsz  = sz + n;
-    unsigned int  cap  = array_capacity(ptr);
-    unsigned int  ncap = 3 * cap / 2;
-    unsigned int* r;
+	unsigned int  sz   = array_size(ptr);
+	unsigned int  nsz  = sz + n;
+	unsigned int  cap  = array_capacity(ptr);
+	unsigned int  ncap = 3 * cap / 2;
+	unsigned int* r;
 
 
-    if (ncap < nsz)
-        ncap = nsz;
-    ncap = (ncap + 15) & ~15u;
+	if (ncap < nsz)
+		ncap = nsz;
+	ncap = (ncap + 15) & ~15u;
 
-    r = (unsigned int*)(memory_realloc(ptr ? _array_header(ptr) : 0, b * ncap + 2 * sizeof(unsigned int)));
-    if (!r)
-        return 0;
+	r = (unsigned int*)(memory_realloc(ptr ? _array_header(ptr) : 0, b * ncap + 2 * sizeof(unsigned int)));
+	if (!r)
+		return 0;
 
-    r[0] = sz;
-    r[1] = ncap;
+	r[0] = sz;
+	r[1] = ncap;
 
-    return (r + 2);
+	return (r + 2);
 }
 
 
 static
 void* file_open(const char* path)
 {
-    return fopen(path, "rb");
+	return fopen(path, "rb");
 }
 
 
 static
 void file_close(void* file)
 {
-    FILE* f;
-    
-    f = (FILE*)(file);
-    fclose(f);
+	FILE* f;
+
+	f = (FILE*)(file);
+	fclose(f);
 }
 
 
 static
 size_t file_read(void* file, void* dst, size_t bytes)
 {
-    FILE* f;
-    
-    f = (FILE*)(file);
-    return fread(dst, 1, bytes, f);
+	FILE* f;
+
+	f = (FILE*)(file);
+	return fread(dst, 1, bytes, f);
 }
 
 
 static
 unsigned long file_size(void* file)
 {
-    FILE* f;
-    long p;
-    long n;
-    
-    f = (FILE*)(file);
+	FILE* f;
+	long p;
+	long n;
 
-    p = ftell(f);
-    fseek(f, 0, SEEK_END);
-    n = ftell(f);
-    fseek(f, p, SEEK_SET);
+	f = (FILE*)(file);
 
-    if (n > 0)
-        return (unsigned long)(n);
-    else
-        return 0;
+	p = ftell(f);
+	fseek(f, 0, SEEK_END);
+	n = ftell(f);
+	fseek(f, p, SEEK_SET);
+
+	if (n > 0)
+		return (unsigned long)(n);
+	else
+		return 0;
 }
 
 
 static
 char* string_copy(const char* s, const char* e)
 {
-    size_t n;
-    char*  p;
-        
-    n = (size_t)(e - s);
-    p = (char*)(memory_realloc(0, n + 1));
-    if (p)
-    {
-        memcpy(p, s, n);
-        p[n] = '\0';
-    }
+	size_t n;
+	char*  p;
 
-    return p;
+	n = (size_t)(e - s);
+	p = (char*)(memory_realloc(0, n + 1));
+	if (p)
+	{
+		memcpy(p, s, n);
+		p[n] = '\0';
+	}
+
+	return p;
 }
 
 
 static
 char* string_substr(const char* s, size_t a, size_t b)
 {
-    return string_copy(s + a, s + b);
+	return string_copy(s + a, s + b);
 }
 
 
 static
 char* string_concat(const char* a, const char* s, const char* e)
 {
-    size_t an;
-    size_t sn;
-    char*  p;
-        
-    an = a ? strlen(a) : 0;
-    sn = (size_t)(e - s);
-    p = (char*)(memory_realloc(0, an + sn + 1));
-    if (p)
-    {
-        if (a)
-            memcpy(p, a, an);
-        memcpy(p + an, s, sn);
-        p[an + sn] = '\0';
-    }
+	size_t an;
+	size_t sn;
+	char*  p;
 
-    return p;
+	an = a ? strlen(a) : 0;
+	sn = (size_t)(e - s);
+	p = (char*)(memory_realloc(0, an + sn + 1));
+	if (p)
+	{
+		if (a)
+			memcpy(p, a, an);
+		memcpy(p + an, s, sn);
+		p[an + sn] = '\0';
+	}
+
+	return p;
 }
 
 
 static
 int string_equal(const char* a, const char* s, const char* e)
 {
-    while (*a++ == *s++ && s != e)
-        ;
+	while (*a++ == *s++ && s != e)
+		;
 
-    return (*a == '\0' && s == e);
+	return (*a == '\0' && s == e);
 }
 
 
 static
 int string_find_last(const char* s, char c, size_t* p)
 {
-    const char* e;
+	const char* e;
 
-    e = s + strlen(s);
-    while (e > s)
-    {
-        e--;
+	e = s + strlen(s);
+	while (e > s)
+	{
+		e--;
 
-        if (*e == c)
-        {
-            *p = (size_t)(e - s);
-            return 1;
-        }
-    }
+		if (*e == c)
+		{
+			*p = (size_t)(e - s);
+			return 1;
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 
 static
 void string_fix_separators(char* s)
 {
-    while (*s)
-    {
-        if (*s == FAST_OBJ_OTHER_SEP)
-            *s = FAST_OBJ_SEPARATOR;
-        s++;
-    }
+	while (*s)
+	{
+		if (*s == FAST_OBJ_OTHER_SEP)
+			*s = FAST_OBJ_SEPARATOR;
+		s++;
+	}
 }
 
 
 static
 int is_whitespace(char c)
 {
-    return (c == ' ' || c == '\t' || c == '\r');
+	return (c == ' ' || c == '\t' || c == '\r');
 }
 
 
 static
 int is_newline(char c)
 {
-    return (c == '\n');
+	return (c == '\n');
 }
 
 
 static
 int is_digit(char c)
 {
-    return (c >= '0' && c <= '9');
+	return (c >= '0' && c <= '9');
 }
 
 
 static
 int is_exponent(char c)
 {
-    return (c == 'e' || c == 'E');
+	return (c == 'e' || c == 'E');
 }
 
 
 static
 const char* skip_whitespace(const char* ptr)
 {
-    while (is_whitespace(*ptr))
-        ptr++;
+	while (is_whitespace(*ptr))
+		ptr++;
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* skip_line(const char* ptr)
 {
-    while (!is_newline(*ptr++))
-        ;
+	while (!is_newline(*ptr++))
+		;
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 fastObjGroup group_default(void)
 {
-    fastObjGroup group;
+	fastObjGroup group;
 
-    group.name         = 0;
-    group.face_count   = 0;
-    group.face_offset  = 0;
-    group.index_offset = 0;
+	group.name         = 0;
+	group.face_count   = 0;
+	group.face_offset  = 0;
+	group.index_offset = 0;
 
-    return group;
+	return group;
 }
 
 
 static
 void group_clean(fastObjGroup* group)
 {
-    memory_dealloc(group->name);
+	memory_dealloc(group->name);
 }
 
 
 static
 void flush_output(fastObjData* data)
 {
-    /* Add group if not empty */
-    if (data->group.face_count > 0)
-        array_push(data->mesh->groups, data->group);
-    else
-        group_clean(&data->group);
+	/* Add group if not empty */
+	if (data->group.face_count > 0)
+		array_push(data->mesh->groups, data->group);
+	else
+		group_clean(&data->group);
 
-    /* Reset for more data */
-    data->group = group_default();
-    data->group.face_offset = array_size(data->mesh->face_vertices);
-    data->group.index_offset = array_size(data->mesh->indices);
+	/* Reset for more data */
+	data->group = group_default();
+	data->group.face_offset = array_size(data->mesh->face_vertices);
+	data->group.index_offset = array_size(data->mesh->indices);
 }
 
 
 static
 const char* parse_int(const char* ptr, int* val)
 {
-    int sign;
-    int num;
+	int sign;
+	int num;
 
 
-    if (*ptr == '-')
-    {
-        sign = -1;
-        ptr++;
-    }
-    else
-    {
-        sign = +1;
-    }
+	if (*ptr == '-')
+	{
+		sign = -1;
+		ptr++;
+	}
+	else
+	{
+		sign = +1;
+	}
 
-    num = 0;
-    while (is_digit(*ptr))
-        num = 10 * num + (*ptr++ - '0');
+	num = 0;
+	while (is_digit(*ptr))
+		num = 10 * num + (*ptr++ - '0');
 
-    *val = sign * num;
+	*val = sign * num;
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* parse_float(const char* ptr, float* val)
 {
-    double        sign;
-    double        num;
-    double        fra;
-    double        div;
-    int           eval;
-    const double* powers;
+	double        sign;
+	double        num;
+	double        fra;
+	double        div;
+	int           eval;
+	const double* powers;
 
 
-    ptr = skip_whitespace(ptr);
+	ptr = skip_whitespace(ptr);
 
-    switch (*ptr)
-    {
-    case '+':
-        sign = 1.0;
-        ptr++;
-        break;
+	switch (*ptr)
+	{
+	case '+':
+		sign = 1.0;
+		ptr++;
+		break;
 
-    case '-':
-        sign = -1.0;
-        ptr++;
-        break;
+	case '-':
+		sign = -1.0;
+		ptr++;
+		break;
 
-    default:
-        sign = 1.0;
-        break;
-    }
+	default:
+		sign = 1.0;
+		break;
+	}
 
 
-    num = 0.0;
-    while (is_digit(*ptr))
-        num = 10.0 * num + (double)(*ptr++ - '0');
+	num = 0.0;
+	while (is_digit(*ptr))
+		num = 10.0 * num + (double)(*ptr++ - '0');
 
-    if (*ptr == '.')
-        ptr++;
+	if (*ptr == '.')
+		ptr++;
 
-    fra = 0.0;
-    div = 1.0;
+	fra = 0.0;
+	div = 1.0;
 
-    while (is_digit(*ptr))
-    {
-        fra  = 10.0 * fra + (double)(*ptr++ - '0');
-        div *= 10.0;
-    }
+	while (is_digit(*ptr))
+	{
+		fra  = 10.0 * fra + (double)(*ptr++ - '0');
+		div *= 10.0;
+	}
 
-    num += fra / div;
+	num += fra / div;
 
-    if (is_exponent(*ptr))
-    {
-        ptr++;
+	if (is_exponent(*ptr))
+	{
+		ptr++;
 
-        switch (*ptr)
-        {
-        case '+':
-            powers = POWER_10_POS;
-            ptr++;
-            break;
+		switch (*ptr)
+		{
+		case '+':
+			powers = POWER_10_POS;
+			ptr++;
+			break;
 
-        case '-':
-            powers = POWER_10_NEG;
-            ptr++;
-            break;
+		case '-':
+			powers = POWER_10_NEG;
+			ptr++;
+			break;
 
-        default:
-            powers = POWER_10_POS;
-            break;
-        }
+		default:
+			powers = POWER_10_POS;
+			break;
+		}
 
-        eval = 0;
-        while (is_digit(*ptr))
-            eval = 10 * eval + (*ptr++ - '0');
+		eval = 0;
+		while (is_digit(*ptr))
+			eval = 10 * eval + (*ptr++ - '0');
 
-        num *= (eval >= MAX_POWER) ? 0.0 : powers[eval];
-    }
+		num *= (eval >= MAX_POWER) ? 0.0 : powers[eval];
+	}
 
-    *val = (float)(sign * num);
+	*val = (float)(sign * num);
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* parse_vertex(fastObjData* data, const char* ptr)
 {
-    unsigned int ii;
-    float        v;
+	unsigned int ii;
+	float        v;
 
 
-    for (ii = 0; ii < 3; ii++)
-    {
-        ptr = parse_float(ptr, &v);
-        array_push(data->mesh->positions, v);
-    }
+	for (ii = 0; ii < 3; ii++)
+	{
+		ptr = parse_float(ptr, &v);
+		array_push(data->mesh->positions, v);
+	}
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* parse_texcoord(fastObjData* data, const char* ptr)
 {
-    unsigned int ii;
-    float        v;
+	unsigned int ii;
+	float        v;
 
 
-    for (ii = 0; ii < 2; ii++)
-    {
-        ptr = parse_float(ptr, &v);
-        array_push(data->mesh->texcoords, v);
-    }
+	for (ii = 0; ii < 2; ii++)
+	{
+		ptr = parse_float(ptr, &v);
+		array_push(data->mesh->texcoords, v);
+	}
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* parse_normal(fastObjData* data, const char* ptr)
 {
-    unsigned int ii;
-    float        v;
+	unsigned int ii;
+	float        v;
 
 
-    for (ii = 0; ii < 3; ii++)
-    {
-        ptr = parse_float(ptr, &v);
-        array_push(data->mesh->normals, v);
-    }
+	for (ii = 0; ii < 3; ii++)
+	{
+		ptr = parse_float(ptr, &v);
+		array_push(data->mesh->normals, v);
+	}
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* parse_face(fastObjData* data, const char* ptr)
 {
-    unsigned int count;
-    fastObjIndex vn;
-    int          v;
-    int          t;
-    int          n;
+	unsigned int count;
+	fastObjIndex vn;
+	int          v;
+	int          t;
+	int          n;
 
 
-    ptr = skip_whitespace(ptr);
+	ptr = skip_whitespace(ptr);
 
-    count = 0;
-    while (!is_newline(*ptr))
-    {
-        v = 0;
-        t = 0;
-        n = 0;
+	count = 0;
+	while (!is_newline(*ptr))
+	{
+		v = 0;
+		t = 0;
+		n = 0;
 
-        ptr = parse_int(ptr, &v);
-        if (*ptr == '/')
-        {
-            ptr++;
-            if (*ptr != '/')
-                ptr = parse_int(ptr, &t);
+		ptr = parse_int(ptr, &v);
+		if (*ptr == '/')
+		{
+			ptr++;
+			if (*ptr != '/')
+				ptr = parse_int(ptr, &t);
 
-            if (*ptr == '/')
-            {
-                ptr++;
-                ptr = parse_int(ptr, &n);
-            }
-        }
+			if (*ptr == '/')
+			{
+				ptr++;
+				ptr = parse_int(ptr, &n);
+			}
+		}
 
-        if (v < 0)
-            vn.p = (array_size(data->mesh->positions) / 3) - (unsigned int)(-v);
-        else
-            vn.p = (unsigned int)(v);
+		if (v < 0)
+			vn.p = (array_size(data->mesh->positions) / 3) - (unsigned int)(-v);
+		else
+			vn.p = (unsigned int)(v);
 
-        if (t < 0)
-            vn.t = (array_size(data->mesh->texcoords) / 2) - (unsigned int)(-t);
-        else if (t > 0)
-            vn.t = (unsigned int)(t);
-        else
-            vn.t = 0;
+		if (t < 0)
+			vn.t = (array_size(data->mesh->texcoords) / 2) - (unsigned int)(-t);
+		else if (t > 0)
+			vn.t = (unsigned int)(t);
+		else
+			vn.t = 0;
 
-        if (n < 0)
-            vn.n = (array_size(data->mesh->normals) / 3) - (unsigned int)(-n);
-        else if (n > 0)
-            vn.n = (unsigned int)(n);
-        else
-            vn.n = 0;
+		if (n < 0)
+			vn.n = (array_size(data->mesh->normals) / 3) - (unsigned int)(-n);
+		else if (n > 0)
+			vn.n = (unsigned int)(n);
+		else
+			vn.n = 0;
 
-        array_push(data->mesh->indices, vn);
-        count++;
+		array_push(data->mesh->indices, vn);
+		count++;
 
-        ptr = skip_whitespace(ptr);
-    }
+		ptr = skip_whitespace(ptr);
+	}
 
-    array_push(data->mesh->face_vertices, count);
-    array_push(data->mesh->face_materials, data->material);
+	array_push(data->mesh->face_vertices, count);
+	array_push(data->mesh->face_materials, data->material);
 
-    data->group.face_count++;
+	data->group.face_count++;
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 const char* parse_group(fastObjData* data, const char* ptr)
 {
-    const char* s;
-    const char* e;
+	const char* s;
+	const char* e;
 
 
-    ptr = skip_whitespace(ptr);
+	ptr = skip_whitespace(ptr);
 
-    s = ptr;
-    while (!is_whitespace(*ptr) && !is_newline(*ptr))
-        ptr++;
+	s = ptr;
+	while (!is_whitespace(*ptr) && !is_newline(*ptr))
+		ptr++;
 
-    e = ptr;
+	e = ptr;
 
-    flush_output(data);
-    data->group.name = string_copy(s, e);
+	flush_output(data);
+	data->group.name = string_copy(s, e);
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 fastObjTexture map_default(void)
 {
-    fastObjTexture map;
+	fastObjTexture map;
 
-    map.name = 0;
-    map.path = 0;
+	map.name = 0;
+	map.path = 0;
 
-    return map;
+	return map;
 }
 
 
 static
 fastObjMaterial mtl_default(void)
 {
-    fastObjMaterial mtl;
+	fastObjMaterial mtl;
 
-    mtl.name = 0;
+	mtl.name = 0;
 
-    mtl.Ka[0] = 0.0;
-    mtl.Ka[1] = 0.0;
-    mtl.Ka[2] = 0.0;
-    mtl.Kd[0] = 1.0;
-    mtl.Kd[1] = 1.0;
-    mtl.Kd[2] = 1.0;
-    mtl.Ks[0] = 0.0;
-    mtl.Ks[1] = 0.0;
-    mtl.Ks[2] = 0.0;
-    mtl.Ke[0] = 0.0;
-    mtl.Ke[1] = 0.0;
-    mtl.Ke[2] = 0.0;
-    mtl.Kt[0] = 0.0;
-    mtl.Kt[1] = 0.0;
-    mtl.Kt[2] = 0.0;
-    mtl.Ns    = 1.0;
-    mtl.Ni    = 1.0;
-    mtl.Tf[0] = 1.0;
-    mtl.Tf[1] = 1.0;
-    mtl.Tf[2] = 1.0;
-    mtl.d     = 1.0;
-    mtl.illum = 1;
+	mtl.Ka[0] = 0.0;
+	mtl.Ka[1] = 0.0;
+	mtl.Ka[2] = 0.0;
+	mtl.Kd[0] = 1.0;
+	mtl.Kd[1] = 1.0;
+	mtl.Kd[2] = 1.0;
+	mtl.Ks[0] = 0.0;
+	mtl.Ks[1] = 0.0;
+	mtl.Ks[2] = 0.0;
+	mtl.Ke[0] = 0.0;
+	mtl.Ke[1] = 0.0;
+	mtl.Ke[2] = 0.0;
+	mtl.Kt[0] = 0.0;
+	mtl.Kt[1] = 0.0;
+	mtl.Kt[2] = 0.0;
+	mtl.Ns    = 1.0;
+	mtl.Ni    = 1.0;
+	mtl.Tf[0] = 1.0;
+	mtl.Tf[1] = 1.0;
+	mtl.Tf[2] = 1.0;
+	mtl.d     = 1.0;
+	mtl.illum = 1;
 
-    mtl.map_Ka   = map_default();
-    mtl.map_Kd   = map_default();
-    mtl.map_Ks   = map_default();
-    mtl.map_Ke   = map_default();
-    mtl.map_Kt   = map_default();
-    mtl.map_Ns   = map_default();
-    mtl.map_Ni   = map_default();
-    mtl.map_d    = map_default();
-    mtl.map_bump = map_default();
+	mtl.map_Ka   = map_default();
+	mtl.map_Kd   = map_default();
+	mtl.map_Ks   = map_default();
+	mtl.map_Ke   = map_default();
+	mtl.map_Kt   = map_default();
+	mtl.map_Ns   = map_default();
+	mtl.map_Ni   = map_default();
+	mtl.map_d    = map_default();
+	mtl.map_bump = map_default();
 
-    return mtl;
+	return mtl;
 }
 
 
 static
 const char* parse_usemtl(fastObjData* data, const char* ptr)
 {
-    const char*      s;
-    const char*      e;
-    unsigned int     idx;
-    fastObjMaterial* mtl;
+	const char*      s;
+	const char*      e;
+	unsigned int     idx;
+	fastObjMaterial* mtl;
 
 
-    ptr = skip_whitespace(ptr);
+	ptr = skip_whitespace(ptr);
 
-    /* Parse the material name */
-    s = ptr;
-    while (!is_whitespace(*ptr) && !is_newline(*ptr))
-        ptr++;
+	/* Parse the material name */
+	s = ptr;
+	while (!is_whitespace(*ptr) && !is_newline(*ptr))
+		ptr++;
 
-    e = ptr;
-
-
-    /* If there are no materials yet, add a dummy invalid material at index 0 */
-    if (array_empty(data->mesh->materials))
-        array_push(data->mesh->materials, mtl_default());
+	e = ptr;
 
 
-    /* Find an existing material with the same name */
-    idx = 0;
-    while (idx < array_size(data->mesh->materials))
-    {
-        mtl = &data->mesh->materials[idx];
-        if (mtl->name && string_equal(mtl->name, s, e))
-            break;
+	/* If there are no materials yet, add a dummy invalid material at index 0 */
+	if (array_empty(data->mesh->materials))
+		array_push(data->mesh->materials, mtl_default());
 
-        idx++;
-    }
 
-    if (idx == array_size(data->mesh->materials))
-        idx = 0;
+	/* Find an existing material with the same name */
+	idx = 0;
+	while (idx < array_size(data->mesh->materials))
+	{
+		mtl = &data->mesh->materials[idx];
+		if (mtl->name && string_equal(mtl->name, s, e))
+			break;
 
-    data->material = idx;
+		idx++;
+	}
 
-    return ptr;
+	if (idx == array_size(data->mesh->materials))
+		idx = 0;
+
+	data->material = idx;
+
+	return ptr;
 }
 
 
 static
 void map_clean(fastObjTexture* map)
 {
-    memory_dealloc(map->name);
-    memory_dealloc(map->path);
+	memory_dealloc(map->name);
+	memory_dealloc(map->path);
 }
 
 
 static
 void mtl_clean(fastObjMaterial* mtl)
 {
-    map_clean(&mtl->map_Ka);
-    map_clean(&mtl->map_Kd);
-    map_clean(&mtl->map_Ks);
-    map_clean(&mtl->map_Ke);
-    map_clean(&mtl->map_Kt);
-    map_clean(&mtl->map_Ns);
-    map_clean(&mtl->map_Ni);
-    map_clean(&mtl->map_d);
-    map_clean(&mtl->map_bump);
+	map_clean(&mtl->map_Ka);
+	map_clean(&mtl->map_Kd);
+	map_clean(&mtl->map_Ks);
+	map_clean(&mtl->map_Ke);
+	map_clean(&mtl->map_Kt);
+	map_clean(&mtl->map_Ns);
+	map_clean(&mtl->map_Ni);
+	map_clean(&mtl->map_d);
+	map_clean(&mtl->map_bump);
 
-    memory_dealloc(mtl->name);
+	memory_dealloc(mtl->name);
 }
 
 
 static
 const char* read_mtl_int(const char* p, int* v)
 {
-    return parse_int(p, v);
+	return parse_int(p, v);
 }
 
 
 static
 const char* read_mtl_single(const char* p, float* v)
 {
-    return parse_float(p, v);
+	return parse_float(p, v);
 }
 
 
 static
 const char* read_mtl_triple(const char* p, float v[3])
 {
-    p = read_mtl_single(p, &v[0]);
-    p = read_mtl_single(p, &v[1]);
-    p = read_mtl_single(p, &v[2]);
+	p = read_mtl_single(p, &v[0]);
+	p = read_mtl_single(p, &v[1]);
+	p = read_mtl_single(p, &v[2]);
 
-    return p;
+	return p;
 }
 
 
 static
 const char* read_map(fastObjData* data, const char* ptr, fastObjTexture* map)
 {
-    const char* s;
-    const char* e;
-    char*       name;
-    char*       path;
+	const char* s;
+	const char* e;
+	char*       name;
+	char*       path;
 
-    ptr = skip_whitespace(ptr);
+	ptr = skip_whitespace(ptr);
 
-    /* Don't support options at present */
-    if (*ptr == '-')
-        return ptr;
+	/* Don't support options at present */
+	if (*ptr == '-')
+		return ptr;
 
 
-    /* Read name */
-    s = ptr;
-    while (!is_whitespace(*ptr) && !is_newline(*ptr))
-        ptr++;
+	/* Read name */
+	s = ptr;
+	while (!is_whitespace(*ptr) && !is_newline(*ptr))
+		ptr++;
 
-    e = ptr;
+	e = ptr;
 
-    name = string_copy(s, e);
+	name = string_copy(s, e);
 
-    path = string_concat(data->base, s, e);
-    string_fix_separators(path);
+	path = string_concat(data->base, s, e);
+	string_fix_separators(path);
 
-    map->name = name;
-    map->path = path;
+	map->name = name;
+	map->path = path;
 
-    return e;
+	return e;
 }
 
 
 static
 int read_mtllib(fastObjData* data, void* file)
 {
-    unsigned long   n;
-    const char*     s;
-    char*           contents;
-    size_t          l;
-    const char*     p;
-    const char*     e;
-    int             found_d;
-    fastObjMaterial mtl;
+	unsigned long   n;
+	const char*     s;
+	char*           contents;
+	size_t          l;
+	const char*     p;
+	const char*     e;
+	int             found_d;
+	fastObjMaterial mtl;
 
 
-    /* Read entire file */
-    n = file_size(file);
+	/* Read entire file */
+	n = file_size(file);
 
-    contents = (char*)(memory_realloc(0, n + 1));
-    if (!contents)
-        return 0;
+	contents = (char*)(memory_realloc(0, n + 1));
+	if (!contents)
+		return 0;
 
-    l = file_read(file, contents, n);
-    contents[l] = '\n';
+	l = file_read(file, contents, n);
+	contents[l] = '\n';
 
-    mtl = mtl_default();
+	mtl = mtl_default();
 
-    found_d = 0;
+	found_d = 0;
 
-    p = contents;
-    e = contents + l;
-    while (p < e)
-    {
-        p = skip_whitespace(p);
+	p = contents;
+	e = contents + l;
+	while (p < e)
+	{
+		p = skip_whitespace(p);
 
-        switch (*p)
-        {
-        case 'n':
-            p++;
-            if (p[0] == 'e' &&
-                p[1] == 'w' &&
-                p[2] == 'm' &&
-                p[3] == 't' &&
-                p[4] == 'l' &&
-                is_whitespace(p[5]))
-            {
-                /* Push previous material (if there is one) */
-                if (mtl.name)
-                {
-                    array_push(data->mesh->materials, mtl);
-                    mtl = mtl_default();
-                }
+		switch (*p)
+		{
+		case 'n':
+			p++;
+			if (p[0] == 'e' &&
+			        p[1] == 'w' &&
+			        p[2] == 'm' &&
+			        p[3] == 't' &&
+			        p[4] == 'l' &&
+			        is_whitespace(p[5]))
+			{
+				/* Push previous material (if there is one) */
+				if (mtl.name)
+				{
+					array_push(data->mesh->materials, mtl);
+					mtl = mtl_default();
+				}
 
 
-                /* Read name */
-                p += 5;
+				/* Read name */
+				p += 5;
 
-                while (is_whitespace(*p))
-                    p++;
+				while (is_whitespace(*p))
+					p++;
 
-                s = p;
-                while (!is_whitespace(*p) && !is_newline(*p))
-                    p++;
+				s = p;
+				while (!is_whitespace(*p) && !is_newline(*p))
+					p++;
 
-                mtl.name = string_copy(s, p);
-            }
-            break;
+				mtl.name = string_copy(s, p);
+			}
+			break;
 
-        case 'K':
-            if (p[1] == 'a')
-                p = read_mtl_triple(p + 2, mtl.Ka);
-            else if (p[1] == 'd')
-                p = read_mtl_triple(p + 2, mtl.Kd);
-            else if (p[1] == 's')
-                p = read_mtl_triple(p + 2, mtl.Ks);
-            else if (p[1] == 'e')
-                p = read_mtl_triple(p + 2, mtl.Ke);
-            else if (p[1] == 't')
-                p = read_mtl_triple(p + 2, mtl.Kt);
-            break;
+		case 'K':
+			if (p[1] == 'a')
+				p = read_mtl_triple(p + 2, mtl.Ka);
+			else if (p[1] == 'd')
+				p = read_mtl_triple(p + 2, mtl.Kd);
+			else if (p[1] == 's')
+				p = read_mtl_triple(p + 2, mtl.Ks);
+			else if (p[1] == 'e')
+				p = read_mtl_triple(p + 2, mtl.Ke);
+			else if (p[1] == 't')
+				p = read_mtl_triple(p + 2, mtl.Kt);
+			break;
 
-        case 'N':
-            if (p[1] == 's')
-                p = read_mtl_single(p + 2, &mtl.Ns);
-            else if (p[1] == 'i')
-                p = read_mtl_single(p + 2, &mtl.Ni);
-            break;
+		case 'N':
+			if (p[1] == 's')
+				p = read_mtl_single(p + 2, &mtl.Ns);
+			else if (p[1] == 'i')
+				p = read_mtl_single(p + 2, &mtl.Ni);
+			break;
 
-        case 'T':
-            if (p[1] == 'r')
-            {
-                float Tr;
-                p = read_mtl_single(p + 2, &Tr);
-                if (!found_d)
-                {
-                    /* Ignore Tr if we've already read d */
-                    mtl.d = 1.0f - Tr;
-                }
-            }
-            else if (p[1] == 'f')
-                p = read_mtl_triple(p + 2, mtl.Tf);
-            break;
+		case 'T':
+			if (p[1] == 'r')
+			{
+				float Tr;
+				p = read_mtl_single(p + 2, &Tr);
+				if (!found_d)
+				{
+					/* Ignore Tr if we've already read d */
+					mtl.d = 1.0f - Tr;
+				}
+			}
+			else if (p[1] == 'f')
+				p = read_mtl_triple(p + 2, mtl.Tf);
+			break;
 
-        case 'd':
-            if (is_whitespace(p[1]))
-            {
-                p = read_mtl_single(p + 1, &mtl.d);
-                found_d = 1;
-            }
-            break;
+		case 'd':
+			if (is_whitespace(p[1]))
+			{
+				p = read_mtl_single(p + 1, &mtl.d);
+				found_d = 1;
+			}
+			break;
 
-        case 'i':
-            p++;
-            if (p[0] == 'l' &&
-                p[1] == 'l' &&
-                p[2] == 'u' &&
-                p[3] == 'm' &&
-                is_whitespace(p[4]))
-            {
-                p = read_mtl_int(p + 4, &mtl.illum);
-            }
-            break;
+		case 'i':
+			p++;
+			if (p[0] == 'l' &&
+			        p[1] == 'l' &&
+			        p[2] == 'u' &&
+			        p[3] == 'm' &&
+			        is_whitespace(p[4]))
+			{
+				p = read_mtl_int(p + 4, &mtl.illum);
+			}
+			break;
 
-        case 'm':
-            p++;
-            if (p[0] == 'a' &&
-                p[1] == 'p' &&
-                p[2] == '_')
-            {
-                p += 3;
-                if (*p == 'K')
-                {
-                    p++;
-                    if (is_whitespace(p[1]))
-                    {
-                        if (*p == 'a')
-                            p = read_map(data, p + 1, &mtl.map_Ka);
-                        else if (*p == 'd')
-                            p = read_map(data, p + 1, &mtl.map_Kd);
-                        else if (*p == 's')
-                            p = read_map(data, p + 1, &mtl.map_Ks);
-                        else if (*p == 'e')
-                            p = read_map(data, p + 1, &mtl.map_Ke);
-                        else if (*p == 't')
-                            p = read_map(data, p + 1, &mtl.map_Kt);
-                    }
-                }
-                else if (*p == 'N')
-                {
-                    p++;
-                    if (is_whitespace(p[1]))
-                    {
-                        if (*p == 's')
-                            p = read_map(data, p + 1, &mtl.map_Ns);
-                        else if (*p == 'i')
-                            p = read_map(data, p + 1, &mtl.map_Ni);
-                    }
-                }
-                else if (*p == 'd')
-                {
-                    p++;
-                    if (is_whitespace(*p))
-                        p = read_map(data, p, &mtl.map_d);
-                }
-                else if (p[0] == 'b' &&
-                         p[1] == 'u' &&
-                         p[2] == 'm' &&
-                         p[3] == 'p' &&
-                         is_whitespace(p[4]))
-                {
-                    p = read_map(data, p + 4, &mtl.map_d);
-                }
-            }
-            break;
+		case 'm':
+			p++;
+			if (p[0] == 'a' &&
+			        p[1] == 'p' &&
+			        p[2] == '_')
+			{
+				p += 3;
+				if (*p == 'K')
+				{
+					p++;
+					if (is_whitespace(p[1]))
+					{
+						if (*p == 'a')
+							p = read_map(data, p + 1, &mtl.map_Ka);
+						else if (*p == 'd')
+							p = read_map(data, p + 1, &mtl.map_Kd);
+						else if (*p == 's')
+							p = read_map(data, p + 1, &mtl.map_Ks);
+						else if (*p == 'e')
+							p = read_map(data, p + 1, &mtl.map_Ke);
+						else if (*p == 't')
+							p = read_map(data, p + 1, &mtl.map_Kt);
+					}
+				}
+				else if (*p == 'N')
+				{
+					p++;
+					if (is_whitespace(p[1]))
+					{
+						if (*p == 's')
+							p = read_map(data, p + 1, &mtl.map_Ns);
+						else if (*p == 'i')
+							p = read_map(data, p + 1, &mtl.map_Ni);
+					}
+				}
+				else if (*p == 'd')
+				{
+					p++;
+					if (is_whitespace(*p))
+						p = read_map(data, p, &mtl.map_d);
+				}
+				else if (p[0] == 'b' &&
+				         p[1] == 'u' &&
+				         p[2] == 'm' &&
+				         p[3] == 'p' &&
+				         is_whitespace(p[4]))
+				{
+					p = read_map(data, p + 4, &mtl.map_d);
+				}
+			}
+			break;
 
-        case '#':
-            break;
-        }
+		case '#':
+			break;
+		}
 
-        p = skip_line(p);
-    }
+		p = skip_line(p);
+	}
 
-    /* Push final material */
-    if (mtl.name)
-        array_push(data->mesh->materials, mtl);
+	/* Push final material */
+	if (mtl.name)
+		array_push(data->mesh->materials, mtl);
 
-    memory_dealloc(contents);
+	memory_dealloc(contents);
 
-    return 1;
+	return 1;
 }
 
 
 static
 const char* parse_mtllib(fastObjData* data, const char* ptr)
 {
-    const char* s;
-    const char* e;
-    char*       lib;
-    void*       file;
+	const char* s;
+	const char* e;
+	char*       lib;
+	void*       file;
 
 
-    ptr = skip_whitespace(ptr);
+	ptr = skip_whitespace(ptr);
 
-    s = ptr;
-    while (!is_whitespace(*ptr) && !is_newline(*ptr))
-        ptr++;
+	s = ptr;
+	while (!is_whitespace(*ptr) && !is_newline(*ptr))
+		ptr++;
 
-    e = ptr;
+	e = ptr;
 
-    lib = string_concat(data->base, s, e);
-    if (lib)
-    {
-        string_fix_separators(lib);
+	lib = string_concat(data->base, s, e);
+	if (lib)
+	{
+		string_fix_separators(lib);
 
-        file = file_open(lib);
-        if (file)
-        {
-            read_mtllib(data, file);
-            file_close(file);
-        }
+		file = file_open(lib);
+		if (file)
+		{
+			read_mtllib(data, file);
+			file_close(file);
+		}
 
-        memory_dealloc(lib);
-    }
+		memory_dealloc(lib);
+	}
 
-    return ptr;
+	return ptr;
 }
 
 
 static
 void parse_buffer(fastObjData* data, const char* ptr, const char* end)
 {
-    const char* p;
-    
-    
-    p = ptr;
-    while (p != end)
-    {
-        p = skip_whitespace(p);
+	const char* p;
 
-        switch (*p)
-        {
-        case 'v':
-            p++;
 
-            switch (*p++)
-            {
-            case ' ':
-            case '\t':
-                p = parse_vertex(data, p);
-                break;
+	p = ptr;
+	while (p != end)
+	{
+		p = skip_whitespace(p);
 
-            case 't':
-                p = parse_texcoord(data, p);
-                break;
+		switch (*p)
+		{
+		case 'v':
+			p++;
 
-            case 'n':
-                p = parse_normal(data, p);
-                break;
+			switch (*p++)
+			{
+			case ' ':
+			case '\t':
+				p = parse_vertex(data, p);
+				break;
 
-            default:
-                p--; /* roll p++ back in case *p was a newline */
-            }
-            break;
+			case 't':
+				p = parse_texcoord(data, p);
+				break;
 
-        case 'f':
-            p++;
+			case 'n':
+				p = parse_normal(data, p);
+				break;
 
-            switch (*p++)
-            {
-            case ' ':
-            case '\t':
-                p = parse_face(data, p);
-                break;
+			default:
+				p--; /* roll p++ back in case *p was a newline */
+			}
+			break;
 
-            default:
-                p--; /* roll p++ back in case *p was a newline */
-            }
-            break;
+		case 'f':
+			p++;
 
-        case 'g':
-            p++;
+			switch (*p++)
+			{
+			case ' ':
+			case '\t':
+				p = parse_face(data, p);
+				break;
 
-            switch (*p++)
-            {
-            case ' ':
-            case '\t':
-                p = parse_group(data, p);
-                break;
+			default:
+				p--; /* roll p++ back in case *p was a newline */
+			}
+			break;
 
-            default:
-                p--; /* roll p++ back in case *p was a newline */
-            }
-            break;
+		case 'g':
+			p++;
 
-        case 'm':
-            p++;
-            if (p[0] == 't' &&
-                p[1] == 'l' &&
-                p[2] == 'l' &&
-                p[3] == 'i' &&
-                p[4] == 'b' &&
-                is_whitespace(p[5]))
-                p = parse_mtllib(data, p + 5);
-            break;
+			switch (*p++)
+			{
+			case ' ':
+			case '\t':
+				p = parse_group(data, p);
+				break;
 
-        case 'u':
-            p++;
-            if (p[0] == 's' &&
-                p[1] == 'e' &&
-                p[2] == 'm' &&
-                p[3] == 't' &&
-                p[4] == 'l' &&
-                is_whitespace(p[5]))
-                p = parse_usemtl(data, p + 5);
-            break;
+			default:
+				p--; /* roll p++ back in case *p was a newline */
+			}
+			break;
 
-        case '#':
-            break;
-        }
+		case 'm':
+			p++;
+			if (p[0] == 't' &&
+			        p[1] == 'l' &&
+			        p[2] == 'l' &&
+			        p[3] == 'i' &&
+			        p[4] == 'b' &&
+			        is_whitespace(p[5]))
+				p = parse_mtllib(data, p + 5);
+			break;
 
-        p = skip_line(p);
+		case 'u':
+			p++;
+			if (p[0] == 's' &&
+			        p[1] == 'e' &&
+			        p[2] == 'm' &&
+			        p[3] == 't' &&
+			        p[4] == 'l' &&
+			        is_whitespace(p[5]))
+				p = parse_usemtl(data, p + 5);
+			break;
 
-        data->line++;
-    }
+		case '#':
+			break;
+		}
+
+		p = skip_line(p);
+
+		data->line++;
+	}
 }
 
 
 void fast_obj_destroy(fastObjMesh* m)
 {
-    unsigned int ii;
+	unsigned int ii;
 
 
-    for (ii = 0; ii < array_size(m->groups); ii++)
-        group_clean(&m->groups[ii]);
+	for (ii = 0; ii < array_size(m->groups); ii++)
+		group_clean(&m->groups[ii]);
 
-    for (ii = 0; ii < array_size(m->materials); ii++)
-        mtl_clean(&m->materials[ii]);
+	for (ii = 0; ii < array_size(m->materials); ii++)
+		mtl_clean(&m->materials[ii]);
 
-    array_clean(m->positions);
-    array_clean(m->texcoords);
-    array_clean(m->normals);
-    array_clean(m->face_vertices);
-    array_clean(m->face_materials);
-    array_clean(m->indices);
-    array_clean(m->groups);
-    array_clean(m->materials);
+	array_clean(m->positions);
+	array_clean(m->texcoords);
+	array_clean(m->normals);
+	array_clean(m->face_vertices);
+	array_clean(m->face_materials);
+	array_clean(m->indices);
+	array_clean(m->groups);
+	array_clean(m->materials);
 
-    memory_dealloc(m);
+	memory_dealloc(m);
 }
 
 
 fastObjMesh* fast_obj_read(const char* path)
 {
-    fastObjData  data;
-    fastObjMesh* m;
-    void*        file;
-    char*        buffer;
-    char*        start;
-    char*        end;
-    char*        last;
-    unsigned int read;
-    size_t       sep;
-    unsigned int bytes;
+	fastObjData  data;
+	fastObjMesh* m;
+	void*        file;
+	char*        buffer;
+	char*        start;
+	char*        end;
+	char*        last;
+	unsigned int read;
+	size_t       sep;
+	unsigned int bytes;
 
 
-    /* Open file */
-    file = file_open(path);
-    if (!file)
-        return 0;
+	/* Open file */
+	file = file_open(path);
+	if (!file)
+		return 0;
 
 
-    /* Empty mesh */
-    m = (fastObjMesh*)(memory_realloc(0, sizeof(fastObjMesh)));
-    if (!m)
-        return 0;
+	/* Empty mesh */
+	m = (fastObjMesh*)(memory_realloc(0, sizeof(fastObjMesh)));
+	if (!m)
+		return 0;
 
-    m->positions      = 0;
-    m->texcoords      = 0;
-    m->normals        = 0;
-    m->face_vertices  = 0;
-    m->face_materials = 0;
-    m->indices        = 0;
-    m->materials      = 0;
-    m->groups         = 0;
-
-
-    /* Add dummy position/texcoord/normal */
-    array_push(m->positions, 0.0f);
-    array_push(m->positions, 0.0f);
-    array_push(m->positions, 0.0f);
-
-    array_push(m->texcoords, 0.0f);
-    array_push(m->texcoords, 0.0f);
-
-    array_push(m->normals, 0.0f);
-    array_push(m->normals, 0.0f);
-    array_push(m->normals, 1.0f);
+	m->positions      = 0;
+	m->texcoords      = 0;
+	m->normals        = 0;
+	m->face_vertices  = 0;
+	m->face_materials = 0;
+	m->indices        = 0;
+	m->materials      = 0;
+	m->groups         = 0;
 
 
-    /* Data needed during parsing */
-    data.mesh     = m;
-    data.group    = group_default();
-    data.material = 0;
-    data.line     = 1;
-    data.base     = 0;
+	/* Add dummy position/texcoord/normal */
+	array_push(m->positions, 0.0f);
+	array_push(m->positions, 0.0f);
+	array_push(m->positions, 0.0f);
+
+	array_push(m->texcoords, 0.0f);
+	array_push(m->texcoords, 0.0f);
+
+	array_push(m->normals, 0.0f);
+	array_push(m->normals, 0.0f);
+	array_push(m->normals, 1.0f);
 
 
-    /* Find base path for materials/textures */
-    if (string_find_last(path, FAST_OBJ_SEPARATOR, &sep))
-        data.base = string_substr(path, 0, sep + 1);
+	/* Data needed during parsing */
+	data.mesh     = m;
+	data.group    = group_default();
+	data.material = 0;
+	data.line     = 1;
+	data.base     = 0;
 
 
-    /* Create buffer for reading file */
-    buffer = (char*)(memory_realloc(0, 2 * BUFFER_SIZE * sizeof(char)));
-    if (!buffer)
-        return 0;
-
-    start = buffer;
-    for (;;)
-    {
-        /* Read another buffer's worth from file */
-        read = (unsigned int)(file_read(file, start, BUFFER_SIZE));
-        if (read == 0 && start == buffer)
-            break;
+	/* Find base path for materials/textures */
+	if (string_find_last(path, FAST_OBJ_SEPARATOR, &sep))
+		data.base = string_substr(path, 0, sep + 1);
 
 
-        /* Ensure buffer ends in a newline */
-        if (read < BUFFER_SIZE)
-        {
-            if (read == 0 || start[read - 1] != '\n')
-                start[read++] = '\n';
-        }
+	/* Create buffer for reading file */
+	buffer = (char*)(memory_realloc(0, 2 * BUFFER_SIZE * sizeof(char)));
+	if (!buffer)
+		return 0;
 
-        end = start + read;
-        if (end == buffer)
-            break;
-
-
-        /* Find last new line */
-        last = end;
-        while (last > buffer)
-        {
-            last--;
-            if (*last == '\n')
-                break;
-        }
+	start = buffer;
+	for (;;)
+	{
+		/* Read another buffer's worth from file */
+		read = (unsigned int)(file_read(file, start, BUFFER_SIZE));
+		if (read == 0 && start == buffer)
+			break;
 
 
-        /* Check there actually is a new line */
-        if (*last != '\n')
-            break;
+		/* Ensure buffer ends in a newline */
+		if (read < BUFFER_SIZE)
+		{
+			if (read == 0 || start[read - 1] != '\n')
+				start[read++] = '\n';
+		}
 
-        last++;
-
-
-        /* Process buffer */
-        parse_buffer(&data, buffer, last);
-
-
-        /* Copy overflow for next buffer */
-        bytes = (unsigned int)(end - last);
-        memcpy(buffer, last, bytes);
-        start = buffer + bytes;
-    }
+		end = start + read;
+		if (end == buffer)
+			break;
 
 
-    /* Flush final group */
-    flush_output(&data);
-    group_clean(&data.group);
-
-    m->position_count = array_size(m->positions) / 3;
-    m->texcoord_count = array_size(m->texcoords) / 2;
-    m->normal_count   = array_size(m->normals) / 3;
-    m->face_count     = array_size(m->face_vertices);
-    m->material_count = array_size(m->materials);
-    m->group_count    = array_size(m->groups);
+		/* Find last new line */
+		last = end;
+		while (last > buffer)
+		{
+			last--;
+			if (*last == '\n')
+				break;
+		}
 
 
-    /* Clean up */
-    memory_dealloc(buffer);
-    memory_dealloc(data.base);
+		/* Check there actually is a new line */
+		if (*last != '\n')
+			break;
 
-    file_close(file);
+		last++;
 
-    return m;
+
+		/* Process buffer */
+		parse_buffer(&data, buffer, last);
+
+
+		/* Copy overflow for next buffer */
+		bytes = (unsigned int)(end - last);
+		memcpy(buffer, last, bytes);
+		start = buffer + bytes;
+	}
+
+
+	/* Flush final group */
+	flush_output(&data);
+	group_clean(&data.group);
+
+	m->position_count = array_size(m->positions) / 3;
+	m->texcoord_count = array_size(m->texcoords) / 2;
+	m->normal_count   = array_size(m->normals) / 3;
+	m->face_count     = array_size(m->face_vertices);
+	m->material_count = array_size(m->materials);
+	m->group_count    = array_size(m->groups);
+
+
+	/* Clean up */
+	memory_dealloc(buffer);
+	memory_dealloc(data.base);
+
+	file_close(file);
+
+	return m;
 }
 
 #endif

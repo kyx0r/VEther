@@ -498,7 +498,11 @@ inline int meshopt_quantizeSnorm(float v, int N)
 
 inline unsigned short meshopt_quantizeHalf(float v)
 {
-	union { float f; unsigned int ui; } u = {v};
+	union
+	{
+		float f;
+		unsigned int ui;
+	} u = {v};
 	unsigned int ui = u.ui;
 
 	int s = (ui >> 16) & 0x8000;
@@ -521,7 +525,11 @@ inline unsigned short meshopt_quantizeHalf(float v)
 
 inline float meshopt_quantizeFloat(float v, int N)
 {
-	union { float f; unsigned int ui; } u = {v};
+	union
+	{
+		float f;
+		unsigned int ui;
+	} u = {v};
 	unsigned int ui = u.ui;
 
 	const int mask = (1 << (23 - N)) - 1;
@@ -598,9 +606,9 @@ struct meshopt_IndexAdapter<T, false>
 	size_t count;
 
 	meshopt_IndexAdapter(T* result_, const T* input, size_t count_)
-	    : result(result_)
-	    , data(0)
-	    , count(count_)
+		: result(result_)
+		, data(0)
+		, count(count_)
 	{
 		size_t size = count > size_t(-1) / sizeof(unsigned int) ? size_t(-1) : count * sizeof(unsigned int);
 
@@ -631,7 +639,7 @@ struct meshopt_IndexAdapter<T, true>
 	unsigned int* data;
 
 	meshopt_IndexAdapter(T* result, const T* input, size_t)
-	    : data(reinterpret_cast<unsigned int*>(result ? result : const_cast<T*>(input)))
+		: data(reinterpret_cast<unsigned int*>(result ? result : const_cast<T*>(input)))
 	{
 	}
 };

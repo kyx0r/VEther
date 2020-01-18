@@ -53,9 +53,9 @@ typedef int mz_bool;
 
 // An attempt to work around MSVC's spammy "warning C4127: conditional expression is constant" message.
 #ifdef _MSC_VER
-   #define MZ_MACRO_END while (0, 0)
+#define MZ_MACRO_END while (0, 0)
 #else
-   #define MZ_MACRO_END while (0)
+#define MZ_MACRO_END while (0)
 #endif
 
 #define MZ_ADLER32_INIT (1)
@@ -71,10 +71,10 @@ mz_uint32 mz_adler32(mz_uint32 adler, const unsigned char *ptr, size_t buf_len);
 // TINFL_FLAG_COMPUTE_ADLER32: Force adler-32 checksum computation of the decompressed bytes.
 enum
 {
-  TINFL_FLAG_PARSE_ZLIB_HEADER = 1,
-  TINFL_FLAG_HAS_MORE_INPUT = 2,
-  TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF = 4,
-  TINFL_FLAG_COMPUTE_ADLER32 = 8
+	TINFL_FLAG_PARSE_ZLIB_HEADER = 1,
+	TINFL_FLAG_HAS_MORE_INPUT = 2,
+	TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF = 4,
+	TINFL_FLAG_COMPUTE_ADLER32 = 8
 };
 
 // High level decompression functions:
@@ -88,7 +88,8 @@ size_t tinfl_decompress_mem_to_mem(void *pOut_buf, size_t out_buf_len, const voi
 typedef int (*tinfl_put_buf_func_ptr)(const void* pBuf, int len, void *pUser);
 int tinfl_decompress_mem_to_callback(const void *pIn_buf, size_t *pIn_buf_size, tinfl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags);
 
-struct tinfl_decompressor_tag; typedef struct tinfl_decompressor_tag tinfl_decompressor;
+struct tinfl_decompressor_tag;
+typedef struct tinfl_decompressor_tag tinfl_decompressor;
 
 // Max size of LZ dictionary.
 #define TINFL_LZ_DICT_SIZE 32768
@@ -96,12 +97,12 @@ struct tinfl_decompressor_tag; typedef struct tinfl_decompressor_tag tinfl_decom
 // Return status.
 typedef enum
 {
-  TINFL_STATUS_BAD_PARAM = -3,
-  TINFL_STATUS_ADLER32_MISMATCH = -2,
-  TINFL_STATUS_FAILED = -1,
-  TINFL_STATUS_DONE = 0,
-  TINFL_STATUS_NEEDS_MORE_INPUT = 1,
-  TINFL_STATUS_HAS_MORE_OUTPUT = 2
+	TINFL_STATUS_BAD_PARAM = -3,
+	TINFL_STATUS_ADLER32_MISMATCH = -2,
+	TINFL_STATUS_FAILED = -1,
+	TINFL_STATUS_DONE = 0,
+	TINFL_STATUS_NEEDS_MORE_INPUT = 1,
+	TINFL_STATUS_HAS_MORE_OUTPUT = 2
 } tinfl_status;
 
 // Initializes the decompressor to its initial state.
@@ -115,14 +116,14 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
 // Internal/private bits follow.
 enum
 {
-  TINFL_MAX_HUFF_TABLES = 3, TINFL_MAX_HUFF_SYMBOLS_0 = 288, TINFL_MAX_HUFF_SYMBOLS_1 = 32, TINFL_MAX_HUFF_SYMBOLS_2 = 19,
-  TINFL_FAST_LOOKUP_BITS = 10, TINFL_FAST_LOOKUP_SIZE = 1 << TINFL_FAST_LOOKUP_BITS
+	TINFL_MAX_HUFF_TABLES = 3, TINFL_MAX_HUFF_SYMBOLS_0 = 288, TINFL_MAX_HUFF_SYMBOLS_1 = 32, TINFL_MAX_HUFF_SYMBOLS_2 = 19,
+	TINFL_FAST_LOOKUP_BITS = 10, TINFL_FAST_LOOKUP_SIZE = 1 << TINFL_FAST_LOOKUP_BITS
 };
 
 typedef struct
 {
-  mz_uint8 m_code_size[TINFL_MAX_HUFF_SYMBOLS_0];
-  mz_int16 m_look_up[TINFL_FAST_LOOKUP_SIZE], m_tree[TINFL_MAX_HUFF_SYMBOLS_0 * 2];
+	mz_uint8 m_code_size[TINFL_MAX_HUFF_SYMBOLS_0];
+	mz_int16 m_look_up[TINFL_FAST_LOOKUP_SIZE], m_tree[TINFL_MAX_HUFF_SYMBOLS_0 * 2];
 } tinfl_huff_table;
 
 typedef mz_uint32 tinfl_bit_buf_t;
@@ -130,11 +131,11 @@ typedef mz_uint32 tinfl_bit_buf_t;
 
 struct tinfl_decompressor_tag
 {
-  mz_uint32 m_state, m_num_bits, m_zhdr0, m_zhdr1, m_z_adler32, m_final, m_type, m_check_adler32, m_dist, m_counter, m_num_extra, m_table_sizes[TINFL_MAX_HUFF_TABLES];
-  tinfl_bit_buf_t m_bit_buf;
-  size_t m_dist_from_out_buf_start;
-  tinfl_huff_table m_tables[TINFL_MAX_HUFF_TABLES];
-  mz_uint8 m_raw_header[4], m_len_codes[TINFL_MAX_HUFF_SYMBOLS_0 + TINFL_MAX_HUFF_SYMBOLS_1 + 137];
+	mz_uint32 m_state, m_num_bits, m_zhdr0, m_zhdr1, m_z_adler32, m_final, m_type, m_check_adler32, m_dist, m_counter, m_num_extra, m_table_sizes[TINFL_MAX_HUFF_TABLES];
+	tinfl_bit_buf_t m_bit_buf;
+	size_t m_dist_from_out_buf_start;
+	tinfl_huff_table m_tables[TINFL_MAX_HUFF_TABLES];
+	mz_uint8 m_raw_header[4], m_len_codes[TINFL_MAX_HUFF_SYMBOLS_0 + TINFL_MAX_HUFF_SYMBOLS_1 + 137];
 };
 
 // ------------------- Low-level Compression API Definitions
@@ -146,7 +147,7 @@ struct tinfl_decompressor_tag
 // TDEFL_DEFAULT_MAX_PROBES: The compressor defaults to 128 dictionary probes per dictionary search. 0=Huffman only, 1=Huffman+LZ (fastest/crap compression), 4095=Huffman+LZ (slowest/best compression).
 enum
 {
-  TDEFL_HUFFMAN_ONLY = 0, TDEFL_DEFAULT_MAX_PROBES = 128, TDEFL_MAX_PROBES_MASK = 0xFFF
+	TDEFL_HUFFMAN_ONLY = 0, TDEFL_DEFAULT_MAX_PROBES = 128, TDEFL_MAX_PROBES_MASK = 0xFFF
 };
 
 // TDEFL_WRITE_ZLIB_HEADER: If set, the compressor outputs a zlib header before the deflate data, and the Adler-32 of the source data at the end. Otherwise, you'll get raw deflate data.
@@ -160,14 +161,14 @@ enum
 // The low 12 bits are reserved to control the max # of hash probes per dictionary lookup (see TDEFL_MAX_PROBES_MASK).
 enum
 {
-  TDEFL_WRITE_ZLIB_HEADER             = 0x01000,
-  TDEFL_COMPUTE_ADLER32               = 0x02000,
-  TDEFL_GREEDY_PARSING_FLAG           = 0x04000,
-  TDEFL_NONDETERMINISTIC_PARSING_FLAG = 0x08000,
-  TDEFL_RLE_MATCHES                   = 0x10000,
-  TDEFL_FILTER_MATCHES                = 0x20000,
-  TDEFL_FORCE_ALL_STATIC_BLOCKS       = 0x40000,
-  TDEFL_FORCE_ALL_RAW_BLOCKS          = 0x80000
+	TDEFL_WRITE_ZLIB_HEADER             = 0x01000,
+	TDEFL_COMPUTE_ADLER32               = 0x02000,
+	TDEFL_GREEDY_PARSING_FLAG           = 0x04000,
+	TDEFL_NONDETERMINISTIC_PARSING_FLAG = 0x08000,
+	TDEFL_RLE_MATCHES                   = 0x10000,
+	TDEFL_FILTER_MATCHES                = 0x20000,
+	TDEFL_FORCE_ALL_STATIC_BLOCKS       = 0x40000,
+	TDEFL_FORCE_ALL_RAW_BLOCKS          = 0x80000
 };
 
 // High level compression functions:
@@ -198,47 +199,47 @@ enum { TDEFL_LZ_CODE_BUF_SIZE = 64 * 1024, TDEFL_OUT_BUF_SIZE = (TDEFL_LZ_CODE_B
 // The low-level tdefl functions below may be used directly if the above helper functions aren't flexible enough. The low-level functions don't make any heap allocations, unlike the above helper functions.
 typedef enum
 {
-  TDEFL_STATUS_BAD_PARAM = -2,
-  TDEFL_STATUS_PUT_BUF_FAILED = -1,
-  TDEFL_STATUS_OKAY = 0,
-  TDEFL_STATUS_DONE = 1,
+	TDEFL_STATUS_BAD_PARAM = -2,
+	TDEFL_STATUS_PUT_BUF_FAILED = -1,
+	TDEFL_STATUS_OKAY = 0,
+	TDEFL_STATUS_DONE = 1,
 } tdefl_status;
 
 // Must map to MZ_NO_FLUSH, MZ_SYNC_FLUSH, etc. enums
 typedef enum
 {
-  TDEFL_NO_FLUSH = 0,
-  TDEFL_SYNC_FLUSH = 2,
-  TDEFL_FULL_FLUSH = 3,
-  TDEFL_FINISH = 4
+	TDEFL_NO_FLUSH = 0,
+	TDEFL_SYNC_FLUSH = 2,
+	TDEFL_FULL_FLUSH = 3,
+	TDEFL_FINISH = 4
 } tdefl_flush;
 
 // tdefl's compression state structure.
 typedef struct
 {
-  tdefl_put_buf_func_ptr m_pPut_buf_func;
-  void *m_pPut_buf_user;
-  mz_uint m_flags, m_max_probes[2];
-  int m_greedy_parsing;
-  mz_uint m_adler32, m_lookahead_pos, m_lookahead_size, m_dict_size;
-  mz_uint8 *m_pLZ_code_buf, *m_pLZ_flags, *m_pOutput_buf, *m_pOutput_buf_end;
-  mz_uint m_num_flags_left, m_total_lz_bytes, m_lz_code_buf_dict_pos, m_bits_in, m_bit_buffer;
-  mz_uint m_saved_match_dist, m_saved_match_len, m_saved_lit, m_output_flush_ofs, m_output_flush_remaining, m_finished, m_block_index, m_wants_to_finish;
-  tdefl_status m_prev_return_status;
-  const void *m_pIn_buf;
-  void *m_pOut_buf;
-  size_t *m_pIn_buf_size, *m_pOut_buf_size;
-  tdefl_flush m_flush;
-  const mz_uint8 *m_pSrc;
-  size_t m_src_buf_left, m_out_buf_ofs;
-  mz_uint8 m_dict[TDEFL_LZ_DICT_SIZE + TDEFL_MAX_MATCH_LEN - 1];
-  mz_uint16 m_huff_count[TDEFL_MAX_HUFF_TABLES][TDEFL_MAX_HUFF_SYMBOLS];
-  mz_uint16 m_huff_codes[TDEFL_MAX_HUFF_TABLES][TDEFL_MAX_HUFF_SYMBOLS];
-  mz_uint8 m_huff_code_sizes[TDEFL_MAX_HUFF_TABLES][TDEFL_MAX_HUFF_SYMBOLS];
-  mz_uint8 m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE];
-  mz_uint16 m_next[TDEFL_LZ_DICT_SIZE];
-  mz_uint16 m_hash[TDEFL_LZ_HASH_SIZE];
-  mz_uint8 m_output_buf[TDEFL_OUT_BUF_SIZE];
+	tdefl_put_buf_func_ptr m_pPut_buf_func;
+	void *m_pPut_buf_user;
+	mz_uint m_flags, m_max_probes[2];
+	int m_greedy_parsing;
+	mz_uint m_adler32, m_lookahead_pos, m_lookahead_size, m_dict_size;
+	mz_uint8 *m_pLZ_code_buf, *m_pLZ_flags, *m_pOutput_buf, *m_pOutput_buf_end;
+	mz_uint m_num_flags_left, m_total_lz_bytes, m_lz_code_buf_dict_pos, m_bits_in, m_bit_buffer;
+	mz_uint m_saved_match_dist, m_saved_match_len, m_saved_lit, m_output_flush_ofs, m_output_flush_remaining, m_finished, m_block_index, m_wants_to_finish;
+	tdefl_status m_prev_return_status;
+	const void *m_pIn_buf;
+	void *m_pOut_buf;
+	size_t *m_pIn_buf_size, *m_pOut_buf_size;
+	tdefl_flush m_flush;
+	const mz_uint8 *m_pSrc;
+	size_t m_src_buf_left, m_out_buf_ofs;
+	mz_uint8 m_dict[TDEFL_LZ_DICT_SIZE + TDEFL_MAX_MATCH_LEN - 1];
+	mz_uint16 m_huff_count[TDEFL_MAX_HUFF_TABLES][TDEFL_MAX_HUFF_SYMBOLS];
+	mz_uint16 m_huff_codes[TDEFL_MAX_HUFF_TABLES][TDEFL_MAX_HUFF_SYMBOLS];
+	mz_uint8 m_huff_code_sizes[TDEFL_MAX_HUFF_TABLES][TDEFL_MAX_HUFF_SYMBOLS];
+	mz_uint8 m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE];
+	mz_uint16 m_next[TDEFL_LZ_DICT_SIZE];
+	mz_uint16 m_hash[TDEFL_LZ_HASH_SIZE];
+	mz_uint8 m_output_buf[TDEFL_OUT_BUF_SIZE];
 } tdefl_compressor;
 
 // Initializes the compressor.

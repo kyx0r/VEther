@@ -174,7 +174,10 @@ void testCache(IDXGIAdapter* adapter)
 
 	setupShaders(device, context);
 
-	inspectCache([&](const unsigned int* indices, size_t index_count) { return queryVSInvocations(device, context, indices, index_count); });
+	inspectCache([&](const unsigned int* indices, size_t index_count)
+	{
+		return queryVSInvocations(device, context, indices, index_count);
+	});
 }
 
 void testCacheSequence(IDXGIAdapter* adapter, int argc, char** argv)

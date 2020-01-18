@@ -142,16 +142,16 @@ Mesh objmesh(const char* path)
 			fastObjIndex gi = obj->indices[index_offset + j];
 
 			Vertex v =
-			    {
-			        obj->positions[gi.p * 3 + 0],
-			        obj->positions[gi.p * 3 + 1],
-			        obj->positions[gi.p * 3 + 2],
-			        obj->normals[gi.n * 3 + 0],
-			        obj->normals[gi.n * 3 + 1],
-			        obj->normals[gi.n * 3 + 2],
-			        obj->texcoords[gi.t * 2 + 0],
-			        obj->texcoords[gi.t * 2 + 1],
-			    };
+			{
+				obj->positions[gi.p * 3 + 0],
+				obj->positions[gi.p * 3 + 1],
+				obj->positions[gi.p * 3 + 2],
+				obj->normals[gi.n * 3 + 0],
+				obj->normals[gi.n * 3 + 1],
+				obj->normals[gi.n * 3 + 2],
+				obj->texcoords[gi.t * 2 + 0],
+				obj->texcoords[gi.t * 2 + 1],
+			};
 
 			// triangulate polygon on the fly; offset-3 is always the first polygon vertex
 			if (j >= 3)

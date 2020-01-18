@@ -45,8 +45,9 @@ enum
 };
 
 // KTX Specification: 3.1. identifier
-static const uint8_t Ktx2FileIdentifier[12] = {
-    0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A, //
+static const uint8_t Ktx2FileIdentifier[12] =
+{
+	0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A, //
 };
 
 // KTX Specification: 3.12.2. Basis Universal Global Data
@@ -116,11 +117,12 @@ static void createDfd(std::vector<uint32_t>& result, int channels, bool srgb)
 	KHR_DFDSETVAL(dfd, TRANSFER, srgb ? KHR_DF_TRANSFER_SRGB : KHR_DF_TRANSFER_LINEAR);
 	KHR_DFDSETVAL(dfd, FLAGS, KHR_DF_FLAG_ALPHA_STRAIGHT);
 
-	static const khr_df_model_channels_e channel_enums[] = {
-	    KHR_DF_CHANNEL_RGBSDA_R,
-	    KHR_DF_CHANNEL_RGBSDA_G,
-	    KHR_DF_CHANNEL_RGBSDA_B,
-	    KHR_DF_CHANNEL_RGBSDA_A,
+	static const khr_df_model_channels_e channel_enums[] =
+	{
+		KHR_DF_CHANNEL_RGBSDA_R,
+		KHR_DF_CHANNEL_RGBSDA_G,
+		KHR_DF_CHANNEL_RGBSDA_B,
+		KHR_DF_CHANNEL_RGBSDA_A,
 	};
 
 	for (int i = 0; i < channels; ++i)
@@ -178,8 +180,9 @@ std::string basisToKtx(const std::string& basis, bool srgb)
 	std::vector<uint32_t> dfd;
 	createDfd(dfd, has_alpha ? 4 : 3, srgb);
 
-	const char* kvp_data[][2] = {
-	    {"KTXwriter", "gltfpack"},
+	const char* kvp_data[][2] =
+	{
+		{"KTXwriter", "gltfpack"},
 	};
 
 	std::string kvp;

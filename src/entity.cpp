@@ -65,7 +65,7 @@ void InitCamera()
 	cam.zoom = 45.0f;
 }
 
-size_t TriangulateObj(fastObjMesh* obj, std::vector<Vertex_>& vertices) 
+size_t TriangulateObj(fastObjMesh* obj, std::vector<Vertex_>& vertices)
 {
 	size_t vertex_offset = 0;
 	size_t index_offset = 0;
@@ -117,7 +117,7 @@ void InitMeshes()
 		}
 
 		std::vector<Vertex_> triangle_vertices(index_count);
-		size_t offs = TriangulateObj(head->obj, triangle_vertices); 
+		size_t offs = TriangulateObj(head->obj, triangle_vertices);
 		ASSERT(offs == index_count, "");
 
 		std::vector<uint32_t> remap(index_count);

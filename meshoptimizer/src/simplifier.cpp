@@ -202,23 +202,25 @@ enum VertexKind
 // complex vertices can collapse onto complex/locked
 // a rule of thumb is that collapsing kind A into kind B preserves the kind B in the target vertex
 // for example, while we could collapse Complex into Manifold, this would mean the target vertex isn't Manifold anymore
-const unsigned char kCanCollapse[Kind_Count][Kind_Count] = {
-    {1, 1, 1, 1, 1},
-    {0, 1, 0, 0, 0},
-    {0, 0, 1, 0, 0},
-    {0, 0, 0, 1, 1},
-    {0, 0, 0, 0, 0},
+const unsigned char kCanCollapse[Kind_Count][Kind_Count] =
+{
+	{1, 1, 1, 1, 1},
+	{0, 1, 0, 0, 0},
+	{0, 0, 1, 0, 0},
+	{0, 0, 0, 1, 1},
+	{0, 0, 0, 0, 0},
 };
 
 // if a vertex is manifold or seam, adjoining edges are guaranteed to have an opposite edge
 // note that for seam edges, the opposite edge isn't present in the attribute-based topology
 // but is present if you consider a position-only mesh variant
-const unsigned char kHasOpposite[Kind_Count][Kind_Count] = {
-    {1, 1, 1, 0, 1},
-    {1, 0, 1, 0, 0},
-    {1, 1, 1, 0, 1},
-    {0, 0, 0, 0, 0},
-    {1, 0, 1, 0, 0},
+const unsigned char kHasOpposite[Kind_Count][Kind_Count] =
+{
+	{1, 1, 1, 0, 1},
+	{1, 0, 1, 0, 0},
+	{1, 1, 1, 0, 1},
+	{0, 0, 0, 0, 0},
+	{1, 0, 1, 0, 0},
 };
 
 static bool hasEdge(const EdgeAdjacency& adjacency, unsigned int a, unsigned int b)
@@ -243,7 +245,8 @@ static unsigned int findWedgeEdge(const EdgeAdjacency& adjacency, const unsigned
 			return v;
 
 		v = wedge[v];
-	} while (v != a);
+	}
+	while (v != a);
 
 	return ~0u;
 }
@@ -421,7 +424,8 @@ struct Collapse
 	unsigned int v0;
 	unsigned int v1;
 
-	union {
+	union
+	{
 		unsigned int bidi;
 		float error;
 		unsigned int errorui;
@@ -830,7 +834,8 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 			{
 				collapse_remap[v] = r1;
 				v = wedge[v];
-			} while (v != i0);
+			}
+			while (v != i0);
 		}
 		else if (vertex_kind[i0] == Kind_Seam)
 		{

@@ -1500,11 +1500,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 			{
 				const Attr& a = stream.data[i];
 
-				uint16_t v[4] = {
-				    uint16_t(meshopt_quantizeUnorm((a.f[0] - qp.offset[0]) * pos_rscale, qp.bits)),
-				    uint16_t(meshopt_quantizeUnorm((a.f[1] - qp.offset[1]) * pos_rscale, qp.bits)),
-				    uint16_t(meshopt_quantizeUnorm((a.f[2] - qp.offset[2]) * pos_rscale, qp.bits)),
-				    0};
+				uint16_t v[4] =
+				{
+					uint16_t(meshopt_quantizeUnorm((a.f[0] - qp.offset[0]) * pos_rscale, qp.bits)),
+					uint16_t(meshopt_quantizeUnorm((a.f[1] - qp.offset[1]) * pos_rscale, qp.bits)),
+					uint16_t(meshopt_quantizeUnorm((a.f[2] - qp.offset[2]) * pos_rscale, qp.bits)),
+					0
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 
@@ -1532,11 +1534,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 				{
 					const Attr& a = stream.data[i];
 
-					int8_t v[4] = {
-					    int8_t((a.f[0] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[0]) * pos_rscale, qp.bits)),
-					    int8_t((a.f[1] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[1]) * pos_rscale, qp.bits)),
-					    int8_t((a.f[2] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[2]) * pos_rscale, qp.bits)),
-					    0};
+					int8_t v[4] =
+					{
+						int8_t((a.f[0] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[0]) * pos_rscale, qp.bits)),
+						int8_t((a.f[1] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[1]) * pos_rscale, qp.bits)),
+						int8_t((a.f[2] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[2]) * pos_rscale, qp.bits)),
+						0
+					};
 					bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 				}
 
@@ -1549,11 +1553,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 				{
 					const Attr& a = stream.data[i];
 
-					int16_t v[4] = {
-					    int16_t((a.f[0] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[0]) * pos_rscale, qp.bits)),
-					    int16_t((a.f[1] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[1]) * pos_rscale, qp.bits)),
-					    int16_t((a.f[2] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[2]) * pos_rscale, qp.bits)),
-					    0};
+					int16_t v[4] =
+					{
+						int16_t((a.f[0] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[0]) * pos_rscale, qp.bits)),
+						int16_t((a.f[1] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[1]) * pos_rscale, qp.bits)),
+						int16_t((a.f[2] >= 0.f ? 1 : -1) * meshopt_quantizeUnorm(fabsf(a.f[2]) * pos_rscale, qp.bits)),
+						0
+					};
 					bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 				}
 
@@ -1564,18 +1570,20 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 	}
 	else if (stream.type == cgltf_attribute_type_texcoord)
 	{
-		float uv_rscale[2] = {
-		    qt.scale[0] == 0.f ? 0.f : 1.f / qt.scale[0],
-		    qt.scale[1] == 0.f ? 0.f : 1.f / qt.scale[1],
+		float uv_rscale[2] =
+		{
+			qt.scale[0] == 0.f ? 0.f : 1.f / qt.scale[0],
+			qt.scale[1] == 0.f ? 0.f : 1.f / qt.scale[1],
 		};
 
 		for (size_t i = 0; i < stream.data.size(); ++i)
 		{
 			const Attr& a = stream.data[i];
 
-			uint16_t v[2] = {
-			    uint16_t(meshopt_quantizeUnorm((a.f[0] - qt.offset[0]) * uv_rscale[0], qt.bits)),
-			    uint16_t(meshopt_quantizeUnorm((a.f[1] - qt.offset[1]) * uv_rscale[1], qt.bits)),
+			uint16_t v[2] =
+			{
+				uint16_t(meshopt_quantizeUnorm((a.f[0] - qt.offset[0]) * uv_rscale[0], qt.bits)),
+				uint16_t(meshopt_quantizeUnorm((a.f[1] - qt.offset[1]) * uv_rscale[1], qt.bits)),
 			};
 			bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 		}
@@ -1599,20 +1607,24 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 
 			if (bits > 8)
 			{
-				int16_t v[4] = {
-				    int16_t(meshopt_quantizeSnorm(nx, bits)),
-				    int16_t(meshopt_quantizeSnorm(ny, bits)),
-				    int16_t(meshopt_quantizeSnorm(nz, bits)),
-				    0};
+				int16_t v[4] =
+				{
+					int16_t(meshopt_quantizeSnorm(nx, bits)),
+					int16_t(meshopt_quantizeSnorm(ny, bits)),
+					int16_t(meshopt_quantizeSnorm(nz, bits)),
+					0
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 			else
 			{
-				int8_t v[4] = {
-				    int8_t(meshopt_quantizeSnorm(nx, bits)),
-				    int8_t(meshopt_quantizeSnorm(ny, bits)),
-				    int8_t(meshopt_quantizeSnorm(nz, bits)),
-				    0};
+				int8_t v[4] =
+				{
+					int8_t(meshopt_quantizeSnorm(nx, bits)),
+					int8_t(meshopt_quantizeSnorm(ny, bits)),
+					int8_t(meshopt_quantizeSnorm(nz, bits)),
+					0
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 		}
@@ -1644,20 +1656,24 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 
 			if (bits > 8)
 			{
-				int16_t v[4] = {
-				    int16_t(meshopt_quantizeSnorm(nx, bits)),
-				    int16_t(meshopt_quantizeSnorm(ny, bits)),
-				    int16_t(meshopt_quantizeSnorm(nz, bits)),
-				    int16_t(meshopt_quantizeSnorm(nw, 8))};
+				int16_t v[4] =
+				{
+					int16_t(meshopt_quantizeSnorm(nx, bits)),
+					int16_t(meshopt_quantizeSnorm(ny, bits)),
+					int16_t(meshopt_quantizeSnorm(nz, bits)),
+					int16_t(meshopt_quantizeSnorm(nw, 8))
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 			else
 			{
-				int8_t v[4] = {
-				    int8_t(meshopt_quantizeSnorm(nx, bits)),
-				    int8_t(meshopt_quantizeSnorm(ny, bits)),
-				    int8_t(meshopt_quantizeSnorm(nz, bits)),
-				    int8_t(meshopt_quantizeSnorm(nw, 8))};
+				int8_t v[4] =
+				{
+					int8_t(meshopt_quantizeSnorm(nx, bits)),
+					int8_t(meshopt_quantizeSnorm(ny, bits)),
+					int8_t(meshopt_quantizeSnorm(nz, bits)),
+					int8_t(meshopt_quantizeSnorm(nw, 8))
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 		}
@@ -1681,11 +1697,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 		{
 			const Attr& a = stream.data[i];
 
-			uint8_t v[4] = {
-			    uint8_t(meshopt_quantizeUnorm(a.f[0], 8)),
-			    uint8_t(meshopt_quantizeUnorm(a.f[1], 8)),
-			    uint8_t(meshopt_quantizeUnorm(a.f[2], 8)),
-			    uint8_t(meshopt_quantizeUnorm(a.f[3], 8))};
+			uint8_t v[4] =
+			{
+				uint8_t(meshopt_quantizeUnorm(a.f[0], 8)),
+				uint8_t(meshopt_quantizeUnorm(a.f[1], 8)),
+				uint8_t(meshopt_quantizeUnorm(a.f[2], 8)),
+				uint8_t(meshopt_quantizeUnorm(a.f[3], 8))
+			};
 			bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 		}
 
@@ -1701,11 +1719,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 			float ws = a.f[0] + a.f[1] + a.f[2] + a.f[3];
 			float wsi = (ws == 0.f) ? 0.f : 1.f / ws;
 
-			uint8_t v[4] = {
-			    uint8_t(meshopt_quantizeUnorm(a.f[0] * wsi, 8)),
-			    uint8_t(meshopt_quantizeUnorm(a.f[1] * wsi, 8)),
-			    uint8_t(meshopt_quantizeUnorm(a.f[2] * wsi, 8)),
-			    uint8_t(meshopt_quantizeUnorm(a.f[3] * wsi, 8))};
+			uint8_t v[4] =
+			{
+				uint8_t(meshopt_quantizeUnorm(a.f[0] * wsi, 8)),
+				uint8_t(meshopt_quantizeUnorm(a.f[1] * wsi, 8)),
+				uint8_t(meshopt_quantizeUnorm(a.f[2] * wsi, 8)),
+				uint8_t(meshopt_quantizeUnorm(a.f[3] * wsi, 8))
+			};
 
 			if (wsi != 0.f)
 				renormalizeWeights(v);
@@ -1731,11 +1751,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 			{
 				const Attr& a = stream.data[i];
 
-				uint8_t v[4] = {
-				    uint8_t(a.f[0]),
-				    uint8_t(a.f[1]),
-				    uint8_t(a.f[2]),
-				    uint8_t(a.f[3])};
+				uint8_t v[4] =
+				{
+					uint8_t(a.f[0]),
+					uint8_t(a.f[1]),
+					uint8_t(a.f[2]),
+					uint8_t(a.f[3])
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 
@@ -1748,11 +1770,13 @@ StreamFormat writeVertexStream(std::string& bin, const Stream& stream, const Qua
 			{
 				const Attr& a = stream.data[i];
 
-				uint16_t v[4] = {
-				    uint16_t(a.f[0]),
-				    uint16_t(a.f[1]),
-				    uint16_t(a.f[2]),
-				    uint16_t(a.f[3])};
+				uint16_t v[4] =
+				{
+					uint16_t(a.f[0]),
+					uint16_t(a.f[1]),
+					uint16_t(a.f[2]),
+					uint16_t(a.f[3])
+				};
 				bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 			}
 
@@ -1868,11 +1892,12 @@ StreamFormat writeKeyframeStream(std::string& bin, cgltf_animation_path_type typ
 		{
 			const Attr& a = data[i];
 
-			int16_t v[4] = {
-			    int16_t(meshopt_quantizeSnorm(a.f[0], 16)),
-			    int16_t(meshopt_quantizeSnorm(a.f[1], 16)),
-			    int16_t(meshopt_quantizeSnorm(a.f[2], 16)),
-			    int16_t(meshopt_quantizeSnorm(a.f[3], 16)),
+			int16_t v[4] =
+			{
+				int16_t(meshopt_quantizeSnorm(a.f[0], 16)),
+				int16_t(meshopt_quantizeSnorm(a.f[1], 16)),
+				int16_t(meshopt_quantizeSnorm(a.f[2], 16)),
+				int16_t(meshopt_quantizeSnorm(a.f[3], 16)),
 			};
 			bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 		}
@@ -1901,10 +1926,12 @@ StreamFormat writeKeyframeStream(std::string& bin, cgltf_animation_path_type typ
 		{
 			const Attr& a = data[i];
 
-			float v[3] = {
-			    meshopt_quantizeFloat(a.f[0], bits),
-			    meshopt_quantizeFloat(a.f[1], bits),
-			    meshopt_quantizeFloat(a.f[2], bits)};
+			float v[3] =
+			{
+				meshopt_quantizeFloat(a.f[0], bits),
+				meshopt_quantizeFloat(a.f[1], bits),
+				meshopt_quantizeFloat(a.f[2], bits)
+			};
 			bin.append(reinterpret_cast<const char*>(v), sizeof(v));
 		}
 
@@ -2464,11 +2491,12 @@ Attr interpolateLinear(const Attr& l, const Attr& r, float t, cgltf_animation_pa
 		float t1 = ca > 0 ? ot : -ot;
 
 		Attr lerp = {{
-		    l.f[0] * t0 + r.f[0] * t1,
-		    l.f[1] * t0 + r.f[1] * t1,
-		    l.f[2] * t0 + r.f[2] * t1,
-		    l.f[3] * t0 + r.f[3] * t1,
-		}};
+				l.f[0] * t0 + r.f[0] * t1,
+				l.f[1] * t0 + r.f[1] * t1,
+				l.f[2] * t0 + r.f[2] * t1,
+				l.f[3] * t0 + r.f[3] * t1,
+			}
+		};
 
 		float len = sqrtf(lerp.f[0] * lerp.f[0] + lerp.f[1] * lerp.f[1] + lerp.f[2] * lerp.f[2] + lerp.f[3] * lerp.f[3]);
 
@@ -2485,11 +2513,12 @@ Attr interpolateLinear(const Attr& l, const Attr& r, float t, cgltf_animation_pa
 	else
 	{
 		Attr lerp = {{
-		    l.f[0] * (1 - t) + r.f[0] * t,
-		    l.f[1] * (1 - t) + r.f[1] * t,
-		    l.f[2] * (1 - t) + r.f[2] * t,
-		    l.f[3] * (1 - t) + r.f[3] * t,
-		}};
+				l.f[0] * (1 - t) + r.f[0] * t,
+				l.f[1] * (1 - t) + r.f[1] * t,
+				l.f[2] * (1 - t) + r.f[2] * t,
+				l.f[3] * (1 - t) + r.f[3] * t,
+			}
+		};
 
 		return lerp;
 	}
@@ -2506,11 +2535,12 @@ Attr interpolateHermite(const Attr& v0, const Attr& t0, const Attr& v1, const At
 	float ts3 = dt * s3;
 
 	Attr lerp = {{
-	    s0 * v0.f[0] + ts1 * t0.f[0] + s2 * v1.f[0] + ts3 * t1.f[0],
-	    s0 * v0.f[1] + ts1 * t0.f[1] + s2 * v1.f[1] + ts3 * t1.f[1],
-	    s0 * v0.f[2] + ts1 * t0.f[2] + s2 * v1.f[2] + ts3 * t1.f[2],
-	    s0 * v0.f[3] + ts1 * t0.f[3] + s2 * v1.f[3] + ts3 * t1.f[3],
-	}};
+			s0 * v0.f[0] + ts1 * t0.f[0] + s2 * v1.f[0] + ts3 * t1.f[0],
+			s0 * v0.f[1] + ts1 * t0.f[1] + s2 * v1.f[1] + ts3 * t1.f[1],
+			s0 * v0.f[2] + ts1 * t0.f[2] + s2 * v1.f[2] + ts3 * t1.f[2],
+			s0 * v0.f[3] + ts1 * t0.f[3] + s2 * v1.f[3] + ts3 * t1.f[3],
+		}
+	};
 
 	if (type == cgltf_animation_path_type_rotation)
 	{
@@ -3013,7 +3043,7 @@ struct TempFile
 	int fd;
 
 	TempFile(const char* suffix)
-	    : fd(-1)
+		: fd(-1)
 	{
 #ifdef _WIN32
 		const char* temp_dir = getenv("TEMP");
@@ -3835,7 +3865,8 @@ void printAttributeStats(const std::vector<BufferView>& views, BufferView::Kind 
 			variant = animationPath(cgltf_animation_path_type(view.variant));
 			break;
 
-		default:;
+		default:
+			;
 		}
 
 		size_t count = view.data.size() / view.stride;
@@ -4180,15 +4211,16 @@ void process(cgltf_data* data, const char* input_path, const char* output_path, 
 	}
 	append(json, "}");
 
-	const ExtensionInfo extensions[] = {
-	    {"KHR_mesh_quantization", true, true},
-	    {"MESHOPT_compression", settings.compress, !settings.fallback},
-	    {"KHR_texture_transform", !json_textures.empty(), false},
-	    {"KHR_materials_pbrSpecularGlossiness", ext_pbr_specular_glossiness, false},
-	    {"KHR_materials_unlit", ext_unlit, false},
-	    {"KHR_lights_punctual", data->lights_count > 0, false},
-	    {"KHR_image_ktx2", !json_textures.empty() && settings.texture_ktx2, true},
-	    {"KHR_texture_basisu", !json_textures.empty() && settings.texture_ktx2, true},
+	const ExtensionInfo extensions[] =
+	{
+		{"KHR_mesh_quantization", true, true},
+		{"MESHOPT_compression", settings.compress, !settings.fallback},
+		{"KHR_texture_transform", !json_textures.empty(), false},
+		{"KHR_materials_pbrSpecularGlossiness", ext_pbr_specular_glossiness, false},
+		{"KHR_materials_unlit", ext_unlit, false},
+		{"KHR_lights_punctual", data->lights_count > 0, false},
+		{"KHR_image_ktx2", !json_textures.empty() && settings.texture_ktx2, true},
+		{"KHR_texture_basisu", !json_textures.empty() && settings.texture_ktx2, true},
 	};
 
 	writeExtensions(json, extensions, sizeof(extensions) / sizeof(extensions[0]));

@@ -552,11 +552,12 @@ static const unsigned char* decodeBytesGroupSimd(const unsigned char* data, unsi
 #endif
 
 #ifdef SIMD_AVX
-static const __m128i decodeBytesGroupConfig[] = {
-    _mm_set1_epi8(3),
-    _mm_set1_epi8(15),
-    _mm_setr_epi8(6, 4, 2, 0, 14, 12, 10, 8, 22, 20, 18, 16, 30, 28, 26, 24),
-    _mm_setr_epi8(4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56),
+static const __m128i decodeBytesGroupConfig[] =
+{
+	_mm_set1_epi8(3),
+	_mm_set1_epi8(15),
+	_mm_setr_epi8(6, 4, 2, 0, 14, 12, 10, 8, 22, 20, 18, 16, 30, 28, 26, 24),
+	_mm_setr_epi8(4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56),
 };
 
 static const unsigned char* decodeBytesGroupSimd(const unsigned char* data, unsigned char* buffer, int bitslog2)
