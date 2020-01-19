@@ -440,19 +440,20 @@ Z_Free
 void Z_Free (void *ptr, uint8_t zoneid)
 {
 	memblock_t	*block, *other;
-
-#ifdef DEBUG
-	static bool once = true; //silence
+	
 	if (!ptr)
 	{
+#ifdef DEBUG
+		static bool once = true; //silence
 		if(once)
 		{
 			info("Z_Free: NULL pointer");
 			once = false;
 		}
+#endif
 		return;
 	}
-#endif
+
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
 	{
