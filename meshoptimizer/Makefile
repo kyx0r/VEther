@@ -11,7 +11,7 @@ OBJECTS=$(LIBRARY_OBJECTS)
 LIBRARY=$(BUILD)/libmeshoptimizer.a
 
 CFLAGS=-g -Wall -Wextra -Werror -std=c89
-CXXFLAGS=-g -Wall -Wextra -Wshadow -Wno-missing-field-initializers -Werror -std=c++98
+CXXFLAGS= -Wextra -Wshadow -Wno-missing-field-initializers -Werror -std=c++98 $(SHARED_FLAGS)
 LDFLAGS=
 
 ifeq ($(config),iphone)
@@ -43,10 +43,13 @@ ifeq ($(config),analyze)
 	CXXFLAGS+=--analyze
 endif
 
-all: $(LIBRARY)
+all: $(LIBRARY) RANLIB
+
+RANLIB: 
+	gcc-ranlib $(LIBRARY)
 
 $(LIBRARY): $(LIBRARY_OBJECTS)
-	ar rcs $@ $^
+	ar -cvr $@ $^
 
 $(BUILD)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -59,4 +62,4 @@ $(BUILD)/%.c.o: %.c
 clean:
 	rm -rf $(BUILD)/src $(LIBRARY) 
 
-.PHONY: all clean format
+.PHONY: all clean

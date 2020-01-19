@@ -19,33 +19,32 @@ Copyright (C) 2019-.... FAETHER / Etherr
 */
 
 unsigned char* stack_mem = nullptr;
-static std::mutex mtx1;
-static std::mutex mtx2;
+static std::mutex zmtx[3];
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
-	mtx1.lock();
-	void* p = zone::Z_TagMalloc(size, 1, 8, 1);
+	zmtx[0].lock();
+	void* p = zone::Z_TagMalloc(size, 1, 1);
 	ASSERT(p,"operator new failed.");
-	mtx1.unlock();
+	zmtx[0].unlock();
 	return p;
 }
 
 void operator delete(void* p)
 {
-	mtx1.lock();
+	zmtx[0].lock();
 	zone::Z_Free(p, 1);
-	mtx1.unlock();
+	zmtx[0].unlock();
 	return;
 }
 
 void operator delete(void* p, size_t size)
 {
-	mtx1.lock();
+	zmtx[0].lock();
 	zone::Z_Free(p, 1);
-	mtx1.unlock();
+	zmtx[0].unlock();
 	// Here this will keep the memory alive but does not is free.
 	// I question size parameter.
 	// "If present, the std::size_t size argument must equal the
@@ -56,43 +55,47 @@ void operator delete(void* p, size_t size)
 
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-	mtx2.lock();
-	void* p = zone::Z_TagMalloc(size, 1, 8, 2);
+	zmtx[1].lock();
+	void* p = zone::Z_TagMalloc(size, 1, 2);
 	//void* p = malloc(size);
 	ASSERT(p,"VEtherAlloc failed.");
-	mtx2.unlock();
+	zmtx[1].unlock();
 	return p;
 }
 
 void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
-	mtx2.lock();
-	void* p = zone::Z_Realloc(porg, size, 8, 2);
+	zmtx[1].lock();
+	void* p = zone::Z_Realloc(porg, size, 2);
 	//void* p = realloc(porg, size);
 	ASSERT(p,"VEtherRealloc failed.");
-	mtx2.unlock();
+	zmtx[1].unlock();
 	return p;
 }
 
 void VEtherFree(void* pusd, void* ptr)
 {
 	//free(ptr);
-	mtx2.lock();
+	zmtx[1].lock();
 	zone::Z_Free(ptr, 2);
-	mtx2.unlock();
+	zmtx[1].unlock();
 	return;
 }
 
 void* Bt_alloc(size_t size)
 {
-	void* p = zone::Z_TagMalloc(size, 1, 8, 0);
+	zmtx[2].lock();
+	void* p = zone::Z_TagMalloc(size, 1, 0);
 	ASSERT(p,"Bt_alloc failed.");
+	zmtx[2].unlock();
 	return p;
 }
 
 void Bt_free(void* ptr)
 {
+	zmtx[2].lock();
 	zone::Z_Free(ptr, 0);
+	zmtx[2].unlock();
 	return;
 }
 
@@ -542,20 +545,20 @@ void Z_Print (uint8_t zoneid)
 	      (float)zsizes[zoneid]/(float)(1024*1024));
 }
 
-void *Z_TagMalloc (int size, int tag, int align, uint8_t zoneid)
+void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 {
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
 
 	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");
-	//p("%d, %d, %d", size, tag, align);
 //
 // scan through the block list looking for the first free block
 // of sufficient size
 //
 	size += sizeof(memblock_t);	// account for size of block header
 	size += 4;					// space for memory trash tester
-	size = (size + (align-1)) & -align;		// align to spec char boundary
+	size = (size + (sizeof(max_align_t)-1)) & -sizeof(max_align_t);
+	//alignment must be consistent through out the allocator.
 
 	base = rover = mainzone[zoneid]->rover;
 	start = base->prev;
@@ -612,7 +615,7 @@ void *Z_Malloc (int size, uint8_t zoneid)
 
 	//Z_CheckHeap ();
 
-	buf = Z_TagMalloc (size, 1, 8, 2);
+	buf = Z_TagMalloc (size, 1, zoneid);
 	if (!buf)
 	{
 		fatal("Z_Malloc: failed on allocation of %i bytes", size);
@@ -627,7 +630,7 @@ void *Z_Malloc (int size, uint8_t zoneid)
 Z_Realloc
 ========================
 */
-void *Z_Realloc(void *ptr, int size, int align, uint8_t zoneid)
+void *Z_Realloc(void *ptr, int size, uint8_t zoneid)
 {
 	int old_size;
 	void *old_ptr;
@@ -651,7 +654,7 @@ void *Z_Realloc(void *ptr, int size, int align, uint8_t zoneid)
 	old_ptr = ptr;
 
 	Z_Free (ptr, zoneid);
-	ptr = Z_TagMalloc (size, 1, align, zoneid);
+	ptr = Z_TagMalloc (size, 1, zoneid);
 	if (!ptr)
 	{
 		fatal("Z_Realloc: failed on allocation of %i bytes", size);

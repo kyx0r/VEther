@@ -569,6 +569,7 @@ void CreateQueryPool(int queryCount)
 	VkQueryPoolCreateInfo createInfo;
 	createInfo.pNext = nullptr;
 	createInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+	createInfo.flags = 0;
 	createInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
 	createInfo.queryCount = queryCount;
 	createInfo.pipelineStatistics = 0;
