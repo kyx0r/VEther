@@ -52,7 +52,7 @@ void InitCamera()
 	cam.fovy = CalcFovy(cam.fovx, window_width, window_height);
 
 	cam.pos[0] = 0.0f;
-	cam.pos[1] = 10.0f;
+	cam.pos[1] = -3.0f;
 	cam.pos[2] = -3.0f;
 	cam.front[0] = 0.0f;
 	cam.front[1] = 0.0f;
@@ -116,19 +116,12 @@ size_t TriangulateObj(fastObjMesh* obj, std::vector<Vertex_>& vertices)
 	return vertex_offset;
 }
 
-void SetupWorldPlane()
+void MeshCollisionModel(mesh_ent_t* mesh)
 {
-	mesh_ent_t* mesh = GetMesh("./res/plane.obj", nullptr);
 	btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
-	dynamicsWorld->removeRigidBody(mesh->rigidBody);
-	delete mesh->colShape;
-	delete mesh->rigidBody;
-	//btVector3 extent = btVector3(100.f, 0.f, 1.f);
-	//mesh->colShape = new btBoxShape(extent);
 	mesh->collisionMesh = new btTriangleMesh();
 	mesh->collisionMesh->m_indexedMeshes[0].m_numTriangles = mesh->index_count / 3;
 	mesh->collisionMesh->m_indexedMeshes[0].m_numVertices = mesh->vertex_count;
-//addTriangle
 	Vertex_* ptr = (Vertex_*)mesh->vertex_data;
 	for(uint32_t i = 0; i<mesh->vertex_count; i++)
 	{
@@ -157,10 +150,27 @@ void SetupWorldPlane()
 	mesh->rigidBody = new btRigidBody(rigidBodyCI);
 	dynamicsWorld->addRigidBody(mesh->rigidBody);
 	mesh->rigidBody->setFriction(1.0f);
-	//ScaleMatrix(mesh->mat->view, 100.f, 100.f, 100.f);
+}
 
-	//btVector3 scale = btVector3(5.0f, 5.0f, 5.0f);
-	//mesh->colShape->setLocalScaling(scale);
+
+void SetupWorldPlane(float size)
+{
+	mesh_ent_t* mesh = GetMesh("./res/plane.obj", nullptr);
+	btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
+	dynamicsWorld->removeRigidBody(mesh->rigidBody);
+	delete mesh->colShape;
+	delete mesh->rigidBody;
+	mesh->colShape = new btBoxShape(btVector3(btScalar(size), btScalar(size), btScalar(size)));
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(btVector3(0, size, 0));
+	btDefaultMotionState* motionState = new btDefaultMotionState(transform);
+	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(0.f, motionState, mesh->colShape, inertia);
+	mesh->rigidBody = new btRigidBody(rigidBodyCI);
+	dynamicsWorld->addRigidBody(mesh->rigidBody);
+	mesh->rigidBody->setFriction(1.0f);
+	TranslationMatrix(mesh->mat->view, 0, -size, 0);
+	ScaleMatrix(mesh->mat->view, size, size, size);
 }
 
 void InitMeshes()

@@ -96,6 +96,6 @@ void MoveTo(char* name, vec3_t pos);
 void SetPosition(mesh_ent_t* copy, vec3_t pos);
 void InitPhysics();
 void StepPhysics();
-void SetupWorldPlane();
+void SetupWorldPlane(float size);
 } //namespace entity
 #endif

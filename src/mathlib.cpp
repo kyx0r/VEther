@@ -721,8 +721,6 @@ TranslationMatrix
 */
 void TranslationMatrix(float matrix[16], float x, float y, float z)
 {
-	memset(matrix, 0, 16 * sizeof(float));
-
 	// First column
 	matrix[0*4 + 0] = 1.0f;
 
@@ -746,8 +744,6 @@ ScaleMatrix
 */
 void ScaleMatrix(float matrix[16], float x, float y, float z)
 {
-	memset(matrix, 0, 16 * sizeof(float));
-
 	// First column
 	matrix[0*4 + 0] = x;
 

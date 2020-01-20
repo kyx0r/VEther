@@ -591,7 +591,7 @@ void PreDraw()
 	entity::InitCamera();
 	entity::InitPhysics();
 	entity::InitMeshes();
-	entity::SetupWorldPlane();
+	entity::SetupWorldPlane(50.0f);
 
 	for(int i = 0; i<10; i++)
 	{
