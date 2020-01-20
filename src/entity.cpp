@@ -17,6 +17,8 @@ static btSequentialImpulseConstraintSolver* solver;
 static char* smeshes[][1] =
 {
 	{"./res/kitty.obj"},
+	{"./res/doch.obj"},
+	{"./res/plane.obj"},
 	{"./res/cube.obj"},
 };
 
@@ -114,13 +116,60 @@ size_t TriangulateObj(fastObjMesh* obj, std::vector<Vertex_>& vertices)
 	return vertex_offset;
 }
 
+void SetupWorldPlane()
+{
+	mesh_ent_t* mesh = GetMesh("./res/plane.obj", nullptr);
+	btVector3 inertia = btVector3(0.0f, 0.0f, 0.0f);
+	dynamicsWorld->removeRigidBody(mesh->rigidBody);
+	delete mesh->colShape;
+	delete mesh->rigidBody;
+	//btVector3 extent = btVector3(100.f, 0.f, 1.f);
+	//mesh->colShape = new btBoxShape(extent);
+	mesh->collisionMesh = new btTriangleMesh();
+	mesh->collisionMesh->m_indexedMeshes[0].m_numTriangles = mesh->index_count / 3;
+	mesh->collisionMesh->m_indexedMeshes[0].m_numVertices = mesh->vertex_count;
+//addTriangle
+	Vertex_* ptr = (Vertex_*)mesh->vertex_data;
+	for(uint32_t i = 0; i<mesh->vertex_count; i++)
+	{
+		mesh->collisionMesh->m_3componentVertices.push_back(ptr->pos[0]);
+		mesh->collisionMesh->m_3componentVertices.push_back(ptr->pos[1]);
+		mesh->collisionMesh->m_3componentVertices.push_back(ptr->pos[2]);
+		ptr++;
+	}
+
+	for(uint32_t i = 0; i<mesh->index_count; i++)
+	{
+		mesh->collisionMesh->m_32bitIndices.push_back(mesh->index_data[i]);
+	}
+	mesh->collisionMesh->m_indexedMeshes[0].m_triangleIndexBase = (unsigned char*)&mesh->collisionMesh->m_32bitIndices[0];
+	mesh->collisionMesh->m_indexedMeshes[0].m_vertexBase = (unsigned char*)&mesh->collisionMesh->m_3componentVertices[0];
+
+	mesh->collisionShape = new btGImpactMeshShape(mesh->collisionMesh);
+	mesh->collisionShape->setLocalScaling(btVector3(1, 1, 1));
+	mesh->collisionShape->setMargin(0.0f);
+	mesh->collisionShape->updateBound();
+
+	btTransform transform;
+	transform.setIdentity();
+	btDefaultMotionState* motionState = new btDefaultMotionState(transform);
+	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(0.f, motionState, mesh->collisionShape, inertia);
+	mesh->rigidBody = new btRigidBody(rigidBodyCI);
+	dynamicsWorld->addRigidBody(mesh->rigidBody);
+	mesh->rigidBody->setFriction(1.0f);
+	//ScaleMatrix(mesh->mat->view, 100.f, 100.f, 100.f);
+
+	//btVector3 scale = btVector3(5.0f, 5.0f, 5.0f);
+	//mesh->colShape->setLocalScaling(scale);
+}
+
 void InitMeshes()
 {
 	meshes = (mesh_ent_t*) zone::Z_Malloc(sizeof(mesh_ent_t));
 	mesh_ent_t* head = meshes;
 	for(uint8_t i = 0; i<ARRAYSIZE(smeshes); i++)
 	{
-		head->id = i;
+		head->name = smeshes[i][0];
 		head->obj = fast_obj_read(smeshes[i][0]);
 		size_t index_count = 0;
 		for (unsigned int i = 0; i < head->obj->face_count; ++i)
@@ -174,15 +223,18 @@ void InitMeshes()
 	}
 }
 
-mesh_ent_t* GetMesh(int id, mesh_ent_t** last)
+mesh_ent_t* GetMesh(char* name, mesh_ent_t** last)
 {
 	mesh_ent_t* head = meshes;
 	mesh_ent_t* copy = nullptr;
 	while(head->vertex_data)
 	{
-		if(head->id == id)
+		if(head->name)
 		{
-			copy = head;
+			if(zone::Q_strcmp(head->name, name) == 0)
+			{
+				copy = head;
+			}
 		}
 		head = head->next;
 	}
@@ -194,16 +246,14 @@ mesh_ent_t* GetMesh(int id, mesh_ent_t** last)
 }
 
 //make a soft dublicate of the entity
-mesh_ent_t* InstanceMesh(int id)
+mesh_ent_t* InstanceMesh(char* name)
 {
 	mesh_ent_t* head = nullptr;
-	mesh_ent_t* copy = GetMesh(id, &head);
+	mesh_ent_t* copy = GetMesh(name, &head);
 	if(copy)
 	{
 		// always have an empty node allocated at the back.
 		head->parent = copy;
-		head->id = head->prev->id;
-		head->id++;
 		head->obj = copy->obj;
 		head->vertex_data = copy->vertex_data;
 		head->index_data = copy->index_data;
@@ -234,7 +284,7 @@ mesh_ent_t* InstanceMesh(int id)
 	}
 	else
 	{
-		error("mesh ent id %d not found!", id);
+		error("mesh ent %s not found!", name);
 	}
 	return head;
 }
@@ -248,16 +298,16 @@ void SetPosition(mesh_ent_t* copy, vec3_t pos)
 	copy->rigidBody->setCenterOfMassTransform(transform);
 }
 
-void MoveTo(int id, vec3_t pos)
+void MoveTo(char* name, vec3_t pos)
 {
-	mesh_ent_t* copy = GetMesh(id, nullptr);
+	mesh_ent_t* copy = GetMesh(name, nullptr);
 	if(copy)
 	{
 		SetPosition(copy, pos);
 	}
 	else
 	{
-		error("mesh ent id %d not found!", id);
+		error("mesh ent %s not found!", name);
 	}
 }
 
@@ -273,7 +323,7 @@ void InitPhysics()
 	solver = new btSequentialImpulseConstraintSolver();
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, 0.0f, 0));
+	dynamicsWorld->setGravity(btVector3(0, 10.0f, 0));
 }
 
 void StepPhysics()

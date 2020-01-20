@@ -57,7 +57,7 @@ static VkImageMemoryBarrier image_memory_barrier_before_draw = {};
 static VkImageMemoryBarrier image_memory_barrier_before_present = {};
 static VkSubmitInfo submit_info = {};
 static VkPresentInfoKHR present_info = {};
-static 	uint32_t image_index;
+static uint32_t image_index;
 static VkPipelineStageFlags flags = {VK_PIPELINE_STAGE_ALL_COMMANDS_BIT};
 static std::mutex mtx[2]; //locking
 static std::condition_variable cvx[2]; //signaling
@@ -65,7 +65,6 @@ static bool run_threads[2] = {};
 static bool quit = false;
 static double frameCpuAvg = 0;
 static double frameGpuAvg = 0;
-static float mvp[16];
 
 namespace window
 {
@@ -154,7 +153,7 @@ void keyCallback(GLFWwindow* _window, int key, int scancode, int action, int mod
 				}
 				break;
 			case GLFW_KEY_E:
-				mesh_ent_t* target = entity::InstanceMesh(0);
+				mesh_ent_t* target = entity::InstanceMesh("./res/kitty.obj");
 				vec3_t pos = {cam.pos[0], cam.pos[1], cam.pos[2]};
 				entity::SetPosition(target, pos);
 				target->rigidBody->setLinearVelocity(btVector3(cam.front[0]*5, cam.front[1]*5, cam.front[2]*5));
@@ -258,7 +257,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		{
 			mu_input_mousedown(ctx, xm, ym, 1);
 			p("%lf, %lf", xm_norm, ym_norm);
-			mesh_ent_t* m = entity::GetMesh(0, nullptr);
+			mesh_ent_t* m = entity::GetMesh("./res/kitty.obj", nullptr);
 			btTransform transform;
 			m->rigidBody->getMotionState()->getWorldTransform(transform);
 			btVector3 origin = transform.getOrigin();
@@ -271,7 +270,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			//PrintMatrix(mvp);
 			//PrintMatrix(inv_mvp);
 			TranslationMatrix(pos, xm_norm, ym_norm, 0);
-			MatrixMultiply(pos, mvp);
+			MatrixMultiply(pos, cam.mvp);
 			PrintMatrix(pos);
 		}
 		break;
@@ -547,11 +546,11 @@ void Main3DThread()
 
 		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
-		float c[16];
-		Perspective(mvp, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
-		entity::ViewMatrix(c);
-		MatrixMultiply(mvp, c);
-		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &mvp);
+		Perspective(cam.proj, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
+		entity::ViewMatrix(cam.view);
+		zone::Q_memcpy(cam.mvp, cam.proj, 16*sizeof(float));
+		MatrixMultiply(cam.mvp, cam.view);
+		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &cam.mvp);
 
 		draw::Meshes();
 		draw::SkyDome();
@@ -592,10 +591,11 @@ void PreDraw()
 	entity::InitCamera();
 	entity::InitPhysics();
 	entity::InitMeshes();
+	entity::SetupWorldPlane();
 
 	for(int i = 0; i<10; i++)
 	{
-		entity::InstanceMesh(0);
+		entity::InstanceMesh("./res/kitty.obj");
 	}
 
 	/* init microui */

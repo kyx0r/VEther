@@ -18,6 +18,9 @@ typedef struct cam_ent_t
 	vec3_t up;
 	vec3_t right;
 	vec3_t worldup;
+	float proj[16];
+	float view[16];
+	float mvp[16];
 
 	float yaw      ;
 	float pitch    ;
@@ -57,8 +60,7 @@ typedef struct sky_ent_t
 
 typedef struct mesh_ent_t
 {
-	uint8_t id;
-//	ParsedOBJ obj;
+	char* name;
 	fastObjMesh* obj;
 	VkBuffer buffer[4];
 	VkDeviceSize buffer_offset[2];
@@ -88,11 +90,12 @@ void UpdateCamera();
 void InitCamera();
 void ViewMatrix(float matrix[16]);
 void InitMeshes();
-mesh_ent_t* GetMesh(int id, mesh_ent_t** last);
-mesh_ent_t* InstanceMesh(int id);
-void MoveTo(int id, vec3_t pos);
+mesh_ent_t* GetMesh(char* name, mesh_ent_t** last);
+mesh_ent_t* InstanceMesh(char* name);
+void MoveTo(char* name, vec3_t pos);
 void SetPosition(mesh_ent_t* copy, vec3_t pos);
 void InitPhysics();
 void StepPhysics();
+void SetupWorldPlane();
 } //namespace entity
 #endif
