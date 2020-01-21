@@ -135,7 +135,7 @@ bool RefreshWatch(WatchStruct* pWatch, bool _clear)
 {
 	return ReadDirectoryChangesW(
 	           pWatch->mDirHandle, pWatch->mBuffer, sizeof(pWatch->mBuffer), pWatch->mIsRecursive,
-	           pWatch->mNotifyFilter, NULL, &pWatch->mOverlapped, _clear ? 0 : WatchCallback);
+	           pWatch->mNotifyFilter, NULL, &pWatch->mOverlapped, _clear ? NULL : WatchCallback);
 }
 
 /// Stops monitoring a directory.
@@ -157,7 +157,7 @@ void DestroyWatch(WatchStruct* pWatch)
 		CloseHandle(pWatch->mOverlapped.hEvent);
 		CloseHandle(pWatch->mDirHandle);
 		delete pWatch->mDirName;
-		delete pWatch;
+		zone::Z_Free(pWatch);
 	}
 }
 
@@ -175,7 +175,7 @@ WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter
 		pWatch->mOverlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		pWatch->mNotifyFilter = mNotifyFilter;
 		pWatch->mIsRecursive = recursive;
-		if (RefreshWatch(pWatch, true))
+		if (RefreshWatch(pWatch))
 		{
 			return pWatch;
 		}
@@ -184,10 +184,13 @@ WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter
 			CloseHandle(pWatch->mOverlapped.hEvent);
 			CloseHandle(pWatch->mDirHandle);
 			error("%s", GetErrorMessage(GetLastError()).c_str());
+			zone::Z_Free(pWatch);
+			return NULL;
 		}
 	}
 
-	delete pWatch;
+	error("File not found: %s", szDirectory);
+	zone::Z_Free(pWatch);
 	return NULL;
 }
 
@@ -216,20 +219,17 @@ WatchID FileWatcherWin32::addWatch(const String& directory, FileWatchListener* w
 
 	WatchStruct* watch = CreateWatch(directory.c_str(), recursive,
 	                                 FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_FILE_NAME);
+									 
+	if(watch)
+	{		
+		watch->mWatchid = watchid;
+		watch->mFileWatcher = this;
+		watch->mFileWatchListener = watcher;
+		watch->mDirName = new char[directory.length()+1];
+		strcpy(watch->mDirName, directory.c_str());
 
-	if(!watch)
-	{
-		error("File not found: %s", directory.c_str());
-		return watchid;
+		mWatches.insert(std::make_pair(watchid, watch));
 	}
-	watch->mWatchid = watchid;
-	watch->mFileWatcher = this;
-	watch->mFileWatchListener = watcher;
-	watch->mDirName = new char[directory.length()+1];
-	strcpy(watch->mDirName, directory.c_str());
-
-	mWatches.insert(std::make_pair(watchid, watch));
-
 	return watchid;
 }
 
