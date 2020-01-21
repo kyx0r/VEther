@@ -28,13 +28,39 @@
 #include <windows.h>
 #include "../../src/startup.h"
 #include "../../src/flog.h"
+#include "../../src/zone.h"
+
+typedef std::basic_string<TCHAR> String;
+String GetErrorMessage(DWORD dwErrorCode)
+{
+    LPTSTR psz = NULL;
+    const DWORD cchMsg = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM
+                                         | FORMAT_MESSAGE_IGNORE_INSERTS
+                                         | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+                                       NULL, // (not used with FORMAT_MESSAGE_FROM_SYSTEM)
+                                       dwErrorCode,
+                                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                       reinterpret_cast<LPTSTR>(&psz),
+                                       0,
+                                       NULL);
+    if (cchMsg > 0)
+    {
+        // Assign buffer to smart pointer with custom deleter so that memory gets released
+        // in case String's c'tor throws an exception.
+        auto deleter = [](void* p) { ::HeapFree(::GetProcessHeap(), 0, p); };
+        std::unique_ptr<TCHAR, decltype(deleter)> ptrBuffer(psz, deleter);
+        return String(ptrBuffer.get(), cchMsg);
+    }
+    error("Failed to retrieve error message string.");
+    return String("");
+}
 
 namespace FW
 {
 /// Internal watch data
 struct WatchStruct
 {
-	OVERLAPPED mOverlapped;
+	_OVERLAPPED mOverlapped;
 	HANDLE mDirHandle;
 	BYTE mBuffer[4 * 1024];
 	LPARAM lParam;
@@ -98,12 +124,18 @@ void CALLBACK WatchCallback(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, 
 	}
 }
 
+/*
+ReadDirectoryChangesW fails with ERROR_INVALID_PARAMETER when the buffer length 
+is greater than 64 KB and the application is monitoring a directory over the network. 
+This is due to a packet size limitation with the underlying file sharing protocols.
+*/
+
 /// Refreshes the directory monitoring.
 bool RefreshWatch(WatchStruct* pWatch, bool _clear)
 {
 	return ReadDirectoryChangesW(
 	           pWatch->mDirHandle, pWatch->mBuffer, sizeof(pWatch->mBuffer), pWatch->mIsRecursive,
-	           pWatch->mNotifyFilter, NULL, &pWatch->mOverlapped, _clear ? 0 : WatchCallback) != 0;
+	           pWatch->mNotifyFilter, NULL, &pWatch->mOverlapped, _clear ? 0 : WatchCallback);
 }
 
 /// Stops monitoring a directory.
@@ -132,8 +164,7 @@ void DestroyWatch(WatchStruct* pWatch)
 /// Starts monitoring a directory.
 WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter)
 {
-	WatchStruct* pWatch;
-	pWatch = new WatchStruct;
+	WatchStruct* pWatch = (WatchStruct*) zone::Z_Malloc(sizeof(WatchStruct));
 
 	pWatch->mDirHandle = CreateFileA(szDirectory, FILE_LIST_DIRECTORY,
 	                                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
@@ -144,8 +175,7 @@ WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter
 		pWatch->mOverlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		pWatch->mNotifyFilter = mNotifyFilter;
 		pWatch->mIsRecursive = recursive;
-
-		if (RefreshWatch(pWatch))
+		if (RefreshWatch(pWatch, true))
 		{
 			return pWatch;
 		}
@@ -153,6 +183,7 @@ WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter
 		{
 			CloseHandle(pWatch->mOverlapped.hEvent);
 			CloseHandle(pWatch->mDirHandle);
+			error("%s", GetErrorMessage(GetLastError()).c_str());
 		}
 	}
 
@@ -240,7 +271,7 @@ void FileWatcherWin32::update()
 //--------
 void FileWatcherWin32::handleAction(WatchStruct* watch, const String& filename, unsigned long action)
 {
-	Action fwAction;
+	Action fwAction = {};
 
 	switch(action)
 	{

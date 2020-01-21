@@ -43,8 +43,8 @@ double xm_norm = 0;
 double ym_norm = 0;
 int32_t xm = 0;
 int32_t ym = 0;
-double frametime;
-double lastfps;
+double frametime = 0;
+double lastfps = 0;
 double realtime = 0;
 mu_Context* ctx;
 //}

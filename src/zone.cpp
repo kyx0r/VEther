@@ -412,7 +412,9 @@ typedef struct memblock_s
 {
 	int	size;		// including the header and possibly tiny fragments
 	int	tag;		// a tag of 0 is a free block
+#ifdef DEBUG
 	int	id;		// should be ZONEID
+#endif
 	int	pad;		// pad to 64 bit boundary
 	struct	memblock_s	*next, *prev;
 } memblock_t;
@@ -455,6 +457,7 @@ void Z_Free (void *ptr, uint8_t zoneid)
 	}
 
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
+#ifdef DEBUG	
 	if (block->id != ZONEID)
 	{
 		warn("Z_Free: freed a pointer without ZONEID");
@@ -463,7 +466,7 @@ void Z_Free (void *ptr, uint8_t zoneid)
 	{
 		warn("Z_Free: freed a freed pointer zoneid: %d", zoneid);
 	}
-
+#endif
 	block->tag = 0;		// mark as free
 
 	other = block->prev;
@@ -557,7 +560,9 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 // of sufficient size
 //
 	size += sizeof(memblock_t);	// account for size of block header
-	size += 4;					// space for memory trash tester
+#ifdef DEBUG
+	size += sizeof(int);		// space for memory trash tester
+#endif
 	size = (size + (sizeof(max_align_t)-1)) & -sizeof(max_align_t);
 	//alignment must be consistent through out the allocator.
 
@@ -586,7 +591,9 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 		newblock->size = extra;
 		newblock->tag = 0;			// free block
 		newblock->prev = base;
+#ifdef DEBUG		
 		newblock->id = ZONEID;
+#endif		
 		newblock->next = base->next;
 		newblock->next->prev = newblock;
 		base->next = newblock;
@@ -596,11 +603,12 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 	base->tag = tag;				// no longer a free block
 
 	mainzone[zoneid]->rover = base->next;	// next allocation will start looking here
-
+	
+#ifdef DEBUG
+	// marker for memory trash testing
 	base->id = ZONEID;
-
-// marker for memory trash testing
 	*(int *)((unsigned char *)base + base->size - 4) = ZONEID;
+#endif
 
 	return (void *) ((unsigned char *)base + sizeof(memblock_t));
 }
@@ -642,6 +650,8 @@ void *Z_Realloc(void *ptr, int size, uint8_t zoneid)
 		return Z_Malloc (size, zoneid);
 	}
 	block = (memblock_t *) ((unsigned char *) ptr - sizeof (memblock_t));
+	
+#ifdef DEBUG	
 	if (block->id != ZONEID)
 	{
 		fatal ("Z_Realloc: realloced a pointer without ZONEID");
@@ -650,8 +660,13 @@ void *Z_Realloc(void *ptr, int size, uint8_t zoneid)
 	{
 		fatal ("Z_Realloc: realloced a freed pointer");
 	}
+#endif	
 	old_size = block->size;
-	old_size -= (4 + (int)sizeof(memblock_t));	/* see Z_TagMalloc() */
+	
+#ifdef DEBUG	
+	old_size -= sizeof(int); /* see Z_TagMalloc() */
+#endif	
+	old_size -= ((int)sizeof(memblock_t));	
 	old_ptr = ptr;
 
 	Z_Free (ptr, zoneid);
@@ -1308,13 +1323,17 @@ static void Memory_InitZone (memzone_t *zone, int size)
 	zone->blocklist.next = zone->blocklist.prev = block =
 	                           (memblock_t *)( (unsigned char *)zone + sizeof(memzone_t) );
 	zone->blocklist.tag = 1;	// in use block
+#ifdef DEBUG
 	zone->blocklist.id = 0;
+#endif	
 	zone->blocklist.size = 0;
 	zone->rover = block;
 
 	block->prev = block->next = &zone->blocklist;
 	block->tag = 0;			// free block
+#ifdef DEBUG
 	block->id = ZONEID;
+#endif	
 	block->size = size - sizeof(memzone_t);
 }
 
