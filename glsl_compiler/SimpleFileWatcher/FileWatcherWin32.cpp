@@ -26,6 +26,7 @@
 
 //#define _WIN32_WINNT 0x0550
 #include <windows.h>
+#include <sstream>
 #include "../../src/startup.h"
 #include "../../src/flog.h"
 #include "../../src/zone.h"
@@ -53,6 +54,29 @@ String GetErrorMessage(DWORD dwErrorCode)
     }
     error("Failed to retrieve error message string.");
     return String("");
+}
+
+//Replace all strings of type in std::string.
+//@@1 target string @@2 pattern string @@3 what to replace pattern with.
+std::string replaceAll( const std::string& s, const std::string& f, const std::string& r )
+{
+	if ( s.empty() || f.empty() || f == r || s.find(f) == std::string::npos )
+	{
+		return s;
+	}
+	std::ostringstream build_it;
+	size_t i = 0;
+	for ( size_t pos; ( pos = s.find( f, i ) ) != std::string::npos; )
+	{
+		build_it.write( &s[i], pos - i );
+		build_it << r;
+		i = pos + f.size();
+	}
+	if ( i != s.size() )
+	{
+		build_it.write( &s[i], s.size() - i );
+	}
+	return build_it.str();
 }
 
 namespace FW
@@ -166,7 +190,19 @@ WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter
 {
 	WatchStruct* pWatch = (WatchStruct*) zone::Z_Malloc(sizeof(WatchStruct));
 
-	pWatch->mDirHandle = CreateFileA(szDirectory, FILE_LIST_DIRECTORY,
+	std::string leftslash = "\\";
+	std::string rightslash = "/";
+	
+	char IniFile[1024];
+	
+    GetCurrentDirectory(1024, IniFile);
+	std::string dir(&szDirectory[1]);
+	std::string file(IniFile);
+	
+	dir = replaceAll(dir, rightslash, &leftslash[0]);
+	file += dir;
+	
+	pWatch->mDirHandle = CreateFileA(&file[0], FILE_LIST_DIRECTORY,
 	                                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
 	                                 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
 
