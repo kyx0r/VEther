@@ -105,22 +105,21 @@ void CALLBACK WatchCallback(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, 
 {
 	PFILE_NOTIFY_INFORMATION pNotify;
 	WatchStruct* pWatch = (WatchStruct*) lpOverlapped;
-
 	if(dwNumberOfBytesTransfered == 0)
 		return;
 
 	if (dwErrorCode == ERROR_SUCCESS)
 	{
 		size_t offset = 0;
-		do
-		{
 			pNotify = (PFILE_NOTIFY_INFORMATION) &pWatch->mBuffer[offset];
 			offset += pNotify->NextEntryOffset;
 
 			int requiredSize = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName,
 			                                       pNotify->FileNameLength / sizeof(WCHAR), NULL, 0, NULL, NULL);
 			if (!requiredSize)
-				continue;
+			{
+				goto skip;
+			}
 			PCHAR szFile = new CHAR[requiredSize + 1];
 			int count = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName,
 			                                pNotify->FileNameLength / sizeof(WCHAR),
@@ -128,7 +127,7 @@ void CALLBACK WatchCallback(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, 
 			if (!count)
 			{
 				delete[] szFile;
-				continue;
+				goto skip;
 			}
 			szFile[requiredSize] = 0;
 
@@ -137,11 +136,8 @@ void CALLBACK WatchCallback(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, 
 			{
 				delete[] szFile;
 			}
-
-		}
-		while (pNotify->NextEntryOffset != 0);
 	}
-
+skip:;
 	if (!pWatch->mStopNow)
 	{
 		RefreshWatch(pWatch);
@@ -190,19 +186,7 @@ WatchStruct* CreateWatch(LPCSTR szDirectory, bool recursive, DWORD mNotifyFilter
 {
 	WatchStruct* pWatch = (WatchStruct*) zone::Z_Malloc(sizeof(WatchStruct));
 
-	std::string leftslash = "\\";
-	std::string rightslash = "/";
-	
-	char IniFile[1024];
-	
-    GetCurrentDirectory(1024, IniFile);
-	std::string dir(&szDirectory[1]);
-	std::string file(IniFile);
-	
-	dir = replaceAll(dir, rightslash, &leftslash[0]);
-	file += dir;
-	
-	pWatch->mDirHandle = CreateFileA(&file[0], FILE_LIST_DIRECTORY,
+	pWatch->mDirHandle = CreateFileA(szDirectory, FILE_LIST_DIRECTORY,
 	                                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
 	                                 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
 
@@ -251,9 +235,23 @@ FileWatcherWin32::~FileWatcherWin32()
 //--------
 WatchID FileWatcherWin32::addWatch(const String& directory, FileWatchListener* watcher, bool recursive)
 {
+	std::string dir;
+	dir = directory.substr(0, directory.find_last_of("\\/"));
+	
+	WatchMap::iterator iter = mWatches.begin();
+	WatchMap::iterator end = mWatches.end();
+	for(; iter != end; ++iter)
+	{
+		if(dir == iter->second->mDirName)
+		{
+			delete watcher;
+			return iter->second->mWatchid; //prevent addition of same dir
+		}
+	}
+	
 	WatchID watchid = ++mLastWatchID;
 
-	WatchStruct* watch = CreateWatch(directory.c_str(), recursive,
+	WatchStruct* watch = CreateWatch(dir.c_str(), recursive,
 	                                 FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_FILE_NAME);
 									 
 	if(watch)
@@ -261,8 +259,8 @@ WatchID FileWatcherWin32::addWatch(const String& directory, FileWatchListener* w
 		watch->mWatchid = watchid;
 		watch->mFileWatcher = this;
 		watch->mFileWatchListener = watcher;
-		watch->mDirName = new char[directory.length()+1];
-		strcpy(watch->mDirName, directory.c_str());
+		watch->mDirName = new char[dir.length()+1];
+		strcpy(watch->mDirName, dir.c_str());
 
 		mWatches.insert(std::make_pair(watchid, watch));
 	}

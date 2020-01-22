@@ -49,7 +49,7 @@ public:
 	UpdateListener() {}
 	void handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename, FW::Action action)
 	{
-		info("Reloading shader file: %s", &dir[0]);
+		info("Reloading shader file: %s %s, action: %d", &dir[0], &filename[0], action);
 
 		// Reload everything because doing this with single shoot does not work
 		// for some weird reason and the code grows in complexity as well.
