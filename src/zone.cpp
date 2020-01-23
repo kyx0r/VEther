@@ -27,13 +27,31 @@ void* operator new(size_t size)
 {
 	zmtx[0].lock();
 	void* p = zone::Z_TagMalloc(size, 1, 1);
-	ASSERT(p,"operator new failed.");
+	if(!p)
+	{
+		//edge case, in theory will never happen
+		if(!p)
+		{
+			//warn("Zone extent reached on %d bytes", size);
+			size+=sizeof(int); //space for 0x11acfec marker.
+			p = malloc(size);
+			ASSERT(p,"Operator new failed.");
+			*(int*)((unsigned char*)p) = 0x11afec;
+			p = (void *) ((unsigned char *)p + sizeof(int));
+		}
+	}
 	zmtx[0].unlock();
 	return p;
 }
 
 void operator delete(void* p)
 {
+	if(*(int*)((unsigned char*)p - sizeof(int)) == 0x11afec)
+	{
+		p = (void *) ((unsigned char *)p - sizeof(int));
+		free(p);
+		return;
+	}
 	zmtx[0].lock();
 	zone::Z_Free(p, 1);
 	zmtx[0].unlock();
@@ -42,6 +60,12 @@ void operator delete(void* p)
 
 void operator delete(void* p, size_t size)
 {
+	if(*(int*)((unsigned char*)p - sizeof(int)) == 0x11afec)
+	{
+		p = (void *) ((unsigned char *)p - sizeof(int));
+		free(p);
+		return;
+	}
 	zmtx[0].lock();
 	zone::Z_Free(p, 1);
 	zmtx[0].unlock();
@@ -415,7 +439,6 @@ typedef struct memblock_s
 #ifdef DEBUG
 	int	id;		// should be ZONEID
 #endif
-	int	pad;		// pad to 64 bit boundary
 	struct	memblock_s	*next, *prev;
 } memblock_t;
 
@@ -432,6 +455,7 @@ static void Memory_InitZone (memzone_t *zone, int size);
 
 static memzone_t	*mainzone[3];
 int zsizes[3];
+
 
 /*
 ========================
@@ -455,19 +479,26 @@ void Z_Free (void *ptr, uint8_t zoneid)
 #endif
 		return;
 	}
-
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
 #ifdef DEBUG	
 	if (block->id != ZONEID)
 	{
 		warn("Z_Free: freed a pointer without ZONEID");
+		return;
 	}
 	if (block->tag == 0)
 	{
-		warn("Z_Free: freed a freed pointer zoneid: %d", zoneid);
+		warn("Z_Free: freed a freed pointer zoneid: %d %p %d", zoneid, ptr, block->size);
 	}
 #endif
 	block->tag = 0;		// mark as free
+
+	if(mainzone[zoneid]->rover->size < block->size)
+	{
+p("jjhjkg");
+		mainzone[zoneid]->rover = block;
+		//return;
+	}
 
 	other = block->prev;
 	if (!other->tag)
@@ -479,6 +510,7 @@ void Z_Free (void *ptr, uint8_t zoneid)
 		if (block == mainzone[zoneid]->rover)
 			mainzone[zoneid]->rover = other;
 		block = other;
+
 	}
 
 	other = block->next;
@@ -520,17 +552,24 @@ void Z_Print (uint8_t zoneid)
 	memblock_t	*block;
 	memzone_t *zone = mainzone[zoneid];
 	uint64_t sum = 0;
+	uint64_t actual_size = 0;
+	uint64_t idx = 0;
+	debug("**********************************");
 	debug("zone size: %i  location: %p, id: %d", zsizes[zoneid], zone, zoneid);
 
 	for (block = zone->blocklist.next ; ; block = block->next)
 	{
-		//debug("block:%p    size:%7i    tag:%3i", block, block->size, block->tag);
+		if (block->next == &zone->blocklist)
+		{
+			break;			// all blocks have been hit
+		}
 		if(block->tag)
 		{
 			sum += block->size;
 		}
-		if (block->next == &zone->blocklist)
-			break;			// all blocks have been hit
+		actual_size += block->size;
+		debug("block:%p    size:%7i    tag:%d asize:%d idx:%d", block, block->size, block->tag, actual_size, idx);
+		idx++;
 		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
 		{
 			fatal("ERROR: block size does not touch the next block");
@@ -547,12 +586,13 @@ void Z_Print (uint8_t zoneid)
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB",
 	      sum,  zsizes[zoneid], (float)sum/(float)(1024*1024),
 	      (float)zsizes[zoneid]/(float)(1024*1024));
+	debug("Block extent actual: %dB | %0.2fMB", actual_size, (float)actual_size/float(1024*1024));
 }
 
 void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 {
 	int		extra;
-	memblock_t	*start, *rover, *newblock, *base;
+	memblock_t	*newblock, *base;
 
 	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");
 //
@@ -566,19 +606,12 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 	size = (size + (sizeof(max_align_t)-1)) & -sizeof(max_align_t);
 	//alignment must be consistent through out the allocator.
 
-	base = rover = mainzone[zoneid]->rover;
-	start = base->prev;
+	base = mainzone[zoneid]->rover;
 
-	do
+	if(base->size < size)
 	{
-		if (rover == start)	// scaned all the way around the list
-			return NULL;
-		if (rover->tag)
-			base = rover = rover->next;
-		else
-			rover = rover->next;
+		return NULL;
 	}
-	while (base->tag || base->size < size);
 
 //
 // found a block big enough
@@ -1361,15 +1394,15 @@ void Memory_Init (void *buf, int size)
 	hunk_high_used = 0;
 
 	Cache_Init();
-	zsizes[0] = 220*zonesize;
+	zsizes[0] = 64*zonesize;
 	mainzone[0] = (memzone_t *) Hunk_AllocName (zsizes[0], "mainzone");
 	Memory_InitZone (mainzone[0], zsizes[0]);
 
-	zsizes[1] = 16*zonesize;
+	zsizes[1] = 1*zonesize;
 	mainzone[1] = (memzone_t *) Hunk_AllocName (zsizes[1], "newzone");
 	Memory_InitZone (mainzone[1], zsizes[1]);
 
-	zsizes[2] = 16*zonesize;
+	zsizes[2] = 8*zonesize;
 	mainzone[2] = (memzone_t *) Hunk_AllocName (zsizes[2], "vulkanzone");
 	Memory_InitZone (mainzone[2], zsizes[2]);
 }

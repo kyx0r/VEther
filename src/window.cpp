@@ -552,7 +552,20 @@ void Main3DThread()
 		MatrixMultiply(cam.mvp, cam.view);
 		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &cam.mvp);
 
-		draw::Meshes();
+		vec3_t p1;
+		p1[0] = 0;
+		p1[1] = 10.0f;
+		p1[2] = 0;
+		vec3_t p2;
+		p2[0] = 10.0f;
+		p2[1] = 10.0f;
+		p2[2] = 0;
+		vec3_t col;
+		col[0] = 1.0f;
+		col[1] = 1.0f;
+		col[2] = 1.0f;
+		draw::Line(p1, p2, col);
+		//draw::Meshes();
 		draw::SkyDome();
 
 		VK_CHECK(vkEndCommandBuffer(command_buffer));
@@ -827,7 +840,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 60.0)
+		if (realtime-stamp > 10.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;

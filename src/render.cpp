@@ -461,7 +461,8 @@ VkPipelineVertexInputStateCreateInfo* Vec3FloatPipe()
 
 
 void CreateGraphicsPipeline
-(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), int render_index, VkShaderModule vs, VkShaderModule fs)
+(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), 
+int render_index, VkPolygonMode polygonMode, VkShaderModule vs, VkShaderModule fs)
 {
 	ASSERT(vs, "Failed to load Vertex Shader.");
 	ASSERT(fs, "Failed to load Fragment Shader.");
@@ -504,7 +505,7 @@ void CreateGraphicsPipeline
 	rasterizationState.flags = 0;
 	rasterizationState.depthClampEnable = VK_FALSE;
 	rasterizationState.rasterizerDiscardEnable = VK_FALSE;
-	rasterizationState.polygonMode = (wireframe.string[0] == '1') ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL;
+	rasterizationState.polygonMode = (wireframe.string[0] == '1') ? VK_POLYGON_MODE_LINE : polygonMode;
 	rasterizationState.cullMode = VK_CULL_MODE_NONE;
 	rasterizationState.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	rasterizationState.depthBiasEnable = VK_FALSE;
