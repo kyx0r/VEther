@@ -29,16 +29,11 @@ void* operator new(size_t size)
 	void* p = zone::Z_TagMalloc(size, 1, 1);
 	if(!p)
 	{
-		//edge case, in theory will never happen
-		if(!p)
-		{
-			//warn("Zone extent reached on %d bytes", size);
-			size+=sizeof(int); //space for 0x11acfec marker.
-			p = malloc(size);
-			ASSERT(p,"Operator new failed.");
-			*(int*)((unsigned char*)p) = 0x11afec;
-			p = (void *) ((unsigned char *)p + sizeof(int));
-		}
+		size+=sizeof(int); //space for 0x11acfec marker.
+		p = malloc(size);
+		ASSERT(p,"Operator new failed.");
+		*(int*)((unsigned char*)p) = 0x11afec;
+		p = (void *) ((unsigned char *)p + sizeof(int));
 	}
 	zmtx[0].unlock();
 	return p;
@@ -453,9 +448,50 @@ void Cache_FreeLow (int new_low_hunk);
 void Cache_FreeHigh (int new_high_hunk);
 static void Memory_InitZone (memzone_t *zone, int size);
 
-static memzone_t	*mainzone[3];
-int zsizes[3];
+#define NUM_ZONES 3
+static memzone_t	*mainzone[NUM_ZONES];
+int zsizes[NUM_ZONES];
 
+/*
+========================
+Z_UpdateRover 
+
+Keeps the rover pointing at the largest free block.
+Updated every frame in separate thread.
+========================
+*/
+
+void Z_UpdateRover()
+{
+	memblock_t* block;
+	memblock_t dummy;
+	dummy.size = 0;
+	memblock_t* max = &dummy;
+	for(uint8_t i = 0; i<NUM_ZONES; i++)
+	{
+		memzone_t *zone = mainzone[i];
+		for (block = zone->blocklist.next ; ; block = block->next)
+		{
+			if (block == &zone->blocklist)
+			{
+				break;			// all blocks have been hit
+			}
+			if(!block->tag)
+			{
+				if(block->size > max->size)
+				{
+					max = block;		
+				}
+			}
+		}
+		max->next = &zone->blocklist;
+		zone->rover = max;
+		//p("%p %d", max, max->size);
+		//p("%p %d", zone->rover, zone->rover->size);
+		max = &dummy;
+		p("%p", &zone->blocklist);
+	}
+}
 
 /*
 ========================
@@ -492,14 +528,6 @@ void Z_Free (void *ptr, uint8_t zoneid)
 	}
 #endif
 	block->tag = 0;		// mark as free
-
-	if(mainzone[zoneid]->rover->size < block->size)
-	{
-p("jjhjkg");
-		mainzone[zoneid]->rover = block;
-		//return;
-	}
-
 	other = block->prev;
 	if (!other->tag)
 	{
@@ -583,6 +611,7 @@ void Z_Print (uint8_t zoneid)
 			fatal("ERROR: two consecutive free blocks");
 		}
 	}
+	debug("Rover: %p size: %d ", mainzone[zoneid]->rover,  mainzone[zoneid]->rover->size);
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB",
 	      sum,  zsizes[zoneid], (float)sum/(float)(1024*1024),
 	      (float)zsizes[zoneid]/(float)(1024*1024));
@@ -607,7 +636,6 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 	//alignment must be consistent through out the allocator.
 
 	base = mainzone[zoneid]->rover;
-
 	if(base->size < size)
 	{
 		return NULL;
