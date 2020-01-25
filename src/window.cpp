@@ -673,6 +673,7 @@ void PreDraw()
 
 	std::thread (UIThread).detach();
 	std::thread (Main3DThread).detach();
+	std::thread(zone::Z_UpdateRover).detach();
 }
 
 void AwakeWorkers()
@@ -846,7 +847,6 @@ void mainLoop()
 			stamp = realtime;
 		}
 #endif
-		std::thread(zone::Z_UpdateRover).detach();
 wait:
 		oldrealtime = realtime;
 		frametime = CLAMP (0.0001, frametime, 0.1);

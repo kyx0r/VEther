@@ -451,45 +451,60 @@ static void Memory_InitZone (memzone_t *zone, int size);
 #define NUM_ZONES 3
 static memzone_t	*mainzone[NUM_ZONES];
 int zsizes[NUM_ZONES];
+uint8_t zfail[NUM_ZONES];
 
 /*
 ========================
-Z_UpdateRover 
+Z_UpdateRover
 
 Keeps the rover pointing at the largest free block.
 Updated every frame in separate thread.
 ========================
 */
+bool abc = false;
 
 void Z_UpdateRover()
 {
-	memblock_t* block;
 	memblock_t dummy;
 	dummy.size = 0;
 	memblock_t* max = &dummy;
-	for(uint8_t i = 0; i<NUM_ZONES; i++)
+	for(;;)
 	{
-		memzone_t *zone = mainzone[i];
-		for (block = zone->blocklist.next ; ; block = block->next)
+		for(uint8_t i = 0; i<NUM_ZONES; i++)
 		{
-			if (block == &zone->blocklist)
+			if(zfail[i])
 			{
-				break;			// all blocks have been hit
-			}
-			if(!block->tag)
-			{
-				if(block->size > max->size)
+				memblock_t	*start, *rover;
+				rover = mainzone[i]->rover;
+				start = rover->prev;
+				do
 				{
-					max = block;		
+					if (rover == start)	// scaned all the way around the list
+						break;
+					if (rover->tag == 0)
+					{
+						if(rover->size > max->size)
+						{
+							max = rover;
+						}
+						rover = rover->next;
+					}
+					else
+						rover = rover->next;
 				}
+				while (true);
+				if(max != &dummy)
+				{
+					memblock_t* r = mainzone[i]->rover;
+					debug("Old rover for zone %d, %p, %d, %d",i, r, r->size, r->tag);
+					mainzone[i]->rover = max;
+					debug("New rover for zone %d, %p, %d, %d",i, max, max->size, max->tag);
+					abc = true;
+				}
+				max = &dummy;
+				zfail[i] = 0;
 			}
 		}
-		max->next = &zone->blocklist;
-		zone->rover = max;
-		//p("%p %d", max, max->size);
-		//p("%p %d", zone->rover, zone->rover->size);
-		max = &dummy;
-		p("%p", &zone->blocklist);
 	}
 }
 
@@ -502,7 +517,6 @@ Z_Free
 void Z_Free (void *ptr, uint8_t zoneid)
 {
 	memblock_t	*block, *other;
-	
 	if (!ptr)
 	{
 #ifdef DEBUG
@@ -516,7 +530,7 @@ void Z_Free (void *ptr, uint8_t zoneid)
 		return;
 	}
 	block = (memblock_t *) ( (unsigned char *)ptr - sizeof(memblock_t));
-#ifdef DEBUG	
+#ifdef DEBUG
 	if (block->id != ZONEID)
 	{
 		warn("Z_Free: freed a pointer without ZONEID");
@@ -611,7 +625,7 @@ void Z_Print (uint8_t zoneid)
 			fatal("ERROR: two consecutive free blocks");
 		}
 	}
-	debug("Rover: %p size: %d ", mainzone[zoneid]->rover,  mainzone[zoneid]->rover->size);
+	debug("Rover: %p size: %d tag: %d", mainzone[zoneid]->rover,  mainzone[zoneid]->rover->size, mainzone[zoneid]->rover->tag);
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB",
 	      sum,  zsizes[zoneid], (float)sum/(float)(1024*1024),
 	      (float)zsizes[zoneid]/(float)(1024*1024));
@@ -636,11 +650,11 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 	//alignment must be consistent through out the allocator.
 
 	base = mainzone[zoneid]->rover;
-	if(base->size < size)
+	if(base->tag || base->size < size)
 	{
+		zfail[zoneid] = 1;
 		return NULL;
 	}
-
 //
 // found a block big enough
 //
@@ -652,9 +666,9 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 		newblock->size = extra;
 		newblock->tag = 0;			// free block
 		newblock->prev = base;
-#ifdef DEBUG		
+#ifdef DEBUG
 		newblock->id = ZONEID;
-#endif		
+#endif
 		newblock->next = base->next;
 		newblock->next->prev = newblock;
 		base->next = newblock;
@@ -664,7 +678,7 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 	base->tag = tag;				// no longer a free block
 
 	mainzone[zoneid]->rover = base->next;	// next allocation will start looking here
-	
+
 #ifdef DEBUG
 	// marker for memory trash testing
 	base->id = ZONEID;
@@ -711,8 +725,8 @@ void *Z_Realloc(void *ptr, int size, uint8_t zoneid)
 		return Z_Malloc (size, zoneid);
 	}
 	block = (memblock_t *) ((unsigned char *) ptr - sizeof (memblock_t));
-	
-#ifdef DEBUG	
+
+#ifdef DEBUG
 	if (block->id != ZONEID)
 	{
 		fatal ("Z_Realloc: realloced a pointer without ZONEID");
@@ -721,13 +735,13 @@ void *Z_Realloc(void *ptr, int size, uint8_t zoneid)
 	{
 		fatal ("Z_Realloc: realloced a freed pointer");
 	}
-#endif	
+#endif
 	old_size = block->size;
-	
-#ifdef DEBUG	
+
+#ifdef DEBUG
 	old_size -= sizeof(int); /* see Z_TagMalloc() */
-#endif	
-	old_size -= ((int)sizeof(memblock_t));	
+#endif
+	old_size -= ((int)sizeof(memblock_t));
 	old_ptr = ptr;
 
 	Z_Free (ptr, zoneid);
@@ -1386,7 +1400,7 @@ static void Memory_InitZone (memzone_t *zone, int size)
 	zone->blocklist.tag = 1;	// in use block
 #ifdef DEBUG
 	zone->blocklist.id = 0;
-#endif	
+#endif
 	zone->blocklist.size = 0;
 	zone->rover = block;
 
@@ -1394,7 +1408,7 @@ static void Memory_InitZone (memzone_t *zone, int size)
 	block->tag = 0;			// free block
 #ifdef DEBUG
 	block->id = ZONEID;
-#endif	
+#endif
 	block->size = size - sizeof(memzone_t);
 }
 

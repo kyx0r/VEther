@@ -461,8 +461,8 @@ VkPipelineVertexInputStateCreateInfo* Vec3FloatPipe()
 
 
 void CreateGraphicsPipeline
-(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(), 
-int render_index, VkPolygonMode polygonMode, VkShaderModule vs, VkShaderModule fs)
+(VkPipelineCache pipelineCache, VkPipelineVertexInputStateCreateInfo* (*vertexInput)(),
+ int render_index, VkPolygonMode polygonMode, VkShaderModule vs, VkShaderModule fs)
 {
 	ASSERT(vs, "Failed to load Vertex Shader.");
 	ASSERT(fs, "Failed to load Fragment Shader.");

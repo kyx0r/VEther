@@ -34,26 +34,29 @@
 typedef std::basic_string<TCHAR> String;
 String GetErrorMessage(DWORD dwErrorCode)
 {
-    LPTSTR psz = NULL;
-    const DWORD cchMsg = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM
-                                         | FORMAT_MESSAGE_IGNORE_INSERTS
-                                         | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-                                       NULL, // (not used with FORMAT_MESSAGE_FROM_SYSTEM)
-                                       dwErrorCode,
-                                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                       reinterpret_cast<LPTSTR>(&psz),
-                                       0,
-                                       NULL);
-    if (cchMsg > 0)
-    {
-        // Assign buffer to smart pointer with custom deleter so that memory gets released
-        // in case String's c'tor throws an exception.
-        auto deleter = [](void* p) { ::HeapFree(::GetProcessHeap(), 0, p); };
-        std::unique_ptr<TCHAR, decltype(deleter)> ptrBuffer(psz, deleter);
-        return String(ptrBuffer.get(), cchMsg);
-    }
-    error("Failed to retrieve error message string.");
-    return String("");
+	LPTSTR psz = NULL;
+	const DWORD cchMsg = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM
+	                                   | FORMAT_MESSAGE_IGNORE_INSERTS
+	                                   | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+	                                   NULL, // (not used with FORMAT_MESSAGE_FROM_SYSTEM)
+	                                   dwErrorCode,
+	                                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+	                                   reinterpret_cast<LPTSTR>(&psz),
+	                                   0,
+	                                   NULL);
+	if (cchMsg > 0)
+	{
+		// Assign buffer to smart pointer with custom deleter so that memory gets released
+		// in case String's c'tor throws an exception.
+		auto deleter = [](void* p)
+		{
+			::HeapFree(::GetProcessHeap(), 0, p);
+		};
+		std::unique_ptr<TCHAR, decltype(deleter)> ptrBuffer(psz, deleter);
+		return String(ptrBuffer.get(), cchMsg);
+	}
+	error("Failed to retrieve error message string.");
+	return String("");
 }
 
 //Replace all strings of type in std::string.
@@ -111,33 +114,34 @@ void CALLBACK WatchCallback(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, 
 	if (dwErrorCode == ERROR_SUCCESS)
 	{
 		size_t offset = 0;
-			pNotify = (PFILE_NOTIFY_INFORMATION) &pWatch->mBuffer[offset];
-			offset += pNotify->NextEntryOffset;
+		pNotify = (PFILE_NOTIFY_INFORMATION) &pWatch->mBuffer[offset];
+		offset += pNotify->NextEntryOffset;
 
-			int requiredSize = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName,
-			                                       pNotify->FileNameLength / sizeof(WCHAR), NULL, 0, NULL, NULL);
-			if (!requiredSize)
-			{
-				goto skip;
-			}
-			PCHAR szFile = new CHAR[requiredSize + 1];
-			int count = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName,
-			                                pNotify->FileNameLength / sizeof(WCHAR),
-			                                szFile, requiredSize, NULL, NULL);
-			if (!count)
-			{
-				delete[] szFile;
-				goto skip;
-			}
-			szFile[requiredSize] = 0;
+		int requiredSize = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName,
+		                                       pNotify->FileNameLength / sizeof(WCHAR), NULL, 0, NULL, NULL);
+		if (!requiredSize)
+		{
+			goto skip;
+		}
+		PCHAR szFile = new CHAR[requiredSize + 1];
+		int count = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName,
+		                                pNotify->FileNameLength / sizeof(WCHAR),
+		                                szFile, requiredSize, NULL, NULL);
+		if (!count)
+		{
+			delete[] szFile;
+			goto skip;
+		}
+		szFile[requiredSize] = 0;
 
-			pWatch->mFileWatcher->handleAction(pWatch, szFile, pNotify->Action);
-			if (szFile != NULL)
-			{
-				delete[] szFile;
-			}
+		pWatch->mFileWatcher->handleAction(pWatch, szFile, pNotify->Action);
+		if (szFile != NULL)
+		{
+			delete[] szFile;
+		}
 	}
-skip:;
+skip:
+	;
 	if (!pWatch->mStopNow)
 	{
 		RefreshWatch(pWatch);
@@ -145,8 +149,8 @@ skip:;
 }
 
 /*
-ReadDirectoryChangesW fails with ERROR_INVALID_PARAMETER when the buffer length 
-is greater than 64 KB and the application is monitoring a directory over the network. 
+ReadDirectoryChangesW fails with ERROR_INVALID_PARAMETER when the buffer length
+is greater than 64 KB and the application is monitoring a directory over the network.
 This is due to a packet size limitation with the underlying file sharing protocols.
 */
 
@@ -237,7 +241,7 @@ WatchID FileWatcherWin32::addWatch(const String& directory, FileWatchListener* w
 {
 	std::string dir;
 	dir = directory.substr(0, directory.find_last_of("\\/"));
-	
+
 	WatchMap::iterator iter = mWatches.begin();
 	WatchMap::iterator end = mWatches.end();
 	for(; iter != end; ++iter)
@@ -248,14 +252,14 @@ WatchID FileWatcherWin32::addWatch(const String& directory, FileWatchListener* w
 			return iter->second->mWatchid; //prevent addition of same dir
 		}
 	}
-	
+
 	WatchID watchid = ++mLastWatchID;
 
 	WatchStruct* watch = CreateWatch(dir.c_str(), recursive,
 	                                 FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_FILE_NAME);
-									 
+
 	if(watch)
-	{		
+	{
 		watch->mWatchid = watchid;
 		watch->mFileWatcher = this;
 		watch->mFileWatchListener = watcher;
