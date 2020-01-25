@@ -564,8 +564,8 @@ void Main3DThread()
 		col[0] = 1.0f;
 		col[1] = 1.0f;
 		col[2] = 1.0f;
-		draw::Line(p1, p2, col);
-		//draw::Meshes();
+		//draw::Line(p1, p2, col);
+		draw::Meshes();
 		draw::SkyDome();
 
 		VK_CHECK(vkEndCommandBuffer(command_buffer));

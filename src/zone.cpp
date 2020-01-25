@@ -1440,7 +1440,7 @@ void Memory_Init (void *buf, int size)
 	mainzone[0] = (memzone_t *) Hunk_AllocName (zsizes[0], "mainzone");
 	Memory_InitZone (mainzone[0], zsizes[0]);
 
-	zsizes[1] = 1*zonesize;
+	zsizes[1] = 64*zonesize;
 	mainzone[1] = (memzone_t *) Hunk_AllocName (zsizes[1], "newzone");
 	Memory_InitZone (mainzone[1], zsizes[1]);
 
