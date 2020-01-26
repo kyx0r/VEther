@@ -444,6 +444,7 @@ typedef struct
 	int		size;		// total bytes malloced, including header
 	memblock_t	blocklist;	// start / end cap for linked list
 	memblock_t	*rover;
+	memblock_t      *staging_rover;
 } memzone_t;
 
 void Cache_FreeLow (int new_low_hunk);
@@ -476,68 +477,59 @@ void Z_UpdateRover()
 	{
 		for(uint8_t i = 0; i<NUM_ZONES; i++)
 		{
-			if(zfail[i])
+			for(int c = blocks_idx[i]; c>0; c--)
 			{
-				for(int c = blocks_idx[i]; c>0; c--)
+				memblock_t* block = blocks[(100000*i)+c];
+				if(block)
 				{
-					memblock_t* block = blocks[(100000*i)+c];
-					if(block)
+					if(block->tag == 0)
 					{
-						if(block->tag == 0)
+						while(block->prev && !block->prev->tag)
 						{
-							while(!block->prev->tag)
-							{
-								block = block->prev; //all the way back.
-							}
-							memblock_t* org = block;
+							block = block->prev; //all the way back.
+						}
+						memblock_t* org = block;
 check:
-							if (!block->next->tag)
-							{
-								// merge with previous free block
-								block->size += block->next->size;
-								block->next->size = 0;
-								block->next->tag = 1;
-								block->next = block->next->next;
-								block->next->prev = block;
-							//	p("next next = %p", block->next->next);
-							//	p("block = %p", block);
-
-								block = block->next;
-								goto check;
-							}
-							if(org->size > max->size)
-							{
-								max = org;
-							}
-						}
-					}
-				}
-				if(max != &dummy)
-				{
-					memblock_t* r = mainzone[i]->rover;
-					if(r->size < max->size)
-					{
-						//debug("Old rover for zone %d, %p, %d, %d",i, r, r->size, r->tag);
-						//debug("New rover for zone %d, %p, %d, %d",i, max, max->size, max->tag);
-						//mainzone[i]->rover = max;
-					}
-				}
-				max = &dummy;
-				zfail[i] = 0;
-			}
-			else
-			{
-				for(int c = 1; c<blocks_idx[i]; c++)
-				{
-					memblock_t* block = blocks[(100000*i)+c];
-					if(block)
-					{
-						if(block->size == 0 || block->tag != 0)
+						if (!block->next->tag)
 						{
-							blocks[(100000*i)+c] = nullptr;
-							ibuffer[(100000*i)+ibuffer_idx[i]] = (100000*i)+c;
-							ibuffer_idx[i]++;
+							// merge with previous free block
+							block->size += block->next->size;
+							block->next->size = 0;
+							block->next->tag = 1;
+							block->next = block->next->next;
+							block->next->prev = block;
+							block = block->next;
+							goto check;
 						}
+
+						if(org->size > max->size)
+						{
+							max = org;
+						}
+					}
+				}
+			}
+			if(max != &dummy)
+			{
+				memblock_t* r = mainzone[i]->rover;
+				if(r->size < max->size)
+				{
+					//debug("Old rover for zone %d, %p, %d, %d",i, r, r->size, r->tag);
+					//debug("New rover for zone %d, %p, %d, %d",i, max, max->size, max->tag);
+					mainzone[i]->rover = max;
+				}
+			}
+			max = &dummy;
+			for(int c = 1; c<blocks_idx[i]; c++)
+			{
+				memblock_t* block = blocks[(100000*i)+c];
+				if(block)
+				{
+					if(block->size == 0 || block->tag != 0)
+					{
+						blocks[(100000*i)+c] = nullptr;
+						ibuffer[(100000*i)+ibuffer_idx[i]] = (100000*i)+c;
+						ibuffer_idx[i]++;
 					}
 				}
 			}
@@ -581,8 +573,8 @@ void Z_Free (void *ptr, uint8_t zoneid)
 	block->tag = 0;		// mark as free
 	if(ibuffer_idx[zoneid])
 	{
-		blocks[ibuffer[(100000*zoneid)+ibuffer_idx[zoneid]]] = block;
 		ibuffer_idx[zoneid]--;
+		blocks[ibuffer[(100000*zoneid)+ibuffer_idx[zoneid]]] = block;
 	}
 	else
 	{
