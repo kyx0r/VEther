@@ -578,6 +578,10 @@ void Main3DThread()
 
 void PreDraw()
 {
+	std::thread (UIThread).detach();
+	std::thread (Main3DThread).detach();
+	std::thread (zone::Z_UpdateRover).detach();
+
 	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
 	render::CreateRenderPass(depthFormat, false);
 	render::CreateSwapchainImageViews();
@@ -671,9 +675,6 @@ void PreDraw()
 	present_info.pImageIndices = &image_index;
 	present_info.pResults = nullptr;
 
-	std::thread (UIThread).detach();
-	std::thread (Main3DThread).detach();
-	std::thread(zone::Z_UpdateRover).detach();
 }
 
 void AwakeWorkers()
