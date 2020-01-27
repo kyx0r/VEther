@@ -44,6 +44,7 @@ double ym_norm = 0;
 int32_t xm = 0;
 int32_t ym = 0;
 double frametime = 0;
+double deltatime = 0;
 double lastfps = 0;
 double realtime = 0;
 mu_Context* ctx;
@@ -805,7 +806,6 @@ void mainLoop()
 	double maxfps;
 	double oldrealtime = 0;
 	double oldtime = 0;
-	double deltatime = 0;
 	double elapsedtime = 0;
 	double stamp = 0;
 	int framecount = 0;
@@ -814,6 +814,7 @@ void mainLoop()
 
 	while (!glfwWindowShouldClose(_window))
 	{
+		//char* a = new char[10000];
 		glfwPollEvents();
 		time1 = glfwGetTime();
 		deltatime = time1 - time2;
@@ -827,6 +828,8 @@ void mainLoop()
 		elapsedtime = realtime - oldtime;
 		frames = framecount - oldframecount;
 
+		
+		
 		if (elapsedtime < 0 || frames < 0)
 		{
 			oldtime = realtime;

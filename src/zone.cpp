@@ -9,6 +9,7 @@ Copyright (C) 2019-.... FAETHER / Etherr
 #include <cstddef>
 #include <csetjmp>
 #include "flog.h"
+#include "window.h"
 #include <mutex>
 /*
 ==============================================================================
@@ -454,11 +455,6 @@ static void Memory_InitZone (memzone_t *zone, int size);
 #define NUM_ZONES 3
 static memzone_t	*mainzone[NUM_ZONES];
 int zsizes[NUM_ZONES];
-uint8_t zfail[NUM_ZONES];
-memblock_t* blocks[100000*NUM_ZONES];
-int blocks_idx[NUM_ZONES];
-int ibuffer[100000*NUM_ZONES];
-int ibuffer_idx[NUM_ZONES];
 
 /*
 ========================
@@ -473,65 +469,68 @@ void Z_UpdateRover()
 	memblock_t dummy;
 	dummy.size = 0;
 	memblock_t* max = &dummy;
+	memblock_t	*block;
+	memzone_t *zone;
+	memblock_t* other;
 	for(;;)
 	{
 		for(uint8_t i = 0; i<NUM_ZONES; i++)
 		{
-			for(int c = blocks_idx[i]; c>0; c--)
+			zone = mainzone[i];
+			for (block = zone->blocklist.next ; ; block = block->next)
 			{
-				memblock_t* block = blocks[(100000*i)+c];
-				if(block)
+				if (block->next == &zone->blocklist)
 				{
-					if(block->tag == 0)
+					break;			// all blocks have been hit
+				}
+				if (!block->tag && !block->next->tag)
+				{
+					other = block->next;
+					block->size += other->size;
+					block->next = other->next;
+					block->next->prev = block;
+					if (other == zone->rover)
 					{
-						while(block->prev && !block->prev->tag)
-						{
-							block = block->prev; //all the way back.
-						}
-						memblock_t* org = block;
-check:
-						if (!block->next->tag)
-						{
-							// merge with previous free block
-							block->size += block->next->size;
-							block->next->size = 0;
-							block->next->tag = 1;
-							block->next = block->next->next;
-							block->next->prev = block;
-							block = block->next;
-							goto check;
-						}
-
-						if(org->size > max->size)
-						{
-							max = org;
-						}
+						//debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+						//zone->rover = block;
+						//debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+					}
+				}
+				if (!block->tag && !block->prev->tag)
+				{
+					// merge with previous free block
+					other = block->prev;
+					other->size += block->size;
+					other->next = block->next;
+					other->next->prev = other;
+					if (block == zone->rover)
+					{
+						//debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+						//zone->rover = other;
+						//debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+					}
+				}
+				if(block->tag == 0)
+				{
+					if(block->size > max->size)
+					{
+						max = block;
 					}
 				}
 			}
 			if(max != &dummy)
 			{
-				memblock_t* r = mainzone[i]->rover;
-				if(r->size < max->size)
+				if(zone->rover->size == 0)
 				{
-					//debug("Old rover for zone %d, %p, %d, %d",i, r, r->size, r->tag);
-					//debug("New rover for zone %d, %p, %d, %d",i, max, max->size, max->tag);
-					mainzone[i]->rover = max;
+					//debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+					//zone->rover = max;
+					//debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
 				}
 			}
 			max = &dummy;
-			for(int c = 1; c<blocks_idx[i]; c++)
+			if(deltatime < 0.02f)
 			{
-				memblock_t* block = blocks[(100000*i)+c];
-				if(block)
-				{
-					if(block->size == 0 || block->tag != 0)
-					{
-						blocks[(100000*i)+c] = nullptr;
-						ibuffer[(100000*i)+ibuffer_idx[i]] = (100000*i)+c;
-						ibuffer_idx[i]++;
-					}
-				}
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			}
 		}
 	}
@@ -571,16 +570,6 @@ void Z_Free (void *ptr, uint8_t zoneid)
 	}
 #endif
 	block->tag = 0;		// mark as free
-	if(ibuffer_idx[zoneid])
-	{
-		ibuffer_idx[zoneid]--;
-		blocks[ibuffer[(100000*zoneid)+ibuffer_idx[zoneid]]] = block;
-	}
-	else
-	{
-		blocks_idx[zoneid]++;
-		blocks[(100000*zoneid)+blocks_idx[zoneid]] = block;
-	}
 }
 
 void Z_TmpExec()
@@ -668,9 +657,9 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 	//alignment must be consistent through out the allocator.
 
 	base = mainzone[zoneid]->rover;
+	//p("%d %d %d",base->size, base->tag, zoneid);
 	if(base->tag == 1 || base->size < size)
 	{
-		zfail[zoneid] = 1;
 		return NULL;
 	}
 //
@@ -1432,9 +1421,9 @@ static void Memory_InitZone (memzone_t *zone, int size)
 
 void MemPrint()
 {
-//	Z_Print(0);
+	Z_Print(0);
 	Z_Print(1);
-//	Z_Print(2);
+	Z_Print(2);
 	Cache_Report();
 	Hunk_Check();
 }
