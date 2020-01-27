@@ -845,7 +845,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 10.0)
+		if (realtime-stamp > 30.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;
