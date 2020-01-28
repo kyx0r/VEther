@@ -581,7 +581,6 @@ void PreDraw()
 {
 	std::thread (UIThread).detach();
 	std::thread (Main3DThread).detach();
-	std::thread (zone::Z_UpdateRover).detach();
 
 	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
 	render::CreateRenderPass(depthFormat, false);
@@ -845,7 +844,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 30.0)
+		if (realtime-stamp > 10.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;

@@ -21,32 +21,81 @@ Copyright (C) 2019-.... FAETHER / Etherr
 
 unsigned char* stack_mem = nullptr;
 
-static std::mutex zmtx[3];
+void* Bt_alloc(size_t size)
+{
+	void* p = zone::Z_TagMalloc(size, 0);
+	ASSERT(p,"Bt_alloc failed.");
+	return p;
+}
+
+void Bt_free(void* ptr)
+{
+	zone::Z_Free(ptr, 0);
+	return;
+}
+
+void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
+{
+	void* p = zone::Z_TagMalloc(size, 2);
+	//void* p = malloc(size);
+	ASSERT(p,"VEtherAlloc failed.");
+	return p;
+}
+
+void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
+{
+	void* p = zone::Z_Realloc(porg, size, 2);
+	//void* p = realloc(porg, size);
+	ASSERT(p,"VEtherRealloc failed.");
+	return p;
+}
+
+void VEtherFree(void* pusd, void* ptr)
+{
+	//free(ptr);
+	zone::Z_Free(ptr, 2);
+	return;
+}
+
+
 //This is a hook to c++ style allocations.
 //VEther will filter it's c++ libraries like glsl compiler
 //thorough this memory zone instead.
 void* operator new(size_t size)
 {
-	zmtx[0].lock();
 	void* p = zone::Z_TagMalloc(size, 1);
-	ASSERT(p,"operator new failed.");
-	zmtx[0].unlock();
+	if(!p)
+	{
+		size+=sizeof(int); //space for 0x11acfec marker.
+		p = malloc(size);
+		ASSERT(p,"Operator new failed.");
+		*(int*)((unsigned char*)p) = 0x11afec;
+		p = (void *) ((unsigned char *)p + sizeof(int));
+	}
 	return p;
 }
 
 void operator delete(void* p)
 {
-	zmtx[0].lock();
+	if(*(int*)((unsigned char*)p - sizeof(int)) == 0x11afec)
+	{
+		p = (void *) ((unsigned char *)p - sizeof(int));
+		free(p);
+		return;
+	}
 	zone::Z_Free(p, 1);
-	zmtx[0].unlock();
 	return;
 }
 
 void operator delete(void* p, size_t size)
 {
-	zmtx[0].lock();
+	if(*(int*)((unsigned char*)p - sizeof(int)) == 0x11afec)
+	{
+		p = (void *) ((unsigned char *)p - sizeof(int));
+		free(p);
+		return;
+	}
 	zone::Z_Free(p, 1);
-	zmtx[0].unlock();
 	// Here this will keep the memory alive but does not is free.
 	// I question size parameter.
 	// "If present, the std::size_t size argument must equal the
@@ -54,53 +103,6 @@ void operator delete(void* p, size_t size)
 	// Concluded to ignore size alltogether.
 	return;
 }
-
-void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
-{
-	zmtx[1].lock();
-	void* p = zone::Z_TagMalloc(size, 2);
-	//void* p = malloc(size);
-	ASSERT(p,"VEtherAlloc failed.");
-	zmtx[1].unlock();
-	return p;
-}
-
-void* VEtherRealloc(void* pusd, void* porg, size_t size, size_t align, VkSystemAllocationScope allocationScope)
-{
-	zmtx[1].lock();
-	void* p = zone::Z_Realloc(porg, size, 2);
-	//void* p = realloc(porg, size);
-	ASSERT(p,"VEtherRealloc failed.");
-	zmtx[1].unlock();
-	return p;
-}
-
-void VEtherFree(void* pusd, void* ptr)
-{
-	//free(ptr);
-	zmtx[1].lock();
-	zone::Z_Free(ptr, 2);
-	zmtx[1].unlock();
-	return;
-}
-
-void* Bt_alloc(size_t size)
-{
-	zmtx[2].lock();
-	void* p = zone::Z_TagMalloc(size, 0);
-	ASSERT(p,"Bt_alloc failed.");
-	zmtx[2].unlock();
-	return p;
-}
-
-void Bt_free(void* ptr)
-{
-	zmtx[2].lock();
-	zone::Z_Free(ptr, 0);
-	zmtx[2].unlock();
-	return;
-}
-
 
 namespace zone
 {
@@ -413,6 +415,7 @@ all big things are allocated on the hunk.
 typedef struct memblock_s
 {
 	int	size;		// including the header and possibly tiny fragments
+	int extra;
 	int	tag;		// a tag of 0 is a free block
 #ifdef DEBUG
 	int	id;		// should be ZONEID
@@ -435,6 +438,7 @@ static void Memory_InitZone (memzone_t *zone, int size);
 #define NUM_ZONES 3
 static memzone_t	*mainzone[NUM_ZONES];
 int zsizes[NUM_ZONES];
+volatile int8_t spinlocks[NUM_ZONES];
 
 /*
 ========================
@@ -467,50 +471,80 @@ void Z_UpdateRover()
 				if (!block->tag && !block->next->tag)
 				{
 					other = block->next;
-					block->size += other->size;
-					block->next = other->next;
-					block->next->prev = block;
+					if (other != zone->rover)
+					{
+		//				block->size += other->size;
+		//				block->next = other->next;
+		//				block->next->prev = block;
+					//	zone->rover = block;
+					}
 				}
 				if (!block->tag && !block->prev->tag)
 				{
 					// merge with previous free block
 					other = block->prev;
-					other->size += block->size;
-					other->next = block->next;
-					other->next->prev = other;
+					if (block != zone->rover)
+					{
+		//				other->size += block->size;
+		//				other->next = block->next;
+		//				other->next->prev = other;
+					//	zone->rover = other;
+					}
 				}
+			}
+
+			if(zone->rover->extra >= MINFRAGMENT)
+			{
+				memblock_t* newblock = (memblock_t*) ((unsigned char *)zone->rover + zone->rover->size);
+				newblock->size = zone->rover->extra;
+				newblock->tag = 0;			// free block
+				newblock->prev = zone->rover;
+#ifdef DEBUG
+				newblock->id = ZONEID;
+#endif
+				newblock->next = zone->rover->next;
+				newblock->next->prev = newblock;
+				zone->rover->next = newblock;
+				zone->rover->extra = 0;
 			}
 			for (block = zone->blocklist.next ; ; block = block->next)
 			{
-				if (block->next == &zone->blocklist)
+				if (block == &zone->blocklist)
 				{
 					break;			// all blocks have been hit
 				}
 				
 				if(!block->tag)
 				{
-					if(block->size > max->size)
-					{
-						max = block;
-					}
+					//if(block->next->tag == 1 && block->prev->tag == 1)
+					//{
+						if(block->size > max->size)
+						{
+							max = block;
+						}
+					//}
 				}
 			}
+			//MemPrint();
 				
 			if(max != &dummy)
 			{
-				if(zone->rover->size < max->size)
+		//		if(zone->rover->size < max->size)
 				{
-				//	debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
-					zone->rover->tag = 0;
-					max->tag = 2;
+			//		debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+				//	volatile int8_t cycle_cap = 0;
+				//	spinlocks[i] = 127;
+				//	while(spinlocks[i] == 127 && cycle_cap < 10){cycle_cap++;};
 					zone->rover = max;
-				//	debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+				//	spinlocks[i] = 0;
+			//		debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+			//		debug("next %p, %d, prev %p %d", max->next, max->next->tag, max->prev, max->prev->tag);
 				}
 			}
 			max = &dummy;
 			if(deltatime < 0.02f)
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
 		}
 	}
@@ -595,12 +629,18 @@ void Z_Print (uint8_t zoneid)
 			sum += block->size;
 		}
 		actual_size += block->size;
-		//debug("block:%p    size:%7i    tag:%d asize:%d idx:%d", block, block->size, block->tag, actual_size, idx);
+		debug("block:%p    size:%7i    tag:%d asize:%d idx:%d", block, block->size, block->tag, actual_size, idx);
 		idx++;
 		if ( (unsigned char *)block + block->size != (unsigned char *)block->next)
 		{
 			fatal("ERROR: block size does not touch the next block");
 			fatal("%p != %p", block+block->size, block->next);
+		}
+		if(block == block->next)
+		{
+			fatal("ERROR: block is pointing to itself");
+			fatal("Rover: %p size: %d tag: %d", mainzone[zoneid]->rover,  mainzone[zoneid]->rover->size, mainzone[zoneid]->rover->tag);
+			abort();
 		}
 // There are no longer an error but it's okay to have them.
 // Keep for reference.
@@ -613,6 +653,7 @@ void Z_Print (uint8_t zoneid)
 			fatal("ERROR: two consecutive free blocks");
 		} */
 	}
+	debug("Last block:%p size:%d tag:%d", block, block->size, block->tag);
 	debug("Rover: %p size: %d tag: %d", mainzone[zoneid]->rover,  mainzone[zoneid]->rover->size, mainzone[zoneid]->rover->tag);
 	debug("Memory used: %dB out of %dB | %0.2fMB out of %0.2fMB",
 	      sum,  zsizes[zoneid], (float)sum/(float)(1024*1024),
@@ -623,8 +664,13 @@ void Z_Print (uint8_t zoneid)
 
 void *Z_TagMalloc (int size, uint8_t zoneid)
 {
+	int		extra;
 	memblock_t	*newblock, *base;
 
+//
+// scan through the block list looking for the first free block
+// of sufficient size
+//
 	size += sizeof(memblock_t);	// account for size of block header
 #ifdef DEBUG
 	size += sizeof(int);		// space for memory trash tester
@@ -632,33 +678,28 @@ void *Z_TagMalloc (int size, uint8_t zoneid)
 	size = (size + (sizeof(max_align_t)-1)) & -sizeof(max_align_t);
 	//alignment must be consistent through out the allocator.
 
-	base = mainzone[zoneid]->rover;
-	//p("%d %d %d %p %d",base->size, base->tag, zoneid, base, size);
-	if(base->tag == 1 || base->size < size)
-	{
-		return NULL;
-	}
-	
-	// there will be a free fragment after the allocated block
-	newblock = (memblock_t *) ((unsigned char *)base + size );
-	newblock->size = base->size - size;
-	newblock->tag = 2;			// free block
-	newblock->prev = base;
-	newblock->next = base->next;
-	newblock->next->prev = newblock;
-	mainzone[zoneid]->rover = newblock;	// next allocation will start looking here
+//	while(spinlocks[zoneid] > 0){};
+//	spinlocks[zoneid]++;
 
-	base->next = newblock;
+	base = mainzone[zoneid]->rover;
+	while (base->tag || base->size < size)
+	{
+//	p("%d %d %p %d %p %d", base->size, base->tag, base->next, base->next->tag, base->prev, base->prev->tag);
+		base = mainzone[zoneid]->rover;
+	}
+
+
+	base->tag = 1;	// no longer a free block
+	base->extra = base->size - size;
 	base->size = size;
-	base->tag = 1;				// no longer a free block
+
 
 #ifdef DEBUG
 	// marker for memory trash testing
 	base->id = ZONEID;
-	newblock->id = ZONEID;
-	*(int *)((unsigned char *)base + base->size - sizeof(int)) = ZONEID;
+	*(int *)((unsigned char *)base + base->size - 4) = ZONEID;
 #endif
-
+//	spinlocks[zoneid]--;
 	return (void *) ((unsigned char *)base + sizeof(memblock_t));
 }
 
@@ -1379,7 +1420,7 @@ static void Memory_InitZone (memzone_t *zone, int size)
 	zone->rover = block;
 
 	block->prev = block->next = &zone->blocklist;
-	block->tag = 2;			// free block
+	block->tag = 0;			// free block
 #ifdef DEBUG
 	block->id = ZONEID;
 #endif
@@ -1414,7 +1455,7 @@ void Memory_Init (void *buf, int size)
 	mainzone[0] = (memzone_t *) Hunk_AllocName (zsizes[0], "mainzone");
 	Memory_InitZone (mainzone[0], zsizes[0]);
 
-	zsizes[1] = 128*zonesize;
+	zsizes[1] = 32*zonesize;
 	mainzone[1] = (memzone_t *) Hunk_AllocName (zsizes[1], "newzone");
 	Memory_InitZone (mainzone[1], zsizes[1]);
 

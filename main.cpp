@@ -60,6 +60,7 @@ int main(int argc, char *lpCmdLine[])
 #endif
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
+	std::thread (zone::Z_UpdateRover).detach();
 	meshopt_setAllocator(Bt_alloc, Bt_free);
 	
 	Cvar_Init();
