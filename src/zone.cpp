@@ -1361,11 +1361,11 @@ void Memory_Init (void *buf, int size)
 	hunk_high_used = 0;
 
 	Cache_Init();
-	zsizes[0] = 220*zonesize;
+	zsizes[0] = 32*zonesize;
 	mainzone[0] = (memzone_t *) Hunk_AllocName (zsizes[0], "mainzone");
 	Memory_InitZone (mainzone[0], zsizes[0]);
 
-	zsizes[1] = 16*zonesize;
+	zsizes[1] = 32*zonesize;
 	mainzone[1] = (memzone_t *) Hunk_AllocName (zsizes[1], "newzone");
 	Memory_InitZone (mainzone[1], zsizes[1]);
 
