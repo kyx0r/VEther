@@ -473,9 +473,9 @@ void Z_UpdateRover()
 					other = block->next;
 					if (other != zone->rover)
 					{
-		//				block->size += other->size;
-		//				block->next = other->next;
-		//				block->next->prev = block;
+						block->size += other->size;
+						block->next = other->next;
+						block->next->prev = block;
 					//	zone->rover = block;
 					}
 				}
@@ -485,27 +485,12 @@ void Z_UpdateRover()
 					other = block->prev;
 					if (block != zone->rover)
 					{
-		//				other->size += block->size;
-		//				other->next = block->next;
-		//				other->next->prev = other;
+						other->size += block->size;
+						other->next = block->next;
+						other->next->prev = other;
 					//	zone->rover = other;
 					}
 				}
-			}
-
-			if(zone->rover->extra >= MINFRAGMENT)
-			{
-				memblock_t* newblock = (memblock_t*) ((unsigned char *)zone->rover + zone->rover->size);
-				newblock->size = zone->rover->extra;
-				newblock->tag = 0;			// free block
-				newblock->prev = zone->rover;
-#ifdef DEBUG
-				newblock->id = ZONEID;
-#endif
-				newblock->next = zone->rover->next;
-				newblock->next->prev = newblock;
-				zone->rover->next = newblock;
-				zone->rover->extra = 0;
 			}
 			for (block = zone->blocklist.next ; ; block = block->next)
 			{
@@ -516,27 +501,26 @@ void Z_UpdateRover()
 				
 				if(!block->tag)
 				{
-					//if(block->next->tag == 1 && block->prev->tag == 1)
-					//{
+					if(block->next->tag == 1 && block->prev->tag == 1)
+					{
 						if(block->size > max->size)
 						{
 							max = block;
 						}
-					//}
+					}
 				}
 			}
-			//MemPrint();
 				
 			if(max != &dummy)
 			{
-		//		if(zone->rover->size < max->size)
+				if(zone->rover->size < max->size)
 				{
 			//		debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
-				//	volatile int8_t cycle_cap = 0;
-				//	spinlocks[i] = 127;
-				//	while(spinlocks[i] == 127 && cycle_cap < 10){cycle_cap++;};
+					volatile int8_t cycle_cap = 0;
+					spinlocks[i] = 127;
+					while(spinlocks[i] == 127 && cycle_cap < 10){cycle_cap++;};
 					zone->rover = max;
-				//	spinlocks[i] = 0;
+					spinlocks[i] = 0;
 			//		debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
 			//		debug("next %p, %d, prev %p %d", max->next, max->next->tag, max->prev, max->prev->tag);
 				}
@@ -661,12 +645,10 @@ void Z_Print (uint8_t zoneid)
 	debug("Block extent actual: %dB | %0.2fMB", actual_size, (float)actual_size/float(1024*1024));
 
 }
-
 void *Z_TagMalloc (int size, uint8_t zoneid)
 {
 	int		extra;
-	memblock_t	*newblock, *base;
-
+	memblock_t	*start, *rover, *newblock, *base;
 //
 // scan through the block list looking for the first free block
 // of sufficient size
@@ -678,30 +660,58 @@ void *Z_TagMalloc (int size, uint8_t zoneid)
 	size = (size + (sizeof(max_align_t)-1)) & -sizeof(max_align_t);
 	//alignment must be consistent through out the allocator.
 
-//	while(spinlocks[zoneid] > 0){};
-//	spinlocks[zoneid]++;
-
-	base = mainzone[zoneid]->rover;
-	while (base->tag || base->size < size)
+	while(spinlocks[zoneid] > 0){};
+	spinlocks[zoneid]++;
+	if(spinlocks[zoneid] > 1)
 	{
-//	p("%d %d %p %d %p %d", base->size, base->tag, base->next, base->next->tag, base->prev, base->prev->tag);
-		base = mainzone[zoneid]->rover;
+		abort();
 	}
 
+	base = rover = mainzone[zoneid]->rover;
+	start = base->prev;
 
-	base->tag = 1;	// no longer a free block
-	base->extra = base->size - size;
-	base->size = size;
+	while (base->tag || base->size < size)
+	{
+		if (rover->tag)
+			base = rover = rover->next;
+		else
+			rover = rover->next;
+	}
 
+//
+// found a block big enough
+//
+	extra = base->size - size;
+	if (extra > MINFRAGMENT)
+	{
+		// there will be a free fragment after the allocated block
+		newblock = (memblock_t *) ((unsigned char *)base + size );
+		newblock->size = extra;
+		newblock->tag = 0;			// free block
+		newblock->prev = base;
+#ifdef DEBUG		
+		newblock->id = ZONEID;
+#endif		
+		newblock->next = base->next;
+		newblock->next->prev = newblock;
+		base->next = newblock;
+		base->size = size;
+	}
 
+	base->tag = 1;				// no longer a free block
+
+	mainzone[zoneid]->rover = base->next;	// next allocation will start looking here
+	
 #ifdef DEBUG
 	// marker for memory trash testing
 	base->id = ZONEID;
 	*(int *)((unsigned char *)base + base->size - 4) = ZONEID;
 #endif
-//	spinlocks[zoneid]--;
+
+	spinlocks[zoneid]--;
 	return (void *) ((unsigned char *)base + sizeof(memblock_t));
 }
+
 
 /*
 ========================
