@@ -415,7 +415,6 @@ all big things are allocated on the hunk.
 typedef struct memblock_s
 {
 	int	size;		// including the header and possibly tiny fragments
-	int extra;
 	int	tag;		// a tag of 0 is a free block
 #ifdef DEBUG
 	int	id;		// should be ZONEID
@@ -439,6 +438,11 @@ static void Memory_InitZone (memzone_t *zone, int size);
 static memzone_t	*mainzone[NUM_ZONES];
 int zsizes[NUM_ZONES];
 volatile int8_t spinlocks[NUM_ZONES];
+
+void pb(char* s, memblock_t* b)
+{
+	p("%s | %p | %d | %d | n:%p | p:%p|", s, b, b->size, b->tag, b->next, b->prev);
+}
 
 /*
 ========================
@@ -467,28 +471,22 @@ void Z_UpdateRover()
 				{
 					break;			// all blocks have been hit
 				}
-				
-				if (!block->tag && !block->next->tag)
+				if(!block->tag)
 				{
-					other = block->next;
-					if (other != zone->rover)
+					if (!block->next->tag)
 					{
+						other = block->next;
 						block->size += other->size;
 						block->next = other->next;
 						block->next->prev = block;
-					//	zone->rover = block;
 					}
-				}
-				if (!block->tag && !block->prev->tag)
-				{
-					// merge with previous free block
-					other = block->prev;
-					if (block != zone->rover)
+					if (!block->prev->tag)
 					{
+						// merge with previous free block
+						other = block->prev;
 						other->size += block->size;
 						other->next = block->next;
 						other->next->prev = other;
-					//	zone->rover = other;
 					}
 				}
 			}
@@ -499,14 +497,11 @@ void Z_UpdateRover()
 					break;			// all blocks have been hit
 				}
 				
-				if(!block->tag)
+				if(!block->tag || block->tag == 2)
 				{
-					if(block->next->tag == 1 && block->prev->tag == 1)
+					if(block->size > max->size)
 					{
-						if(block->size > max->size)
-						{
-							max = block;
-						}
+						max = block;
 					}
 				}
 			}
@@ -516,11 +511,11 @@ void Z_UpdateRover()
 				if(zone->rover->size < max->size)
 				{
 			//		debug("Old rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
-					volatile int8_t cycle_cap = 0;
-					spinlocks[i] = 127;
-					while(spinlocks[i] == 127 && cycle_cap < 10){cycle_cap++;};
+					//volatile int8_t cycle_cap = 0;
+					//spinlocks[i] = 127;
+					//while(spinlocks[i] == 127 && cycle_cap < 10){cycle_cap++;};
 					zone->rover = max;
-					spinlocks[i] = 0;
+					//spinlocks[i] = 0;
 			//		debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
 			//		debug("next %p, %d, prev %p %d", max->next, max->next->tag, max->prev, max->prev->tag);
 				}
@@ -628,11 +623,11 @@ void Z_Print (uint8_t zoneid)
 		}
 // There are no longer an error but it's okay to have them.
 // Keep for reference.
-/* 		if ( block->next->prev != block)
+ 		if ( block->next->prev != block)
 		{
 			fatal("ERROR: next block doesn't have proper back link");
 		}
-		if (!block->tag && !block->next->tag)
+/*		if (!block->tag && !block->next->tag)
 		{
 			fatal("ERROR: two consecutive free blocks");
 		} */
@@ -662,17 +657,18 @@ void *Z_TagMalloc (int size, uint8_t zoneid)
 
 	while(spinlocks[zoneid] > 0){};
 	spinlocks[zoneid]++;
-	if(spinlocks[zoneid] > 1)
-	{
-		abort();
-	}
 
+rupdate:;
 	base = rover = mainzone[zoneid]->rover;
 	start = base->prev;
 
-	while (base->tag || base->size < size)
+	while (base->tag == 1 || base->size < size)
 	{
-		if (rover->tag)
+		if(rover == start)
+		{
+			goto rupdate;
+		}
+		if (rover->tag == 0 || rover->tag == 2)
 			base = rover = rover->next;
 		else
 			rover = rover->next;
@@ -687,7 +683,7 @@ void *Z_TagMalloc (int size, uint8_t zoneid)
 		// there will be a free fragment after the allocated block
 		newblock = (memblock_t *) ((unsigned char *)base + size );
 		newblock->size = extra;
-		newblock->tag = 0;			// free block
+		newblock->tag = 2;			// free block
 		newblock->prev = base;
 #ifdef DEBUG		
 		newblock->id = ZONEID;
@@ -696,8 +692,9 @@ void *Z_TagMalloc (int size, uint8_t zoneid)
 		newblock->next->prev = newblock;
 		base->next = newblock;
 		base->size = size;
+	//	pb("nb",newblock);
+	//	pb("bs",base);
 	}
-
 	base->tag = 1;				// no longer a free block
 
 	mainzone[zoneid]->rover = base->next;	// next allocation will start looking here
@@ -1430,7 +1427,7 @@ static void Memory_InitZone (memzone_t *zone, int size)
 	zone->rover = block;
 
 	block->prev = block->next = &zone->blocklist;
-	block->tag = 0;			// free block
+	block->tag = 2;			// free block
 #ifdef DEBUG
 	block->id = ZONEID;
 #endif
@@ -1465,7 +1462,7 @@ void Memory_Init (void *buf, int size)
 	mainzone[0] = (memzone_t *) Hunk_AllocName (zsizes[0], "mainzone");
 	Memory_InitZone (mainzone[0], zsizes[0]);
 
-	zsizes[1] = 32*zonesize;
+	zsizes[1] = 180*zonesize;
 	mainzone[1] = (memzone_t *) Hunk_AllocName (zsizes[1], "newzone");
 	Memory_InitZone (mainzone[1], zsizes[1]);
 
