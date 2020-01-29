@@ -438,6 +438,7 @@ static void Memory_InitZone (memzone_t *zone, int size);
 static memzone_t	*mainzone[NUM_ZONES];
 int zsizes[NUM_ZONES];
 volatile int8_t spinlocks[NUM_ZONES];
+int rvupdate[NUM_ZONES];
 
 void pb(char* s, memblock_t* b)
 {
@@ -460,6 +461,7 @@ void Z_UpdateRover()
 	memblock_t	*block;
 	memzone_t *zone;
 	memblock_t* other;
+	volatile int8_t cycle_cap = 0;
 	for(;;)
 	{
 		for(uint8_t i = 0; i<NUM_ZONES; i++)
@@ -475,18 +477,24 @@ void Z_UpdateRover()
 				{
 					if (!block->next->tag)
 					{
+						while(spinlocks[i] > 0){};
+						spinlocks[i] = 1;
 						other = block->next;
 						block->size += other->size;
 						block->next = other->next;
 						block->next->prev = block;
+						spinlocks[i] = 0;
 					}
 					if (!block->prev->tag)
 					{
 						// merge with previous free block
+						while(spinlocks[i] > 0){};
+						spinlocks[i] = 1;
 						other = block->prev;
 						other->size += block->size;
 						other->next = block->next;
 						other->next->prev = other;
+						spinlocks[i] = 0;
 					}
 				}
 			}
@@ -514,9 +522,12 @@ void Z_UpdateRover()
 					//volatile int8_t cycle_cap = 0;
 					//spinlocks[i] = 127;
 					//while(spinlocks[i] == 127 && cycle_cap < 10){cycle_cap++;};
+					while(spinlocks[i] > 0 && !rvupdate[i]){};
+					spinlocks[i] = 1;
 					zone->rover = max;
+					spinlocks[i] = 0;
 					//spinlocks[i] = 0;
-			//		debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
+//					debug("New rover for zone %d, %p, %d, %d",i, zone->rover, zone->rover->size, zone->rover->tag);
 			//		debug("next %p, %d, prev %p %d", max->next, max->next->tag, max->prev, max->prev->tag);
 				}
 			}
@@ -643,7 +654,7 @@ void Z_Print (uint8_t zoneid)
 void *Z_TagMalloc (int size, uint8_t zoneid)
 {
 	int		extra;
-	memblock_t	*start, *rover, *newblock, *base;
+	memblock_t	*newblock, *base;
 //
 // scan through the block list looking for the first free block
 // of sufficient size
@@ -656,24 +667,17 @@ void *Z_TagMalloc (int size, uint8_t zoneid)
 	//alignment must be consistent through out the allocator.
 
 	while(spinlocks[zoneid] > 0){};
-	spinlocks[zoneid]++;
+	spinlocks[zoneid] = 1;
 
-rupdate:;
-	base = rover = mainzone[zoneid]->rover;
-	start = base->prev;
-
-	while (base->tag == 1 || base->size < size)
+	base = mainzone[zoneid]->rover;
+	while(base->tag == 1 || base->size < size)
 	{
-		if(rover == start)
-		{
-			goto rupdate;
-		}
-		if (rover->tag == 0 || rover->tag == 2)
-			base = rover = rover->next;
-		else
-			rover = rover->next;
+	//	pb("", base);
+		base = mainzone[zoneid]->rover;
+		rvupdate[zoneid] = 1;
 	}
-
+	rvupdate[zoneid] = 0;
+	base->tag = 1;// no longer a free block
 //
 // found a block big enough
 //
@@ -693,9 +697,8 @@ rupdate:;
 		base->next = newblock;
 		base->size = size;
 	//	pb("nb",newblock);
-	//	pb("bs",base);
+//		pb("bs",base);
 	}
-	base->tag = 1;				// no longer a free block
 
 	mainzone[zoneid]->rover = base->next;	// next allocation will start looking here
 	
@@ -705,7 +708,7 @@ rupdate:;
 	*(int *)((unsigned char *)base + base->size - 4) = ZONEID;
 #endif
 
-	spinlocks[zoneid]--;
+	spinlocks[zoneid] = 0;
 	return (void *) ((unsigned char *)base + sizeof(memblock_t));
 }
 
