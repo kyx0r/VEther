@@ -21,6 +21,7 @@ extern double ym_norm;
 extern int32_t xm;
 extern int32_t ym;
 extern double frametime;
+extern double deltatime;
 extern double lastfps;
 extern double realtime;
 //------------------------

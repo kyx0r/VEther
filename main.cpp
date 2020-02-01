@@ -61,7 +61,7 @@ int main(int argc, char *lpCmdLine[])
 
 	zone::Memory_Init(malloc(DEFAULT_MEMORY), DEFAULT_MEMORY);
 	meshopt_setAllocator(Bt_alloc, Bt_free);
-
+	
 	Cvar_Init();
 
 	log_set_level(0);

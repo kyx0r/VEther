@@ -333,7 +333,7 @@ void InitPhysics()
 	solver = new btSequentialImpulseConstraintSolver();
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, 10.0f, 0));
+	dynamicsWorld->setGravity(btVector3(0, 10, 0));
 }
 
 void StepPhysics()

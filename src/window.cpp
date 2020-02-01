@@ -44,6 +44,7 @@ double ym_norm = 0;
 int32_t xm = 0;
 int32_t ym = 0;
 double frametime = 0;
+double deltatime = 0;
 double lastfps = 0;
 double realtime = 0;
 mu_Context* ctx;
@@ -552,6 +553,19 @@ void Main3DThread()
 		MatrixMultiply(cam.mvp, cam.view);
 		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &cam.mvp);
 
+		vec3_t p1;
+		p1[0] = 0;
+		p1[1] = 10.0f;
+		p1[2] = 0;
+		vec3_t p2;
+		p2[0] = 10.0f;
+		p2[1] = 10.0f;
+		p2[2] = 0;
+		vec3_t col;
+		col[0] = 1.0f;
+		col[1] = 1.0f;
+		col[2] = 1.0f;
+		//draw::Line(p1, p2, col);
 		draw::Meshes();
 		draw::SkyDome();
 
@@ -565,6 +579,9 @@ void Main3DThread()
 
 void PreDraw()
 {
+	std::thread (UIThread).detach();
+	std::thread (Main3DThread).detach();
+
 	VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
 	render::CreateRenderPass(depthFormat, false);
 	render::CreateSwapchainImageViews();
@@ -658,8 +675,6 @@ void PreDraw()
 	present_info.pImageIndices = &image_index;
 	present_info.pResults = nullptr;
 
-	std::thread (UIThread).detach();
-	std::thread (Main3DThread).detach();
 }
 
 void AwakeWorkers()
@@ -790,7 +805,6 @@ void mainLoop()
 	double maxfps;
 	double oldrealtime = 0;
 	double oldtime = 0;
-	double deltatime = 0;
 	double elapsedtime = 0;
 	double stamp = 0;
 	int framecount = 0;
@@ -799,6 +813,7 @@ void mainLoop()
 
 	while (!glfwWindowShouldClose(_window))
 	{
+		//char* a = new char[10000];
 		glfwPollEvents();
 		time1 = glfwGetTime();
 		deltatime = time1 - time2;
@@ -812,6 +827,8 @@ void mainLoop()
 		elapsedtime = realtime - oldtime;
 		frames = framecount - oldframecount;
 
+		
+		
 		if (elapsedtime < 0 || frames < 0)
 		{
 			oldtime = realtime;
@@ -827,7 +844,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 60.0)
+		if (realtime-stamp > 10.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;

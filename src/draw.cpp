@@ -61,7 +61,7 @@ void Triangle(size_t size, float4_t* vertices)
 	vkCmdDraw(command_buffer, 3, 1, 0, 0);
 }
 
-void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array)
+void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array, uint8_t pidx)
 {
 	static VkBuffer buffer[4];
 	static VkDeviceSize buffer_offset[2];
@@ -83,26 +83,11 @@ void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_
 	zone::Q_memcpy(index_data, index_array, index_count * sizeof(uint32_t));
 	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
-	//	ScaleMatrix(mat->model, y_wheel/10, y_wheel/10, 0.0f);
-	// float radius = 0.5f;
-
-	// vec3_t eye = {(float)sin(time1) * radius, 0.0f, (float)cos(time1) * radius};
-	// vec3_t origin = {0.0f, 0.0f, 0.0f};
-	// vec3_t up = {0.0f, 1.0f, 0.0};
-
-	// LookAt(mat->model, eye, origin, up);
-	//PrintMatrix(mat->proj);
-	//TranslationMatrix(mat->model, (float)xm_norm, (float)ym_norm, 0.0f);
-
 	IdentityMatrix(mat->proj);
 	IdentityMatrix(mat->model);
 	IdentityMatrix(mat->view);
-	//RotationMatrix(mat->model, DEG2RAD(0), 0.0f, 0.0f, 1.0f);
-	//RotationMatrix(mat->proj, DEG2RAD(0), 1.0f, 0.0f, 0.0f);
-	//RotationMatrix(mat->view, DEG2RAD(0), 0.0f, 1.0f, 0.0f);
-	//PrintMatrix(mat->view);
 
-	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[0]);
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[pidx]);
 	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &dset[0], 1, &uniform_offset[0]);
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &dset[1], 1, &uniform_offset[1]);
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 2, 1, &tex_descriptor_sets[0], 0, nullptr);
@@ -126,6 +111,27 @@ void Meshes()
 		vkCmdDrawIndexed(command_buffer, head->index_count, 1, 0, 0, 0);
 		head = head->next;
 	}
+}
+
+void Line(vec3_t from, vec3_t to, vec3_t color)
+{
+	Vertex_ v[2];
+	v[0].pos[0] = from[0];
+	v[0].pos[1] = from[1];
+	v[0].pos[2] = from[2];
+	v[1].pos[0] = to[0];
+	v[1].pos[1] = to[1];
+	v[1].pos[2] = to[2];
+	v[0].color[0] = color[0];
+	v[0].color[1] = color[1];
+	v[0].color[2] = color[2];
+	v[1].color[0] = color[0];
+	v[1].color[1] = color[1];
+	v[1].color[2] = color[2];
+	uint32_t ib[2];
+	ib[0] = 0;
+	ib[1] = 1;
+	IndexedTriangle(sizeof(v), &v[0], ARRAYSIZE(ib), &ib[0], 4);
 }
 
 int r_get_text_width(const char *text, int len)

@@ -120,10 +120,12 @@ void LoadShaders()
 	VkShaderModule SkyDomeFS = shaders::loadShaderMem(8);
 	VkShaderModule SkyDomeVS = shaders::loadShaderMem(9);
 
-	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, triangleVS, triangleFS);
-	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, screenVS, screenFS);
+	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, VK_POLYGON_MODE_FILL, triangleVS, triangleFS);
+	render::CreateGraphicsPipeline(pipelineCache, render::ScreenPipe, 0, VK_POLYGON_MODE_FILL, screenVS, screenFS);
 	render::CreateTessGraphicsPipeline(pipelineCache, render::Vec4FloatPipe, 0, shaderVS, shaderFS, shaderTCS, shaderTES);
-	render::CreateGraphicsPipeline(pipelineCache, render::Vec3FloatPipe, 0, SkyDomeVS, SkyDomeFS);
+	render::CreateGraphicsPipeline(pipelineCache, render::Vec3FloatPipe, 0, VK_POLYGON_MODE_FILL, SkyDomeVS, SkyDomeFS);
+	render::CreateGraphicsPipeline(pipelineCache, render::BasicTrianglePipe, 0, VK_POLYGON_MODE_LINE, triangleVS, triangleFS);
+
 }
 
 void CreatePipelineCache()

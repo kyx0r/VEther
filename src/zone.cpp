@@ -26,7 +26,7 @@ static std::mutex zmtx[3];
 void* operator new(size_t size)
 {
 	zmtx[0].lock();
-	void* p = zone::Z_TagMalloc(size, 1, 1);
+	void* p = zone::Z_TagMalloc(size, 1);
 	ASSERT(p,"operator new failed.");
 	zmtx[0].unlock();
 	return p;
@@ -56,7 +56,7 @@ void operator delete(void* p, size_t size)
 void* VEtherAlloc(void* pusd, size_t size, size_t align, VkSystemAllocationScope allocationScope)
 {
 	zmtx[1].lock();
-	void* p = zone::Z_TagMalloc(size, 1, 2);
+	void* p = zone::Z_TagMalloc(size, 2);
 	//void* p = malloc(size);
 	ASSERT(p,"VEtherAlloc failed.");
 	zmtx[1].unlock();
@@ -85,7 +85,7 @@ void VEtherFree(void* pusd, void* ptr)
 void* Bt_alloc(size_t size)
 {
 	zmtx[2].lock();
-	void* p = zone::Z_TagMalloc(size, 1, 0);
+	void* p = zone::Z_TagMalloc(size, 0);
 	ASSERT(p,"Bt_alloc failed.");
 	zmtx[2].unlock();
 	return p;
@@ -549,12 +549,11 @@ void Z_Print (uint8_t zoneid)
 	      (float)zsizes[zoneid]/(float)(1024*1024));
 }
 
-void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
+void *Z_TagMalloc (int size, uint8_t zoneid)
 {
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
 
-	ASSERT(tag, "Z_TagMalloc: tried to use a 0 tag");
 //
 // scan through the block list looking for the first free block
 // of sufficient size
@@ -600,7 +599,7 @@ void *Z_TagMalloc (int size, int tag, uint8_t zoneid)
 		base->size = size;
 	}
 
-	base->tag = tag;				// no longer a free block
+	base->tag = 1;				// no longer a free block
 
 	mainzone[zoneid]->rover = base->next;	// next allocation will start looking here
 	
@@ -624,7 +623,7 @@ void *Z_Malloc (int size, uint8_t zoneid)
 
 	//Z_CheckHeap ();
 
-	buf = Z_TagMalloc (size, 1, zoneid);
+	buf = Z_TagMalloc (size, zoneid);
 	if (!buf)
 	{
 		fatal("Z_Malloc: failed on allocation of %i bytes", size);
@@ -670,7 +669,7 @@ void *Z_Realloc(void *ptr, int size, uint8_t zoneid)
 	old_ptr = ptr;
 
 	Z_Free (ptr, zoneid);
-	ptr = Z_TagMalloc (size, 1, zoneid);
+	ptr = Z_TagMalloc (size, zoneid);
 	if (!ptr)
 	{
 		fatal("Z_Realloc: failed on allocation of %i bytes", size);
