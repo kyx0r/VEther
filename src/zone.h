@@ -82,7 +82,7 @@ void Q_strcat(char *dest, const char *src);
 
 __attribute__((noinline)) void stack_alloc(int size);
 void stack_clear(int size);
-void Z_UpdateRover();
+
 void Memory_Init (void *buf, int size);
 
 void Z_Free (void *ptr, uint8_t zoneid = 0);
