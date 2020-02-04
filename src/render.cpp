@@ -757,7 +757,7 @@ void CreateTessGraphicsPipeline
 
 }
 
-void RebuildPipelines(struct cvar_s*)
+void RebuildPipelines(struct cvar_s* s)
 {
 	p("Rebuilding pipeleines.");
 	VK_CHECK(vkDeviceWaitIdle(logical_device));

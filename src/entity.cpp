@@ -13,6 +13,12 @@ static btBroadphaseInterface* broadphase;
 static btDefaultCollisionConfiguration* collisionConfiguration;
 static btCollisionDispatcher* dispatcher;
 static btSequentialImpulseConstraintSolver* solver;
+static btTypedConstraint* m_pickedConstraint;
+static int m_savedState;
+static btRigidBody* m_pickedBody;
+static btVector3 m_oldPickingPos;
+static btVector3 m_hitPos;
+static btScalar m_oldPickingDist;
 
 static char* smeshes[][1] =
 {
@@ -51,9 +57,9 @@ void InitCamera()
 	cam.fovx = AdaptFovx(90.0f, window_width, window_height);
 	cam.fovy = CalcFovy(cam.fovx, window_width, window_height);
 
-	cam.pos[0] = 0.0f;
-	cam.pos[1] = -3.0f;
-	cam.pos[2] = -3.0f;
+	cam.pos[0] = -4.0f;
+	cam.pos[1] = 0.0f;
+	cam.pos[2] = 0.0f;
 	cam.front[0] = 0.0f;
 	cam.front[1] = 0.0f;
 	cam.front[2] = -1.0f;
@@ -62,7 +68,7 @@ void InitCamera()
 	cam.worldup[2] = 0.0f;
 	cam.yaw = 90.0f;
 	cam.pitch = 0.0f;
-	cam.speed = 2.5f;
+	cam.speed = 10.f;
 	cam.sensitivity = 0.1f;
 	cam.zoom = 45.0f;
 }
@@ -321,6 +327,141 @@ void MoveTo(char* name, vec3_t pos)
 	}
 }
 
+
+	btVector3 GetRayTo(int x, int y)
+	{
+
+		float top = 1.f;
+		float bottom = -1.f;
+		float nearPlane = 1.f;
+		float tanFov = (top - bottom) * 0.5f / nearPlane;
+		float fov = btScalar(2.0) * btAtan(tanFov);
+
+		btVector3 camPos(cam.pos[0], cam.pos[1], cam.pos[2]);
+		btVector3 camTarget(0,0,0);
+
+
+		btVector3 rayFrom = camPos;
+		btVector3 rayForward = (camTarget - camPos);
+		rayForward.normalize();
+		float farPlane = 10000.f;
+		rayForward *= farPlane;
+
+		btVector3 rightOffset;
+		btVector3 cameraUp = btVector3(0, 0, 0);
+		cameraUp[1] = 1;
+
+		btVector3 vertical = cameraUp;
+
+		btVector3 hor;
+		hor = rayForward.cross(vertical);
+		hor.safeNormalize();
+		vertical = hor.cross(rayForward);
+		vertical.safeNormalize();
+
+		float tanfov = tanf(0.5f * fov);
+
+		hor *= 2.f * farPlane * tanfov;
+		vertical *= 2.f * farPlane * tanfov;
+
+		btScalar aspect;
+		float width = (float)window_width;
+		float height = (float)window_height;
+
+		aspect = width / height;
+
+		hor *= aspect;
+
+		btVector3 rayToCenter = rayFrom + rayForward;
+		btVector3 dHor = hor * 1.f / width;
+		btVector3 dVert = vertical * 1.f / height;
+
+		btVector3 rayTo = rayToCenter - 0.5f * hor + 0.5f * vertical;
+		rayTo += btScalar(x) * dHor;
+		rayTo -= btScalar(y) * dVert;
+		return rayTo;
+	}
+
+	bool PickBody(const btVector3& rayFromWorld, const btVector3& rayToWorld)
+	{
+		p("%f %f %f", rayFromWorld.getX(), rayFromWorld.getY(), rayFromWorld.getZ());
+		p("%f %f %f", rayToWorld.getX(), rayToWorld.getY(), rayToWorld.getZ());
+		btCollisionWorld::ClosestRayResultCallback rayCallback(rayFromWorld, rayToWorld);
+
+		rayCallback.m_flags |= btTriangleRaycastCallback::kF_UseGjkConvexCastRaytest;
+		dynamicsWorld->rayTest(rayFromWorld, rayToWorld, rayCallback);
+		if (rayCallback.hasHit())
+		{
+			btVector3 pickPos = rayCallback.m_hitPointWorld;
+			btRigidBody* body = (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
+			if (body)
+			{
+				//other exclusions?
+				if (!(body->isStaticObject() || body->isKinematicObject()))
+				{
+					//btVector3 p = rayFromWorld.lerp(rayToWorld, rayCallback.m_closestHitFraction);
+					//p("%f %f", p, p+rayCallback.m_hitNormalWorld);
+					m_pickedBody = body;
+					m_savedState = m_pickedBody->getActivationState();
+					m_pickedBody->setActivationState(DISABLE_DEACTIVATION);
+					printf("pickPos=%f,%f,%f\n",pickPos.getX(),pickPos.getY(),pickPos.getZ());
+					btVector3 localPivot = body->getCenterOfMassTransform().inverse() * pickPos;
+					btPoint2PointConstraint* p2p = new btPoint2PointConstraint(*body, localPivot);
+					dynamicsWorld->addConstraint(p2p, true);
+					m_pickedConstraint = p2p;
+					btScalar mousePickClamping = 30.f;
+					p2p->m_setting.m_impulseClamp = mousePickClamping;
+					//very weak constraint for picking
+					p2p->m_setting.m_tau = 0.001f;
+				}
+				printf("hit !\n");
+			}
+
+			//					pickObject(pickPos, rayCallback.m_collisionObject);
+			m_oldPickingPos = rayToWorld;
+			m_hitPos = pickPos;
+			m_oldPickingDist = (pickPos - rayFromWorld).length();
+			//p("%d", m_oldPickingDist);
+			//add p2p
+		}
+		return false;
+	}
+
+	bool MovePickedBody(const btVector3& rayFromWorld, const btVector3& rayToWorld)
+	{
+		if (m_pickedBody && m_pickedConstraint)
+		{
+			btPoint2PointConstraint* pickCon = static_cast<btPoint2PointConstraint*>(m_pickedConstraint);
+			if (pickCon)
+			{
+				//keep it at the same picking distance
+
+				btVector3 newPivotB;
+
+				btVector3 dir = rayToWorld - rayFromWorld;
+				dir.normalize();
+				dir *= m_oldPickingDist;
+
+				newPivotB = rayFromWorld + dir;
+				pickCon->setPivotB(newPivotB);
+				return true;
+			}
+		}
+		return false;
+	}
+
+void RemovePickingConstraint()
+{
+	if (m_pickedConstraint)
+		{
+			m_pickedBody->forceActivationState(m_savedState);
+			m_pickedBody->activate();
+			dynamicsWorld->removeConstraint(m_pickedConstraint);
+			delete m_pickedConstraint;
+			m_pickedConstraint = 0;
+			m_pickedBody = 0;
+		}
+}
 void InitPhysics()
 {
 	btAlignedAllocSetCustom((btAllocFunc*) Bt_alloc, (btFreeFunc*) Bt_free);
@@ -333,7 +474,7 @@ void InitPhysics()
 	solver = new btSequentialImpulseConstraintSolver();
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, 10, 0));
+	dynamicsWorld->setGravity(btVector3(0, 0, 0));
 }
 
 void StepPhysics()

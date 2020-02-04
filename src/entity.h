@@ -6,14 +6,11 @@
 #include "render.h"
 #include "fast_obj.h"
 
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
-#include <btBulletDynamicsCommon.h>
 #include <meshoptimizer.h>
 
 typedef struct cam_ent_t
 {
 	vec3_t pos;
-	vec3_t angles;
 	vec3_t front;
 	vec3_t up;
 	vec3_t right;
@@ -22,11 +19,12 @@ typedef struct cam_ent_t
 	float view[16];
 	float mvp[16];
 
-	float yaw      ;
-	float pitch    ;
-	float speed    ;
-	float sensitivity ;
-	float zoom        ;
+	float yaw;
+	float pitch;
+	float roll;
+	float speed;
+	float sensitivity;
+	float zoom;
 	float fovx;
 	float fovy;
 
@@ -42,6 +40,21 @@ typedef struct ui_ent_t
 	int buffer_size;
 	int buf_idx;
 } ui_ent_t;
+
+typedef struct basic_ent_t
+{
+	VkBuffer buffer[4];
+	VkDeviceSize buffer_offset[2];
+	uint32_t uniform_offset[2];
+	VkDescriptorSet dset[2];
+	unsigned char* vertex_data;
+	uint32_t* index_data;
+	UniformMatrix* mat;
+	uint32_t vertex_count;
+	uint32_t index_count;
+	size_t size;
+	uint8_t pidx;
+} basic_ent_t;
 
 typedef struct sky_ent_t
 {
@@ -97,5 +110,9 @@ void SetPosition(mesh_ent_t* copy, vec3_t pos);
 void InitPhysics();
 void StepPhysics();
 void SetupWorldPlane(float size);
+btVector3 GetRayTo(int x, int y);
+ bool PickBody(const btVector3& rayFromWorld, const btVector3& rayToWorld);
+ bool MovePickedBody(const btVector3& rayFromWorld, const btVector3& rayToWorld);
+void RemovePickingConstraint();
 } //namespace entity
 #endif

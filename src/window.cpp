@@ -197,6 +197,8 @@ void processInput()
 		}
 	}
 }
+btVector3 rayFrom;
+btVector3 rayTo;
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -230,6 +232,83 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	entity::UpdateCamera();
 
 	mu_input_mousemove(ctx, xm, ym);
+
+	//btVector3 rayTo = entity::GetRayTo(int(xm), int(ym));
+	//btVector3 rayFrom(cam.pos[0], cam.pos[1], cam.pos[2]);
+	//entity::MovePickedBody(rayFrom, rayTo);
+	float invview[16];
+	float invproj[16];
+	float invmvp[16];
+	float scrw_matrix[16];
+//	InvertMatrix(inv, cam.proj);
+//	vec4_t v;
+//	v[0] = xm_norm;
+//	v[1] = ym_norm;
+//	v[2] = -1.0f;
+//	v[3] = 1.0f;
+//	Vec4Xmat4(v, inv);
+//
+	InvertMatrix(invview, cam.view);
+	InvertMatrix(invproj, cam.proj);
+	InvertMatrix(invmvp, cam.mvp);
+	zone::Q_memcpy(scrw_matrix, invview, sizeof(float)*16);
+	MatrixMultiply(scrw_matrix, invproj);
+
+
+
+
+	//PrintMatrix(invview, "invview");
+	//PrintMatrix(invproj, "invproj");
+	//PrintMatrix(cam.view, "view");
+	//PrintMatrix(cam.proj, "proj");
+	//PrintMatrix(scrw_matrix, "comb");
+	//PrintMatrix(invmvp, "invmvp");
+
+
+	vec4_t v;
+	v[0] = xm_norm;
+	v[1] = ym_norm;
+	v[2] = -1.0f;
+	v[3] = 1.0f;
+	Vec4Xmat4(v, invmvp);
+
+
+	vec4_t e;
+	e[0] = xm_norm;
+	e[1] = ym_norm;
+	e[2] = 0.0f;
+	e[3] = 1.0f;
+	Vec4Xmat4(e, invmvp);
+
+	vec3_t out;
+	VectorSubtract(e, v, out);
+	VectorNormalize(out);
+
+	vec3_t oe;
+	oe[0] = v[0] + out[0]*1000;
+	oe[1] = v[1] + out[1]*1000;
+	oe[2] = v[2] + out[2]*1000;
+
+	//PrintVec4(oe);
+
+//
+//	v[2] = -1.0f;
+//	v[3] = 0.0f;
+//
+//	Vec4Xmat4(v, inv);
+//
+//	vec3_t res;
+//	res[0] = v[0];
+//	res[1] = v[1];
+//	res[2] = v[2];
+//	VectorNormalize(res);
+
+//	PrintVec3(res);
+	rayFrom = btVector3(v[0], v[1], v[2]);
+	rayTo = btVector3(oe[0],oe[1],oe[2]);
+//	rayFrom = btVector3(cam.pos[0], cam.pos[1], cam.pos[2]);
+//	rayTo = entity::GetRayTo(int(xm), int(ym));
+	entity::PickBody(rayFrom, rayTo);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -257,22 +336,11 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		else
 		{
 			mu_input_mousedown(ctx, xm, ym, 1);
-			p("%lf, %lf", xm_norm, ym_norm);
 			mesh_ent_t* m = entity::GetMesh("./res/kitty.obj", nullptr);
 			btTransform transform;
 			m->rigidBody->getMotionState()->getWorldTransform(transform);
 			btVector3 origin = transform.getOrigin();
-			p("%f %f", origin.getX(), origin.getY());
-			//float inv_mvp[16];
-			float pos[16];
-			//InvertMatrix(mvp, inv_mvp);
-			//TranslationMatrix(pos, origin.getX(), origin.getY(), origin.getZ());
-			//MatrixMultiply(pos, mvp);
-			//PrintMatrix(mvp);
-			//PrintMatrix(inv_mvp);
-			TranslationMatrix(pos, xm_norm, ym_norm, 0);
-			MatrixMultiply(pos, cam.mvp);
-			PrintMatrix(pos);
+
 		}
 		break;
 	case GLFW_RELEASE:
@@ -283,6 +351,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		else
 		{
 			mu_input_mouseup(ctx, xm, ym, 1);
+			entity::RemovePickingConstraint();
 		}
 		break;
 	}
@@ -313,6 +382,9 @@ void initWindow()
 
 static  char logbuf[64000];
 static   int logbuf_updated = 0;
+static char input_buf[128];
+static int submitted = 0;
+
 static void write_log(char *text)
 {
 	if(text[0])
@@ -332,6 +404,15 @@ static void write_log(char *text)
 		zone::Q_strcat(logbuf, "\n");
 	}
 }
+
+	void ConsoleCvarCheck()
+	{
+		if (submitted)
+			{
+				write_log(input_buf); //must be on main thread, because of callbacks.
+				input_buf[0] = '\0';
+			}
+	}
 
 static void console(mu_Context *ctx)
 {
@@ -362,19 +443,12 @@ static void console(mu_Context *ctx)
 		}
 
 		/* input textbox */
-		static char buf[128];
-		int submitted = 0;
 		int _width[] = { -1, -1 };
 		mu_layout_row(ctx, 2, _width, 0);
-		if (mu_textbox(ctx, buf, sizeof(buf)) & MU_RES_SUBMIT)
+		if (mu_textbox(ctx, input_buf, sizeof(input_buf)) & MU_RES_SUBMIT)
 		{
 			mu_set_focus(ctx, ctx->last_id);
 			submitted = 1;
-		}
-		if (submitted)
-		{
-			write_log(buf);
-			buf[0] = '\0';
 		}
 
 		mu_end_window(ctx);
@@ -547,25 +621,24 @@ void Main3DThread()
 
 		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
-		Perspective(cam.proj, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.1f, 100.0f); //projection matrix.
+		Perspective(cam.proj, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.01f, 1000.0f); //projection matrix.
 		entity::ViewMatrix(cam.view);
 		zone::Q_memcpy(cam.mvp, cam.proj, 16*sizeof(float));
 		MatrixMultiply(cam.mvp, cam.view);
 		vkCmdPushConstants(command_buffer, pipeline_layout[0], VK_SHADER_STAGE_VERTEX_BIT, 0, 16 * sizeof(float), &cam.mvp);
 
-		vec3_t p1;
-		p1[0] = 0;
-		p1[1] = 10.0f;
-		p1[2] = 0;
-		vec3_t p2;
-		p2[0] = 10.0f;
-		p2[1] = 10.0f;
-		p2[2] = 0;
+		draw::CameraVectors();
+		basic_ent_t line;
+		line.pidx = 4;
+		vec3_t to;
+		vec3_t from;
 		vec3_t col;
 		col[0] = 1.0f;
-		col[1] = 1.0f;
-		col[2] = 1.0f;
-		//draw::Line(p1, p2, col);
+		col[1] = 0.0f;
+		col[2] = 0.0f;
+		Btof(rayFrom, from);
+		Btof(rayTo, to);
+		draw::Line(from, to, col, line);
 		draw::Meshes();
 		draw::SkyDome();
 
@@ -739,6 +812,8 @@ inline uint8_t Draw()
 
 	control::BeginCommandBufferRecordingOperation(0, nullptr);
 
+	ConsoleCvarCheck();
+
 #ifdef DEBUG
 	vkCmdResetQueryPool(command_buffer, queryPool, 0, 128);
 	vkCmdWriteTimestamp(command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, queryPool, 0);
@@ -761,7 +836,6 @@ inline uint8_t Draw()
 
 	control::SetCommandBuffer(current_cmd_buffer_index);
 	vkCmdExecuteCommands(command_buffer, 2, &scommand_buffers[0]);
-
 	vkCmdEndRenderPass(command_buffer);
 
 	image_memory_barrier_before_present.image = handle_array_of_swapchain_images[image_index];
@@ -844,7 +918,7 @@ void mainLoop()
 			oldframecount = framecount;
 		}
 #ifdef DEBUG
-		if (realtime-stamp > 10.0)
+		if (realtime-stamp > 60.0)
 		{
 			std::thread (zone::MemPrint).detach();
 			stamp = realtime;

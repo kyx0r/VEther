@@ -31,6 +31,13 @@ vec3_t vec3_origin = {0,0,0};
 
 /*-----------------------------------------------------------------*/
 
+void Btof(btVector3 v, vec3_t p1)
+	{
+		p1[0] = v.getX();
+		p1[1] = v.getY();
+		p1[2] = v.getZ();
+	}
+
 static long seed;
 void InitRandSeed(long s)
 {
@@ -195,6 +202,11 @@ vec_t _DotProduct (vec3_t v1, vec3_t v2)
 	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
 }
 
+vec_t _DotProduct4 (vec4_t v1, vec4_t v2)
+{
+	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3];
+}
+
 void _VectorSubtract (vec3_t veca, vec3_t vecb, vec3_t out)
 {
 	out[0] = veca[0]-vecb[0];
@@ -269,14 +281,32 @@ int Q_log2(int val)
 	return answer;
 }
 
-void PrintMatrix(float matrix[16])
-{
-	printf("\n");
-	printf("Mat at row X %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 0, matrix[0], matrix[1], matrix[2], matrix[3]);
-	printf("Mat at row Y %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 1, matrix[4], matrix[5], matrix[6], matrix[7]);
-	printf("Mat at row Z %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 2, matrix[8], matrix[9], matrix[10], matrix[11]);
-	printf("Mat at row W %d: [ %.6f, %.6f, %.6f, %.6f ] \n", 3, matrix[12], matrix[13], matrix[14], matrix[15]);
+void PrintVec3(vec3_t v)
+	{
+			p("X:%f Y:%f Z:%f", v[0], v[1], v[2]);
+	}
 
+void PrintVec4(vec4_t v)
+	{
+			p("X:%f Y:%f Z:%f W:%f", v[0], v[1], v[2], v[3]);
+	}
+
+void PrintMatrix(float matrix[16], char* id)
+{
+	if(id)
+		{
+			p("--%s--", id);
+			p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 0, matrix[0], matrix[1], matrix[2], matrix[3]);
+			p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 1, matrix[4], matrix[5], matrix[6], matrix[7]);
+			p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 2, matrix[8], matrix[9], matrix[10], matrix[11]);
+			p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 3, matrix[12], matrix[13], matrix[14], matrix[15]);
+			return;
+		}
+	p("------");
+	p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 0, matrix[0], matrix[1], matrix[2], matrix[3]);
+	p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 1, matrix[4], matrix[5], matrix[6], matrix[7]);
+	p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 2, matrix[8], matrix[9], matrix[10], matrix[11]);
+	p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 3, matrix[12], matrix[13], matrix[14], matrix[15]);
 }
 
 void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f)
@@ -371,7 +401,6 @@ float CalcFovy (float fov_x, float width, float height)
 	return a;
 }
 
-
 void FrustumMatrix(float matrix[16], float fovx, float fovy)
 {
 	const float w = 1.0f / tanf(fovx * 0.5f);
@@ -401,32 +430,30 @@ void FrustumMatrix(float matrix[16], float fovx, float fovy)
 	matrix[3*4 + 2] = -(n * f) / (f - n);
 }
 
-void SetupMatrix(float view_projection_matrix[16])
+
+//another way to compute view_matrix, slower than lookat
+void WorldToCam(float view_matrix[16])
 {
-	// Projection matrix
-	float projection_matrix[16];
-	FrustumMatrix(projection_matrix, DEG2RAD(cam.fovx), DEG2RAD(cam.fovy));
-	// View matrix
 	float rotation_matrix[16];
-	float view_matrix[16];
 
 	RotationMatrix(view_matrix, -M_PI / 2.0f, 1.0f, 0.0f, 0.0f);
 	RotationMatrix(rotation_matrix,  M_PI / 2.0f, 0.0f, 0.0f, 1.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
-	RotationMatrix(rotation_matrix, DEG2RAD(-cam.angles[2]), 1.0f, 0.0f, 0.0f);
+	RotationMatrix(rotation_matrix, DEG2RAD(-cam.roll), 1.0f, 0.0f, 0.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
-	RotationMatrix(rotation_matrix, DEG2RAD(-cam.angles[0]), 0.0f, 1.0f, 0.0f);
+	RotationMatrix(rotation_matrix, DEG2RAD(-cam.pitch), 0.0f, 1.0f, 0.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
-	RotationMatrix(rotation_matrix, DEG2RAD(-cam.angles[1]), 0.0f, 0.0f, 1.0f);
+	RotationMatrix(rotation_matrix, DEG2RAD(-cam.yaw), 0.0f, 0.0f, 1.0f);
 	MatrixMultiply(view_matrix, rotation_matrix);
+
 
 	float translation_matrix[16];
-	TranslationMatrix(translation_matrix, cam.pos[0], cam.pos[1], cam.pos[2]);
+	memset(translation_matrix, 0, sizeof(translation_matrix));
+	TranslationMatrix(translation_matrix, -cam.pos[0], -cam.pos[1], -cam.pos[2]);
 	MatrixMultiply(view_matrix, translation_matrix);
 
-	// View projection matrix
-	memcpy(view_projection_matrix, projection_matrix, 16 * sizeof(float));
-	MatrixMultiply(view_projection_matrix, view_matrix);
+//	PrintMatrix(view_matrix);
+//	PrintMatrix(cam.view);
 }
 
 /*
@@ -606,6 +633,16 @@ void MatrixMultiply(float left[16], float right[16])
 	}
 }
 
+void Vec4Xmat4(vec4_t v, float m[16])
+	{
+		vec4_t copy;
+		zone::Q_memcpy(copy, v, sizeof(vec4_t));
+		v[0] = _DotProduct4(copy, &m[0]);
+		v[1] = _DotProduct4(copy, &m[4]);
+		v[2] = _DotProduct4(copy, &m[8]);
+		v[3] = _DotProduct4(copy, &m[12]);
+	}
+
 /*
 =============
 RotationMatrix
@@ -779,7 +816,7 @@ void IdentityMatrix(float matrix[16])
 	matrix[3*4 + 3] = 1.0f;
 }
 
-void InvertMatrix(float m[16], float invOut[16])
+void InvertMatrix(float invOut[16], float m[16])
 {
 	float inv[16], det;
 	int i;
@@ -897,7 +934,10 @@ void InvertMatrix(float m[16], float invOut[16])
 	          m[8] * m[2] * m[5];
 
 	det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
-	ASSERT(det != 0, "InverseMatrix failed!");
+	if(!det)
+		{
+			return;
+		}
 	det = 1.0 / det;
 
 	for (i = 0; i < 16; i++)

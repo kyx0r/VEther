@@ -3,7 +3,6 @@
 #include "textures.h"
 #include "atlas.h"
 #include "flog.h"
-#include "entity.h"
 
 /* {
 GVAR: logical_device -> startup.cpp
@@ -61,38 +60,34 @@ void Triangle(size_t size, float4_t* vertices)
 	vkCmdDraw(command_buffer, 3, 1, 0, 0);
 }
 
-void IndexedTriangle(size_t size, Vertex_* vertices, size_t index_count, uint32_t* index_array, uint8_t pidx)
+void IndexedTriangle(size_t size, Vertex_* vertices, uint32_t index_count, uint32_t* index_array, basic_ent_t& ent)
 {
-	static VkBuffer buffer[4];
-	static VkDeviceSize buffer_offset[2];
-	static VkDescriptorSet dset[2];
-	static uint32_t uniform_offset[2];
-	static unsigned char* data = nullptr;
-	static uint32_t* index_data;
-	static UniformMatrix* mat;
-	if(!data)
-	{
-		data = control::VertexBufferDigress(size, &buffer[0], &buffer_offset[0]);
-		index_data = (uint32_t*) control::IndexBufferDigress(index_count * sizeof(uint32_t), &buffer[1], &buffer_offset[1]);
-		mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &buffer[2], &uniform_offset[0], &dset[0], 0);
-	}
+	if(ent.size != size)
+		{
+			ent.vertex_data = control::VertexBufferDigress(size, &ent.buffer[0], &ent.buffer_offset[0]);
+			ent.index_data = (uint32_t*) control::IndexBufferDigress(index_count * sizeof(uint32_t), &ent.buffer[1], &ent.buffer_offset[1]);
+			ent.mat = (UniformMatrix*) control::UniformBufferDigress(sizeof(UniformMatrix), &ent.buffer[2], &ent.uniform_offset[0], &ent.dset[0], 0);
+		}
 
-	zone::Q_memcpy(data, &vertices[0], size);
-	vkCmdBindVertexBuffers(command_buffer, 0, 1, &buffer[0], &buffer_offset[0]);
+	ent.size = size;
 
-	zone::Q_memcpy(index_data, index_array, index_count * sizeof(uint32_t));
-	vkCmdBindIndexBuffer(command_buffer, buffer[1], buffer_offset[1], VK_INDEX_TYPE_UINT32);
+	zone::Q_memcpy(ent.vertex_data, &vertices[0], size);
+	vkCmdBindVertexBuffers(command_buffer, 0, 1, &ent.buffer[0], &ent.buffer_offset[0]);
 
-	IdentityMatrix(mat->proj);
-	IdentityMatrix(mat->model);
-	IdentityMatrix(mat->view);
+	zone::Q_memcpy(ent.index_data, index_array, index_count * sizeof(uint32_t));
+	vkCmdBindIndexBuffer(command_buffer, ent.buffer[1], ent.buffer_offset[1], VK_INDEX_TYPE_UINT32);
 
-	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[pidx]);
-	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &dset[0], 1, &uniform_offset[0]);
+	IdentityMatrix(ent.mat->proj);
+	IdentityMatrix(ent.mat->model);
+	IdentityMatrix(ent.mat->view);
+
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines[ent.pidx]);
+	vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 0, 1, &ent.dset[0], 1, &ent.uniform_offset[0]);
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 1, 1, &dset[1], 1, &uniform_offset[1]);
 	//vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout[0], 2, 1, &tex_descriptor_sets[0], 0, nullptr);
 	vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
+
 
 void Meshes()
 {
@@ -113,26 +108,75 @@ void Meshes()
 	}
 }
 
-void Line(vec3_t from, vec3_t to, vec3_t color)
+void Line(vec3_t from, vec3_t to, vec3_t color, basic_ent_t& ent)
 {
-	Vertex_ v[2];
+	Vertex_ v[3];
 	v[0].pos[0] = from[0];
 	v[0].pos[1] = from[1];
 	v[0].pos[2] = from[2];
 	v[1].pos[0] = to[0];
 	v[1].pos[1] = to[1];
 	v[1].pos[2] = to[2];
+	v[2].pos[0] = to[0];
+	v[2].pos[1] = to[1];
+	v[2].pos[2] = to[2];
 	v[0].color[0] = color[0];
 	v[0].color[1] = color[1];
 	v[0].color[2] = color[2];
 	v[1].color[0] = color[0];
 	v[1].color[1] = color[1];
 	v[1].color[2] = color[2];
-	uint32_t ib[2];
+	uint32_t ib[3];
 	ib[0] = 0;
 	ib[1] = 1;
-	IndexedTriangle(sizeof(v), &v[0], ARRAYSIZE(ib), &ib[0], 4);
+	ib[2] = 1;
+	IndexedTriangle(sizeof(v), &v[0], ARRAYSIZE(ib), &ib[0], ent);
 }
+
+void CameraVectors()
+	{
+
+		static basic_ent_t lines[4];
+		lines[0].pidx = 4;
+		lines[1].pidx = 4;
+		lines[2].pidx = 4;
+		lines[3].pidx = 4;
+		vec3_t p1;
+		p1[0] = 0;
+		p1[1] = 0;
+		p1[2] = 0;
+		vec3_t p2;
+		vec3_t col;
+		p2[0] = cam.front[0];
+		p2[1] = cam.front[1];
+		p2[2] = cam.front[2];
+		col[0] = 1.0f;
+		col[1] = 0.0f;
+		col[2] = 0.0f;
+		Line(p1, p2, col, lines[0]);
+		p2[0] = cam.up[0];
+		p2[1] = cam.up[1];
+		p2[2] = cam.up[2];
+		col[0] = 0.0f;
+		col[1] = 1.0f;
+		col[2] = 0.0f;
+		Line(p1, p2, col, lines[1]);
+		p2[0] = cam.right[0];
+		p2[1] = cam.right[1];
+		p2[2] = cam.right[2];
+		col[0] = 0.0f;
+		col[1] = 0.0f;
+		col[2] = 1.0f;
+		Line(p1, p2, col, lines[2]);
+		p2[0] = cam.pos[0];
+		p2[1] = cam.pos[1]+1.0f;
+		p2[2] = cam.pos[2];
+		col[0] = 1.0f;
+		col[1] = 1.0f;
+		col[2] = 1.0f;
+		Line(p1, p2, col, lines[3]);
+	}
+
 
 int r_get_text_width(const char *text, int len)
 {

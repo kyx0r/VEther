@@ -28,6 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <math.h>
 
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include <BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
+#include <btBulletDynamicsCommon.h>
+
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
@@ -88,6 +92,7 @@ static inline int IS_NAN (float x)
 
 #define DEG2RAD( a ) ( (a) * M_PI_DIV_180 )
 
+void Btof(btVector3 v, vec3_t p1);
 void InitRandSeed(long s);
 double NextRandDouble();
 double Drand(double min, double max);
@@ -112,10 +117,12 @@ int Q_log2(int val);
 void Perspective(float mat[16], float angle, float ratio, float near, float far);
 float AdaptFovx (float fov_x, float width, float height);
 float CalcFovy (float fov_x, float width, float height);
-void PrintMatrix(float matrix[16]);
+void PrintMatrix(float matrix[16], char* id = nullptr);
+void PrintVec4(vec4_t v);
+void PrintVec3(vec3_t v);
 void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f);
 void FrustumMatrix(float matrix[16], float fovx, float fovy);
-void SetupMatrix (float view_projection_matrix[16]);
+void WorldToCam(float view_matrix[16]);
 void R_ConcatRotations (float in1[3][3], float in2[3][3], float out[3][3]);
 void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4]);
 
@@ -128,11 +135,12 @@ void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 float	anglemod(float a);
 
 void MatrixMultiply(float left[16], float right[16]);
+void Vec4Xmat4(vec4_t v, float m[16]);
 void RotationMatrix(float matrix[16], float angle, float x, float y, float z);
 void TranslationMatrix(float matrix[16], float x, float y, float z);
 void ScaleMatrix(float matrix[16], float x, float y, float z);
 void IdentityMatrix(float matrix[16]);
-void InvertMatrix(float m[16], float invOut[16]);
+void InvertMatrix(float invOut[16], float m[16]);
 void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up);
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)	\
