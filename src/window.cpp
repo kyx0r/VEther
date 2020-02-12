@@ -47,6 +47,7 @@ double frametime = 0;
 double deltatime = 0;
 double lastfps = 0;
 double realtime = 0;
+float aspectRatio;
 mu_Context* ctx;
 //}
 
@@ -206,8 +207,13 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	static float lastY = window_width / 2.0f;
 //	printf("Xpos: %.6f \n", xpos);
 //	printf("Ypos: %.6f \n", ypos);
-	xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
-	ym_norm = (ypos - ((window_height - 0.001) / 2)) / ((window_height - 0.001) / 2);
+	//xm_norm = (xpos - ((window_width - 0.001) / 2)) / ((window_width - 0.001) / 2);
+	//ym_norm = (ypos - ((window_height - 0.001) / 2)) / ((window_height - 0.001) / 2);
+	xm_norm = ((float)xpos/(float)window_width  - 0.5f) * 2.0f;
+	ym_norm = ((float)ypos/(float)window_height - 0.5f) * 2.0f;
+
+	//p("%f", ((xm_norm / 2.0f) * window_width) + (0.5f * window_width));
+
 	xm = (int32_t)xpos;
 	ym = (int32_t)ypos;
 //	p("Xpos: %d", xm);
@@ -224,6 +230,9 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	cam.yaw   += xoffset;
 	cam.pitch -= yoffset;
 
+//p("%f", cam.pitch);
+//p("%f", cam.yaw);
+
 	// Make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (cam.pitch > 89.0f)
 		cam.pitch = 89.0f;
@@ -236,79 +245,6 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	//btVector3 rayTo = entity::GetRayTo(int(xm), int(ym));
 	//btVector3 rayFrom(cam.pos[0], cam.pos[1], cam.pos[2]);
 	//entity::MovePickedBody(rayFrom, rayTo);
-	float invview[16];
-	float invproj[16];
-	float invmvp[16];
-	float scrw_matrix[16];
-//	InvertMatrix(inv, cam.proj);
-//	vec4_t v;
-//	v[0] = xm_norm;
-//	v[1] = ym_norm;
-//	v[2] = -1.0f;
-//	v[3] = 1.0f;
-//	Vec4Xmat4(v, inv);
-//
-	InvertMatrix(invview, cam.view);
-	InvertMatrix(invproj, cam.proj);
-	InvertMatrix(invmvp, cam.mvp);
-	zone::Q_memcpy(scrw_matrix, invview, sizeof(float)*16);
-	MatrixMultiply(scrw_matrix, invproj);
-
-
-
-
-	//PrintMatrix(invview, "invview");
-	//PrintMatrix(invproj, "invproj");
-	//PrintMatrix(cam.view, "view");
-	//PrintMatrix(cam.proj, "proj");
-	//PrintMatrix(scrw_matrix, "comb");
-	//PrintMatrix(invmvp, "invmvp");
-
-
-	vec4_t v;
-	v[0] = xm_norm;
-	v[1] = ym_norm;
-	v[2] = -1.0f;
-	v[3] = 1.0f;
-	Vec4Xmat4(v, invmvp);
-
-
-	vec4_t e;
-	e[0] = xm_norm;
-	e[1] = ym_norm;
-	e[2] = 0.0f;
-	e[3] = 1.0f;
-	Vec4Xmat4(e, invmvp);
-
-	vec3_t out;
-	VectorSubtract(e, v, out);
-	VectorNormalize(out);
-
-	vec3_t oe;
-	oe[0] = v[0] + out[0]*1000;
-	oe[1] = v[1] + out[1]*1000;
-	oe[2] = v[2] + out[2]*1000;
-
-	//PrintVec4(oe);
-
-//
-//	v[2] = -1.0f;
-//	v[3] = 0.0f;
-//
-//	Vec4Xmat4(v, inv);
-//
-//	vec3_t res;
-//	res[0] = v[0];
-//	res[1] = v[1];
-//	res[2] = v[2];
-//	VectorNormalize(res);
-
-//	PrintVec3(res);
-	rayFrom = btVector3(v[0], v[1], v[2]);
-	rayTo = btVector3(oe[0],oe[1],oe[2]);
-//	rayFrom = btVector3(cam.pos[0], cam.pos[1], cam.pos[2]);
-//	rayTo = entity::GetRayTo(int(xm), int(ym));
-	entity::PickBody(rayFrom, rayTo);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -341,6 +277,93 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			m->rigidBody->getMotionState()->getWorldTransform(transform);
 			btVector3 origin = transform.getOrigin();
 
+			float invview[16];
+			float invproj[16];
+			float invmvp[16];
+			float scrw_matrix[16];
+			//	InvertMatrix(inv, cam.proj);
+			//	vec4_t v;
+			//	v[0] = xm_norm;
+			//	v[1] = ym_norm;
+			//	v[2] = -1.0f;
+			//	v[3] = 1.0f;
+			//	Vec4Xmat4(v, inv);
+			//
+			InvertMatrix(invview, cam.view);
+			InvertMatrix(invproj, cam.proj);
+			InvertMatrix(invmvp, cam.mvp);
+			zone::Q_memcpy(scrw_matrix, invview, sizeof(float)*16);
+			MatrixMultiply(scrw_matrix, invproj);
+
+
+
+
+			//PrintMatrix(invview, "invview");
+			//PrintMatrix(invproj, "invproj");
+			//PrintMatrix(cam.view, "view");
+			//PrintMatrix(cam.proj, "proj");
+			//PrintMatrix(scrw_matrix, "comb");
+			//PrintMatrix(invmvp, "invmvp");
+
+//			vec4_t near;
+//			near[0] = xm_norm;
+//			near[1] = ym_norm;
+//			near[2] = -1.0f;
+//			near[3] = 1.0f;
+//
+//
+//			vec4_t far;
+//			far[0] = xm_norm;
+//			far[1] = ym_norm;
+//			far[2] = 0.0f;
+//			far[3] = 1.0f;
+//
+//			Vec4Xmat4(near, invmvp);
+//			Vec4Xmat4(far, invmvp);
+//
+//			PrintVec3(near);
+//			PrintVec3(far);
+//
+//			vec3_t dir;
+//			dir[0] = far[0] - near[0];
+//			dir[1] = far[1] - near[1];
+//			dir[2] = far[2] - near[2];
+//
+//			VectorNormalize(dir);
+
+	//		vec4_t r;
+	//		r[0] = clip[0] - cam.pos[0];
+	//		r[1] = clip[1] - cam.pos[1];
+	//		r[2] = clip[2] - cam.pos[2];
+
+			rayFrom = btVector3(cam.pos[0], cam.pos[1], cam.pos[2]);
+			//rayTo = btVector3(near[0]+(dir[0]*1000), near[1]+(dir[1]*1000), near[2]+(dir[2]*1000));
+			//rayFrom = btVector3(clip[0]+cam.pos[0], clip[1]+cam.pos[1], clip[2]+cam.pos[2]);
+
+
+vec4_t fo;
+
+fo[0] = 0;
+ fo[1] = 0;
+ fo[2] = 0;
+fo[3] = 1;
+
+ WorldToScreen(fo);
+
+ PrintVec3(fo);
+
+			vec3_t f;
+			if(cam.pitch < 0)
+				{
+					f[0] = cos(DEG2RAD(cam.yaw)) * cos(DEG2RAD(-89.0 - cam.pitch));
+					f[1] = sin(DEG2RAD(-89.0f - cam.pitch));
+					f[2] = sin(DEG2RAD(cam.yaw)) * cos(DEG2RAD(-89.0f - cam.pitch));
+				}
+			//rayTo = btVector3(cam.front[0]*100, cam.front[1]*100, cam.front[2]*100);
+			//rayTo = btVector3(0,0,0);
+			rayTo = btVector3(f[0]*100, f[1]*100, f[2]*100);
+			//rayTo = entity::GetRayTo(int(xm), int(ym));
+			entity::PickBody(rayFrom, rayTo);
 		}
 		break;
 	case GLFW_RELEASE:
@@ -621,7 +644,8 @@ void Main3DThread()
 
 		vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 		vkCmdSetScissor(command_buffer, 0, 1, &scissor);
-		Perspective(cam.proj, DEG2RAD(cam.zoom), float(window_width) / float(window_height), 0.01f, 1000.0f); //projection matrix.
+		aspectRatio = float(window_width) / float(window_height),
+		Perspective(cam.proj, DEG2RAD(cam.zoom), aspectRatio, 0.01f, 1000.0f); //projection matrix.
 		entity::ViewMatrix(cam.view);
 		zone::Q_memcpy(cam.mvp, cam.proj, 16*sizeof(float));
 		MatrixMultiply(cam.mvp, cam.view);
@@ -639,7 +663,7 @@ void Main3DThread()
 		Btof(rayFrom, from);
 		Btof(rayTo, to);
 		draw::Line(from, to, col, line);
-		draw::Meshes();
+		//draw::Meshes();
 		draw::SkyDome();
 
 		VK_CHECK(vkEndCommandBuffer(command_buffer));
@@ -681,7 +705,7 @@ void PreDraw()
 	entity::InitCamera();
 	entity::InitPhysics();
 	entity::InitMeshes();
-	entity::SetupWorldPlane(50.0f);
+	//entity::SetupWorldPlane(50.0f);
 
 	for(int i = 0; i<10; i++)
 	{

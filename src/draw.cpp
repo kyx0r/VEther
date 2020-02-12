@@ -136,11 +136,16 @@ void Line(vec3_t from, vec3_t to, vec3_t color, basic_ent_t& ent)
 void CameraVectors()
 	{
 
-		static basic_ent_t lines[4];
+		static basic_ent_t lines[9];
 		lines[0].pidx = 4;
 		lines[1].pidx = 4;
 		lines[2].pidx = 4;
 		lines[3].pidx = 4;
+		lines[4].pidx = 4;
+		lines[5].pidx = 4;
+		lines[6].pidx = 4;
+		lines[7].pidx = 4;
+		lines[8].pidx = 4;
 		vec3_t p1;
 		p1[0] = 0;
 		p1[1] = 0;
@@ -168,13 +173,56 @@ void CameraVectors()
 		col[1] = 0.0f;
 		col[2] = 1.0f;
 		Line(p1, p2, col, lines[2]);
-		p2[0] = cam.pos[0];
-		p2[1] = cam.pos[1]+1.0f;
-		p2[2] = cam.pos[2];
-		col[0] = 1.0f;
-		col[1] = 1.0f;
-		col[2] = 1.0f;
+
+		//static coordinate system
+		//positive y is down
+		p2[0] = 100.0f;
+		p2[1] = 0;
+		p2[2] = 0;
+		col[0] = 0.8f;
+		col[1] = 0.8f;
+		col[2] = 0.8f;
 		Line(p1, p2, col, lines[3]);
+
+		p2[0] = 0;
+		p2[1] = 100.0f;
+		p2[2] = 0;
+		col[0] = 0.8f;
+		col[1] = 0.8f;
+		col[2] = 0.8f;
+		Line(p1, p2, col, lines[4]);
+
+		p2[0] = 0;
+		p2[1] = 0;
+		p2[2] = 100.0f;
+		col[0] = 0.8f;
+		col[1] = 0.8f;
+		col[2] = 0.8f;
+		Line(p1, p2, col, lines[5]);
+
+		p2[0] = -100.0f;
+		p2[1] = 0;
+		p2[2] = 0;
+		col[0] = 0.8f;
+		col[1] = 0.8f;
+		col[2] = 0.8f;
+		Line(p1, p2, col, lines[6]);
+
+		p2[0] = 0;
+		p2[1] = -100.0f;
+		p2[2] = 0;
+		col[0] = 0.8f;
+		col[1] = 0.8f;
+		col[2] = 0.8f;
+		Line(p1, p2, col, lines[7]);
+
+		p2[0] = 0;
+		p2[1] = 0;
+		p2[2] = -100.0f;
+		col[0] = 0.8f;
+		col[1] = 0.8f;
+		col[2] = 0.8f;
+		Line(p1, p2, col, lines[8]);
 	}
 
 

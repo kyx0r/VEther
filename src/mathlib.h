@@ -114,6 +114,7 @@ void VectorInverse (vec3_t v);
 void VectorScale (vec3_t in, vec_t scale, vec3_t out);
 int Q_log2(int val);
 
+void WorldToScreen(vec4_t worldp);
 void Perspective(float mat[16], float angle, float ratio, float near, float far);
 float AdaptFovx (float fov_x, float width, float height);
 float CalcFovy (float fov_x, float width, float height);
@@ -123,8 +124,6 @@ void PrintVec3(vec3_t v);
 void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f);
 void FrustumMatrix(float matrix[16], float fovx, float fovy);
 void WorldToCam(float view_matrix[16]);
-void R_ConcatRotations (float in1[3][3], float in2[3][3], float out[3][3]);
-void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4]);
 
 void FloorDivMod (double numer, double denom, int *quotient,
                   int *rem);

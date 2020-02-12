@@ -309,6 +309,26 @@ void PrintMatrix(float matrix[16], char* id)
 	p("Row %d: [ %.6f, %.6f, %.6f, %.6f ]", 3, matrix[12], matrix[13], matrix[14], matrix[15]);
 }
 
+//if W is zero, you have a problem, so you should check that beforehand. If it is zero, then that means that the object is in the plane of projection
+
+void WorldToScreen(vec4_t worldp)
+	{
+		Vec4Xmat4(worldp, cam.mvp);
+		if(worldp[3] != 0)
+			{
+				worldp[0] /= worldp[3];
+				worldp[1] /= worldp[3];
+				worldp[2] /= worldp[3];
+			}
+		worldp[0] = ((worldp[0] / 2.0f) * window_width) + (0.5f * window_width);
+		worldp[1] = ((worldp[1] / 2.0f) * window_height) + (0.5f * window_height);
+		worldp[2] = 0;
+
+		worldp[0] = CLAMP(0, worldp[0], window_width);
+		worldp[1] = CLAMP(0, worldp[1], window_height);
+
+	}
+
 void OrthoMatrix(float matrix[16], float left, float right, float bottom, float top, float n, float f)
 {
 	float tx = -(right + left) / (right - left);
@@ -457,68 +477,6 @@ void WorldToCam(float view_matrix[16])
 }
 
 /*
-================
-R_ConcatRotations
-================
-*/
-void R_ConcatRotations (float in1[3][3], float in2[3][3], float out[3][3])
-{
-	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
-	            in1[0][2] * in2[2][0];
-	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] +
-	            in1[0][2] * in2[2][1];
-	out[0][2] = in1[0][0] * in2[0][2] + in1[0][1] * in2[1][2] +
-	            in1[0][2] * in2[2][2];
-	out[1][0] = in1[1][0] * in2[0][0] + in1[1][1] * in2[1][0] +
-	            in1[1][2] * in2[2][0];
-	out[1][1] = in1[1][0] * in2[0][1] + in1[1][1] * in2[1][1] +
-	            in1[1][2] * in2[2][1];
-	out[1][2] = in1[1][0] * in2[0][2] + in1[1][1] * in2[1][2] +
-	            in1[1][2] * in2[2][2];
-	out[2][0] = in1[2][0] * in2[0][0] + in1[2][1] * in2[1][0] +
-	            in1[2][2] * in2[2][0];
-	out[2][1] = in1[2][0] * in2[0][1] + in1[2][1] * in2[1][1] +
-	            in1[2][2] * in2[2][1];
-	out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] +
-	            in1[2][2] * in2[2][2];
-}
-
-
-/*
-================
-R_ConcatTransforms
-================
-*/
-void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4])
-{
-	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
-	            in1[0][2] * in2[2][0];
-	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] +
-	            in1[0][2] * in2[2][1];
-	out[0][2] = in1[0][0] * in2[0][2] + in1[0][1] * in2[1][2] +
-	            in1[0][2] * in2[2][2];
-	out[0][3] = in1[0][0] * in2[0][3] + in1[0][1] * in2[1][3] +
-	            in1[0][2] * in2[2][3] + in1[0][3];
-	out[1][0] = in1[1][0] * in2[0][0] + in1[1][1] * in2[1][0] +
-	            in1[1][2] * in2[2][0];
-	out[1][1] = in1[1][0] * in2[0][1] + in1[1][1] * in2[1][1] +
-	            in1[1][2] * in2[2][1];
-	out[1][2] = in1[1][0] * in2[0][2] + in1[1][1] * in2[1][2] +
-	            in1[1][2] * in2[2][2];
-	out[1][3] = in1[1][0] * in2[0][3] + in1[1][1] * in2[1][3] +
-	            in1[1][2] * in2[2][3] + in1[1][3];
-	out[2][0] = in1[2][0] * in2[0][0] + in1[2][1] * in2[1][0] +
-	            in1[2][2] * in2[2][0];
-	out[2][1] = in1[2][0] * in2[0][1] + in1[2][1] * in2[1][1] +
-	            in1[2][2] * in2[2][1];
-	out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] +
-	            in1[2][2] * in2[2][2];
-	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] +
-	            in1[2][2] * in2[2][3] + in1[2][3];
-}
-
-
-/*
 ===================
 FloorDivMod
 
@@ -528,8 +486,7 @@ quotient must fit in 32 bits.
 ====================
 */
 
-void FloorDivMod (double numer, double denom, int *quotient,
-                  int *rem)
+void FloorDivMod (double numer, double denom, int *quotient, int *rem)
 {
 	int		q, r;
 	double	x;
@@ -636,11 +593,11 @@ void MatrixMultiply(float left[16], float right[16])
 void Vec4Xmat4(vec4_t v, float m[16])
 	{
 		vec4_t copy;
-		zone::Q_memcpy(copy, v, sizeof(vec4_t));
-		v[0] = _DotProduct4(copy, &m[0]);
-		v[1] = _DotProduct4(copy, &m[4]);
-		v[2] = _DotProduct4(copy, &m[8]);
-		v[3] = _DotProduct4(copy, &m[12]);
+		zone::Q_memcpy(copy, v, 4*sizeof(float));
+		v[0] = copy[0]*m[0] + copy[1]*m[4] + copy[2]*m[8] + copy[3]*m[12];
+		v[1] = copy[0]*m[1] + copy[1]*m[5] + copy[2]*m[9] + copy[3]*m[13];
+		v[2] = copy[0]*m[2] + copy[1]*m[6] + copy[2]*m[10] + copy[3]*m[14];
+		v[3] = copy[0]*m[3] + copy[1]*m[7] + copy[2]*m[11] + copy[3]*m[15];
 	}
 
 /*
@@ -709,6 +666,12 @@ void TranslateInPlace(float matrix[16], float x, float y, float z)
 		matrix[3*4 + i] += vec4_mul_inner(r, t);
 	}
 }
+
+//uses colum major format
+//[cam_right.x,    cam_right.y,    cam_right.z,     0]
+//[cam_up.x,       cam_up.y,       cam_up.z,        0]
+//[cam_forward.x,  cam_forward.y,  cam_forward.z,   0]
+//[cam_position.x, cam_position.y, cam_position.z,  1]
 
 void LookAt(float matrix[16], vec3_t eye, vec3_t center, vec3_t up)
 {
@@ -936,6 +899,7 @@ void InvertMatrix(float invOut[16], float m[16])
 	det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 	if(!det)
 		{
+			warn("Invalid InvertMatrix");
 			return;
 		}
 	det = 1.0 / det;

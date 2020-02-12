@@ -57,7 +57,7 @@ void InitCamera()
 	cam.fovx = AdaptFovx(90.0f, window_width, window_height);
 	cam.fovy = CalcFovy(cam.fovx, window_width, window_height);
 
-	cam.pos[0] = -4.0f;
+	cam.pos[0] = 0.0f;
 	cam.pos[1] = 0.0f;
 	cam.pos[2] = 0.0f;
 	cam.front[0] = 0.0f;
@@ -66,7 +66,7 @@ void InitCamera()
 	cam.worldup[0] = 0.0f;
 	cam.worldup[1] = 1.0f;
 	cam.worldup[2] = 0.0f;
-	cam.yaw = 90.0f;
+	cam.yaw = 0.0f;
 	cam.pitch = 0.0f;
 	cam.speed = 10.f;
 	cam.sensitivity = 0.1f;
@@ -343,13 +343,12 @@ void MoveTo(char* name, vec3_t pos)
 
 		btVector3 rayFrom = camPos;
 		btVector3 rayForward = (camTarget - camPos);
-		rayForward.normalize();
 		float farPlane = 10000.f;
 		rayForward *= farPlane;
 
 		btVector3 rightOffset;
 		btVector3 cameraUp = btVector3(0, 0, 0);
-		cameraUp[1] = 1;
+		cameraUp[1] = -1;
 
 		btVector3 vertical = cameraUp;
 
@@ -384,8 +383,8 @@ void MoveTo(char* name, vec3_t pos)
 
 	bool PickBody(const btVector3& rayFromWorld, const btVector3& rayToWorld)
 	{
-		p("%f %f %f", rayFromWorld.getX(), rayFromWorld.getY(), rayFromWorld.getZ());
-		p("%f %f %f", rayToWorld.getX(), rayToWorld.getY(), rayToWorld.getZ());
+		p("From %f %f %f", rayFromWorld.getX(), rayFromWorld.getY(), rayFromWorld.getZ());
+		p("To %f %f %f", rayToWorld.getX(), rayToWorld.getY(), rayToWorld.getZ());
 		btCollisionWorld::ClosestRayResultCallback rayCallback(rayFromWorld, rayToWorld);
 
 		rayCallback.m_flags |= btTriangleRaycastCallback::kF_UseGjkConvexCastRaytest;
